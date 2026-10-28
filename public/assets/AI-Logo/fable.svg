@@ -1,0 +1,11 @@
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fableGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+  <path d="M12 2L21 8.5V15.5L12 22L3 15.5V8.5L12 2Z" fill="url(#fableGrad)"/>
+  <path d="M12 6L17 10V14L12 18L7 14V10L12 6Z" fill="#FFFFFF" fill-opacity="0.9"/>
+  <path d="M12 9L14.5 11V13L12 15L9.5 13V11L12 9Z" fill="#6D28D9"/>
+</svg>
