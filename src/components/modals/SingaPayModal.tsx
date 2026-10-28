@@ -22,11 +22,15 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedVa, setCopiedVa] = useState(false);
   const [copiedAmount, setCopiedAmount] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "simulated" | "error">("idle");
+  const [emailMessage, setEmailMessage] = useState("");
 
   const handleClose = () => {
     setStep("checkout");
     setApiKeyGenerated("");
     setTimeLeft(15 * 60);
+    setEmailStatus("idle");
+    setEmailMessage("");
     onClose();
   };
 
@@ -53,10 +57,48 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
     setStep("payment");
   };
 
+  const triggerSendReceipt = async (key: string) => {
+    if (!pkg || !customerEmail) return;
+    setEmailStatus("sending");
+    const currentM = paymentMethods.find((m) => m.id === selectedMethod) || paymentMethods[0];
+    try {
+      const res = await fetch("/api/send-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName,
+          customerEmail,
+          packageName: pkg.name,
+          priceIdr: pkg.priceIdr + (currentM.feeAmount ?? 0),
+          paymentMethod: currentM.name,
+          apiKey: key,
+          gatewayUrl: GATEWAY_BASE_URL,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.simulated) {
+          setEmailStatus("simulated");
+          setEmailMessage(data.message || `Mode simulasi: email siap dikirim ke ${customerEmail}`);
+        } else {
+          setEmailStatus("sent");
+          setEmailMessage(`Bukti pembayaran & API Key telah dikirim ke ${customerEmail}`);
+        }
+      } else {
+        setEmailStatus("error");
+        setEmailMessage(data.error || "Gagal mengirim email tanda terima.");
+      }
+    } catch {
+      setEmailStatus("error");
+      setEmailMessage("Gagal terhubung ke layanan pengiriman email.");
+    }
+  };
+
   const handleSimulateSuccess = () => {
     const randomKey = `jt-live-${Math.random().toString(36).substring(2, 10)}${Math.random().toString(36).substring(2, 10)}`;
     setApiKeyGenerated(randomKey);
     setStep("success");
+    triggerSendReceipt(randomKey);
   };
 
   const copyToClipboard = async (text: string, type: "key" | "url" | "va" | "amount") => {
@@ -333,7 +375,10 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
           )}
 
           <div className="simulation-control">
-            <p className="sim-text">⚡ Lingkungan Demo SingaPay: Klik tombol di bawah untuk menyimulasikan pembayaran berhasil.</p>
+            <p className="sim-text">
+              <Icon name="bolt" size={13} style={{ marginRight: "4px", color: "var(--blue)" }} />
+              Lingkungan Demo SingaPay: Klik tombol di bawah untuk menyimulasikan pembayaran berhasil.
+            </p>
             <button type="button" className="button-accent full" onClick={handleSimulateSuccess}>
               Simulasikan Pembayaran Berhasil
             </button>
@@ -351,6 +396,42 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
           <p className="success-desc">
             Paket <b>{pkg.name}</b> telah aktif. Kredensial telah diterbitkan dan tidak pernah kedaluwarsa.
           </p>
+
+          {/* Email Delivery Confirmation Card */}
+          <div className={`email-status-card status-${emailStatus}`}>
+            <div className="esc-header">
+              <span className="esc-icon" aria-hidden="true">
+                {emailStatus === "sending" && <span className="esc-spinner" />}
+                {emailStatus === "sent" && <Icon name="check" size={15} />}
+                {emailStatus === "simulated" && <Icon name="info" size={15} />}
+                {emailStatus === "error" && <Icon name="alert" size={15} />}
+                {emailStatus === "idle" && <Icon name="info" size={15} />}
+              </span>
+              <div className="esc-text">
+                <strong>
+                  {emailStatus === "sending" && "Mengirimkan bukti pembayaran & API Key ke email..."}
+                  {emailStatus === "sent" && "Bukti Bayar & API Key Terkirim via Gmail"}
+                  {emailStatus === "simulated" && "Sistem Email Terhubung (Mode Simulasi)"}
+                  {emailStatus === "error" && "Kendala Pengiriman Email"}
+                  {emailStatus === "idle" && "Email Pengiriman Bukti Pembayaran"}
+                </strong>
+                <p>
+                  {emailMessage || (
+                    <>Bukti transaksi resmi dan kredensial API Key dikirimkan ke <b>{customerEmail}</b>.</>
+                  )}
+                </p>
+              </div>
+            </div>
+            {emailStatus === "error" && (
+              <button
+                type="button"
+                className="esc-retry-btn"
+                onClick={() => triggerSendReceipt(apiKeyGenerated)}
+              >
+                Kirim Ulang
+              </button>
+            )}
+          </div>
 
           <div className="credential-card">
             <div className="cred-field">
@@ -385,10 +466,35 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
           <div className="quick-start-box">
             <h4>Bisa langsung dicolok ke:</h4>
             <ul>
+              <li><b>Web Chatbox:</b> Buka <a href="https://web.chatboxai.app/" target="_blank" rel="noopener noreferrer" style={{ color: "var(--blue)", fontWeight: 700 }}>web.chatboxai.app ↗</a> <i>(bukan chat-box.ai)</i></li>
+              <li><b>NextChat Web:</b> Buka <a href="https://app.nextchat.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "var(--blue)", fontWeight: 700 }}>app.nextchat.dev ↗</a></li>
               <li><b>Claude Code CLI:</b> <code>$env:ANTHROPIC_API_KEY=&quot;{apiKeyGenerated}&quot;</code></li>
               <li><b>Cursor AI:</b> Masukkan di <i>Settings &gt; Models &gt; Custom API Key</i></li>
-              <li><b>Chatbox (HP/PC):</b> Masukkan base URL &amp; API key, bisa langsung chat santai</li>
             </ul>
+            <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+              <a
+                href="https://web.chatboxai.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-primary-sm"
+                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "6px 12px", gap: "5px" }}
+              >
+                <Icon name="globe" size={13} />
+                <span>Buka Web Chatbox</span>
+                <Icon name="external" size={11} />
+              </a>
+              <a
+                href="https://app.nextchat.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-primary-sm"
+                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "6px 12px", background: "#f0f6fc", color: "var(--blue)", border: "1px solid #c8dcf4", gap: "5px" }}
+              >
+                <Icon name="globe" size={13} />
+                <span>Buka NextChat</span>
+                <Icon name="external" size={11} />
+              </a>
+            </div>
           </div>
 
           <button type="button" className="button-primary full" onClick={handleClose}>

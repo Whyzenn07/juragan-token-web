@@ -347,8 +347,8 @@ export const compatibleApps = (m: ModelItem): string[] => {
 };
 
 const modelById = (id: string) => modelsCatalog.find((m) => m.id === id) as ModelItem;
-const answersFor = (id: string, budget: number) =>
-  `≈ ${new Intl.NumberFormat("id-ID").format(unitsForBudget(modelById(id), budget))} jawaban ${modelById(id).name}`;
+const answersFor = (id: string, budget: number, shortModelName: string) =>
+  `±${new Intl.NumberFormat("id-ID").format(unitsForBudget(modelById(id), budget))} Interaksi · ${shortModelName}`;
 
 // Paket Retail Khusus Mahasiswa & Retail (Top-up Nominal Ramah Uang Saku)
 export const retailPackages: RetailPackage[] = [
@@ -356,9 +356,9 @@ export const retailPackages: RetailPackage[] = [
     id: "pkt-mhs-uji",
     name: "Paket Coba-Coba",
     subtitle: "Uang saku ramah kantong",
-    targetUser: "Mahasiswa / Pemula yang baru mau coba API",
+    targetUser: "Pemula",
     priceIdr: 15000,
-    estToken: answersFor("deepseek-v4-flash", 15000),
+    estToken: answersFor("deepseek-v4-flash", 15000, "DeepSeek"),
     description: "Cukup untuk ratusan pertanyaan tugas, terjemahan jurnal bahasa Inggris, dan chat harian di HP.",
     popularFor: ["Tugas Kuliah", "Chatbox di HP", "Terjemah Jurnal"],
     recommendedModel: "DeepSeek V4 Flash / Gemini 3.8 Flash",
@@ -368,34 +368,34 @@ export const retailPackages: RetailPackage[] = [
     id: "pkt-mhs-starter",
     name: "Paket Starter Kuliah",
     subtitle: "Pilihan paling hemat bulanan",
-    targetUser: "Mahasiswa aktif untuk tugas & riset mingguan",
+    targetUser: "Mahasiswa",
     priceIdr: 29000,
-    estToken: answersFor("gemini-3.8-flash", 29000),
+    estToken: answersFor("gemini-3.8-flash", 29000, "Gemini"),
     description: "Saldo fleksibel untuk tanya jawab intensif, bedah tugas presentasi, dan ringkas materi PDF perkuliahan.",
     popularFor: ["Review Jurnal PDF", "Bantuan Resume", "Chatbot Harian"],
     recommendedModel: "Gemini 3.8 Flash / Kimi K2.7 Code",
-    badge: "Favorit Mahasiswa",
+    badge: "Favorit",
     featured: true
   },
   {
     id: "pkt-skripsi-koding",
     name: "Paket Skripsi & Koding",
     subtitle: "Kekuatan ganda riset & debug",
-    targetUser: "Mahasiswa tingkat akhir & developer pemula",
+    targetUser: "Skripsi",
     priceIdr: 69000,
-    estToken: answersFor("claude-sonnet-5-5", 69000),
-    description: "Rangkum puluhan jurnal dengan Gemini 3.1 Pro, lalu kerjakan kode praktikum dengan Claude Sonnet atau Kimi Code.",
+    estToken: answersFor("claude-sonnet-5-5", 69000, "Claude"),
+    description: "Rangkum puluhan jurnal dengan Gemini 3.1 Pro, lalu kerjakan kode praktikum dengan Claude Sonnet.",
     popularFor: ["Skripsi Bab 1-5", "Debug Error Coding", "Cursor & VS Code"],
     recommendedModel: "Claude Sonnet 5.5 / Gemini 3.1 Pro / Kimi K2.7 Code",
-    badge: "Paling Bernilai"
+    badge: "Best Value"
   },
   {
     id: "pkt-pro-builder",
     name: "Paket Pro Builder",
     subtitle: "Spesialis Claude Code & Cursor",
-    targetUser: "Freelancer, developer solo, & tech builder",
+    targetUser: "Developer",
     priceIdr: 149000,
-    estToken: answersFor("claude-sonnet-5-5", 149000),
+    estToken: answersFor("claude-sonnet-5-5", 149000, "Claude"),
     description: "Saldo besar untuk pairing coding di terminal Claude Code tanpa kartu kredit dan tanpa langganan bulanan.",
     popularFor: ["Claude Code CLI", "Alternatif Cursor Pro", "Sprint Proyek Klien"],
     recommendedModel: "Claude Sonnet 5.5 / Claude Opus 5.5 / GPT-6 Sol",
@@ -403,7 +403,7 @@ export const retailPackages: RetailPackage[] = [
   }
 ];
 
-export const paymentMethods = [
+export const paymentMethods: PaymentMethod[] = [
   { id: "qris", name: "QRIS SingaPay (Instan)", fee: "Gratis Biaya Admin", feeAmount: 0, provider: "BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, Dana", speed: "1 Detik Verifikasi" },
   { id: "va-bca", name: "BCA Virtual Account", fee: "Rp 1.000", feeAmount: 1000, provider: "BCA Mobile / myBCA / KlikBCA", speed: "Otomatis Real-time" },
   { id: "va-mandiri", name: "Mandiri Virtual Account", fee: "Rp 1.000", feeAmount: 1000, provider: "Livin by Mandiri", speed: "Otomatis Real-time" },

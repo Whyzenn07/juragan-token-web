@@ -24,7 +24,7 @@ interface RemotePricingItem {
 
 export async function GET() {
   const syncTimestamp = new Date().toISOString();
-  let remoteModels: ModelItem[] = [];
+  const remoteModels: ModelItem[] = [];
   let source = "gateway_cache";
 
   try {

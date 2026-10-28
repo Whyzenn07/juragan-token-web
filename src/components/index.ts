@@ -10,5 +10,4 @@ export * from "./modals/SingaPayModal";
 export * from "./modals/TokenBalanceModal";
 
 // Sections
-export * from "./sections/SavingsCalculator";
 export * from "./sections/SetupGuides";

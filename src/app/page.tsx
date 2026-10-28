@@ -7,7 +7,6 @@ import {
   ModelDetailModal,
   ProviderLogo,
   RegionBadge,
-  SavingsCalculator,
   SetupGuides,
   SingaPayModal,
   TokenBalanceModal
@@ -285,6 +284,9 @@ export default function Home() {
                 className={`header-nav-link ${isCurrent ? "active" : ""}`}
                 onMouseEnter={() => setHoveredNav(item.id)}
                 onClick={(e) => {
+                  if (item.href.startsWith("/")) {
+                    return; // Normal route change
+                  }
                   if (item.id === "catalog") {
                     e.preventDefault();
                     setViewSavedOnly(false);
@@ -310,7 +312,13 @@ export default function Home() {
 
         <div className="header-right">
           <div className="region-indicator">
-            <span className="flag-icon">🇮🇩</span>
+            <span className="flag-badge-svg" aria-hidden="true">
+              <svg width="18" height="12" viewBox="0 0 18 12" fill="none" style={{ borderRadius: "2px", overflow: "hidden", display: "block" }}>
+                <rect width="18" height="6" fill="#e11d48" />
+                <rect y="6" width="18" height="6" fill="#ffffff" />
+                <rect width="18" height="12" stroke="#cbd5e1" strokeWidth="0.5" rx="1" />
+              </svg>
+            </span>
             <span>Indonesia (IDR)</span>
           </div>
           <span className="header-divider" />
@@ -319,10 +327,22 @@ export default function Home() {
             className="check-balance-btn"
             onClick={() => setBalanceModalOpen(true)}
           >
-            <span>Cek Saldo Key ↗</span>
+            <span>Cek Saldo Key</span>
+            <span className="btn-arrow" aria-hidden="true">↗</span>
           </button>
-          <a href="#panduan-setup" className="company-button">
-            <span>Untuk Mahasiswa &amp; Dev ↗</span>
+          <a
+            href="#katalog-retail"
+            className="company-button"
+            onClick={(e) => {
+              const el = document.getElementById("katalog-retail");
+              if (el) {
+                e.preventDefault();
+                el.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+          >
+            <span>Beli Token</span>
+            <span className="btn-arrow" aria-hidden="true">↗</span>
           </a>
           <button
             type="button"
@@ -883,9 +903,14 @@ export default function Home() {
                     <p className="pkg-sub">{pkg.subtitle}</p>
                   </div>
 
-                  <div className="pkg-price-row">
-                    <strong>{formatIdr(pkg.priceIdr)}</strong>
-                    <span className="token-est">{pkg.estToken}</span>
+                  <div className="pkg-price-block">
+                    <div className="pkg-price-main">
+                      <strong className="pkg-price-amount">{formatIdr(pkg.priceIdr)}</strong>
+                      <span className="pkg-price-period">/&nbsp;paket</span>
+                    </div>
+                    <div className="pkg-token-pill">
+                      <span className="token-pill-text">{pkg.estToken}</span>
+                    </div>
                   </div>
 
                   <p className="pkg-desc">{pkg.description}</p>
@@ -919,16 +944,6 @@ export default function Home() {
                 </article>
               ))}
             </div>
-
-            {/* Kalkulator Hemat Kantong Mahasiswa */}
-            <SavingsCalculator
-              onSelectRecommended={() => {
-                const starter =
-                  retailPackages.find((p) => p.id === "pkt-mhs-starter") || retailPackages[0];
-                setSelectedPackage(starter);
-                setSingaPayOpen(true);
-              }}
-            />
           </section>
 
           {/* 7. Bundle Banner (Pola ai-vouchers.com) */}
@@ -953,35 +968,141 @@ export default function Home() {
           {/* 8. Setup Guides Section */}
           <SetupGuides />
 
-          {/* 9. FAQ Section (Accordion Grid ala ai-vouchers.com) */}
+          {/* 9. FAQ Section */}
           <section className="faq-section" id="faq" aria-labelledby="faq-heading">
             <div className="section-kicker">JURAGAN TOKEN</div>
-            <h2 id="faq-heading">Bantuan sebelum memulai</h2>
+            <h2 id="faq-heading">Pertanyaan Umum (FAQ)</h2>
+            <p className="faq-section-lead">
+              Semua yang perlu Anda ketahui tentang fleksibilitas saldo token, kompatibilitas aplikasi, dan keamanan data.
+            </p>
+
             <div className="faq-grid">
-              <details>
-                <summary>Apa itu kredit token AI prabayar?<span>+</span></summary>
-                <p>
-                  Kredit token prabayar adalah saldo pemakaian API AI yang bisa Anda gunakan kapan saja tanpa harus membayar langganan bulanan $20 USD. Anda hanya membayar token yang benar-benar Anda konsumsi.
-                </p>
+              <details className="faq-card" open>
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Multi-AI Pool</span>
+                    <h3 className="faq-question">Apakah 1 saldo token bisa dipakai bergantian untuk Claude, ChatGPT, Gemini, dan DeepSeek?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Bisa! Sistem kami menggunakan Multi-AI Pool (1 Saldo untuk Semua).</b>
+                  </p>
+                  <p>
+                    Konsepnya persis seperti pulsa ponsel prabayar. Jika Anda mengisi saldo nominal berapa pun (mulai Rp 15.000), Anda <b>tidak perlu</b> membeli saldo terpisah untuk masing-masing AI. Saldo tersebut otomatis memotong biaya sesuai tarif model yang Anda panggil secara real-time—misalnya Claude Sonnet untuk coding intensif, lalu beralih ke Gemini 3.8 Flash untuk riset tugas tanpa perlu ganti akun.
+                  </p>
+                </div>
               </details>
-              <details>
-                <summary>Apakah saya butuh kartu kredit internasional?<span>+</span></summary>
-                <p>
-                  <b>Sama sekali tidak.</b> Juragan Token didesain khusus untuk ritel dan mahasiswa Indonesia, mendukung pembayaran mata uang rupiah tanpa perlu kartu kredit.
-                </p>
+
+              <details className="faq-card">
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Kompatibilitas</span>
+                    <h3 className="faq-question">Apakah bisa disambungkan langsung di website resmi chatgpt.com atau claude.ai?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Tidak bisa di web portal konsumen resmi mereka.</b> Website <code>chatgpt.com</code> dan <code>claude.ai</code> adalah produk SaaS tertutup yang sengaja tidak menyediakan input API Key pribadi karena bisnis mereka berbasis sistem langganan kartu kredit bulanan.
+                  </p>
+                  <p>
+                    Namun, token Juragan Token <b>100% kompatibel</b> dan bekerja mulus di semua aplikasi web client gratis (NextChat, Chatbox), code editor (Cursor, Windsurf, VS Code), dan terminal Anthropic resmi (Claude Code CLI) dengan kecerdasan model dan parameter yang identik.
+                  </p>
+                </div>
               </details>
-              <details>
-                <summary>Bagaimana cara memakai token ini di Claude Code CLI?<span>+</span></summary>
-                <p>
-                  Cukup atur variabel lingkungan <code>$env:ANTHROPIC_BASE_URL=&quot;{GATEWAY_ORIGIN}&quot;</code> dan masukkan API Key Anda di terminal sebelum menjalankan perintah <code>claude</code>.
-                </p>
+
+              <details className="faq-card">
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Masa Aktif</span>
+                    <h3 className="faq-question">Apakah saldo token memiliki masa kedaluwarsa atau batas waktu hangus bulanan?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Tidak ada masa kedaluwarsa (Aktif Permanen / Lifetime).</b>
+                  </p>
+                  <p>
+                    Berbeda dengan langganan bulanan SaaS yang hangus tiap tanggal jatuh tempo meskipun tidak Anda pakai, saldo Juragan Token tetap utuh di akun Anda selamanya. Saldo hanya akan berkurang saat Anda mengirimkan prompt atau menjalankan kalkulasi token.
+                  </p>
+                </div>
               </details>
-              <details>
-                <summary>Apakah mahasiswa non-koder bisa memakainya di HP?<span>+</span></summary>
-                <p>
-                  <b>Sangat bisa!</b> Anda cukup mengunduh aplikasi gratis seperti <b>Chatbox</b> di Google Play Store atau iOS App Store, masukkan Base URL &amp; API Key, dan Anda bisa chat untuk tugas kuliah dengan biaya super hemat.
-                </p>
+
+              <details className="faq-card">
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Pembayaran</span>
+                    <h3 className="faq-question">Apakah butuh kartu kredit internasional? Bagaimana cara pembayarannya?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Sama sekali tidak memerlukan kartu kredit.</b>
+                  </p>
+                  <p>
+                    Juragan Token didesain untuk kemudahan pengguna dan mahasiswa di Indonesia. Pembayaran dilakukan 100% dalam mata uang Rupiah (IDR) menggunakan <b>QRIS SingaPay Instan</b> (bisa di-scan dari BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA) maupun Virtual Account bank lokal dengan aktivasi otomatis detik itu juga.
+                  </p>
+                </div>
               </details>
+
+              <details className="faq-card">
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Transparansi</span>
+                    <h3 className="faq-question">Bagaimana cara mengecek sisa saldo token dan riwayat konsumsi saya?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Sangat mudah dan transparan.</b>
+                  </p>
+                  <p>
+                    Cukup klik tombol <b>Cek Saldo Key ↗</b> di header atas website ini, lalu tempelkan API Key Anda (misal <code>jt-live-xxxxxx</code>). Sistem kami langsung menampilkan sisa saldo rupiah, estimasi kuota token yang tersisa, serta rincian pemakaian model terakhir secara transparan tanpa perlu login password yang rumit.
+                  </p>
+                </div>
+              </details>
+
+              <details className="faq-card">
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Privasi &amp; Keamanan</span>
+                    <h3 className="faq-question">Bagaimana dengan privasi percakapan dan kerahasiaan data koding saya?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Privasi dan keamanan kode Anda terlindungi 100%.</b>
+                  </p>
+                  <p>
+                    Gateway Juragan Token menerapkan enkripsi TLS/SSL berstandar industri dan sistem direct-streaming (penerusan langsung) ke server resmi penyedia model AI (Anthropic, OpenAI, Google). Kami <b>tidak pernah</b> merekam, menyimpan, membagikan, atau menggunakan prompt maupun cuplikan kode tugas Anda untuk melatih model AI apa pun.
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div className="faq-footer-help">
+              <span className="ffh-text">Butuh panduan teknis langkah-demi-langkah memasang token di aplikasi Anda?</span>
+              <a href="#panduan-setup" className="ffh-link">
+                Lihat Panduan Setup Interaktif (Cursor, Claude Code, Chatbox, Python) ↗
+              </a>
             </div>
           </section>
 

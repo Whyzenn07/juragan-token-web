@@ -119,7 +119,7 @@ print(response.choices[0].message.content)`;
             <div className="panel-text">
               <h4>Pasang di Cursor AI (Alternatif Cursor Pro Murah)</h4>
               <p>
-                Jika kuota fast request Cursor Anda habis atau tidak punya kartu kredit untuk bayar $20/bulan, cukup gunakan fitur Custom API Key di Cursor:
+                Jika kuota fast request Cursor Anda habis atau tidak punya kartu kredit untuk langganan resmi bulanan, cukup gunakan fitur Custom API Key di Cursor:
               </p>
               <ol className="cursor-steps">
                 <li>Buka Cursor, tekan <code>Ctrl + Shift + J</code> (atau buka Settings).</li>
@@ -146,24 +146,87 @@ print(response.choices[0].message.content)`;
         {activeTab === "chatbox" && (
           <div className="panel-content">
             <div className="panel-text">
-              <h4>Chat Harian di HP Android/iPhone &amp; Laptop (Mirip ChatGPT Plus)</h4>
+              <h4>Chat Harian di Browser, HP Android/iPhone, &amp; Laptop</h4>
               <p>
-                Bagi mahasiswa yang tidak ngoding dan hanya ingin tanya jawab tugas kuliah, bikin makalah, atau terjemahan jurnal di HP:
+                Bagi mahasiswa &amp; pengguna yang tidak ngoding dan ingin tampilan seperti ChatGPT Plus / Claude Pro resmi tanpa bayar langganan bulanan:
               </p>
+
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", margin: "14px 0 16px" }}>
+                <a
+                  href="https://web.chatboxai.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="setup-link-btn primary"
+                >
+                  <Icon name="globe" size={14} />
+                  <span>Buka Web Chatbox (web.chatboxai.app)</span>
+                  <Icon name="external" size={12} />
+                </a>
+                <a
+                  href="https://app.nextchat.dev/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="setup-link-btn secondary"
+                >
+                  <Icon name="globe" size={14} />
+                  <span>Buka NextChat Web (app.nextchat.dev)</span>
+                  <Icon name="external" size={12} />
+                </a>
+              </div>
+
+              <div className="faq-alert-card" style={{ margin: "0 0 16px" }}>
+                <div className="faq-alert-icon">
+                  <Icon name="alert" size={15} />
+                </div>
+                <div className="faq-alert-body">
+                  <b>Perhatian: Hindari Salah Eja Domain</b>
+                  <p>
+                    Buka <code>web.chatboxai.app</code> <i>(tanpa tanda strip)</i> atau <code>app.nextchat.dev</code>. Jangan buka <i>chat-box.ai</i> karena itu web komersial pihak ketiga yang mengunci custom API Key.
+                  </p>
+                </div>
+              </div>
+
               <ol className="cursor-steps">
-                <li>Download aplikasi gratis <b>Chatbox</b> (tersedia di Google Play Store, App Store iOS, Windows, Mac).</li>
-                <li>Buka Settings &gt; Pilih Provider <b>Custom / OpenAI Compatible</b>.</li>
-                <li>Isi API Host: <code>{GATEWAY_BASE_URL}</code></li>
-                <li>Masukkan API Key Anda. Sekarang Anda punya asisten AI super pintar di HP dengan biaya beberapa rupiah saja per chat!</li>
+                <li>Buka <b>Settings</b> (<Icon name="settings" size={13} style={{ margin: "0 2px" }} /> di pojok kiri bawah).</li>
+                <li>Pilih menu <b>Model Provider</b> &gt; pilih <b>OpenAI</b> (karena Juragan Token memakai protokol standar OpenAI).</li>
+                <li>Pada kolom <b>API Host</b>, masukkan: <code>https://www.juragantoken.co.id</code></li>
+                <li>Pada kolom <b>API Key</b>, tempelkan API Key token Anda.</li>
+                <li>Klik tombol <b>+ New</b> di bagian Model, lalu ketik model pilihan (misal: <code>claude-sonnet-5.5</code> atau <code>gemini-3.8-flash</code>). Selesai!</li>
               </ol>
             </div>
-            <div className="chatbox-preview-box">
-              <div className="chat-bubble user">Halo, tolong ringkas bab 2 jurnal ini dalam 3 poin utama...</div>
-              <div className="chat-bubble ai">
-                <b>Gemini 3.8 Flash:</b> Tentu, berikut adalah 3 temuan kunci metodologi dari jurnal tersebut:
-                <br />1. Variabel independen menunjukkan korelasi signifikan...
+
+            <div className="cursor-mockup-card">
+              <div className="mock-title">Panduan Input di Web Chatbox / NextChat</div>
+              <div className="mock-field">
+                <label>1. Model Provider</label>
+                <input readOnly value="OpenAI (Kompatibel Semua Model Juragan Token)" />
               </div>
-              <small className="chat-stat">Biaya chat ini: ±Rp 3 (Sangat murah!)</small>
+              <div className="mock-field">
+                <label>2. API Host / Endpoint</label>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <input readOnly value="https://www.juragantoken.co.id" />
+                  <button
+                    type="button"
+                    className="copy-btn"
+                    style={{ background: "#0a4ea3", color: "#fff", borderRadius: "4px", padding: "0 10px", flexShrink: 0 }}
+                    onClick={() => copyCode("https://www.juragantoken.co.id", "host")}
+                  >
+                    {copied === "host" ? "Tersalin!" : "Salin"}
+                  </button>
+                </div>
+              </div>
+              <div className="mock-field">
+                <label>3. API Key</label>
+                <input readOnly value="jt-live-token-anda (Didapat setelah checkout)" />
+              </div>
+              <div className="mock-field">
+                <label>4. Model yang Didukung (Tinggal Ketik)</label>
+                <input readOnly value="claude-sonnet-5.5, gpt-6-sol, gemini-3.8-flash, deepseek-v4-flash" />
+              </div>
+              <span className="mock-tag" style={{ color: "#16a34a", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                <Icon name="check" size={13} />
+                1 Token berlaku bersamaan untuk Claude, GPT, Gemini, &amp; DeepSeek!
+              </span>
             </div>
           </div>
         )}

@@ -23,7 +23,7 @@ export function SavingsCalculator({ onSelectRecommended }: { onSelectRecommended
     new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
 
   return (
-    <div className="calculator-card" data-reveal>
+    <div className="calculator-card" id="kalkulator-hemat" data-reveal>
       <div className="calc-header">
         <span className="badge-pill">Kalkulator Hemat Kantong Mahasiswa</span>
         <h3>Berapa uang jajan yang bisa Anda hemat tiap bulan?</h3>
