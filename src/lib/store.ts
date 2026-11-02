@@ -39,7 +39,25 @@ export type KeyRecord = {
   status: "active";
 };
 
-type Db = { orders: Record<string, Order>; keys: Record<string, KeyRecord> };
+export type UsageLog = {
+  id: string;
+  keyHash: string;
+  keyLast4: string;
+  model: string;
+  provider: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  costIdr: number;
+  remainingBalanceIdr: number;
+  createdAt: string;
+};
+
+type Db = {
+  orders: Record<string, Order>;
+  keys: Record<string, KeyRecord>;
+  usageLogs?: UsageLog[];
+};
 
 const FILE = path.join(process.cwd(), "data", "store.json");
 
@@ -49,9 +67,13 @@ async function readDb(): Promise<Db> {
   try {
     const raw = await fs.readFile(FILE, "utf8");
     const parsed = JSON.parse(raw) as Partial<Db>;
-    return { orders: parsed.orders ?? {}, keys: parsed.keys ?? {} };
+    return {
+      orders: parsed.orders ?? {},
+      keys: parsed.keys ?? {},
+      usageLogs: parsed.usageLogs ?? [],
+    };
   } catch {
-    return { orders: {}, keys: {} };
+    return { orders: {}, keys: {}, usageLogs: [] };
   }
 }
 

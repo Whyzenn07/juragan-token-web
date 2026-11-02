@@ -4,6 +4,7 @@ import {
   resolveUpstreamModel,
   calculateUsageCost,
   deductKeyBalance,
+  recordUsageLog,
 } from "@/lib/gateway";
 
 const CORS_HEADERS = {
@@ -155,9 +156,23 @@ export async function POST(req: NextRequest) {
     if (isStream && upstreamRes.body) {
       // Potong estimasi nominal ringan secara background untuk sesi streaming
       const estCost = calculateUsageCost(targetModel, 150, 350);
-      deductKeyBalance(auth.keyHash, estCost).catch((err) => {
-        console.warn("[GATEWAY DEDUCT STREAM] Error:", err);
-      });
+      deductKeyBalance(auth.keyHash, estCost)
+        .then((remainingBal) => {
+          recordUsageLog({
+            keyHash: auth.keyHash!,
+            keyLast4: auth.keyRecord!.last4,
+            model: targetModel,
+            provider,
+            promptTokens: 150,
+            completionTokens: 350,
+            totalTokens: 500,
+            costIdr: estCost,
+            remainingBalanceIdr: remainingBal,
+          });
+        })
+        .catch((err) => {
+          console.warn("[GATEWAY DEDUCT STREAM] Error:", err);
+        });
 
       return new Response(upstreamRes.body, {
         headers: {
@@ -175,9 +190,22 @@ export async function POST(req: NextRequest) {
 
     const promptTokens = data.usage?.prompt_tokens || 100;
     const completionTokens = data.usage?.completion_tokens || 150;
+    const totalTokens = data.usage?.total_tokens || promptTokens + completionTokens;
     const costIdr = calculateUsageCost(targetModel, promptTokens, completionTokens);
 
     const remainingBal = await deductKeyBalance(auth.keyHash, costIdr);
+
+    recordUsageLog({
+      keyHash: auth.keyHash,
+      keyLast4: auth.keyRecord.last4,
+      model: targetModel,
+      provider,
+      promptTokens,
+      completionTokens,
+      totalTokens,
+      costIdr,
+      remainingBalanceIdr: remainingBal,
+    }).catch(() => undefined);
 
     return NextResponse.json(data, {
       headers: {

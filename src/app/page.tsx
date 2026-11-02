@@ -1106,7 +1106,10 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 10. Footer */}
+          {/* 10. Panduan Setup Interaktif */}
+          <SetupGuides />
+
+          {/* 11. Footer */}
           <footer>
             <a className="footer-brand" href="#top">
               ✳ juragan token.

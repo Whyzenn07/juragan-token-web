@@ -1,12 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GATEWAY_BASE_URL, GATEWAY_ORIGIN } from "@/data/catalog";
 import { Icon } from "@/components/ui/Icon";
 
 export function SetupGuides() {
   const [activeTab, setActiveTab] = useState<"claudecode" | "cursor" | "chatbox" | "python">("claudecode");
   const [copied, setCopied] = useState<string | null>(null);
+  const [origin, setOrigin] = useState(GATEWAY_ORIGIN);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
+  const activeGatewayUrl = `${origin}/v1`;
 
   const copyCode = async (code: string, id: string) => {
     try {
@@ -19,23 +28,23 @@ export function SetupGuides() {
   };
 
   const claudeCodeSnippet = `# 1. Buka PowerShell / Terminal di project Anda
-$env:ANTHROPIC_BASE_URL = "${GATEWAY_ORIGIN}"
+$env:ANTHROPIC_BASE_URL = "${origin}"
 $env:ANTHROPIC_API_KEY  = "jt-live-token-anda"
 
-# 2. Jalankan Claude Code (bisa pilih model: claude-sonnet-5-5 atau claude-opus-5-5)
-claude --model claude-sonnet-5-5`;
+# 2. Jalankan Claude Code (bisa pilih model: gemini-3.8-flash atau claude-sonnet-5-5)
+claude --model gemini-3.8-flash`;
 
   const pythonSnippet = `from openai import OpenAI
 
-# 1 Key untuk semua model (Claude, GPT-6, Gemini, DeepSeek, Qwen, Kimi)
+# 1 Key untuk semua model (Gemini, Claude, GPT, DeepSeek)
 client = OpenAI(
-    base_url="${GATEWAY_BASE_URL}",
+    base_url="${activeGatewayUrl}",
     api_key="jt-live-token-anda"
 )
 
 response = client.chat.completions.create(
-    model="claude-sonnet-5-5", # coba juga: 'deepseek-v4-flash', 'gemini-3.8-flash', 'kimi-k2.7-code'
-    messages=[{"role": "user", "content": "Bantu jelaskan error kode ini..."}]
+    model="gemini-3.8-flash", # Coba juga: 'deepseek-v4-flash', 'claude-sonnet-5-5'
+    messages=[{"role": "user", "content": "Halo! Bantu optimasi fungsi Python ini..."}]
 )
 print(response.choices[0].message.content)`;
 
@@ -124,7 +133,7 @@ print(response.choices[0].message.content)`;
               <ol className="cursor-steps">
                 <li>Buka Cursor, tekan <code>Ctrl + Shift + J</code> (atau buka Settings).</li>
                 <li>Masuk ke menu <b>Models</b> &gt; aktifkan <b>OpenAI API Key</b> atau <b>Anthropic API Key</b>.</li>
-                <li>Centang opsi <b>Override OpenAI Base URL</b> dan isi dengan: <br /><code>{GATEWAY_BASE_URL}</code></li>
+                <li>Centang opsi <b>Override OpenAI Base URL</b> dan isi dengan: <br /><code>{activeGatewayUrl}</code></li>
                 <li>Masukkan API Key Juragan Token Anda. Selesai! Anda bisa coding sepuasnya.</li>
               </ol>
             </div>
@@ -132,13 +141,13 @@ print(response.choices[0].message.content)`;
               <div className="mock-title">Pengaturan Cursor</div>
               <div className="mock-field">
                 <label>Override Base URL</label>
-                <input readOnly value={GATEWAY_BASE_URL} />
+                <input readOnly value={activeGatewayUrl} />
               </div>
               <div className="mock-field">
                 <label>API Key</label>
                 <input readOnly value="jt-live-7f89xxxxxxxxxxxxxx" />
               </div>
-              <span className="mock-tag">Model: claude-sonnet-5-5, deepseek-v4-flash, kimi-k2.7-code</span>
+              <span className="mock-tag">Model: gemini-3.8-flash (Aktif), claude-sonnet-5-5, deepseek-v4-flash</span>
             </div>
           </div>
         )}

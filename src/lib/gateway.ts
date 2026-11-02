@@ -209,3 +209,65 @@ export async function deductKeyBalance(keyHash: string, costIdr: number): Promis
 
   return remaining;
 }
+
+export type RecordUsageParams = {
+  keyHash: string;
+  keyLast4: string;
+  model: string;
+  provider: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  costIdr: number;
+  remainingBalanceIdr: number;
+};
+
+/**
+ * Catat riwayat inferensi chat ke memory store lokal dan Supabase public.usage_logs
+ */
+export async function recordUsageLog(params: RecordUsageParams): Promise<void> {
+  const logId = `log-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  const now = new Date().toISOString();
+
+  // 1. Simpan di local store
+  mutate((db) => {
+    if (!db.usageLogs) db.usageLogs = [];
+    db.usageLogs.unshift({
+      id: logId,
+      ...params,
+      createdAt: now,
+    });
+    if (db.usageLogs.length > 200) db.usageLogs = db.usageLogs.slice(0, 200);
+  }).catch(() => undefined);
+
+  // 2. Kirim ke Supabase jika tabel usage_logs ada
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    try {
+      fetch(`${SUPABASE_URL}/rest/v1/usage_logs`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          key_hash: params.keyHash,
+          key_last4: params.keyLast4,
+          model: params.model,
+          provider: params.provider,
+          prompt_tokens: params.promptTokens,
+          completion_tokens: params.completionTokens,
+          total_tokens: params.totalTokens,
+          cost_idr: params.costIdr,
+          remaining_balance_idr: params.remainingBalanceIdr,
+          created_at: now,
+        }),
+      }).catch((err) => {
+        // Abaikan jika tabel belum ada atau sedang dibuat
+        console.warn("[GATEWAY USAGE LOG] Cloud log notice:", err.message);
+      });
+    } catch {
+      // background
+    }
+  }
+}
