@@ -2,6 +2,7 @@ import { paymentMethods, retailPackages } from "@/data/catalog";
 import { generateApiKey, generateInvoiceId, generateOrderToken, safeEqualHash, sha256 } from "./keys";
 import { mutate, query, type Order } from "./store";
 import { sendReceiptEmail } from "./receipt-email";
+import { syncOrderToSupabase, syncKeyToSupabase } from "./supabase-sync";
 
 export const ORDER_TTL_MS = 15 * 60 * 1000;
 
@@ -56,6 +57,8 @@ export async function createOrder(
   await mutate((db) => {
     db.orders[invoiceId] = order;
   });
+  // Sinkronisasi otomatis ke Supabase di background
+  syncOrderToSupabase(order).catch(() => {});
   return { ok: true, value: { invoiceId, orderToken, totalIdr: order.totalIdr } };
 }
 
@@ -174,5 +177,9 @@ export async function confirmOrder(id: string): Promise<OrderResult<PublicOrder>
   }
 
   const fresh = await query((db) => db.orders[id]);
+  const freshKey = order.keyHash ? await query((db) => db.keys[order.keyHash!]) : undefined;
+  if (fresh) syncOrderToSupabase(fresh).catch(() => {});
+  if (freshKey) syncKeyToSupabase(freshKey).catch(() => {});
+
   return { ok: true, value: toPublic(fresh ?? order) };
 }
