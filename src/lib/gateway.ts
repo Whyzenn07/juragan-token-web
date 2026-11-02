@@ -113,7 +113,7 @@ export function resolveUpstreamModel(inputModel: string): {
   provider: "gemini" | "openrouter";
   targetModel: string;
 } {
-  const m = (inputModel || "gemini-2.0-flash").toLowerCase().trim();
+  const m = (inputModel || "gemini-3.8-flash").toLowerCase().trim();
 
   // Mapping Google Gemini
   if (
@@ -121,9 +121,8 @@ export function resolveUpstreamModel(inputModel: string): {
     m === "default" ||
     m === "gpt-3.5-turbo" // fallback umum untuk client lama
   ) {
-    if (m.includes("pro")) return { provider: "gemini", targetModel: "gemini-1.5-pro" };
-    if (m.includes("1.5-flash")) return { provider: "gemini", targetModel: "gemini-1.5-flash" };
-    return { provider: "gemini", targetModel: "gemini-2.0-flash" };
+    if (m.includes("pro")) return { provider: "gemini", targetModel: "gemini-pro-latest" };
+    return { provider: "gemini", targetModel: "gemini-3.8-flash" };
   }
 
   // Model lainnya (Claude, GPT-4o, DeepSeek) diarahkan ke OpenRouter

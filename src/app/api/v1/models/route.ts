@@ -13,14 +13,24 @@ export async function OPTIONS() {
 export async function GET() {
   const models = [
     {
-      id: "gemini-2.0-flash",
+      id: "gemini-3.8-flash",
       object: "model",
       created: 1730000000,
       owned_by: "google",
       permission: [],
-      root: "gemini-2.0-flash",
+      root: "gemini-3.8-flash",
       parent: null,
-      description: "Google Gemini 2.0 Flash - Sangat cepat, hemat, dan cerdas untuk koding & chat sehari-hari.",
+      description: "Google Gemini 3.8 Flash - Generasi terbaru: ultra cepat, cerdas, dan hemat untuk koding & chat.",
+    },
+    {
+      id: "gemini-flash-latest",
+      object: "model",
+      created: 1730000000,
+      owned_by: "google",
+      permission: [],
+      root: "gemini-flash-latest",
+      parent: null,
+      description: "Google Gemini Flash (Auto-updated to latest production build).",
     },
     {
       id: "gemini-1.5-flash",

@@ -37,6 +37,7 @@ yarn-error.log*
 # local order & key store (berisi data pembeli)
 /data/
 /backups/
+/scratch/
 
 # vercel
 .vercel
