@@ -107,15 +107,17 @@ export async function authenticateGatewayKey(authHeader: string | null): Promise
 }
 
 /**
- * Normalisasi nama model ke provider upstream yang sesuai
+ * Normalisasi nama model ke provider upstream yang sesuai.
+ * Model Gemini diproses via master key Gemini.
+ * Model Claude, GPT-4o, DeepSeek, Qwen diarahkan ke Pass-Through Engine (juragantoken.co.id).
  */
 export function resolveUpstreamModel(inputModel: string): {
-  provider: "gemini" | "openrouter";
+  provider: "gemini" | "engine";
   targetModel: string;
 } {
   const m = (inputModel || "gemini-3.8-flash").toLowerCase().trim();
 
-  // Mapping Google Gemini
+  // Mapping Google Gemini (bisa diproses lokal mandiri)
   if (
     m.includes("gemini") ||
     m === "default" ||
@@ -125,26 +127,9 @@ export function resolveUpstreamModel(inputModel: string): {
     return { provider: "gemini", targetModel: "gemini-3.8-flash" };
   }
 
-  // Mapping Claude / Anthropic ke model ID OpenRouter resmi
-  if (m.includes("claude") || m.includes("sonnet") || m.includes("opus") || m.includes("haiku")) {
-    if (m.includes("opus")) return { provider: "openrouter", targetModel: "anthropic/claude-opus-5.5" };
-    if (m.includes("haiku")) return { provider: "openrouter", targetModel: "anthropic/claude-haiku-5.5" };
-    return { provider: "openrouter", targetModel: "anthropic/claude-sonnet-5.5" };
-  }
-
-  // Mapping OpenAI ChatGPT (Astra 6 / GPT-4o / GPT-6)
-  if (m.includes("chatgpt") || m.includes("gpt") || m.includes("openai") || m.includes("astra")) {
-    return { provider: "openrouter", targetModel: "openai/gpt-4o-mini" };
-  }
-
-  // Mapping DeepSeek
-  if (m.includes("deepseek")) {
-    return { provider: "openrouter", targetModel: "deepseek/deepseek-chat" };
-  }
-
-  // Fallback model lainnya diarahkan langsung ke OpenRouter
+  // Model lainnya (Claude Opus/Sonnet, GPT-4o/Astra, DeepSeek) diarahkan ke Pass-Through Engine
   return {
-    provider: "openrouter",
+    provider: "engine",
     targetModel: inputModel,
   };
 }

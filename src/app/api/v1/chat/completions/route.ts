@@ -93,29 +93,23 @@ export async function POST(req: NextRequest) {
     upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
     upstreamAuthHeader = `Bearer ${geminiKey}`;
   } else {
-    // OpenRouter provider untuk Claude / GPT-4o / DeepSeek
-    const openRouterKey = process.env.OPENROUTER_API_KEY?.trim();
-    if (!openRouterKey) {
-      return NextResponse.json(
-        {
-          error: {
-            message: `Model '${requestedModel}' memerlukan OpenRouter Master Key. Untuk saat ini, silakan gunakan model Google Gemini ('gemini-2.0-flash' atau 'gemini-1.5-flash').`,
-            type: "provider_not_configured",
-            code: "missing_openrouter_api_key",
-          },
-        },
-        { status: 503, headers: CORS_HEADERS }
-      );
-    }
-    upstreamUrl = "https://openrouter.ai/api/v1/chat/completions";
-    upstreamAuthHeader = `Bearer ${openRouterKey}`;
+    // Pass-Through Engine ke juragantoken.co.id
+    const engineUrl =
+      process.env.UPSTREAM_ENGINE_URL?.trim() ||
+      "https://gateway.juragantoken.co.id/v1";
+    const engineKey =
+      process.env.UPSTREAM_ENGINE_KEY?.trim() ||
+      process.env.ADMIN_SECRET?.trim() ||
+      "";
+
+    upstreamUrl = `${engineUrl.replace(/\/+$/, "")}/chat/completions`;
+    upstreamAuthHeader = engineKey ? `Bearer ${engineKey}` : (authHeader || "");
   }
 
   // 5. Buat Payload yang Diteruskan
   const upstreamPayload = {
     ...body,
     model: targetModel,
-    ...(provider === "openrouter" && !body.max_tokens ? { max_tokens: 1500 } : {}),
   };
 
   const isStream = Boolean(body.stream);
@@ -126,12 +120,8 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         Authorization: upstreamAuthHeader,
-        ...(provider === "openrouter"
-          ? {
-              "HTTP-Referer": "https://juragantoken.com",
-              "X-Title": "Juragan Token Indonesia",
-            }
-          : {}),
+        "x-juragan-client-key": auth.keyHash,
+        "x-juragan-retail-origin": "juragan-token-web",
       },
       body: JSON.stringify(upstreamPayload),
     });
@@ -144,7 +134,9 @@ export async function POST(req: NextRequest) {
           error: {
             message:
               errBody?.error?.message ||
-              `Gagal mendapatkan respons dari provider ${provider} (Status: ${upstreamRes.status}).`,
+              (provider === "engine"
+                ? `Engine Utama (juragantoken.co.id) mengembalikan status ${upstreamRes.status}. Coba gunakan model Google Gemini ('gemini-3.8-flash').`
+                : `Gagal mendapatkan respons dari provider ${provider} (Status: ${upstreamRes.status}).`),
             type: "upstream_error",
             code: errBody?.error?.code || "upstream_failure",
           },

@@ -90,7 +90,7 @@ export async function GET() {
       permission: [],
       root: "gpt-4o",
       parent: null,
-      description: "OpenAI GPT-4o - Model multimodal serbaguna andalan OpenAI (memerlukan OpenRouter key).",
+      description: "OpenAI GPT-4o - Model multimodal serbaguna andalan OpenAI via Pass-Through Engine Juragan Token.",
     },
     {
       id: "deepseek-chat",
