@@ -125,7 +125,14 @@ export function resolveUpstreamModel(inputModel: string): {
     return { provider: "gemini", targetModel: "gemini-3.8-flash" };
   }
 
-  // Model lainnya (Claude, GPT-4o, DeepSeek) diarahkan ke OpenRouter
+  // Mapping Claude / Anthropic ke model ID OpenRouter
+  if (m.includes("claude") || m.includes("sonnet") || m.includes("opus") || m.includes("haiku")) {
+    if (m.includes("opus")) return { provider: "openrouter", targetModel: "anthropic/claude-3-opus" };
+    if (m.includes("haiku")) return { provider: "openrouter", targetModel: "anthropic/claude-3.5-haiku" };
+    return { provider: "openrouter", targetModel: "anthropic/claude-3.5-sonnet" };
+  }
+
+  // Model lainnya (GPT-4o, DeepSeek) diarahkan ke OpenRouter
   return {
     provider: "openrouter",
     targetModel: inputModel,
