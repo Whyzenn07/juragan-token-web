@@ -125,14 +125,24 @@ export function resolveUpstreamModel(inputModel: string): {
     return { provider: "gemini", targetModel: "gemini-3.8-flash" };
   }
 
-  // Mapping Claude / Anthropic ke model ID OpenRouter
+  // Mapping Claude / Anthropic ke model ID OpenRouter resmi
   if (m.includes("claude") || m.includes("sonnet") || m.includes("opus") || m.includes("haiku")) {
-    if (m.includes("opus")) return { provider: "openrouter", targetModel: "anthropic/claude-3-opus" };
-    if (m.includes("haiku")) return { provider: "openrouter", targetModel: "anthropic/claude-3.5-haiku" };
-    return { provider: "openrouter", targetModel: "anthropic/claude-3.5-sonnet" };
+    if (m.includes("opus")) return { provider: "openrouter", targetModel: "anthropic/claude-opus-5.5" };
+    if (m.includes("haiku")) return { provider: "openrouter", targetModel: "anthropic/claude-haiku-5.5" };
+    return { provider: "openrouter", targetModel: "anthropic/claude-sonnet-5.5" };
   }
 
-  // Model lainnya (GPT-4o, DeepSeek) diarahkan ke OpenRouter
+  // Mapping OpenAI ChatGPT (Astra 6 / GPT-4o / GPT-6)
+  if (m.includes("chatgpt") || m.includes("gpt") || m.includes("openai") || m.includes("astra")) {
+    return { provider: "openrouter", targetModel: "openai/gpt-4o-mini" };
+  }
+
+  // Mapping DeepSeek
+  if (m.includes("deepseek")) {
+    return { provider: "openrouter", targetModel: "deepseek/deepseek-chat" };
+  }
+
+  // Fallback model lainnya diarahkan langsung ke OpenRouter
   return {
     provider: "openrouter",
     targetModel: inputModel,

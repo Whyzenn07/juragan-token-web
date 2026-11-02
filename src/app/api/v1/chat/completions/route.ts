@@ -115,6 +115,7 @@ export async function POST(req: NextRequest) {
   const upstreamPayload = {
     ...body,
     model: targetModel,
+    ...(provider === "openrouter" && !body.max_tokens ? { max_tokens: 1500 } : {}),
   };
 
   const isStream = Boolean(body.stream);
