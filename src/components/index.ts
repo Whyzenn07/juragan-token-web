@@ -2,6 +2,7 @@
 export * from "./ui/Icon";
 export * from "./ui/ProviderLogo";
 export * from "./ui/RegionBadge";
+export * from "./ui/PaymentSuccessMark";
 
 // Modals
 export * from "./modals/Dialog";

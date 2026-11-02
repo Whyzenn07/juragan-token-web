@@ -1115,6 +1115,16 @@ export default function Home() {
             <a href="#panduan-setup" className="footer-link">
               Panduan Integrasi API ↗
             </a>
+            <a
+              href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Halo Admin Juragan Token, saya butuh informasi / bantuan mengenai pemesanan token.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#16a34a", fontWeight: 700 }}
+            >
+              <Icon name="whatsapp" size={14} />
+              <span>Bantuan WhatsApp ↗</span>
+            </a>
             <span>© 2026 Juragan Token</span>
           </footer>
         </main>

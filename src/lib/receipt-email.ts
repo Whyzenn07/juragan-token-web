@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-interface SendReceiptPayload {
+export interface SendReceiptPayload {
   customerName: string;
   customerEmail: string;
   packageName: string;
@@ -9,44 +8,34 @@ interface SendReceiptPayload {
   paymentMethod: string;
   apiKey: string;
   gatewayUrl?: string;
-  invoiceId?: string;
+  invoiceId: string;
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const body: SendReceiptPayload = await req.json();
+export type SendReceiptResult = { status: "sent" | "simulated"; messageId?: string; message?: string };
+
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+/** Dipanggil hanya dari server setelah pembayaran terkonfirmasi. Melempar error jika SMTP gagal. */
+export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<SendReceiptResult> {
+  {
     const {
-      customerName,
       customerEmail,
-      packageName,
       priceIdr,
-      paymentMethod,
-      apiKey,
-      gatewayUrl = process.env.GATEWAY_BASE_URL || "https://gateway.juragantoken.co.id/v1",
-      invoiceId = `INV-JT-${Date.now().toString(36).toUpperCase()}`,
-    } = body;
-
-    // 1. Validasi input wajib
-    if (!customerEmail || !customerName || !apiKey || !packageName) {
-      return NextResponse.json(
-        { success: false, error: "Data transaksi tidak lengkap (customerEmail, customerName, apiKey, packageName wajib diisi)." },
-        { status: 400 }
-      );
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerEmail)) {
-      return NextResponse.json(
-        { success: false, error: "Format alamat email tidak valid." },
-        { status: 400 }
-      );
-    }
+      invoiceId,
+      gatewayUrl: rawGatewayUrl = process.env.GATEWAY_BASE_URL || "https://gateway.juragantoken.co.id/v1",
+    } = payload;
+    const customerName = escapeHtml(payload.customerName);
+    const packageName = escapeHtml(payload.packageName);
+    const paymentMethod = escapeHtml(payload.paymentMethod);
+    const apiKey = escapeHtml(payload.apiKey);
+    const gatewayUrl = escapeHtml(rawGatewayUrl);
 
     const formattedPrice = new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       maximumFractionDigits: 0,
-    }).format(priceIdr || 15000);
+    }).format(priceIdr);
 
     const transactionDate = new Intl.DateTimeFormat("id-ID", {
       dateStyle: "full",
@@ -58,7 +47,7 @@ export async function POST(req: NextRequest) {
     const gmailPass = process.env.GMAIL_APP_PASSWORD?.trim();
     const fromName = process.env.GMAIL_FROM_NAME?.trim() || "Juragan Token Indonesia";
 
-    // 2. Mode Simulasi / Pengujian (jika kredensial Gmail belum diisi di .env.local)
+    // Mode simulasi bila kredensial Gmail belum diisi di .env.local
     const isConfigured = Boolean(
       gmailUser &&
       gmailPass &&
@@ -67,19 +56,13 @@ export async function POST(req: NextRequest) {
     );
 
     if (!isConfigured) {
-      console.log(`[SIMULASI EMAIL] Pengiriman ke: ${customerEmail}`);
-      console.log(`[SIMULASI EMAIL] Invoice: ${invoiceId} | Paket: ${packageName} | Key: ${apiKey}`);
-      console.log(`[SIMULASI EMAIL] Info: Masukkan GMAIL_USER dan GMAIL_APP_PASSWORD di .env.local untuk mengirim email nyata.`);
-
-      return NextResponse.json({
-        success: true,
-        simulated: true,
-        invoiceId,
-        message: `Mode simulasi aktif: Kredensial API Key siap dikirimkan ke ${customerEmail}. Tambahkan GMAIL_APP_PASSWORD di .env.local untuk pengiriman riil.`,
-      });
+      console.log(`[SIMULASI EMAIL] Ke: ${customerEmail} | Invoice: ${invoiceId} | Paket: ${payload.packageName}`);
+      return {
+        status: "simulated",
+        message: `Mode simulasi: kredensial Gmail belum diisi, email untuk ${customerEmail} tidak dikirim.`,
+      };
     }
 
-    // 3. Konfigurasi Transporter Nodemailer (Gmail SMTP)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -88,7 +71,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 4. Template Email HTML (Desain Responsif, Navy & Blue Juragan Token)
+    // Template Email HTML (Desain Responsif, Navy & Blue Juragan Token)
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="id">
@@ -244,33 +227,14 @@ export async function POST(req: NextRequest) {
 </html>
     `;
 
-    // 5. Kirim Email Melalui Nodemailer
-    const mailOptions = {
+    const info = await transporter.sendMail({
       from: `"${fromName}" <${gmailUser}>`,
       to: customerEmail,
       subject: `[Juragan Token] Bukti Pembayaran & Kredensial API Key Token (${invoiceId})`,
       html: htmlContent,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
+    });
     console.log(`[EMAIL BERHASIL] ID: ${info.messageId} dikirim ke ${customerEmail}`);
 
-    return NextResponse.json({
-      success: true,
-      simulated: false,
-      messageId: info.messageId,
-      invoiceId,
-      recipient: customerEmail,
-    });
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan internal pengiriman email.";
-    console.error("[EMAIL ERROR]", errorMessage);
-    return NextResponse.json(
-      {
-        success: false,
-        error: errorMessage,
-      },
-      { status: 500 }
-    );
+    return { status: "sent", messageId: info.messageId };
   }
 }

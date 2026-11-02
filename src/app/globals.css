@@ -2850,6 +2850,126 @@ footer {
   align-items: center;
   gap: 12px;
 }
+/* Centang Hijau Profesional (GoPay / BCA Style Animation) */
+.pay-success-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px auto 8px;
+  animation: psm-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.psm-circle {
+  stroke: #16a34a;
+  stroke-width: 3.5;
+  stroke-dasharray: 150;
+  stroke-dashoffset: 150;
+  animation: psm-draw-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.psm-check {
+  stroke: #16a34a;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: psm-draw-check 0.45s cubic-bezier(0.65, 0, 0.45, 1) 0.32s forwards;
+}
+@keyframes psm-draw-circle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes psm-draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes psm-pop {
+  0% {
+    transform: scale(0.75);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pay-success-mark,
+  .psm-circle,
+  .psm-check {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Struk Rincian Transaksi Gaya Fintech (BCA / GoPay) */
+.fintech-receipt-card {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 10px;
+}
+.frc-amount-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+}
+.frc-amount-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+.frc-amount-val {
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f172a;
+  font-family: var(--font-h);
+}
+.frc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+.frc-row-label {
+  color: #64748b;
+}
+.frc-row-val {
+  font-weight: 600;
+  color: #1e293b;
+  font-family: monospace;
+}
+.frc-status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
 .success-icon-wrap {
   width: 60px;
   height: 60px;
@@ -3037,6 +3157,177 @@ footer {
 }
 .quick-start-box li {
   margin-bottom: 4px;
+}
+
+/* WhatsApp Ordering & Confirmation Components in SingaPay Modal */
+.sp-or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 14px 0 8px;
+}
+.sp-or-divider::before,
+.sp-or-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px dashed #d0e0f2;
+}
+.sp-or-divider span {
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6482a0;
+}
+.sp-wa-direct-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #14532d;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.sp-wa-direct-btn:hover {
+  background: #25d366;
+  color: #ffffff;
+  border-color: #25d366;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+}
+.wa-payment-confirm-wrap {
+  margin-top: 14px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+.sp-wa-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #16a34a;
+  border: 1px solid #15803d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+}
+.sp-wa-action-btn:hover {
+  background: #15803d;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+}
+.wa-confirm-hint {
+  font-size: 10.5px;
+  color: #55779a;
+  margin: 0;
+  line-height: 1.4;
+}
+.wa-share-card {
+  width: 100%;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 4px 0 10px;
+}
+.wa-share-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.wa-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #25d366;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+}
+.wa-share-header-text strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #14532d;
+  margin-bottom: 2px;
+}
+.wa-share-header-text p {
+  font-size: 11px;
+  color: #166534;
+  margin: 0;
+  line-height: 1.4;
+}
+.wa-share-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 480px) {
+  .wa-share-buttons {
+    grid-template-columns: 1fr;
+  }
+}
+.wa-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  background: #16a34a;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+.wa-btn-primary:hover {
+  background: #15803d;
+}
+.wa-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  background: #ffffff;
+  color: #14532d;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.wa-btn-secondary:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
 }
 
 /* 13c. Savings Calculator Component */
@@ -4192,4 +4483,175 @@ footer {
   font-size: 11.5px;
   color: #64748b;
 }
+
+/* ==========================================================================
+   FINTECH PAYMENT SUCCESS & RECEIPT (GoPay / BCA / SingaPay Style)
+   ========================================================================== */
+
+.pay-success-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  position: relative;
+}
+
+.psm-circle {
+  stroke: #16a34a;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 145;
+  stroke-dashoffset: 145;
+  animation: psm-circle-draw 0.65s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.psm-check {
+  stroke: #16a34a;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: psm-check-draw 0.45s 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes psm-circle-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes psm-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .psm-circle,
+  .psm-check {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+.fintech-receipt-card {
+  background: #ffffff;
+  border: 1px solid #d8e5f2;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 14px 0;
+  box-shadow: 0 4px 18px rgba(10, 37, 64, 0.05);
+  text-align: left;
+}
+
+.frc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #cbd5e1;
+  margin-bottom: 12px;
+}
+
+.frc-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0a2540;
+}
+
+.frc-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ecfdf5;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+}
+
+.frc-amount-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.frc-amount-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+
+.frc-amount-val {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0a2540;
+  letter-spacing: -0.5px;
+  font-family: var(--font-h);
+}
+
+.frc-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+  font-size: 12px;
+}
+
+.frc-meta-item {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  align-items: flex-start !important;
+}
+
+.frc-meta-label {
+  font-size: 11px !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  display: block !important;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.frc-meta-value {
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  word-break: break-all !important;
+  display: block !important;
+  font-size: 12.5px !important;
+}
+
+.frc-meta-value code {
+  font-size: 11.5px;
+  color: #0a58ca;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.balance-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: psm-spin 0.6s linear infinite;
+  margin-right: 6px;
+}
+
+@keyframes psm-spin {
+  to { transform: rotate(360deg); }
+}
+
 

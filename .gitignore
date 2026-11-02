@@ -34,6 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
+# local order & key store (berisi data pembeli)
+/data/
+/backups/
+
 # vercel
 .vercel
 

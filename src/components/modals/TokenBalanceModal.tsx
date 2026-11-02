@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GATEWAY_BASE_URL } from "@/data/catalog";
 import { Dialog } from "./Dialog";
 import { Icon } from "@/components/ui/Icon";
@@ -11,88 +11,91 @@ type TokenBalanceModalProps = {
   onTopUp: () => void;
 };
 
-type KeyData = {
-  key: string;
+type KeyCheckResult = {
+  maskedKey: string;
   planName: string;
+  estPackage: string;
   balanceIdr: number;
-  estTokensRemaining: string;
-  status: "active" | "expired" | "not_found";
+  status: "active" | "suspended" | "revoked";
   createdAt: string;
-  usageHistory: { model: string; tokens: string; cost: string }[];
-};
-
-const MOCK_KEYS: Record<string, KeyData> = {
-  "jt-live-starter-demo": {
-    key: "jt-live-starter-demo",
-    planName: "Paket Starter Kuliah",
-    balanceIdr: 24500,
-    estTokensRemaining: "± 11.200.000 Token",
-    status: "active",
-    createdAt: "24 Okt 2026",
-    usageHistory: [
-      { model: "Claude Sonnet 5.5", tokens: "420.000 token", cost: "Rp 20.160" },
-      { model: "Gemini 3.8 Flash", tokens: "1.200.000 token", cost: "Rp 6.000" },
-      { model: "Kimi K2.7 Code", tokens: "250.000 token", cost: "Rp 3.750" }
-    ]
-  },
-  "jt-live-coba-demo": {
-    key: "jt-live-coba-demo",
-    planName: "Paket Coba-Coba",
-    balanceIdr: 12800,
-    estTokensRemaining: "± 3.800.000 Token",
-    status: "active",
-    createdAt: "25 Okt 2026",
-    usageHistory: [
-      { model: "Gemini 3.8 Flash", tokens: "400.000 token", cost: "Rp 2.000" },
-      { model: "DeepSeek V4 Flash", tokens: "80.000 token", cost: "Rp 360" }
-    ]
-  }
 };
 
 export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalProps) {
   const [inputKey, setInputKey] = useState("");
-  const [checkedData, setCheckedData] = useState<KeyData | null>(null);
+  const [checkedData, setCheckedData] = useState<KeyCheckResult | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [lastPurchasedKey, setLastPurchasedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open && typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem("jt_last_api_key");
+        if (saved) setLastPurchasedKey(saved);
+      } catch {
+        // Abaikan jika storage dinonaktifkan
+      }
+    }
+  }, [open]);
 
   const formatIdr = (val: number) =>
     new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
 
-  const handleCheck = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    const cleanKey = inputKey.trim();
-    if (!cleanKey) return;
-
-    setHasSearched(true);
-    if (MOCK_KEYS[cleanKey]) {
-      setCheckedData(MOCK_KEYS[cleanKey]);
-    } else if (cleanKey.startsWith("jt-live-")) {
-      // Dynamic simulated result for freshly generated keys from checkout
-      setCheckedData({
-        key: cleanKey,
-        planName: "Paket Ritel Aktif",
-        balanceIdr: 29000,
-        estTokensRemaining: "± 14.500.000 Token",
-        status: "active",
-        createdAt: "Hari ini (Baru Diaktivasi)",
-        usageHistory: [
-          { model: "Node Gateway", tokens: "0 token terpakai", cost: "Rp 0" }
-        ]
-      });
-    } else {
-      setCheckedData(null);
+  const formatDate = (isoString: string) => {
+    try {
+      return new Intl.DateTimeFormat("id-ID", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(isoString));
+    } catch {
+      return isoString;
     }
   };
 
-  const loadDemoKey = (keyName: string) => {
-    setInputKey(keyName);
+  const handleCheck = async (e?: React.FormEvent, directKey?: string) => {
+    if (e) e.preventDefault();
+    const cleanKey = (directKey ?? inputKey).trim();
+    if (!cleanKey) return;
+
+    setLoading(true);
+    setErrorMessage("");
     setHasSearched(true);
-    setCheckedData(MOCK_KEYS[keyName]);
+
+    try {
+      const res = await fetch("/api/keys/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: cleanKey }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.key) {
+        setCheckedData(data.key);
+        setErrorMessage("");
+      } else {
+        setCheckedData(null);
+        setErrorMessage(data.error || "API Key tidak ditemukan di server Juragan Token.");
+      }
+    } catch {
+      setCheckedData(null);
+      setErrorMessage("Gagal terhubung ke server verifikasi. Periksa koneksi internet Anda.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const applyKey = (key: string) => {
+    setInputKey(key);
+    handleCheck(undefined, key);
   };
 
   const handleClose = () => {
     setInputKey("");
     setCheckedData(null);
     setHasSearched(false);
+    setErrorMessage("");
+    setLoading(false);
     onClose();
   };
 
@@ -108,7 +111,7 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
         </div>
         <div>
           <h3>Cek Saldo &amp; Kuota API Key</h3>
-          <p>Masukkan API Key Juragan Token Anda untuk mengecek sisa saldo dan histori pemakaian.</p>
+          <p>Masukkan Kunci API Anda untuk mengecek sisa saldo dan status keaktifan di server Juragan Token.</p>
         </div>
       </div>
 
@@ -116,53 +119,68 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
         <div className="balance-input-wrap">
           <input
             type="text"
-            placeholder="Contoh: jt-live-xxxxxxxxxxxxxx"
+            placeholder="Contoh: jt-live-xxxxxxxxxxxxxxxxxxxx"
             value={inputKey}
             onChange={(e) => setInputKey(e.target.value)}
             className="balance-input"
+            autoComplete="off"
+            spellCheck="false"
+            disabled={loading}
           />
-          <button type="submit" className="button-primary-sm">
-            Cek Saldo ↗
+          <button type="submit" className="button-primary-sm" disabled={loading || !inputKey.trim()}>
+            {loading ? (
+              <>
+                <span className="balance-spinner" aria-hidden="true" />
+                <span>Memverifikasi...</span>
+              </>
+            ) : (
+              <span>Cek Saldo ↗</span>
+            )}
           </button>
         </div>
-        <div className="demo-key-hints">
-          <span>Belum punya key? Coba simulasi:</span>
-          <button type="button" onClick={() => loadDemoKey("jt-live-starter-demo")}>
-            jt-live-starter-demo
-          </button>
-          <button type="button" onClick={() => loadDemoKey("jt-live-coba-demo")}>
-            jt-live-coba-demo
-          </button>
-        </div>
+
+        {lastPurchasedKey && (
+          <div className="demo-key-hints">
+            <span>Kunci dari pesanan terakhir:</span>
+            <button
+              type="button"
+              onClick={() => applyKey(lastPurchasedKey)}
+              disabled={loading}
+              title="Gunakan API Key yang baru saja Anda beli"
+            >
+              Tempel Kunci ({lastPurchasedKey.slice(0, 11)}...{lastPurchasedKey.slice(-4)})
+            </button>
+          </div>
+        )}
       </form>
 
-      {hasSearched && (
+      {hasSearched && !loading && (
         <div className="balance-results">
           {checkedData ? (
             <div className="balance-card">
               <div className="balance-card-head">
                 <div>
                   <span className="balance-status-badge">
-                    <span className="online-dot" /> Aktif Permanen (Lifetime)
+                    <span className="online-dot" /> Terverifikasi Server (Aktif Permanen)
                   </span>
                   <h4>{checkedData.planName}</h4>
-                  <code className="key-code">{checkedData.key}</code>
+                  <code className="key-code">{checkedData.maskedKey}</code>
                 </div>
                 <div className="balance-amount-box">
                   <span className="balance-label">Sisa Saldo</span>
                   <strong className="balance-value">{formatIdr(checkedData.balanceIdr)}</strong>
-                  <span className="token-est-label">{checkedData.estTokensRemaining}</span>
+                  <span className="token-est-label">{checkedData.estPackage}</span>
                 </div>
               </div>
 
               <div className="balance-details-grid">
                 <div className="detail-item">
-                  <span className="detail-label">Tanggal Terbit</span>
-                  <strong>{checkedData.createdAt}</strong>
+                  <span className="detail-label">Tanggal Diterbitkan</span>
+                  <strong>{formatDate(checkedData.createdAt)}</strong>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Masa Berlaku</span>
-                  <strong className="lifetime-strong">Tidak Pernah Hangus</strong>
+                  <strong className="lifetime-strong">Aktif Permanen Tanpa Kedaluwarsa</strong>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Gateway Endpoint</span>
@@ -171,16 +189,17 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
               </div>
 
               <div className="usage-breakdown-box">
-                <h5>Histori Pemakaian Terakhir:</h5>
+                <h5>Histori Pemakaian:</h5>
                 <div className="usage-list">
-                  {checkedData.usageHistory.map((u, i) => (
-                    <div key={i} className="usage-row">
-                      <span className="usage-model">{u.model}</span>
-                      <span className="usage-tokens">{u.tokens}</span>
-                      <strong className="usage-cost">{u.cost}</strong>
-                    </div>
-                  ))}
+                  <div className="usage-row">
+                    <span className="usage-model">Penggunaan Gateway</span>
+                    <span className="usage-tokens">Belum ada pemakaian token</span>
+                    <strong className="usage-cost">Rp 0</strong>
+                  </div>
                 </div>
+                <p style={{ fontSize: "11px", color: "var(--muted)", marginTop: "6px" }}>
+                  Saldo Anda masih 100% utuh dan siap digunakan di Claude Code, Cursor AI, atau Web Chatbox.
+                </p>
               </div>
 
               <div className="balance-actions-row">
@@ -192,15 +211,18 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
                     onTopUp();
                   }}
                 >
-                  Top Up Saldo SingaPay ↗
+                  Beli Token / Top Up Baru ↗
                 </button>
               </div>
             </div>
           ) : (
             <div className="balance-not-found">
               <span className="error-icon">✕</span>
-              <h4>API Key Tidak Ditemukan</h4>
-              <p>Pastikan Anda memasukkan format key yang benar (dimulai dengan <code>jt-live-</code>).</p>
+              <h4>Kunci API Tidak Ditemukan</h4>
+              <p>
+                {errorMessage ||
+                  "Pastikan Anda memasukkan format kunci yang valid (dimulai dengan prefix jt-live-) dan telah menyelesaikan pembayaran."}
+              </p>
             </div>
           )}
         </div>
@@ -208,3 +230,4 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
     </Dialog>
   );
 }
+
