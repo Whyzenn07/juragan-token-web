@@ -67,8 +67,8 @@ export async function POST(req: NextRequest) {
   }
 
   // 3. Tentukan Target Upstream Provider & Model
-  const requestedModel = body.model || "gemini-2.0-flash";
-  const { provider, targetModel } = resolveUpstreamModel(requestedModel);
+  const requestedModel = body.model || "gemini-3.5-flash";
+  let { provider, targetModel } = resolveUpstreamModel(requestedModel);
 
   // 4. Siapkan Upstream URL & Authorization
   let upstreamUrl = "";
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 5. Buat Payload yang Diteruskan
-  const upstreamPayload = {
+  let upstreamPayload = {
     ...body,
     model: targetModel,
   };
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
   const isStream = Boolean(body.stream);
 
   try {
-    const upstreamRes = await fetch(upstreamUrl, {
+    let upstreamRes = await fetch(upstreamUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -126,6 +126,23 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(upstreamPayload),
     });
 
+    // Otomatis failover ke gemini-3.5-flash jika model pilihan sedang spike 503
+    if (provider === "gemini" && upstreamRes.status === 503 && targetModel !== "gemini-3.5-flash") {
+      console.warn(`[GATEWAY 503 FAILOVER] ${targetModel} sibuk, mengalihkan ke gemini-3.5-flash...`);
+      targetModel = "gemini-3.5-flash";
+      upstreamPayload.model = "gemini-3.5-flash";
+      upstreamRes = await fetch(upstreamUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: upstreamAuthHeader,
+          "x-juragan-client-key": auth.keyHash,
+          "x-juragan-retail-origin": "juragan-token-web",
+        },
+        body: JSON.stringify(upstreamPayload),
+      });
+    }
+
     if (!upstreamRes.ok) {
       const errBody = await upstreamRes.json().catch(() => ({}));
       console.warn(`[GATEWAY UPSTREAM ERROR] ${provider} status ${upstreamRes.status}:`, errBody);
@@ -135,7 +152,7 @@ export async function POST(req: NextRequest) {
             message:
               errBody?.error?.message ||
               (provider === "engine"
-                ? `Engine Utama (juragantoken.co.id) mengembalikan status ${upstreamRes.status}. Coba gunakan model Google Gemini ('gemini-3.8-flash').`
+                ? `Engine Utama (juragantoken.co.id) mengembalikan status ${upstreamRes.status}. Coba gunakan model Google Gemini ('gemini-3.5-flash').`
                 : `Gagal mendapatkan respons dari provider ${provider} (Status: ${upstreamRes.status}).`),
             type: "upstream_error",
             code: errBody?.error?.code || "upstream_failure",
