@@ -383,17 +383,23 @@ Pembeli: *${customerName || "Sahabat Token"}*
   const vaInfo = getVaInfo(selectedMethod);
 
   return (
-    <Dialog open={open} onClose={handleClose} label="Pembayaran Paket Token" panelClassName="modal singapay-modal">
+    <Dialog open={open} onClose={handleClose} label="Bukti Pembayaran Resmi" panelClassName="modal singapay-modal">
       <button className="close-button" onClick={handleClose} aria-label="Tutup pembayaran">
         <Icon name="close" />
       </button>
 
-      {/* Header Pembayaran */}
+      {/* Header Pembayaran Resmi */}
       <div className="singapay-header">
-        <div className="singapay-logo-badge">
-          <span className="brand-dot-sp" />
-          <strong>JuraganPay</strong>
-          <small>Pembayaran Instan</small>
+        <div className="singapay-logo-badge" style={{ gap: "8px" }}>
+          <span className="brand-mark" style={{ width: "22px", height: "18px", color: "var(--blue)" }}>
+            <Icon name="bolt" size={18} />
+          </span>
+          <strong style={{ fontSize: "16px", color: "var(--ink)", fontWeight: 800 }}>
+            Juragan<span style={{ color: "var(--blue)", fontWeight: 600 }}>Token</span>
+          </strong>
+          <small style={{ background: "#e0f2fe", color: "#0369a1", fontWeight: 700, padding: "2px 7px", borderRadius: "4px" }}>
+            {step === "success" ? "Invoice Lunas" : "Pembayaran Resmi"}
+          </small>
         </div>
         <span className="secure-badge">
           <Icon name="check" size={14} /> Terverifikasi QRIS Nasional
@@ -582,7 +588,7 @@ Pembeli: *${customerName || "Sahabat Token"}*
                   <rect x="115" y="125" width="12" height="15" fill="#0a2442" />
                   <rect x="135" y="130" width="10" height="10" fill="#0a2442" />
                 </svg>
-                <div className="qris-center-badge">SingaPay</div>
+                <div className="qris-center-badge">QRIS</div>
               </div>
 
               <p className="qris-hint">
@@ -669,173 +675,109 @@ Pembeli: *${customerName || "Sahabat Token"}*
       )}
 
       {step === "success" && (
-        <div className="sp-step-content payment-success">
-          <PaymentSuccessMark size={78} />
-          <span className="success-tag">Pembayaran Dikonfirmasi oleh SingaPay</span>
-          <h3>Token API Anda Siap Digunakan!</h3>
-          <p className="success-desc">
-            Paket <b>{pkg.name}</b> telah aktif. Kredensial telah diterbitkan oleh server dan tidak pernah kedaluwarsa.
+        <div className="sp-step-content payment-success" style={{ textAlign: "center", paddingTop: "8px" }}>
+          <PaymentSuccessMark size={76} />
+          
+          <h3 style={{ fontSize: "22px", fontWeight: 800, color: "var(--ink)", margin: "0 0 6px" }}>
+            Pembayaran Berhasil!
+          </h3>
+          <p className="success-desc" style={{ maxWidth: "420px", margin: "0 auto 20px", color: "#536b85", fontSize: "13px" }}>
+            Paket <b>{pkg.name}</b> telah aktif. Bukti transaksi resmi dan kredensial API Key telah dikirimkan ke email Anda.
           </p>
 
-          {/* Fintech Receipt Card (GoPay / BCA style) */}
-          <div className="fintech-receipt-card">
+          {/* Official Fintech Receipt Card */}
+          <div className="fintech-receipt-card" style={{ textAlign: "left" }}>
             <div className="frc-header">
-              <div className="frc-brand">
-                <span className="brand-dot-sp" />
-                <strong>SingaPay Receipt</strong>
+              <div className="frc-brand" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="brand-mark" style={{ width: "20px", height: "16px", color: "var(--blue)" }}>
+                  <Icon name="bolt" size={16} />
+                </span>
+                <strong style={{ fontSize: "14px", color: "var(--ink)" }}>Bukti Pembayaran Resmi</strong>
               </div>
               <span className="frc-status-pill">
                 <Icon name="check" size={12} /> LUNAS &amp; TERVERIFIKASI
               </span>
             </div>
+
             <div className="frc-amount-box">
-              <span className="frc-amount-label">Total Pembayaran</span>
+              <span className="frc-amount-label">TOTAL PEMBAYARAN</span>
               <span className="frc-amount-val">{formatIdr(totalPaid || totalPrice)}</span>
             </div>
+
             <div className="frc-meta-grid">
               <div className="frc-meta-item">
-                <span className="frc-meta-label">No. Invoice</span>
+                <span className="frc-meta-label">NO. INVOICE</span>
                 <span className="frc-meta-value"><code>{invoiceId}</code></span>
               </div>
               <div className="frc-meta-item">
-                <span className="frc-meta-label">Metode Pembayaran</span>
+                <span className="frc-meta-label">METODE PEMBAYARAN</span>
                 <span className="frc-meta-value">{currentMethod.name}</span>
               </div>
               <div className="frc-meta-item">
-                <span className="frc-meta-label">Waktu Verifikasi</span>
+                <span className="frc-meta-label">PAKET TOKEN AI</span>
+                <span className="frc-meta-value"><b>{pkg.name}</b></span>
+              </div>
+              <div className="frc-meta-item">
+                <span className="frc-meta-label">WAKTU TRANSAKSI</span>
                 <span className="frc-meta-value">{formatDate(paidAt || new Date().toISOString())}</span>
               </div>
               <div className="frc-meta-item">
-                <span className="frc-meta-label">Nama Pemesan</span>
+                <span className="frc-meta-label">NAMA PEMESAN</span>
                 <span className="frc-meta-value">{customerName || "Pelanggan"}</span>
               </div>
+              <div className="frc-meta-item">
+                <span className="frc-meta-label">EMAIL TUJUAN</span>
+                <span className="frc-meta-value" style={{ color: "var(--blue)", wordBreak: "break-all" }}>{customerEmail}</span>
+              </div>
             </div>
-          </div>
 
-          {/* Email Delivery Confirmation Card */}
-          <div className={`email-status-card status-${emailStatus}`}>
-            <div className="esc-header">
-              <span className="esc-icon" aria-hidden="true">
-                {emailStatus === "sending" && <span className="esc-spinner" />}
-                {emailStatus === "sent" && <Icon name="check" size={15} />}
-                {emailStatus === "simulated" && <Icon name="info" size={15} />}
-                {emailStatus === "error" && <Icon name="alert" size={15} />}
-                {(emailStatus === "idle" || emailStatus === "none") && <Icon name="info" size={15} />}
+            {/* Notifikasi Pengiriman Kredensial via Gmail */}
+            <div
+              style={{
+                marginTop: "16px",
+                padding: "12px 14px",
+                background: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "10px",
+                fontSize: "12px",
+                color: "#166534",
+                lineHeight: 1.5,
+              }}
+            >
+              <span style={{ color: "#16a34a", marginTop: "2px", flexShrink: 0 }}>
+                <Icon name="check" size={16} />
               </span>
-              <div className="esc-text">
-                <strong>
-                  {emailStatus === "sending" && "Mengirimkan bukti pembayaran & API Key ke email..."}
-                  {emailStatus === "sent" && "Bukti Bayar & API Key Terkirim via Gmail"}
-                  {emailStatus === "simulated" && "Sistem Email Terhubung (Mode Simulasi)"}
-                  {emailStatus === "error" && "Kendala Pengiriman Email"}
-                  {(emailStatus === "idle" || emailStatus === "none") && "Email Pengiriman Bukti Pembayaran"}
+              <div>
+                <strong style={{ display: "block", color: "#14532d", marginBottom: "2px" }}>
+                  Kredensial API Telah Dikirim ke Gmail
                 </strong>
-                <p>
-                  {emailMessage || (
-                    <>Bukti transaksi resmi dan kredensial API Key dikirimkan ke <b>{customerEmail}</b>.</>
-                  )}
-                </p>
+                <span>
+                  Kunci <b>Virtual API Key</b> (<code>jt-live-...</code>) dan <b>Base URL Gateway</b> resmi telah dikirim ke <b>{customerEmail}</b>. Silakan cek kotak masuk atau folder spam email Anda.
+                </span>
               </div>
             </div>
           </div>
 
-          {/* WhatsApp Credentials Sharing Card */}
-          <div className="wa-share-card">
-            <div className="wa-share-header">
-              <span className="wa-icon-badge" aria-hidden="true">
-                <Icon name="whatsapp" size={20} />
-              </span>
-              <div className="wa-share-header-text">
-                <strong>Simpan / Kirim Bukti ke WhatsApp</strong>
-                <p>Kirim salinan invoice resmi &amp; Virtual API Key langsung ke WhatsApp Anda atau Admin.</p>
-              </div>
-            </div>
-            <div className="wa-share-buttons">
-              <button
-                type="button"
-                className="wa-btn-primary"
-                onClick={() => openWhatsAppCredentials("self")}
-              >
-                <Icon name="whatsapp" size={16} />
-                <span>Kirim ke WhatsApp Saya</span>
-              </button>
-              <button
-                type="button"
-                className="wa-btn-secondary"
-                onClick={() => openWhatsAppCredentials("admin")}
-              >
-                <Icon name="external" size={14} />
-                <span>Kirim ke Admin Juragan Token</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="credential-card">
-            <div className="cred-field">
-              <label>Virtual API Key Anda</label>
-              <div className="cred-copy-row">
-                <code>{apiKeyGenerated}</code>
-                <button
-                  type="button"
-                  className="button-primary-sm"
-                  onClick={() => copyToClipboard(apiKeyGenerated, "key")}
-                >
-                  {copiedKey ? "Tersalin!" : "Salin Key"}
-                </button>
-              </div>
-            </div>
-
-            <div className="cred-field">
-              <label>Base URL Gateway</label>
-              <div className="cred-copy-row">
-                <code>{GATEWAY_BASE_URL}</code>
-                <button
-                  type="button"
-                  className="button-primary-sm"
-                  onClick={() => copyToClipboard(GATEWAY_BASE_URL, "url")}
-                >
-                  {copiedUrl ? "Tersalin!" : "Salin URL"}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="quick-start-box">
-            <h4>Bisa langsung dicolok ke:</h4>
-            <ul>
-              <li><b>Web Chatbox:</b> Buka <a href="https://web.chatboxai.app/" target="_blank" rel="noopener noreferrer" style={{ color: "var(--blue)", fontWeight: 700 }}>web.chatboxai.app ↗</a> <i>(bukan chat-box.ai)</i></li>
-              <li><b>NextChat Web:</b> Buka <a href="https://app.nextchat.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "var(--blue)", fontWeight: 700 }}>app.nextchat.dev ↗</a></li>
-              <li><b>Claude Code CLI:</b> <code>$env:ANTHROPIC_API_KEY=&quot;{apiKeyGenerated}&quot;</code></li>
-              <li><b>Cursor AI:</b> Masukkan di <i>Settings &gt; Models &gt; Custom API Key</i></li>
-            </ul>
-            <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
-              <a
-                href="https://web.chatboxai.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="button-primary-sm"
-                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "6px 12px", gap: "5px" }}
-              >
-                <Icon name="globe" size={13} />
-                <span>Buka Web Chatbox</span>
-                <Icon name="external" size={11} />
-              </a>
-              <a
-                href="https://app.nextchat.dev/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="button-primary-sm"
-                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "6px 12px", background: "#f0f6fc", color: "var(--blue)", border: "1px solid #c8dcf4", gap: "5px" }}
-              >
-                <Icon name="globe" size={13} />
-                <span>Buka NextChat</span>
-                <Icon name="external" size={11} />
-              </a>
-            </div>
-          </div>
-
-          <button type="button" className="button-primary full" onClick={handleClose}>
-            Selesai &amp; Kembali ke Katalog
+          <button
+            type="button"
+            className="button-primary full"
+            onClick={handleClose}
+            style={{
+              marginTop: "20px",
+              height: "46px",
+              fontSize: "14px",
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}
+          >
+            <span>Selesai &amp; Kembali ke Halaman Utama</span>
+            <Icon name="arrow" size={16} />
           </button>
         </div>
       )}

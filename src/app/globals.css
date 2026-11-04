@@ -4654,4 +4654,72 @@ footer {
   to { transform: rotate(360deg); }
 }
 
+/* Floating WhatsApp Customer Support Widget */
+.floating-wa-btn {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.floating-wa-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.42);
+  transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.floating-wa-btn:hover .floating-wa-icon {
+  transform: scale(1.08) translateY(-2px);
+  background: #20ba5a;
+  box-shadow: 0 10px 28px rgba(37, 211, 102, 0.58);
+}
+
+.floating-wa-tooltip {
+  background: #0a2540;
+  color: #ffffff;
+  font-family: var(--font-h);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(10, 37, 64, 0.22);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.floating-wa-btn:hover .floating-wa-tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 640px) {
+  .floating-wa-btn {
+    bottom: 20px;
+    right: 18px;
+  }
+  .floating-wa-icon {
+    width: 52px;
+    height: 52px;
+  }
+  .floating-wa-tooltip {
+    display: none;
+  }
+}
+
 

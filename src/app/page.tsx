@@ -1165,6 +1165,23 @@ export default function Home() {
           setSingaPayOpen(true);
         }}
       />
+
+      {/* Floating WhatsApp Support Button (Pojok Bawah Kanan) */}
+      <a
+        href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990"}?text=${encodeURIComponent(
+          "Halo Admin Juragan Token! 👋 Saya ingin bertanya mengenai pembelian paket token AI atau bantuan integrasi gateway."
+        )}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="floating-wa-btn"
+        aria-label="Hubungi WhatsApp Admin Juragan Token"
+        title="Butuh bantuan? Chat WhatsApp Kami"
+      >
+        <span className="floating-wa-tooltip">Butuh Bantuan? Chat WhatsApp</span>
+        <span className="floating-wa-icon" aria-hidden="true">
+          <Icon name="whatsapp" size={32} />
+        </span>
+      </a>
     </div>
   );
 }
