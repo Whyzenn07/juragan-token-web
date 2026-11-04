@@ -1,34 +1,36 @@
 # Product Requirement Document (PRD): Juragan Token
 
-**Versi Dokumen:** 1.2.0  
-**Status:** Living Document / Aktif  
-**Tanggal Pembaruan:** 30 Oktober 2026  
-**Platform:** Web Application (Next.js 16.4.2 App Router, TypeScript, Vanilla CSS)  
+**Versi Dokumen:** 2.0.0  
+**Status:** Living Document / Production-Ready Architecture  
+**Tanggal Pembaruan:** 4 November 2026  
+**Platform:** Web Application (Next.js 16.4.2 App Router, TypeScript, Vanilla CSS, Supabase Cloud)  
+**Repository:** `Whyzenn07/juragan-token-web`  
 
 ---
 
 ## 1. Ikhtisar Produk (Product Overview)
 
 ### 1.1 Latar Belakang & Masalah
-Banyak developer, periset, mahasiswa, dan pembuat konten di Indonesia yang ingin memanfaatkan AI global tercanggih (Claude 3.5 Sonnet, Claude Opus 5.5, OpenAI GPT-4o / GPT-6, Google Gemini 3.8 Flash, DeepSeek V4, Alibaba Qwen 2.5, dsb). Namun, mereka menghadapi hambatan besar:
-1. **Ketiadaan Kartu Kredit Internasional:** Provider resmi (OpenAI, Anthropic, Google Cloud) mewajibkan kartu kredit Visa/Mastercard internasional dengan 3D Secure.
-2. **Komitmen Biaya Langganan yang Mahal:** Paket resmi $20/bulan (±Rp 330.000 - Rp 350.000) terasa memberatkan untuk kebutuhan sesekali atau mahasiswa dengan budget terbatas.
+Banyak developer, periset, mahasiswa, dan pembuat konten di Indonesia yang ingin memanfaatkan AI global tercanggih (Claude 3.5 Sonnet, Claude Opus 5.5, OpenAI GPT-4o, Google Gemini 3.8 Flash, DeepSeek V4, Alibaba Qwen 2.5, dsb). Namun, mereka menghadapi hambatan struktural:
+1. **Ketiadaan Kartu Kredit Internasional:** Provider resmi (OpenAI, Anthropic, Google Cloud) mewajibkan kartu kredit Visa/Mastercard internasional dengan otentikasi 3D Secure.
+2. **Komitmen Biaya Langganan Bulanan yang Mahal:** Paket resmi $20/bulan (±Rp 330.000 - Rp 350.000 per layanan) terasa memberatkan untuk kebutuhan sesekali, eksperimen, atau mahasiswa dengan anggaran terbatas.
 3. **Masa Berlaku Kedaluwarsa:** Kredit resmi seringkali memiliki masa kedaluwarsa bulanan (*use-it-or-lose-it*).
 
 ### 1.2 Solusi: Juragan Token
-**Juragan Token** adalah platform marketplace kredit API Multi-AI prabayar lokal pertama di Indonesia yang:
-- Mengonversi kuota API resmi ke dalam rupiah (IDR) dengan sistem **Pay-As-You-Go** prabayar.
-- Menyediakan paket ritel mulai dari **Rp 15.000** tanpa kartu kredit.
-- Menerima metode pembayaran lokal Indonesia (**QRIS Instan**, Virtual Account **BCA, Mandiri, BRI** melalui SingaPay).
-- Memberikan **1 Virtual API Key (`jt-live-...`)** yang kompatibel dengan protokol OpenAI (`base_url: https://gateway.juragantoken.co.id/v1`) yang dapat dipakai di berbagai aplikasi (Cursor AI, Claude Code CLI, Windsurf, Chatbox, Script Python).
-- **Masa aktif token selamanya** (tanpa kedaluwarsa bulanan).
-- Mengirimkan **bukti transaksi dan kredensial API Key secara otomatis ke Gmail pengguna**.
+**Juragan Token** adalah platform marketplace & gateway kredit Multi-AI prabayar lokal pertama di Indonesia yang berfungsi sebagai:
+- **Toko Ritel & Kasir Pembayaran IDR:** Memungkinkan pembelian kredit API mulai dari **Rp 15.000** menggunakan metode pembayaran lokal Indonesia (**QRIS Instan**, Virtual Account **BCA, Mandiri, BRI** melalui SingaPay, serta pemesanan cepat via WhatsApp).
+- **Universal OpenAI-Compatible AI Gateway:** Menyediakan **1 Virtual API Key (`jt-live-...`)** dengan Base URL standar (`https://www.juragantoken.co.id/v1`) yang dapat langsung dicolokkan ke berbagai *coding tools* dan klien populer (Cursor AI, Windsurf, Claude Code CLI, Chatbox, dan Python SDK).
+- **Hybrid Upstream Routing:** 
+  1. *Direct Engine:* Permintaan Google Gemini diproses langsung secara lokal ke Google AI Studio (`gemini-3.8-flash`) menggunakan Master Key berkecepatan tinggi.
+  2. *Pass-Through Engine:* Permintaan model frontier berdaya tinggi (Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, DeepSeek) diteruskan secara aman ke Central Engine di `https://gateway.juragantoken.co.id/v1` (bebas dependensi OpenRouter).
+- **Masa Aktif Token Selamanya:** Saldo kredit dalam mata uang rupiah (IDR) berlaku permanen tanpa kedaluwarsa bulanan.
+- **Dual Persistence & Audit Log:** Setiap transaksi dan pemakaian kredit tersinkronisasi secara *real-time* ke **Supabase Cloud Database** dengan failover penyimpanan lokal atomik.
 
 ---
 
 ## 2. Arsitektur & Diagram Alur (Flowcharts)
 
-### 2.1 Alur Pengguna Utama (End-to-End User Journey Flowchart)
+### 2.1 Alur Pengguna Utama (End-to-End User Journey)
 
 ```mermaid
 flowchart TD
@@ -40,37 +42,88 @@ flowchart TD
     Filter --> DetailModel[Modal Detail Model & Perbandingan Harga]
     DetailModel --> RetailAnchor[Scroll ke Katalog Paket Ritel]
     
-    Choice -->|Beli Token Langsung| Retail[Katalog Paket Ritel 4 Pilihan]
+    Choice -->|Beli Token Langsung| Retail[Katalog Paket Ritel: 4 Pilihan]
     Retail --> SelectPkg[Pilih Paket: Starter, Pro, Studio, Enterprise]
     
     SelectPkg --> OpenCheckout[Buka SingaPay Modal: Step 1 Formulir]
-    OpenCheckout --> InputData[Isi Nama Lengkap & Alamat Email Aktif]
+    OpenCheckout --> InputData[Isi Nama, Email, & No. WhatsApp]
     InputData --> SelectPayment[Pilih Metode: QRIS / BCA / Mandiri / BRI VA]
     
     SelectPayment --> StepPay[Step 2: Layar Pembayaran & Timer 15 Menit]
-    StepPay --> UserPay[User Melakukan Pembayaran QRIS / Transfer VA]
+    StepPay --> UserPay[User Melakukan Pembayaran QRIS / VA]
     
     UserPay --> VerifyPay{Verifikasi Pembayaran}
-    VerifyPay -->|Berhasil| GenerateKey[Generate Kunci Virtual: jt-live-xxxx]
+    VerifyPay -->|Berhasil| GenerateKey[Generate Kunci CSPRNG: jt-live-xxxx]
     
-    GenerateKey --> StepSuccess[Step 3: Layar Sukses & Tampilkan API Key + Base URL]
-    StepSuccess --> SendEmailTrigger[Trigger POST /api/send-receipt]
+    GenerateKey --> StepSuccess[Step 3: Layar Sukses & Kredensial API Key]
+    StepSuccess --> SendEmailTrigger[Trigger POST /api/send-receipt via Nodemailer]
+    StepSuccess --> BackupWA[Opsi Cadangkan Kredensial ke WhatsApp]
     
-    SendEmailTrigger --> EmailEngine{Cek Kredensial Gmail SMTP}
-    EmailEngine -->|Terkonfigurasi| SendSMTP[Kirim HTML Receipt via Nodemailer]
-    EmailEngine -->|Belum Diisi| SmartMock[Log Mode Simulasi & Response Ramah]
-    
-    SendSMTP --> UserInbox[Email Masuk ke Inbox Gmail Pembeli]
-    SmartMock --> UserInboxSim[Pemberitahuan Status di UI Modal]
-    
-    StepSuccess --> SetupGuide[Lihat Panduan Setup 1-Menit]
-    SetupGuide --> ColokTools[Colok ke Claude Code / Cursor / Chatbox / Python]
-    ColokTools --> Done([Selesai: User Menikmati Akses AI])
+    StepSuccess --> SetupGuide[Lihat Panduan Setup 1-Menit di Beranda]
+    SetupGuide --> ColokTools[Colok Base URL & Key ke Cursor / Claude Code / Chatbox / Python]
+    ColokTools --> Done([Selesai: User Menikmati Akses Multi-AI])
 ```
 
 ---
 
-### 2.2 Alur Sistem Pengiriman Email (Gmail SMTP Integration Flowchart)
+### 2.2 Alur Universal AI Gateway & Deduplikasi Saldo (AI Inference Flowchart)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Klien AI (Cursor / Claude Code / Chatbox)
+    participant Rewrite as Next.js Router (/v1/* -> /api/v1/*)
+    participant Gateway as /api/v1/chat/completions
+    participant Auth as Gateway Auth & Supabase DB
+    participant Engine as Upstream Provider (Gemini / Pass-Through)
+    participant Audit as Audit Logger (public.usage_logs)
+
+    Client->>Rewrite: POST /v1/chat/completions (Bearer jt-live-...)
+    Rewrite->>Gateway: Forward ke route handler internal
+    Gateway->>Auth: Validasi Authorization Header & SHA-256 Hash
+    
+    alt API Key Tidak Ditemukan / Tidak Aktif
+        Auth-->>Gateway: Return 401 Unauthorized
+        Gateway-->>Client: Error 401: invalid_api_key
+    else Saldo Habis (Balance <= 0)
+        Auth-->>Gateway: Return 402 Payment Required
+        Gateway-->>Client: Error 402: insufficient_quota
+    else Autentikasi Sukses
+        Auth-->>Gateway: Return KeyRecord & Saldo IDR
+    end
+
+    Gateway->>Gateway: Resolve Upstream Model (Gemini vs Frontier)
+    
+    alt Model = Gemini (e.g. gemini-3.8-flash)
+        Gateway->>Engine: POST Google AI Studio (OpenAI-compatible endpoint)
+    else Model = Frontier (Claude / GPT-4o / DeepSeek)
+        Gateway->>Engine: Pass-Through ke https://gateway.juragantoken.co.id/v1
+    end
+
+    Engine-->>Gateway: Stream chunks / JSON response
+    Gateway-->>Client: Teruskan Stream SSE / JSON ke Klien
+    
+    Gateway->>Auth: Potong Saldo IDR (deductKeyBalance di Supabase & Local)
+    Gateway->>Audit: Catat Riwayat ke public.usage_logs (Model, Token, Biaya)
+```
+
+---
+
+### 2.3 Alur Dual-Persistence Data (Cloud Database & Local Fallback)
+
+```mermaid
+flowchart LR
+    A[Mutasi Transaksi / Kunci / Saldo] --> B{Supabase Cloud Terhubung?}
+    B -->|Ya| C[Tulis ke PostgreSQL: public.orders / public.keys / public.usage_logs]
+    B -->|Offline / Fallback| D[Tulis ke Local Atomic Store: data/store.json]
+    C --> E[Sync Mirror ke Memory Cache Lokal]
+    D --> E
+    E --> F[Respon Instan < 50ms ke Pengguna]
+```
+
+---
+
+### 2.4 Alur Sistem Notifikasi Email (Gmail SMTP Integration)
 
 ```mermaid
 sequenceDiagram
@@ -78,175 +131,187 @@ sequenceDiagram
     actor User as Pengguna (Browser)
     participant Modal as SingaPayModal.tsx
     participant API as /api/send-receipt/route.ts
-    participant Env as .env.local Configuration
+    participant Env as Environment Config (.env.local)
     participant SMTP as Gmail SMTP Server (smtp.gmail.com)
     actor Inbox as Gmail Inbox Pengguna
 
-    User->>Modal: Bayar Paket (QRIS / VA Sukses)
-    Modal->>Modal: Generate API Key: jt-live-xxxxxxxx
+    User->>Modal: Pembayaran Terkonfirmasi Lunas
     Modal->>API: POST /api/send-receipt { customerName, customerEmail, packageName, priceIdr, paymentMethod, apiKey }
+    API->>API: Validasi Data Wajib & Regex Email RFC 5322
     
-    API->>API: Validasi Parameter Wajib & Regex Email RFC 5322
-    alt Data Tidak Lengkap / Email Invalid
-        API-->>Modal: Return 400 Bad Request
-        Modal->>User: Tampilkan Notifikasi Error Form
-    end
-
-    API->>Env: Cek GMAIL_USER & GMAIL_APP_PASSWORD
-    alt Kredensial Kosong / Masih Default (Simulasi)
-        API-->>Modal: Return 200 OK (simulated: true, preview mode)
-        Modal->>User: Tampilkan Badge: "Mode Simulasi: Siap Kirim"
-    else Kredensial Lengkap & Valid
-        API->>SMTP: Connect via TLS & Google App Password
-        API->>SMTP: Send Email (HTML Navy-Blue Branded Template)
-        SMTP-->>Inbox: Masuk ke Inbox Pengguna
-        SMTP-->>API: 250 Message Delivered (messageId)
-        API-->>Modal: Return 200 OK (success: true, simulated: false)
-        Modal->>User: Tampilkan Badge: "Bukti Pembayaran & API Key Telah Terkirim"
+    API->>Env: Periksa GMAIL_USER & GMAIL_APP_PASSWORD
+    alt Kredensial Lengkap & Valid
+        API->>SMTP: Connect via TLS Port 465 / 587
+        API->>SMTP: Kirim HTML Receipt Navy-Branded
+        SMTP-->>Inbox: Email Bukti & API Key Masuk ke Inbox
+        API-->>Modal: Return 200 OK (sent: true)
+        Modal->>User: Badge: "Bukti Pembayaran & API Key Telah Terkirim"
+    else Kredensial Kosong / Mode Pengujian
+        API-->>Modal: Return 200 OK (simulated: true)
+        Modal->>User: Badge: "Mode Simulasi: Pengiriman Email Siap"
     end
 ```
 
 ---
 
-### 2.3 Alur Pemesanan & Notifikasi WhatsApp (Testing & Direct Orders)
+## 3. Spesifikasi Fungsional Produk (Feature Specifications)
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Pengguna / Tester
-    participant Modal as SingaPayModal.tsx
-    actor WA as WhatsApp Web / App
-    actor Admin as Admin Juragan Token
-
-    alt Skenario 1: Pesan Cepat Langsung via WhatsApp (Step 1)
-        User->>Modal: Isi Nama, Email, & No. WhatsApp
-        User->>Modal: Klik "Pesan Cepat via WhatsApp Admin"
-        Modal->>WA: Buka wa.me/ADMIN?text={Rincian Paket, Invoice, Data Pemesan}
-        WA->>Admin: Chat Pesanan Terkirim ke Admin
-        Modal->>Modal: Pindah ke Step 2 (Layar Pembayaran QRIS/VA)
-    else Skenario 2: Konfirmasi Bayar via WhatsApp (Step 2)
-        User->>Modal: Klik "Konfirmasi Bayar ke WhatsApp Admin"
-        Modal->>WA: Buka wa.me/ADMIN?text={Invoice, Status Bayar, Total IDR}
-        WA->>Admin: Chat Bukti Bayar Masuk ke Admin
-    else Skenario 3: Cadangkan Kredensial & Kunci API (Step 3)
-        User->>Modal: Klik "Kirim ke WhatsApp Saya" atau "Kirim ke Admin"
-        Modal->>WA: Buka wa.me/?text={Invoice, API Key, Base URL, Panduan Colok}
-        WA->>User: Kredensial Tersimpan Aman di Chat WhatsApp Pribadi/Admin
-    end
-```
-
----
-
-### 2.4 Alur Cek Saldo & Validasi Token (Token Balance Flowchart)
-
-```mermaid
-flowchart LR
-    A([User Buka Modal 'Cek Saldo Key']) --> B[Input Kunci jt-live-...]
-    B --> C{Pemeriksaan Kunci}
-    C -->|Kunci Demo / Terdaftar| D[Tampilkan Saldo IDR, Jatah Token & Riwayat]
-    C -->|Kunci Baru jt-live-*| E[Tampilkan Status Aktif & Kalkulasi Otomatis]
-    C -->|Format Tidak Valid / Kosong| F[Tampilkan Peringatan Kunci Tidak Ditemukan]
-    D --> G[Opsi Top-Up Cepat -> Scroll ke Paket Ritel]
-    E --> G
-```
-
----
-
-## 3. Spesifikasi Fungsional (Feature Specifications)
-
-| Modul | Komponen / File | Deskripsi Fungsional |
+| Modul | Komponen / Endpoint | Deskripsi Fungsional & Standar Teknis |
 | :--- | :--- | :--- |
-| **Header & Navigasi** | `page.tsx`, `BrandMark.tsx` | Brand logo khas (3 balok bertingkat), sliding indicator tab navigasi, badge bendera Indonesia (IDR), tombol pintas *Cek Saldo Key*, tombol CTA *Beli Token*, dan menu responsif mobile. Shortcut keyboard `/` untuk auto-fokus search bar. |
-| **Hero Section** | `page.tsx` | Value proposition utama, announcement pill, trust strip (15+ Model, 100% Prabayar, Aktif Selamanya, Gateway Indonesia), dan CTA eksplorasi. |
-| **Katalog Model & Gateway Sync** | `page.tsx`, `catalog.ts`, `/api/models/sync` | Katalog 15+ model AI global dengan filter kategori (*Semua*, *Ngoding*, *Tugas & Riset*, *Gambar*), sortir harga/unggulan, pencarian instan, bookmark model, modal detail model, dan sinkronisasi live gateway pricing. |
-| **Kalkulator Biaya IDR** | `SavingsCalculator.tsx`, `catalog.ts` | Konversi rasio token resmi ke rupiah berdasarkan kurs acuan USD (Rp 16.250). |
-| **Katalog Paket Ritel** | `page.tsx` (`#katalog-retail`) | 4 kartu paket flat siap bayar (Starter Rp 15rb, Pro Rp 49rb, Studio Rp 99rb, Custom Enterprise) dengan tipografi profesional, badge rekomendasi, estimasi jumlah token, dan tombol beli langsung. |
-| **Sistem Checkout SingaPay** | `SingaPayModal.tsx`, `Dialog.tsx` | Modal multi-step checkout: input identitas pembeli, nomor WhatsApp, pemilihan metode bayar (QRIS/VA), layar instruksi dengan timer 15 menit, dan layar sukses yang mengekspos API Key + Base URL. |
-| **Integrasi Notifikasi WhatsApp** | `SingaPayModal.tsx`, `page.tsx` | Opsi pesan langsung via WhatsApp Admin di Step 1, tombol konfirmasi bayar WhatsApp di Step 2, tombol cadangkan kredensial ke WhatsApp pribadi/admin di Step 3, serta link bantuan WhatsApp di footer. |
-| **Integrasi Notifikasi Email** | `/api/send-receipt/route.ts` | Endpoint backend berbasis Nodemailer untuk mengirim bukti bayar resmi dan kredensial API Key dengan template HTML responsif, fallback aman, dan pesan informatif. |
-| **Panduan Setup 1-Menit** | `SetupGuides.tsx` | Tab panduan siap salin untuk Claude Code CLI, Cursor AI / Windsurf, Chatbox Web & App, serta script Python. |
-| **Portal Cek Saldo Key** | `TokenBalanceModal.tsx` | Modal verifikasi saldo sisa IDR, estimasi token, dan riwayat pemakaian per model. |
-| **FAQ Interaktif** | `page.tsx` (`#faq`) | Accordion pertanyaan krusial yang bersih, relevan, dan bebas duplikasi penjelasan teknis. |
+| **Universal AI Gateway** | `/v1/chat/completions`<br>`/api/v1/chat/completions` | Endpoint kompatibel 100% dengan OpenAI API. Mendukung Server-Sent Events (SSE) streaming dan non-streaming JSON. Dilengkapi validasi bearer token, error format standar OpenAI, dan header CORS lengkap. |
+| **Model Registry & Sync** | `/v1/models`<br>`/api/models/sync` | Mengembalikan daftar model yang tersedia (`gemini-3.8-flash`, `gemini-1.5-pro`, `claude-sonnet-5-5`, `claude-opus-5-5`, `gpt-4o`, `deepseek-chat`). Sinkronisasi harga live IDR per 1k token. |
+| **Router Rewrite** | `next.config.ts` | Konfigurasi internal rewrites: mapping otomatis dari `/v1/:path*` ke `/api/v1/:path*` agar klien AI pihak ketiga (Cursor/Claude CLI) dapat langsung memanggil root URL. |
+| **Deduplikasi Saldo & Metering** | `src/lib/gateway.ts` | Perhitungan tarif rupiah riil per request berdasarkan jumlah token input/output. Mengurangi `balance_idr` secara atomik di Supabase dan lokal. |
+| **Audit Usage Logging** | `public.usage_logs` | Pencatatan riwayat pemakaian API setiap kali request inferensi selesai (mencatat model, provider, prompt tokens, completion tokens, biaya IDR, dan sisa saldo). |
+| **Portal Cek Saldo Key** | `TokenBalanceModal.tsx`<br>`/api/keys/check` | Modal verifikasi saldo sisa IDR, estimasi token, status keaktifan permanen, proteksi rate-limiting (10 req/menit), masking kunci (`jt-live-...xxxx`), dan tombol 1-klik "Tempel Kunci Terakhir". |
+| **Panduan Setup 4-in-1** | `SetupGuides.tsx` | Tab panduan interaktif siap salin dengan deteksi otomatis Base URL origin (`http://localhost:3000/v1` di dev, atau `https://www.juragantoken.co.id/v1` saat live) untuk: Cursor AI, Claude Code CLI, Chatbox, dan Python SDK. |
+| **Sistem Checkout SingaPay** | `SingaPayModal.tsx` | Modal checkout 3 langkah: input identitas pembeli, pemilihan metode bayar (QRIS/VA), layar instruksi dengan timer 15 menit, dan layar sukses yang mengekspos API Key + Base URL. |
+| **Integrasi Notifikasi WhatsApp** | `SingaPayModal.tsx`, `page.tsx` | Pesan langsung via WhatsApp Admin di Step 1, konfirmasi bayar WhatsApp di Step 2, cadangkan kredensial ke WhatsApp pribadi/admin di Step 3, serta link bantuan WhatsApp di footer (`081226983990`). |
+| **Layanan Email Kuitansi** | `/api/send-receipt/route.ts` | Endpoint server-side berbasis Nodemailer untuk mengirim bukti bayar resmi dan kredensial API Key dengan template HTML responsif Navy Blue branded. |
+| **SEO & OpenGraph Metadata** | `src/app/layout.tsx` | Metadata komersial profesional: Title, Description berdaya konversi tinggi, OpenGraph WhatsApp preview, Twitter card, Canonical URL, dan bebas dari kata "simulasi". |
 
 ---
 
 ## 4. Status Implementasi Detail (Gap Analysis & Audit Status)
 
-Berikut adalah rekapitulasi audit status implementasi fitur per tanggal 30 Oktober 2026:
+Berikut adalah rekapitulasi audit status implementasi per tanggal **4 November 2026**:
 
 ```
-[✓] SUDAH DIIMPLEMENTASIKAN (100% Siap & Berfungsi)
-[~] SEBAGIAN / SIMULASI (Frontend Aktif, Backend Membutuhkan Kredensial / Webhook Eksternal)
-[ ] BELUM DIIMPLEMENTASIKAN (Roadmap Tahap Berikutnya)
+[✓] SUDAH DIIMPLEMENTASIKAN (100% Siap & Berfungsi di Codebase)
+[~] SEBAGIAN / SIAP AKTIVASI (Logika Siap, Memerlukan Kredensial / Saklar Produksi)
+[ ] ROADMAP TAHAP BERIKUTNYA
 ```
 
-### 4.1 Frontend & User Interface
-- [x] **[✓] Sistem Navigasi Responsif:** Sliding indicator mengikuti posisi scroll/hover, mobile menu toggle, sticky blur header.
-- [x] **[✓] Identitas Desain & Brand:** Logo tiga balok miring Juragan Token (SVG native), tema terang elegan (`#0a2442`, `#0a4ea3`, `#f5f8fb`), font Plus Jakarta Sans & IBM Plex Sans.
-- [x] **[✓] Hero Section & Value Proposition:** Headline tajam, badge IDR, jaminan tanpa kartu kredit internasional.
-- [x] **[✓] Katalog Model Interaktif:** 15+ model AI (Claude Sonnet 5.5, Claude Opus 5.5, GPT-4o, Gemini 3.8 Flash, DeepSeek V4, Qwen 2.5, Kimi, Flux, dll).
-- [x] **[✓] Filter, Search & Bookmark:** Filter kategori instan, pencarian berbasis keyword/provider, bookmark lokal (`savedIds`), shortcut `/`.
-- [x] **[✓] Modal Detail Model:** Spesifikasi token context window, input/output capabilities, dan perbandingan harga IDR.
-- [x] **[✓] Paket Ritel 4 Kolom Rapi:** Desain flat profesional tanpa emoji anak-anak, tinggi kartu sejajar, harga transparan, estimasi token jelas.
-- [x] **[✓] Panduan Setup 1-Menit:** 4 Tab interaktif dengan tombol "Salin Kode" (Claude Code, Cursor, Chatbox, Python).
-- [x] **[✓] FAQ Bersih & Bebas Duplikasi:** 5 butir FAQ accordion esensial yang tidak tumpang tindih dengan panduan setup.
-- [x] **[✓] Penghapusan Fitur `/langganan-resmi`:** Sesuai instruksi pemilik produk, fokus dialihkan 100% ke penjualan token API prabayar.
+### 4.1 AI Gateway & Inference Engine
+- [x] **[✓] Endpoint Kompatibel OpenAI (`/v1/chat/completions`):** Streaming SSE & non-streaming JSON aktif.
+- [x] **[✓] Endpoint Daftar Model (`/v1/models`):** JSON response berstandar OpenAI models schema.
+- [x] **[✓] Rewrites Router (`next.config.ts`):** Mapping `/v1/*` ke `/api/v1/*` selesai.
+- [x] **[✓] Direct Master Key Routing Google Gemini:** Routing `gemini-3.8-flash` & `gemini-1.5-pro` langsung ke Google AI Studio dengan master key.
+- [x] **[✓] Pass-Through Engine Frontier Models:** Routing Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, dan DeepSeek diteruskan ke `UPSTREAM_ENGINE_URL` (`juragantoken.co.id`). Dependensi OpenRouter telah dihapus 100%.
+- [x] **[✓] Pemotongan Saldo Real-Time (`deductKeyBalance`):** Pemotongan IDR per request berbasis volume token.
+- [x] **[✓] Audit Log Pemakaian (`recordUsageLog`):** Pencatatan riwayat pemakaian ke `public.usage_logs` dan memori lokal.
 
-### 4.2 Alur Transaksi, Checkout & WhatsApp
-- [x] **[✓] Modal SingaPay (Step 1 - Identitas & Channel):** Form Nama, Email, Nomor WhatsApp, pilihan QRIS, BCA VA, Mandiri VA, BRI VA.
-- [x] **[✓] Pesan Langsung via WhatsApp Admin (Step 1):** Tombol hijau direct-order yang otomatis menyusun teks invoice rapi dan membuka chat WhatsApp admin.
-- [x] **[✓] Modal SingaPay (Step 2 - Instruksi & Timer):** Tampilan QRIS simulasi / Nomor VA, nominal unik, timer hitung mundur 15 menit.
-- [x] **[✓] Konfirmasi Bayar via WhatsApp (Step 2):** Tombol kirim konfirmasi bayar WhatsApp dengan payload no. invoice, paket, nominal, dan data pemesan.
-- [x] **[✓] Modal SingaPay (Step 3 - Aktivasi Kunci):** Penyerahan Virtual API Key resmi dari server (`jt-live-...`), Base URL Gateway, tombol salin instan.
-- [x] **[✓] Verifikasi Pembayaran & Centang Hijau Fintech (Step 3):** Animasi stroke centang hijau profesional (`PaymentSuccessMark`) ala GoPay/BCA, serta SingaPay Receipt Card resmi berisikan nomor invoice, nominal, metode bayar, dan stempel LUNAS & TERVERIFIKASI.
-- [x] **[✓] Pembuatan Kunci API Server-Side:** Kunci virtual dibuat di server via CSPRNG (`crypto.randomBytes`), di-hash dengan SHA-256, dan hanya diungkapkan satu kali pada saat konfirmasi/polling pembayaran.
-- [x] **[✓] Cadangkan Bukti & API Key ke WhatsApp (Step 3):** Opsi kirim salinan lengkap kredensial ke WhatsApp diri sendiri maupun ke WhatsApp admin (081226983990).
-- [x] **[✓] Bantuan WhatsApp di Footer:** Tautan langsung ke WhatsApp resmi Juragan Token di footer beranda.
-- [x] **[✓] Server Order Lifecycle & Polling:** Polling otomatis status order via `GET /api/orders/[id]` terlindungi `x-order-token` dan endpoint konfirmasi aman `POST /api/orders/[id]/confirm`.
+### 4.2 Data & Database Cloud (Supabase)
+- [x] **[✓] Migrasi Tabel Orders & Keys:** `public.orders` dan `public.keys` aktif dengan Row Level Security (RLS).
+- [x] **[✓] Migrasi Tabel Usage Logs:** `public.usage_logs` aktif dengan indeks pencarian per key hash dan waktu.
+- [x] **[✓] Autentikasi Kunci SHA-256:** Kunci `jt-live-...` dienkripsi satu arah dengan SHA-256 sebelum disimpan. Kunci mentah tidak pernah disimpan permanen di database.
+- [x] **[✓] Dual-Write Fallback:** Jika koneksi cloud mengalami latensi/gangguan, sistem otomatis beralih ke local atomic store (`data/store.json`).
 
-### 4.3 Layanan Email (Gmail SMTP Integration)
-- [x] **[✓] Server-Side Email Dispatcher (`lib/receipt-email.ts`):** Validasi input, HTML escaping anti-XSS, formatting IDR, tanggal transaksi Indonesia, pemanggilan otomatis di server saat pesanan terkonfirmasi lunas.
-- [x] **[✓] Template Email HTML:** Desain responsif Navy Blue branded, kotak kredensial rahasia, petunjuk colok kilat.
-- [x] **[✓] Fallback Cerdas (Smart Dry-Run):** Jika kredensial belum ada di `.env.local`, sistem tetap mencatat status pengiriman email tersimulasi secara aman tanpa error/crash.
-- [x] **[✓] Status Pill Otomatis:** Modal SingaPay menerima status email langsung dari data pesanan server (*sending*, *sent*, *simulated*, *error*).
-- [ ] **[~] Kredensial Riil Google App Password:** Menunggu pengisian Sandi Aplikasi 16 karakter dari akun Google pemilik produk di `.env.local` agar email dapat langsung meluncur ke inbox pengguna.
+### 4.3 Frontend, User Experience & Panduan
+- [x] **[✓] Panduan Setup Interaktif 4-in-1 (`SetupGuides.tsx`):** Tab dinamis untuk Cursor, Claude Code, Chatbox, Python dengan deteksi Base URL otomatis.
+- [x] **[✓] Metadata SEO & OpenGraph WhatsApp:** Tampilan share WhatsApp profesional dan bebas kata "simulasi".
+- [x] **[✓] Modal SingaPay (Step 1-3):** Alur checkout, timer 15 menit, verifikasi bayar, dan penerbitan API key.
+- [x] **[✓] Notifikasi & Backup WhatsApp:** Pesan instan, konfirmasi bayar, dan cadangkan kredensial ke WhatsApp.
+- [x] **[✓] Portal Cek Saldo Key:** Pencarian saldo via SHA-256 hash lookup di server, rate limiting, dan masking kunci.
 
-### 4.4 Data & Persistensi Backend
-- [x] **[✓] Gateway Pricing Synchronizer (`/api/models/sync`):** Fetcher endpoint dengan timeout, fallback cache internal, dan dynamic price recalculation.
-- [x] **[✓] Portal Cek Saldo Riil (`TokenBalanceModal.tsx` & `/api/keys/check`):** Menggunakan data kunci server riil (SHA-256 hash lookup), proteksi rate-limiting (10 req/menit), masking kunci (`jt-live-...xxxx`), status keaktifan permanen, serta tombol 1-klik "Tempel Kunci Terakhir". Bebas dari mock keys.
-- [x] **[✓] Atomic Store Persistensi (`lib/store.ts`):** Penyimpanan persisten lokal berbasis JSON dengan antrian mutasi atomik (*read-modify-write queue*) untuk data `orders` dan `keys`.
-- [ ] **[ ] Reverse Proxy Gateway Server:** Gateway `https://gateway.juragantoken.co.id/v1` merupakan arsitektur target; server proxy sesungguhnya (LiteLLM / One-API / custom Go proxy) dikelola secara terpisah dari web frontend ini.
+### 4.4 Komponen Kesiapan Operasional (Pending Activation)
+- [ ] **[~] Pengalihan Mode Demo ke Live (`NEXT_PUBLIC_DEMO_MODE=false`):** Saklar siap diputar ke `false` saat pembayaran QRIS merchant riil aktif.
+- [ ] **[~] Gambar QRIS Merchant Resmi:** Menunggu unggah gambar QRIS berizin resmi ber-NMID (saat ini menggunakan vector QRIS mockup).
+- [ ] **[~] Sandi Aplikasi Gmail SMTP (16 Karakter):** Sistem email siap meluncur ke inbox pembeli setelah Sandi Aplikasi Google dimasukkan ke `GMAIL_APP_PASSWORD`.
 
 ---
 
-## 5. Ringkasan Status Berdasarkan Skala Prioritas
+## 5. Spesifikasi Teknis Metering Saldo & Tarif IDR
 
-| Fitur | Kategori | Tingkat Kesiapan | Catatan Operasional |
-| :--- | :--- | :---: | :--- |
-| **Katalog & Navigasi Web** | Frontend | **100% Siap** | Tampilan modern, responsif, accessibility audit lolos. |
-| **Paket Ritel & FAQ** | Frontend | **100% Siap** | Telah dirapikan, bebas emoji, tata letak seimbang. |
-| **Modal SingaPay & WhatsApp Flow** | Frontend | **100% Siap** | Alur 3 tahap interaktif + integrasi pesan/konfirmasi WhatsApp selesai & teruji. |
-| **Verifikasi Pembayaran & Centang Hijau** | UI/UX | **100% Siap** | Animasi `PaymentSuccessMark` (GoPay/BCA style) + SingaPay Receipt Card. |
-| **Pembuatan Kunci API Server-Side** | Keamanan | **100% Siap** | Random CSPRNG + SHA-256 hash + one-time reveal. Bebas `Math.random()` client. |
-| **Integrasi Notifikasi WhatsApp** | Integrasi | **100% Siap** | Direct chat, invoice otomatis, konfirmasi bukti bayar ke `081226983990`. |
-| **Cek Saldo Key** | Backend/Data | **100% Siap** | Terverifikasi server via `/api/keys/check`, rate limited, masked keys. |
-| **Engine Email Nodemailer** | Backend | **95% Siap** | Kode server-side siap; menunggu input App Password di `.env.local`. |
-| **Persistensi Transaksi & Kunci** | Backend/Data | **100% Siap** | Atomic file store (`data/store.json`) dengan safe locking. |
-| **Webhook Payment Gateway** | Backend | **80% Siap** | Endpoint konfirmasi `/api/orders/[id]/confirm` siap dipanggil webhook/admin secret. |
+Setiap request yang melalui gateway `/v1/chat/completions` akan dihitung biayanya menggunakan rumus berbasis jumlah total token:
+
+$$\text{Biaya (IDR)} = \left\lceil \frac{\text{Prompt Tokens} + \text{Completion Tokens}}{1.000} \times \text{Tarif Model} \right\rceil$$
+
+### Tabel Acuan Tarif Model di Gateway
+
+| Kategori Model | Model yang Didukung | Tarif per 1.000 Tokens | Minimal Potong per Request | Jalur Pemrosesan |
+| :--- | :--- | :---: | :---: | :--- |
+| **Gemini Flash (Super Hemat)** | `gemini-3.8-flash`, `gemini-2.0-flash` | **Rp 20** | Rp 5 | Direct Google AI Studio |
+| **Gemini Pro (Analisis & Riset)** | `gemini-1.5-pro`, `gemini-pro-latest` | **Rp 60** | Rp 10 | Direct Google AI Studio |
+| **Frontier Coding (Cerdas)** | `claude-sonnet-5-5`, `claude-3-5-sonnet` | **Rp 200** | Rp 25 | Pass-Through Central Engine |
+| **Frontier Reasoning (Ultimate)** | `claude-opus-5-5`, `gpt-4o`, `deepseek-chat` | **Rp 200** | Rp 25 | Pass-Through Central Engine |
+
+*Catatan untuk Streaming (SSE):* Saat client menggunakan opsi `stream: true`, sistem memotong estimasi saldo provisional (150 prompt + 350 completion tokens = 500 tokens) di awal stream, mencatat log audit pemakaian, dan memastikan saldo tidak minus.
 
 ---
 
-## 6. Rekomendasi Langkah Selanjutnya (Actionable Next Steps)
+## 6. Spesifikasi Integrasi Klien (4-in-1 Client Connectors)
 
-1. **Aktivasi Pengiriman Email Riil (Opsional - Estimasi 3 Menit):**
-   - Buka akun Google pengirim di [Google App Passwords](https://myaccount.google.com/apppasswords).
-   - Buat Sandi Aplikasi 16 karakter (pilih app: *Mail*, device: *Other*).
-   - Masukkan ke `.env.local`:
-     ```env
-     GMAIL_USER="namaemail@gmail.com"
-     GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"
-     ```
+Sistem Juragan Token menjamin kompatibilitas 100% dengan 4 alat kerja utama pengembang:
 
-2. **Koneksi Reverse Proxy Gateway:**
-   - Sambungkan kunci `jt-live-...` yang tersimpan di store ke database LiteLLM / One-API proxy gateway `https://gateway.juragantoken.co.id/v1`.
+### 6.1 Cursor AI & Windsurf IDE
+- **Base URL:** `https://www.juragantoken.co.id/v1` (atau `http://localhost:3000/v1` pada tahap lokal)
+- **API Key:** `jt-live-xxxxxxxxxxxxxxxxxxxx`
+- **Model Override:** `claude-sonnet-5-5`, `gpt-4o`, `gemini-3.8-flash`
+- **Konfigurasi:** Masuk ke `Cursor Settings` > `Models` > Aktifkan `OpenAI API Key` > Masukkan Base URL & API Key.
 
+### 6.2 Claude Code CLI (Terminal Anthropic)
+- **Environment Variables:**
+  ```bash
+  export ANTHROPIC_BASE_URL="https://www.juragantoken.co.id/v1"
+  export ANTHROPIC_API_KEY="jt-live-xxxxxxxxxxxxxxxxxxxx"
+  ```
+- **Eksekusi:** Jalankan perintah `claude` langsung di terminal kerja.
+
+### 6.3 Chatbox (Desktop & Web App)
+- **AI Model Provider:** Pilih `OpenAI API`
+- **API Host:** `https://www.juragantoken.co.id` (otomatis menambahkan `/v1`)
+- **API Key:** `jt-live-xxxxxxxxxxxxxxxxxxxx`
+- **Model:** `claude-opus-5-5` atau `gemini-3.8-flash`
+
+### 6.4 Python OpenAI SDK
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://www.juragantoken.co.id/v1",
+    api_key="jt-live-xxxxxxxxxxxxxxxxxxxx"
+)
+
+response = client.chat.completions.create(
+    model="gemini-3.8-flash",
+    messages=[{"role": "user", "content": "Halo Juragan Token!"}]
+)
+print(response.choices[0].message.content)
+```
+
+---
+
+## 7. Matriks Variabel Lingkungan (Environment Variables Matrix)
+
+Berikut adalah konfigurasi variabel lingkungan yang digunakan oleh aplikasi:
+
+| Nama Variabel | Wajib/Opsional | Nilai Default / Format | Fungsi & Keterangan |
+| :--- | :---: | :--- | :--- |
+| `NEXT_PUBLIC_APP_URL` | Wajib | `https://www.juragantoken.co.id` | URL domain publik website untuk penentuan canonical SEO & OpenGraph. |
+| `GATEWAY_BASE_URL` | Wajib | `https://gateway.juragantoken.co.id/v1` | URL gateway acuan pada email bukti pembayaran. |
+| `NEXT_PUBLIC_SUPABASE_URL` | Wajib | `https://nzcblpzianzbgbwglhxc.supabase.co` | Endpoint REST API Cloud PostgreSQL Supabase. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Wajib | `sb_publishable_...` | Kunci anon/publishable untuk query frontend & backend ke Supabase. |
+| `SUPABASE_SECRET_KEY` | Opsional | `sb_secret_...` | Service Role Key untuk bypass RLS (keperluan migrasi database). |
+| `GEMINI_API_KEY` | Wajib | `AQ.Ab8RN6KZoZ...` | Master API Key Google AI Studio untuk pemrosesan direct model Gemini Flash/Pro. |
+| `UPSTREAM_ENGINE_URL` | Wajib | `https://gateway.juragantoken.co.id/v1` | Endpoint Central Engine untuk pass-through request Claude/GPT-4o/DeepSeek. |
+| `UPSTREAM_ENGINE_KEY` | Opsional | `sk-...` | Token otentikasi internal jika Central Engine mewajibkan master header khusus. |
+| `GMAIL_USER` | Opsional | `email@gmail.com` | Alamat Gmail resmi pengirim kuitansi pembelian. |
+| `GMAIL_APP_PASSWORD` | Opsional | 16 Karakter Sandi Aplikasi | Sandi aplikasi Google untuk otentikasi aman tanpa 2FA. |
+| `GMAIL_FROM_NAME` | Opsional | `Juragan Token Indonesia` | Nama pengirim yang tampil di inbox pembeli. |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Wajib | `6281226983990` | Nomor WhatsApp resmi Customer Care & Konfirmasi Pesanan. |
+| `DEMO_MODE` | Wajib | `"true"` atau `"false"` | Mengontrol tombol simulasi bayar di backend. |
+| `NEXT_PUBLIC_DEMO_MODE` | Wajib | `"true"` atau `"false"` | Mengontrol tampilan badge dan tombol simulasi di modal frontend. |
+| `ADMIN_SECRET` | Wajib | String acak panjang | Kunci pengaman untuk memicu konfirmasi manual pesanan via API. |
+
+---
+
+## 8. Langkah Verifikasi Fungsional (Sebelum Go-Live)
+
+1. **Uji Coba Inferensi Kunci Aktif:**
+   - Gunakan kunci aktif yang ada di database (`jt-live-ALbbK0UWHQg0ezVDdoFeDDzU`) untuk memanggil `POST /v1/chat/completions` dengan model `gemini-3.8-flash`.
+   - Pastikan saldo di Supabase berkurang sesuai formula tarif.
+   - Pastikan log transaksi tercatat di tabel `public.usage_logs`.
+
+2. **Uji Coba Portal Cek Saldo:**
+   - Masukkan kunci ke modal *Cek Saldo Key* di beranda.
+   - Pastikan informasi saldo rupiah, estimasi token, dan status aktif tampil akurat.
+
+3. **Uji Coba Alur SingaPay Modal & WhatsApp:**
+   - Jalankan alur checkout dari paket Starter (Rp 15.000).
+   - Pastikan tombol WhatsApp membuka link `wa.me/6281226983990` dengan format invoice yang lengkap.
+
+4. **Transisi Produksi Terakhir (Setelah Semua Berjalan Normal):**
+   - Masukkan Sandi Aplikasi Gmail ke `GMAIL_APP_PASSWORD`.
+   - Unggah gambar QRIS merchant resmi.
+   - Ubah `NEXT_PUBLIC_DEMO_MODE="false"`.
