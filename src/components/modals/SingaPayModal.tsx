@@ -391,9 +391,6 @@ Pembeli: *${customerName || "Sahabat Token"}*
       {/* Header Pembayaran Resmi */}
       <div className="singapay-header">
         <div className="singapay-logo-badge" style={{ gap: "8px" }}>
-          <span className="brand-mark" style={{ width: "22px", height: "18px", color: "var(--blue)" }}>
-            <Icon name="bolt" size={18} />
-          </span>
           <strong style={{ fontSize: "16px", color: "var(--ink)", fontWeight: 800 }}>
             Juragan<span style={{ color: "var(--blue)", fontWeight: 600 }}>Token</span>
           </strong>
@@ -659,8 +656,7 @@ Pembeli: *${customerName || "Sahabat Token"}*
 
           <div className="simulation-control">
             <p className="sim-text">
-              <Icon name="bolt" size={13} style={{ marginRight: "4px", color: "var(--blue)" }} />
-              Lingkungan Demo SingaPay: Klik tombol di bawah untuk menyimulasikan pembayaran berhasil.
+              Mode Simulasi: Klik tombol di bawah untuk menyimulasikan pembayaran berhasil.
             </p>
             <button
               type="button"
@@ -689,9 +685,6 @@ Pembeli: *${customerName || "Sahabat Token"}*
           <div className="fintech-receipt-card" style={{ textAlign: "left" }}>
             <div className="frc-header">
               <div className="frc-brand" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span className="brand-mark" style={{ width: "20px", height: "16px", color: "var(--blue)" }}>
-                  <Icon name="bolt" size={16} />
-                </span>
                 <strong style={{ fontSize: "14px", color: "var(--ink)" }}>Bukti Pembayaran Resmi</strong>
               </div>
               <span className="frc-status-pill">

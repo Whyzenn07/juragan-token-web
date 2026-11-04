@@ -1,4 +1,4 @@
-/** Centang sukses gaya aplikasi GoPay & QRIS: full background hijau dengan centang putih */
+/** Centang sukses gaya aplikasi GoPay & QRIS: full background hijau dengan centang putih beranimasi halus */
 export function PaymentSuccessMark({ size = 76 }: { size?: number }) {
   return (
     <div
@@ -24,11 +24,15 @@ export function PaymentSuccessMark({ size = 76 }: { size?: number }) {
         height={size * 0.52}
         fill="none"
         stroke="#ffffff"
-        strokeWidth="3.2"
+        strokeWidth="3.4"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <polyline points="20 6 9 17 4 12" />
+        <path
+          className="qris-check-animated"
+          pathLength={100}
+          d="M4.5 12.5 L9.5 17.5 L19.5 6.5"
+        />
       </svg>
     </div>
   );

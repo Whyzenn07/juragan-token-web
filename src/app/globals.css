@@ -4515,6 +4515,41 @@ footer {
   animation: psm-check-draw 0.45s 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
+/* GoPay / QRIS Solid Green Badge with Animated White Checkmark */
+.qris-success-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: qris-badge-pop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.qris-check-animated {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: qris-check-draw 0.45s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
+}
+
+@keyframes qris-badge-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes qris-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 @keyframes psm-circle-draw {
   to {
     stroke-dashoffset: 0;
@@ -4529,9 +4564,14 @@ footer {
 
 @media (prefers-reduced-motion: reduce) {
   .psm-circle,
-  .psm-check {
-    animation: none;
-    stroke-dashoffset: 0;
+  .psm-check,
+  .qris-check-animated {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .qris-success-badge {
+    animation: none !important;
+    transform: none !important;
   }
 }
 
