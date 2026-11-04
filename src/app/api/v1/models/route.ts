@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type, x-api-key",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "*",
+  "Access-Control-Max-Age": "86400",
 };
 
 export async function OPTIONS() {
@@ -12,6 +13,16 @@ export async function OPTIONS() {
 
 export async function GET() {
   const models = [
+    {
+      id: "gemini-3.5-flash",
+      object: "model",
+      created: 1730000000,
+      owned_by: "google",
+      permission: [],
+      root: "gemini-3.5-flash",
+      parent: null,
+      description: "Google Gemini 3.5 Flash - Stabil, super cepat, cerdas, dan hemat untuk koding & chat.",
+    },
     {
       id: "gemini-3.8-flash",
       object: "model",

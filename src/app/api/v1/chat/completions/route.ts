@@ -8,10 +8,10 @@ import {
 } from "@/lib/gateway";
 
 const CORS_HEADERS = {
-
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type, x-api-key",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "*",
+  "Access-Control-Max-Age": "86400",
 };
 
 export async function OPTIONS() {
@@ -115,22 +115,49 @@ export async function POST(req: NextRequest) {
   const isStream = Boolean(body.stream);
 
   try {
-    let upstreamRes = await fetch(upstreamUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: upstreamAuthHeader,
-        "x-juragan-client-key": auth.keyHash,
-        "x-juragan-retail-origin": "juragan-token-web",
-      },
-      body: JSON.stringify(upstreamPayload),
-    });
+    let upstreamRes: Response | null = null;
 
-    // Otomatis failover ke gemini-3.5-flash jika model pilihan sedang spike 503
-    if (provider === "gemini" && upstreamRes.status === 503 && targetModel !== "gemini-3.5-flash") {
-      console.warn(`[GATEWAY 503 FAILOVER] ${targetModel} sibuk, mengalihkan ke gemini-3.5-flash...`);
-      targetModel = "gemini-3.5-flash";
-      upstreamPayload.model = "gemini-3.5-flash";
+    if (provider === "engine") {
+      try {
+        upstreamRes = await fetch(upstreamUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: upstreamAuthHeader,
+            "x-juragan-client-key": auth.keyHash,
+            "x-juragan-retail-origin": "juragan-token-web",
+          },
+          body: JSON.stringify(upstreamPayload),
+        });
+      } catch (engineErr: any) {
+        console.warn("[GATEWAY NOTICE] Central engine offline, auto-falling back to Gemini:", engineErr?.message);
+        upstreamRes = null;
+      }
+
+      // Jika Central Engine offline / belum ada DNS, otomatis fallback ke Gemini
+      if (!upstreamRes || !upstreamRes.ok) {
+        const geminiKey = process.env.GEMINI_API_KEY?.trim();
+        if (geminiKey) {
+          console.warn(`[GATEWAY GRACEFUL FALLBACK] Mengalihkan model '${targetModel}' ke Google Gemini agar chat tetap berhasil...`);
+          upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+          upstreamAuthHeader = `Bearer ${geminiKey}`;
+          targetModel = "gemini-3.5-flash";
+          provider = "gemini";
+          upstreamPayload = {
+            ...body,
+            model: "gemini-3.5-flash",
+          };
+          upstreamRes = await fetch(upstreamUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: upstreamAuthHeader,
+            },
+            body: JSON.stringify(upstreamPayload),
+          });
+        }
+      }
+    } else {
       upstreamRes = await fetch(upstreamUrl, {
         method: "POST",
         headers: {
@@ -141,6 +168,23 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify(upstreamPayload),
       });
+
+      // Otomatis failover ke gemini-3.5-flash jika model pilihan sedang spike 503
+      if (upstreamRes.status === 503 && targetModel !== "gemini-3.5-flash") {
+        console.warn(`[GATEWAY 503 FAILOVER] ${targetModel} sibuk, mengalihkan ke gemini-3.5-flash...`);
+        targetModel = "gemini-3.5-flash";
+        upstreamPayload.model = "gemini-3.5-flash";
+        upstreamRes = await fetch(upstreamUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: upstreamAuthHeader,
+            "x-juragan-client-key": auth.keyHash,
+            "x-juragan-retail-origin": "juragan-token-web",
+          },
+          body: JSON.stringify(upstreamPayload),
+        });
+      }
     }
 
     if (!upstreamRes.ok) {
@@ -227,10 +271,15 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("[GATEWAY FATAL ERROR]", err);
+    const friendlyMessage =
+      provider === "engine"
+        ? "Engine Utama Central (https://gateway.juragantoken.co.id) saat ini belum online atau DNS belum terhubung. Silakan gunakan model Google Gemini ('gemini-3.5-flash') untuk pengujian saat ini."
+        : `Koneksi ke provider Google Gemini terputus: ${err?.message || "Internal Network Error"}`;
+
     return NextResponse.json(
       {
         error: {
-          message: `Koneksi ke gateway upstream terputus: ${err?.message || "Internal Network Error"}`,
+          message: friendlyMessage,
           type: "gateway_network_error",
           code: "gateway_network_error",
         },

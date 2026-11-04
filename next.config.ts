@@ -15,8 +15,20 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: "/v1/v1/:path*",
+        destination: "/api/v1/:path*",
+      },
+      {
         source: "/v1/:path*",
         destination: "/api/v1/:path*",
+      },
+      {
+        source: "/chat/completions",
+        destination: "/api/v1/chat/completions",
+      },
+      {
+        source: "/models",
+        destination: "/api/v1/models",
       },
     ];
   },
