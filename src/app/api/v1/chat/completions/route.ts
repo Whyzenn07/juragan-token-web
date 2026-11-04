@@ -18,6 +18,91 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
 
+/**
+ * Sanitasi chunk OpenAI: Hapus field non-standar Google (extra_content / thought_signature)
+ * dan pastikan setiap tool_call memiliki properti `index: number` wajib.
+ */
+function sanitizeOpenAIChunk(parsed: any) {
+  if (!parsed || !parsed.choices) return parsed;
+  for (const choice of parsed.choices) {
+    if (choice.delta) {
+      if (choice.delta.extra_content) delete choice.delta.extra_content;
+      if (Array.isArray(choice.delta.tool_calls)) {
+        choice.delta.tool_calls.forEach((tc: any, idx: number) => {
+          if (tc.extra_content) delete tc.extra_content;
+          if (typeof tc.index !== "number") {
+            tc.index = idx;
+          }
+        });
+      }
+    }
+    if (choice.message) {
+      if (choice.message.extra_content) delete choice.message.extra_content;
+      if (Array.isArray(choice.message.tool_calls)) {
+        choice.message.tool_calls.forEach((tc: any, idx: number) => {
+          if (tc.extra_content) delete tc.extra_content;
+          if (typeof tc.index !== "number") {
+            tc.index = idx;
+          }
+        });
+      }
+    }
+  }
+  return parsed;
+}
+
+/**
+ * TransformStream untuk memfilter baris SSE secara streaming tanpa merusak urutan teks
+ */
+function createOpenAISanitizerStream(readableStream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+  const reader = readableStream.getReader();
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            if (buffer.trim()) {
+              controller.enqueue(encoder.encode(buffer));
+            }
+            controller.close();
+            break;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const dataStr = line.slice(6).trim();
+              if (dataStr === "[DONE]") {
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                continue;
+              }
+              try {
+                const parsed = JSON.parse(dataStr);
+                const cleaned = sanitizeOpenAIChunk(parsed);
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify(cleaned)}\n\n`));
+              } catch {
+                controller.enqueue(encoder.encode(`${line}\n`));
+              }
+            } else if (line.trim().length > 0) {
+              controller.enqueue(encoder.encode(`${line}\n`));
+            }
+          }
+        }
+      } catch (err) {
+        controller.error(err);
+      }
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   // 1. Verifikasi Kredensial API Key `jt-live-...`
   const authHeader = req.headers.get("authorization") || req.headers.get("x-api-key");
@@ -290,7 +375,8 @@ export async function POST(req: NextRequest) {
           console.warn("[GATEWAY DEDUCT STREAM] Error:", err);
         });
 
-      return new Response(upstreamRes.body, {
+      const sanitizedStream = createOpenAISanitizerStream(upstreamRes.body);
+      return new Response(sanitizedStream, {
         headers: {
           ...CORS_HEADERS,
           "Content-Type": "text/event-stream",
@@ -302,7 +388,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 6B. Penanganan Non-Streaming (JSON standar)
-    const data = await upstreamRes.json();
+    const rawData = await upstreamRes.json();
+    const data = sanitizeOpenAIChunk(rawData);
 
     const promptTokens = data.usage?.prompt_tokens || 100;
     const completionTokens = data.usage?.completion_tokens || 150;
