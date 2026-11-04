@@ -187,6 +187,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (!upstreamRes) {
+      return NextResponse.json(
+        {
+          error: {
+            message: "Gagal terhubung ke engine upstream. Silakan coba kembali sesaat lagi.",
+            type: "upstream_error",
+            code: "upstream_unavailable",
+          },
+        },
+        { status: 502, headers: CORS_HEADERS }
+      );
+    }
+
     if (!upstreamRes.ok) {
       const errBody = await upstreamRes.json().catch(() => ({}));
       console.warn(`[GATEWAY UPSTREAM ERROR] ${provider} status ${upstreamRes.status}:`, errBody);
