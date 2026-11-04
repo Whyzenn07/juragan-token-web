@@ -404,7 +404,7 @@ export const retailPackages: RetailPackage[] = [
 ];
 
 export const paymentMethods: PaymentMethod[] = [
-  { id: "qris", name: "QRIS SingaPay (Instan)", fee: "Gratis Biaya Admin", feeAmount: 0, provider: "BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, Dana", speed: "1 Detik Verifikasi" },
+  { id: "qris", name: "QRIS Instan (Semua Bank & e-Wallet)", fee: "Gratis Biaya Admin", feeAmount: 0, provider: "BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, Dana", speed: "1 Detik Verifikasi" },
   { id: "va-bca", name: "BCA Virtual Account", fee: "Rp 1.000", feeAmount: 1000, provider: "BCA Mobile / myBCA / KlikBCA", speed: "Otomatis Real-time" },
   { id: "va-mandiri", name: "Mandiri Virtual Account", fee: "Rp 1.000", feeAmount: 1000, provider: "Livin by Mandiri", speed: "Otomatis Real-time" },
   { id: "va-bri", name: "BRI Virtual Account (BRIVA)", fee: "Rp 1.000", feeAmount: 1000, provider: "BRImo / ATM BRI", speed: "Otomatis Real-time" },

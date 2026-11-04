@@ -383,17 +383,17 @@ Pembeli: *${customerName || "Sahabat Token"}*
   const vaInfo = getVaInfo(selectedMethod);
 
   return (
-    <Dialog open={open} onClose={handleClose} label="Checkout SingaPay" panelClassName="modal singapay-modal">
+    <Dialog open={open} onClose={handleClose} label="Pembayaran Paket Token" panelClassName="modal singapay-modal">
       <button className="close-button" onClick={handleClose} aria-label="Tutup pembayaran">
         <Icon name="close" />
       </button>
 
-      {/* Header SingaPay */}
+      {/* Header Pembayaran */}
       <div className="singapay-header">
         <div className="singapay-logo-badge">
           <span className="brand-dot-sp" />
-          <strong>SingaPay</strong>
-          <small>Payment Gateway</small>
+          <strong>JuraganPay</strong>
+          <small>Pembayaran Instan</small>
         </div>
         <span className="secure-badge">
           <Icon name="check" size={14} /> Terverifikasi QRIS Nasional

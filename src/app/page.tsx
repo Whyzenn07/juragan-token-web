@@ -939,7 +939,7 @@ export default function Home() {
                       setSingaPayOpen(true);
                     }}
                   >
-                    Beli Paket SingaPay ↗
+                    Beli Paket ↗
                   </button>
                 </article>
               ))}
