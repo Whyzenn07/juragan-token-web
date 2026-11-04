@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { modelsCatalog } from "@/data/catalog";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -12,7 +13,7 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  const models = [
+  const customModels = [
     {
       id: "gemini-3.5-flash-lite",
       object: "model",
@@ -44,36 +45,6 @@ export async function GET() {
       description: "Google Gemini 3.5 Flash - Cerdas, hemat token, dan handal untuk analisis teks & koding.",
     },
     {
-      id: "gemini-pro-latest",
-      object: "model",
-      created: 1730000000,
-      owned_by: "google",
-      permission: [],
-      root: "gemini-pro-latest",
-      parent: null,
-      description: "Google Gemini Pro - Penalaran kompleks, pemecahan masalah matematika & arsitektur sistem tingkat lanjut.",
-    },
-    {
-      id: "claude-sonnet-5-5",
-      object: "model",
-      created: 1730000000,
-      owned_by: "anthropic",
-      permission: [],
-      root: "claude-sonnet-5-5",
-      parent: null,
-      description: "Anthropic Claude Sonnet 5.5 - Pilihan utama untuk Claude Code & Cursor: review kode, refactor lintas file, dan logika koding bebas halusinasi.",
-    },
-    {
-      id: "claude-opus-5-5",
-      object: "model",
-      created: 1730000000,
-      owned_by: "anthropic",
-      permission: [],
-      root: "claude-opus-5-5",
-      parent: null,
-      description: "Anthropic Claude Opus 5.5 - Kasta tertinggi untuk deep reasoning logika murni, arsitektur enterprise, dan pembuktian matematis.",
-    },
-    {
       id: "claude-3-5-sonnet",
       object: "model",
       created: 1730000000,
@@ -81,7 +52,17 @@ export async function GET() {
       permission: [],
       root: "claude-3-5-sonnet",
       parent: null,
-      description: "Anthropic Claude 3.5 Sonnet - Model frontier koding & penalaran.",
+      description: "Anthropic Claude 3.5 Sonnet - Model coding dan penalaran tingkat lanjut via Pass-Through Engine Juragan Token.",
+    },
+    {
+      id: "claude-3-5-haiku",
+      object: "model",
+      created: 1730000000,
+      owned_by: "anthropic",
+      permission: [],
+      root: "claude-3-5-haiku",
+      parent: null,
+      description: "Anthropic Claude 3.5 Haiku - Model ringan, cepat, dan ekonomis untuk alur kerja terstruktur.",
     },
     {
       id: "gpt-4o",
@@ -105,10 +86,30 @@ export async function GET() {
     },
   ];
 
+  // Map all models from catalog
+  const catalogList = modelsCatalog.map((m) => ({
+    id: m.id,
+    object: "model",
+    created: 1730000000,
+    owned_by: m.providerId,
+    permission: [],
+    root: m.id,
+    parent: null,
+    description: m.description,
+  }));
+
+  const modelMap = new Map<string, any>();
+  catalogList.forEach((m) => modelMap.set(m.id, m));
+  customModels.forEach((m) => {
+    if (!modelMap.has(m.id)) modelMap.set(m.id, m);
+  });
+
+  const allModels = Array.from(modelMap.values());
+
   return NextResponse.json(
     {
       object: "list",
-      data: models,
+      data: allModels,
     },
     {
       headers: {

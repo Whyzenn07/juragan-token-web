@@ -26,6 +26,7 @@ import {
   perImageIdr,
   PRICING_SNAPSHOT_DATE,
   providerById,
+  providers,
   reachScore,
   RetailPackage,
   retailPackages,
@@ -35,7 +36,7 @@ import {
   USD_RATE
 } from "@/data/catalog";
 
-type SortOption = "featured" | "cheapest" | "priciest";
+type SortOption = "featured" | "provider" | "cheapest" | "priciest";
 
 const formatIdr = (val: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
@@ -93,8 +94,9 @@ export default function Home() {
   };
 
   const [activeCategory, setActiveCategory] = useState<Category>("Semua");
+  const [selectedProvider, setSelectedProvider] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState<SortOption>("featured");
+  const [sortOption, setSortOption] = useState<SortOption>("provider");
   const [selectedModel, setSelectedModel] = useState<ModelItem | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<RetailPackage | null>(null);
@@ -215,12 +217,40 @@ export default function Home() {
     catalogRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleBuyTokenForModel = (model: ModelItem) => {
+    const mName = model.name.toLowerCase();
+    let matched = retailPackages[1]; // default Starter Kuliah
+    if (mName.includes("opus") || mName.includes("astra") || mName.includes("argon")) {
+      matched = retailPackages.find((p) => p.id === "pkt-pro-builder") || retailPackages[3];
+    } else if (
+      mName.includes("sonnet") ||
+      mName.includes("sol") ||
+      mName.includes("m2.5") ||
+      mName.includes("m2.7") ||
+      mName.includes("k2.7") ||
+      mName.includes("qwen 3.6")
+    ) {
+      matched = retailPackages.find((p) => p.id === "pkt-skripsi-koding") || retailPackages[2];
+    } else if (
+      mName.includes("luna") ||
+      mName.includes("flash") ||
+      mName.includes("qwen") ||
+      mName.includes("haiku") ||
+      mName.includes("seed")
+    ) {
+      matched = retailPackages.find((p) => p.id === "pkt-mhs-uji") || retailPackages[0];
+    }
+    setSelectedPackage(matched);
+    setSingaPayOpen(true);
+  };
+
   // Filter & Sort Logic
   const filteredModels = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     const list = models.filter((m) => {
       if (viewSavedOnly && !savedIds.includes(m.id)) return false;
       const matchesCategory = activeCategory === "Semua" || m.category === activeCategory;
+      const matchesProvider = selectedProvider === "all" || m.providerId === selectedProvider;
       const p = providerById(m.providerId);
       const matchesSearch =
         !query ||
@@ -229,16 +259,24 @@ export default function Home() {
         m.description.toLowerCase().includes(query) ||
         p.name.toLowerCase().includes(query) ||
         p.company.toLowerCase().includes(query);
-      return matchesCategory && matchesSearch;
+      return matchesCategory && matchesProvider && matchesSearch;
     });
+    if (sortOption === "provider" || sortOption === "featured") {
+      const providerOrder = ["openai", "anthropic", "alibaba", "minimax", "google", "xai", "moonshot", "deepseek", "bytedance", "zhipu"];
+      return [...list].sort((a, b) => {
+        const pA = providerOrder.indexOf(a.providerId);
+        const pB = providerOrder.indexOf(b.providerId);
+        if (pA !== pB) return (pA === -1 ? 99 : pA) - (pB === -1 ? 99 : pB);
+        return 0; // Mempertahankan urutan tier kurasi di catalog.ts (Luna -> Terra -> Sol -> Astra)
+      });
+    }
     if (sortOption === "cheapest") return [...list].sort((a, b) => unitCostIdr(a) - unitCostIdr(b));
     if (sortOption === "priciest") return [...list].sort((a, b) => unitCostIdr(b) - unitCostIdr(a));
-    // "featured": model unggulan dulu, sisanya mengikuti urutan kurasi di catalog.ts
-    return [...list].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
-  }, [models, activeCategory, searchQuery, sortOption, savedIds, viewSavedOnly]);
+    return list;
+  }, [models, activeCategory, selectedProvider, searchQuery, sortOption, savedIds, viewSavedOnly]);
 
   // Kunci ini memicu animasi masuk kartu saat filter berganti, tapi tidak di setiap ketikan pencarian.
-  const gridKey = `${activeCategory}-${sortOption}-${viewSavedOnly ? "saved" : "all"}`;
+  const gridKey = `${activeCategory}-${selectedProvider}-${sortOption}-${viewSavedOnly ? "saved" : "all"}`;
 
   return (
     <div className="site-canvas">
@@ -601,6 +639,12 @@ export default function Home() {
               <span className="brand-dot-sep">·</span>
               <b>Qwen3.7 Max</b>
             </div>
+            <div className="provider-wordmark" title="MiniMax - MiniMax M2.5">
+              <ProviderLogo provider="minimax" size={18} />
+              <span className="company-brand">MiniMax</span>
+              <span className="brand-dot-sep">·</span>
+              <b>MiniMax M2.5</b>
+            </div>
             <div className="provider-wordmark" title="xAI - Grok 4.3">
               <ProviderLogo provider="grok" size={18} />
               <span className="company-brand">xAI</span>
@@ -645,9 +689,10 @@ export default function Home() {
                 className="text-button"
                 onClick={() => {
                   setActiveCategory("Semua");
+                  setSelectedProvider("all");
                   setSearchQuery("");
                   setViewSavedOnly(false);
-                  setSortOption("featured");
+                  setSortOption("provider");
                 }}
               >
                 Hapus filter
@@ -722,7 +767,8 @@ export default function Home() {
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value as SortOption)}
                 >
-                  <option value="featured">Unggulan</option>
+                  <option value="provider">Per Provider (OpenAI, Claude, Qwen...)</option>
+                  <option value="featured">Pilihan Unggulan</option>
                   <option value="cheapest">Paling hemat</option>
                   <option value="priciest">Harga tertinggi</option>
                 </select>
@@ -746,6 +792,38 @@ export default function Home() {
                   <span className="chip-count">{categoryCount(cat)}</span>
                 </button>
               ))}
+            </div>
+
+            {/* Provider Quick Filter Strip */}
+            <div className="provider-filter-strip" role="group" aria-label="Filter berdasarkan AI Provider">
+              <span className="pfs-label">Provider:</span>
+              <div className="pfs-list">
+                <button
+                  type="button"
+                  className={`chip provider-chip ${selectedProvider === "all" ? "active" : ""}`}
+                  onClick={() => setSelectedProvider("all")}
+                >
+                  Semua
+                  <span className="chip-count">{models.length}</span>
+                </button>
+                {providers.map((p) => {
+                  const count = models.filter((m) => m.providerId === p.id).length;
+                  if (count === 0) return null;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className={`chip provider-chip ${selectedProvider === p.id ? "active" : ""}`}
+                      onClick={() => setSelectedProvider(selectedProvider === p.id ? "all" : p.id)}
+                      title={`Tampilkan hanya model dari ${p.company}`}
+                    >
+                      <ProviderLogo provider={p.id} size={14} />
+                      <span>{p.company}</span>
+                      <span className="chip-count">{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Results Meta */}
@@ -866,6 +944,21 @@ export default function Home() {
                           <span key={app}>{app}</span>
                         ))}
                       </footer>
+
+                      <div className="mc-action-row">
+                        <button
+                          type="button"
+                          className="mc-buy-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBuyTokenForModel(m);
+                          }}
+                          aria-label={`Beli token untuk ${m.name}`}
+                        >
+                          <span>Beli Token</span>
+                          <span className="mc-buy-arrow">→</span>
+                        </button>
+                      </div>
                     </article>
                   );
                 })
