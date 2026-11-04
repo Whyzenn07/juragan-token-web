@@ -193,6 +193,7 @@ export async function POST(req: NextRequest) {
 
   // 5. Buat Payload yang Diteruskan & Multi-Tier Resilience Engine
   const sanitizeGemini = (p: any, m: string) => {
+    // Parameter yang tidak didukung atau memicu 400 di Google OpenAI endpoint:
     const {
       frequency_penalty,
       presence_penalty,
@@ -200,17 +201,34 @@ export async function POST(req: NextRequest) {
       logprobs,
       top_logprobs,
       user,
+      seed,
+      store,
+      metadata,
+      service_tier,
       ...rest
     } = p;
-    return { ...rest, model: m };
+
+    const sanitized: any = { ...rest, model: m };
+
+    // Hapus 'strict: true' jika ada di response_format karena sering ditolak Google
+    if (sanitized.response_format && typeof sanitized.response_format === "object") {
+      const { strict, ...rfRest } = sanitized.response_format;
+      sanitized.response_format = rfRest;
+    }
+
+    return sanitized;
   };
 
   const fetchWithGeminiResilience = async (
     url: string,
-    key: string,
+    keyConfig: string,
     payload: any,
     reqModel: string
   ): Promise<{ res: Response | null; modelUsed: string }> => {
+    // Mendukung key rotation jika GEMINI_API_KEY berisi lebih dari satu kunci dipisah koma
+    const keyPool = keyConfig.split(",").map((k) => k.trim()).filter(Boolean);
+    const activeKey = keyPool[Math.floor(Math.random() * keyPool.length)] || keyConfig;
+
     // Urutan prioritas model untuk keandalan maksimal tanpa 503 spike:
     // 1. gemini-3.5-flash-lite (paling tahan banting & sangat cepat)
     // 2. gemini-flash-lite-latest (versi rolling production)
@@ -230,28 +248,37 @@ export async function POST(req: NextRequest) {
 
     for (const model of candidateModels) {
       const sanitized = sanitizeGemini(payload, model);
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${key}`,
-          },
-          body: JSON.stringify(sanitized),
-        });
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${activeKey}`,
+            },
+            body: JSON.stringify(sanitized),
+          });
 
-        lastRes = res;
-        lastModel = model;
+          lastRes = res;
+          lastModel = model;
 
-        if (res.ok) {
-          return { res, modelUsed: model };
+          if (res.ok) {
+            return { res, modelUsed: model };
+          }
+
+          console.warn(`[GEMINI RESILIENCE] Model '${model}' attempt ${attempt + 1} status ${res.status}.`);
+
+          // Jika 400 (Bad request), kemungkinan payload ada field tidak valid, coba model lain
+          if (res.status === 400) {
+            break;
+          }
+
+          // Jika 503 (Overload) atau 429 (Rate limit), jeda sejenak sebelum percobaan berikutnya
+          await new Promise((r) => setTimeout(r, 250 * (attempt + 1)));
+        } catch (err: any) {
+          console.warn(`[GEMINI RESILIENCE] Network error saat menghubungi ${model}:`, err?.message);
+          await new Promise((r) => setTimeout(r, 200));
         }
-
-        console.warn(`[GEMINI RESILIENCE] Model '${model}' status ${res.status}. Mencoba model cadangan...`);
-        // Jeda singkat sebelum failover ke candidate berikutnya
-        await new Promise((r) => setTimeout(r, 200));
-      } catch (err: any) {
-        console.warn(`[GEMINI RESILIENCE] Network error saat menghubungi ${model}:`, err?.message);
       }
     }
 
