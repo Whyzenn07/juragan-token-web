@@ -106,7 +106,73 @@ export async function POST(req: NextRequest) {
     upstreamAuthHeader = engineKey ? `Bearer ${engineKey}` : (authHeader || "");
   }
 
-  // 5. Buat Payload yang Diteruskan
+  // 5. Buat Payload yang Diteruskan & Multi-Tier Resilience Engine
+  const sanitizeGemini = (p: any, m: string) => {
+    const {
+      frequency_penalty,
+      presence_penalty,
+      logit_bias,
+      logprobs,
+      top_logprobs,
+      user,
+      ...rest
+    } = p;
+    return { ...rest, model: m };
+  };
+
+  const fetchWithGeminiResilience = async (
+    url: string,
+    key: string,
+    payload: any,
+    reqModel: string
+  ): Promise<{ res: Response | null; modelUsed: string }> => {
+    // Urutan prioritas model untuk keandalan maksimal tanpa 503 spike:
+    // 1. gemini-3.5-flash-lite (paling tahan banting & sangat cepat)
+    // 2. gemini-flash-lite-latest (versi rolling production)
+    // 3. gemini-3.5-flash (flash standar)
+    const candidateModels = [
+      "gemini-3.5-flash-lite",
+      "gemini-flash-lite-latest",
+      "gemini-3.5-flash",
+    ];
+
+    if (reqModel.toLowerCase().includes("pro")) {
+      candidateModels.unshift("gemini-pro-latest");
+    }
+
+    let lastRes: Response | null = null;
+    let lastModel = candidateModels[0];
+
+    for (const model of candidateModels) {
+      const sanitized = sanitizeGemini(payload, model);
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${key}`,
+          },
+          body: JSON.stringify(sanitized),
+        });
+
+        lastRes = res;
+        lastModel = model;
+
+        if (res.ok) {
+          return { res, modelUsed: model };
+        }
+
+        console.warn(`[GEMINI RESILIENCE] Model '${model}' status ${res.status}. Mencoba model cadangan...`);
+        // Jeda singkat sebelum failover ke candidate berikutnya
+        await new Promise((r) => setTimeout(r, 200));
+      } catch (err: any) {
+        console.warn(`[GEMINI RESILIENCE] Network error saat menghubungi ${model}:`, err?.message);
+      }
+    }
+
+    return { res: lastRes, modelUsed: lastModel };
+  };
+
   let upstreamPayload = {
     ...body,
     model: targetModel,
@@ -134,57 +200,33 @@ export async function POST(req: NextRequest) {
         upstreamRes = null;
       }
 
-      // Jika Central Engine offline / belum ada DNS, otomatis fallback ke Gemini
+      // Jika Central Engine offline / belum ada DNS, otomatis failover ke Gemini dengan multi-tier resilience
       if (!upstreamRes || !upstreamRes.ok) {
         const geminiKey = process.env.GEMINI_API_KEY?.trim();
         if (geminiKey) {
-          console.warn(`[GATEWAY GRACEFUL FALLBACK] Mengalihkan model '${targetModel}' ke Google Gemini agar chat tetap berhasil...`);
+          console.warn(`[GATEWAY GRACEFUL FALLBACK] Mengalihkan ke Google Gemini Resilience Engine...`);
           upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-          upstreamAuthHeader = `Bearer ${geminiKey}`;
-          targetModel = "gemini-3.5-flash";
           provider = "gemini";
-          upstreamPayload = {
-            ...body,
-            model: "gemini-3.5-flash",
-          };
-          upstreamRes = await fetch(upstreamUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: upstreamAuthHeader,
-            },
-            body: JSON.stringify(upstreamPayload),
-          });
+          const result = await fetchWithGeminiResilience(
+            upstreamUrl,
+            geminiKey,
+            upstreamPayload,
+            requestedModel
+          );
+          upstreamRes = result.res;
+          targetModel = result.modelUsed;
         }
       }
     } else {
-      upstreamRes = await fetch(upstreamUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: upstreamAuthHeader,
-          "x-juragan-client-key": auth.keyHash,
-          "x-juragan-retail-origin": "juragan-token-web",
-        },
-        body: JSON.stringify(upstreamPayload),
-      });
-
-      // Otomatis failover ke gemini-3.5-flash jika model pilihan sedang spike 503
-      if (upstreamRes.status === 503 && targetModel !== "gemini-3.5-flash") {
-        console.warn(`[GATEWAY 503 FAILOVER] ${targetModel} sibuk, mengalihkan ke gemini-3.5-flash...`);
-        targetModel = "gemini-3.5-flash";
-        upstreamPayload.model = "gemini-3.5-flash";
-        upstreamRes = await fetch(upstreamUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: upstreamAuthHeader,
-            "x-juragan-client-key": auth.keyHash,
-            "x-juragan-retail-origin": "juragan-token-web",
-          },
-          body: JSON.stringify(upstreamPayload),
-        });
-      }
+      const geminiKey = process.env.GEMINI_API_KEY?.trim() || "";
+      const result = await fetchWithGeminiResilience(
+        upstreamUrl,
+        geminiKey,
+        upstreamPayload,
+        targetModel
+      );
+      upstreamRes = result.res;
+      targetModel = result.modelUsed;
     }
 
     if (!upstreamRes) {
@@ -202,17 +244,24 @@ export async function POST(req: NextRequest) {
 
     if (!upstreamRes.ok) {
       const errBody = await upstreamRes.json().catch(() => ({}));
+      const rawMessage = Array.isArray(errBody)
+        ? errBody[0]?.error?.message
+        : errBody?.error?.message;
+      const rawCode = Array.isArray(errBody)
+        ? errBody[0]?.error?.code
+        : errBody?.error?.code;
+
       console.warn(`[GATEWAY UPSTREAM ERROR] ${provider} status ${upstreamRes.status}:`, errBody);
       return NextResponse.json(
         {
           error: {
             message:
-              errBody?.error?.message ||
+              rawMessage ||
               (provider === "engine"
-                ? `Engine Utama (juragantoken.co.id) mengembalikan status ${upstreamRes.status}. Coba gunakan model Google Gemini ('gemini-3.5-flash').`
+                ? `Engine Utama (juragantoken.co.id) mengembalikan status ${upstreamRes.status}. Coba gunakan model Google Gemini ('gemini-3.5-flash-lite').`
                 : `Gagal mendapatkan respons dari provider ${provider} (Status: ${upstreamRes.status}).`),
             type: "upstream_error",
-            code: errBody?.error?.code || "upstream_failure",
+            code: rawCode || "upstream_failure",
           },
         },
         { status: upstreamRes.status, headers: CORS_HEADERS }

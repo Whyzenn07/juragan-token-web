@@ -124,8 +124,7 @@ export function resolveUpstreamModel(inputModel: string): {
     m === "gpt-3.5-turbo" // fallback umum untuk client lama
   ) {
     if (m.includes("pro")) return { provider: "gemini", targetModel: "gemini-pro-latest" };
-    if (m.includes("3.8")) return { provider: "gemini", targetModel: "gemini-3.8-flash" };
-    return { provider: "gemini", targetModel: "gemini-3.5-flash" };
+    return { provider: "gemini", targetModel: "gemini-3.5-flash-lite" };
   }
 
   // Model lainnya (Claude Opus/Sonnet, GPT-4o/Astra, DeepSeek) diarahkan ke Pass-Through Engine
