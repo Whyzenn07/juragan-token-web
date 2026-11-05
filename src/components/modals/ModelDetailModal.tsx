@@ -15,7 +15,8 @@ import {
   PRICING_SNAPSHOT_DATE,
   providerById,
   unitCostIdr,
-  unitsForBudget
+  unitsForBudget,
+  USD_RATE
 } from "@/data/catalog";
 import { Dialog } from "./Dialog";
 import { Icon } from "@/components/ui/Icon";
@@ -26,9 +27,10 @@ type ModelDetailModalProps = {
   model: ModelItem | null;
   onClose: () => void;
   onSelectTopUp?: (model: ModelItem) => void;
+  usdRate?: number;
 };
 
-export function ModelDetailModal({ open, model, onClose, onSelectTopUp }: ModelDetailModalProps) {
+export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate = USD_RATE }: ModelDetailModalProps) {
   const [copiedKey, setCopiedKey] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
@@ -91,24 +93,24 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp }: ModelD
         {perImage ? (
           <div className="stat-cell">
             <span className="stat-label">Harga per gambar</span>
-            <strong className="stat-price">{formatIdr(perImageIdr(model))}</strong>
+            <strong className="stat-price">{formatIdr(perImageIdr(model, usdRate))}</strong>
           </div>
         ) : (
           <>
             <div className="stat-cell">
               <span className="stat-label">Input / 1 juta token</span>
-              <strong>{formatIdr(inputIdrPer1M(model))}</strong>
+              <strong>{formatIdr(inputIdrPer1M(model, usdRate))}</strong>
             </div>
             <div className="stat-cell">
               <span className="stat-label">Output / 1 juta token</span>
-              <strong>{formatIdr(outputIdrPer1M(model))}</strong>
+              <strong>{formatIdr(outputIdrPer1M(model, usdRate))}</strong>
             </div>
           </>
         )}
         <div className="stat-cell">
           <span className="stat-label">Rp10.000 cukup untuk</span>
           <strong className="stat-price">
-            ±{formatNum(unitsForBudget(model))} {unit}
+            ±{formatNum(unitsForBudget(model, 10_000, usdRate))} {unit}
           </strong>
         </div>
       </div>
@@ -238,29 +240,29 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp }: ModelD
             {perImage ? (
               <div className="spec-item">
                 <span className="spec-key">Satu gambar</span>
-                <span className="spec-val">{formatIdr(perImageIdr(model))}, berapa pun ukuran prompt-nya</span>
+                <span className="spec-val">{formatIdr(perImageIdr(model, usdRate))}, berapa pun ukuran prompt-nya</span>
               </div>
             ) : (
               <>
                 <div className="spec-item">
                   <span className="spec-key">Satu jawaban</span>
                   <span className="spec-val">
-                    {formatNum(ANSWER_INPUT_TOKENS)} token masuk × {formatIdr(inputIdrPer1M(model))} + {formatNum(ANSWER_OUTPUT_TOKENS)} token keluar × {formatIdr(outputIdrPer1M(model))}, dibagi 1 juta
+                    {formatNum(ANSWER_INPUT_TOKENS)} token masuk × {formatIdr(inputIdrPer1M(model, usdRate))} + {formatNum(ANSWER_OUTPUT_TOKENS)} token keluar × {formatIdr(outputIdrPer1M(model, usdRate))}, dibagi 1 juta
                   </span>
                 </div>
                 <div className="spec-item">
                   <span className="spec-key">Hasilnya</span>
-                  <span className="spec-val">±Rp{unitCostIdr(model).toLocaleString("id-ID", { maximumFractionDigits: 2 })} per jawaban</span>
+                  <span className="spec-val">±Rp{unitCostIdr(model, usdRate).toLocaleString("id-ID", { maximumFractionDigits: 2 })} per jawaban</span>
                 </div>
               </>
             )}
             <div className="spec-item">
               <span className="spec-key">Dengan Rp10.000</span>
-              <span className="spec-val">±{formatNum(unitsForBudget(model))} {unit}</span>
+              <span className="spec-val">±{formatNum(unitsForBudget(model, 10_000, usdRate))} {unit}</span>
             </div>
             <div className="spec-item">
               <span className="spec-key">Sumber tarif</span>
-              <span className="spec-val">Gateway juragantoken.co.id per {PRICING_SNAPSHOT_DATE}, kurs contoh Rp16.250/US$</span>
+              <span className="spec-val">Gateway juragantoken.co.id per {PRICING_SNAPSHOT_DATE}, kurs realtime Rp{formatNum(usdRate)}/US$</span>
             </div>
           </div>
         </div>

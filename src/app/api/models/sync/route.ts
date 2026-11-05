@@ -26,7 +26,32 @@ export async function GET() {
   const syncTimestamp = new Date().toISOString();
   const remoteModels: ModelItem[] = [];
   let source = "gateway_cache";
+  let activeUsdRate = USD_RATE;
+  let rateSource = "local_snapshot";
 
+  // 1. Fetch live real-time USD/IDR exchange rate
+  try {
+    const rateController = new AbortController();
+    const rateTimeoutId = setTimeout(() => rateController.abort(), 2500);
+
+    const rateRes = await fetch("https://open.er-api.com/v6/latest/USD", {
+      signal: rateController.signal,
+      next: { revalidate: 60 }
+    });
+    clearTimeout(rateTimeoutId);
+
+    if (rateRes.ok) {
+      const rateData = await rateRes.json();
+      if (rateData?.rates?.IDR && typeof rateData.rates.IDR === "number" && rateData.rates.IDR > 10000) {
+        activeUsdRate = Math.round(rateData.rates.IDR);
+        rateSource = "live_forex_market";
+      }
+    }
+  } catch {
+    rateSource = "snapshot_fallback";
+  }
+
+  // 2. Fetch remote pricing models
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3500);
@@ -73,6 +98,8 @@ export async function GET() {
                 ? "deepseek"
                 : modelId.includes("qwen")
                 ? "alibaba"
+                : modelId.includes("seed") || modelId.includes("bytedance")
+                ? "bytedance"
                 : "openai",
               category: perImage ? "Gambar" : isCode ? "Ngoding" : "Tugas & Riset",
               description: `Model baru terdeteksi di gateway Juragan Token. Pricing dihitung otomatis dengan rasio gateway ${ratio}x.`,
@@ -100,13 +127,13 @@ export async function GET() {
     return {
       ...m,
       pricing: {
-        inputIdr: isImg ? 0 : inputIdrPer1M(m),
-        outputIdr: isImg ? 0 : outputIdrPer1M(m),
-        perImageIdr: isImg ? perImageIdr(m) : null,
-        unitCostIdr: unitCostIdr(m),
+        inputIdr: isImg ? 0 : inputIdrPer1M(m, activeUsdRate),
+        outputIdr: isImg ? 0 : outputIdrPer1M(m, activeUsdRate),
+        perImageIdr: isImg ? perImageIdr(m, activeUsdRate) : null,
+        unitCostIdr: unitCostIdr(m, activeUsdRate),
         ratio: m.ratio,
         completionRatio: m.completionRatio,
-        unitsPer10k: unitsForBudget(m),
+        unitsPer10k: unitsForBudget(m, 10_000, activeUsdRate),
         reachScore: reachScore(m)
       }
     };
@@ -115,8 +142,9 @@ export async function GET() {
   return NextResponse.json({
     status: "success",
     source,
+    rateSource,
     lastSynced: syncTimestamp,
-    usdRate: USD_RATE,
+    usdRate: activeUsdRate,
     gatewayOrigin: "https://www.juragantoken.co.id",
     totalModels: finalModels.length,
     models: finalModels

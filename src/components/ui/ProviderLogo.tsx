@@ -34,8 +34,8 @@ export function getProviderLogoPath(provider: string): { path: string; name: str
   if (p.includes("kimi") || p.includes("moonshot")) {
     return { path: "/assets/AI-Logo/Kimi-ai.png", name: "Kimi", company: "Moonshot AI" };
   }
-  if (p.includes("bytedance") || p.includes("doubao")) {
-    return { path: "/assets/AI-Logo/bytedance.png", name: "Doubao", company: "Bytedance" };
+  if (p.includes("bytedance") || p.includes("doubao") || p.includes("seed") || p.includes("seedream")) {
+    return { path: "/assets/AI-Logo/bytedance.svg", name: "ByteDance", company: "ByteDance" };
   }
   if (p.includes("minimax")) {
     return { path: "/assets/AI-Logo/minimax.jpg", name: "MiniMax", company: "MiniMax" };

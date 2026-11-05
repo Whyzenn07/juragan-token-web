@@ -66,6 +66,7 @@ function useReveal() {
 
 export default function Home() {
   const [models, setModels] = useState<ModelItem[]>(modelsCatalog);
+  const [usdRate, setUsdRate] = useState<number>(USD_RATE);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState("Gateway Live");
   const [syncNotification, setSyncNotification] = useState<string | null>(null);
@@ -81,8 +82,12 @@ export default function Home() {
         const data = await res.json();
         if (data.models && Array.isArray(data.models)) {
           setModels(data.models);
+          if (data.usdRate && typeof data.usdRate === "number") {
+            setUsdRate(data.usdRate);
+          }
           setSyncStatus("Gateway Live");
-          setSyncNotification(`Sinkronisasi Sukses: ${data.totalModels} model & kalkulasi harga IDR langsung diperbarui!`);
+          const formattedRate = new Intl.NumberFormat("id-ID").format(data.usdRate || USD_RATE);
+          setSyncNotification(`Sinkronisasi Sukses: ${data.totalModels} model & kurs realtime USD/IDR (Rp ${formattedRate}) langsung aktif!`);
           setTimeout(() => setSyncNotification(null), 5000);
         }
       }
@@ -92,6 +97,23 @@ export default function Home() {
       setIsSyncing(false);
     }
   };
+
+  // Sinkronisasi otomatis saat komponen dimuat (real-time forex & pricing)
+  useEffect(() => {
+    fetch("/api/models/sync")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.models && Array.isArray(data.models)) {
+          setModels(data.models);
+          if (data.usdRate && typeof data.usdRate === "number") {
+            setUsdRate(data.usdRate);
+          }
+        }
+      })
+      .catch(() => {
+        // Gunakan rate fallback lokal
+      });
+  }, []);
 
   const [activeCategory, setActiveCategory] = useState<Category>("Semua");
   const [selectedProvider, setSelectedProvider] = useState<string>("all");
@@ -706,10 +728,10 @@ export default function Home() {
                 <div className="gsp-text">
                   <div className="gsp-title-row">
                     <strong>Auto-Update Pricing Gateway</strong>
-                    <span className="gsp-tag">Realtime IDR</span>
+                    <span className="gsp-tag">REALTIME USD/IDR: Rp {formatNum(usdRate)}</span>
                   </div>
                   <p className="gsp-sub">
-                    Model baru otomatis terdaftar dengan kalkulasi Rupiah (USD 1 = Rp {formatNum(USD_RATE)}). Status: <b>{syncStatus}</b> ({models.length} model aktif).
+                    Model baru otomatis terdaftar dengan kalkulasi Rupiah (USD 1 = Rp {formatNum(usdRate)} kurs real-time). Status: <b>{syncStatus}</b> ({models.length} model aktif).
                   </p>
                 </div>
               </div>
@@ -719,7 +741,7 @@ export default function Home() {
                   className={`gsp-sync-button ${isSyncing ? "syncing" : ""}`}
                   onClick={handleSyncPricing}
                   disabled={isSyncing}
-                  title="Segarkan harga dan model terbaru langsung dari gateway juragantoken.co.id"
+                  title="Segarkan harga dan kurs real-time langsung dari gateway juragantoken.co.id"
                 >
                   <span className={`gsp-icon ${isSyncing ? "spin" : ""}`}>↻</span>
                   <span>{isSyncing ? "Menyinkronkan..." : "Sinkronkan Harga & Model"}</span>
@@ -809,16 +831,26 @@ export default function Home() {
                 {providers.map((p) => {
                   const count = models.filter((m) => m.providerId === p.id).length;
                   if (count === 0) return null;
+                  const displayLabel =
+                    p.id === "alibaba"
+                      ? "Qwen (Alibaba)"
+                      : p.id === "bytedance"
+                      ? "ByteDance (Seed)"
+                      : p.id === "openai"
+                      ? "OpenAI (GPT)"
+                      : p.id === "anthropic"
+                      ? "Anthropic (Claude)"
+                      : p.company;
                   return (
                     <button
                       key={p.id}
                       type="button"
                       className={`chip provider-chip ${selectedProvider === p.id ? "active" : ""}`}
                       onClick={() => setSelectedProvider(selectedProvider === p.id ? "all" : p.id)}
-                      title={`Tampilkan hanya model dari ${p.company}`}
+                      title={`Tampilkan hanya model dari ${displayLabel}`}
                     >
                       <ProviderLogo provider={p.id} size={14} />
-                      <span>{p.company}</span>
+                      <span>{displayLabel}</span>
                       <span className="chip-count">{count}</span>
                     </button>
                   );
@@ -832,7 +864,7 @@ export default function Home() {
                 {viewSavedOnly ? `${filteredModels.length} model tersimpan` : `${filteredModels.length} model`}
               </span>
               <span>
-                1 jawaban ≈ {formatNum(ANSWER_INPUT_TOKENS)} token masuk + {formatNum(ANSWER_OUTPUT_TOKENS)} token keluar · kurs contoh Rp{formatNum(USD_RATE)}/US$ · tarif per {PRICING_SNAPSHOT_DATE}
+                1 jawaban ≈ {formatNum(ANSWER_INPUT_TOKENS)} token masuk + {formatNum(ANSWER_OUTPUT_TOKENS)} token keluar · kurs realtime Rp{formatNum(usdRate)}/US$ · tarif gateway per {PRICING_SNAPSHOT_DATE}
               </span>
             </div>
 
@@ -887,7 +919,9 @@ export default function Home() {
                         <span className="mc-logo">
                           <ProviderLogo provider={m.providerId} size={24} />
                         </span>
-                        <span className="mc-provider">{p.company}</span>
+                        <span className="mc-provider">
+                          {p.id === "alibaba" ? "Alibaba Qwen" : p.id === "bytedance" ? "ByteDance Seed" : p.company}
+                        </span>
                         <button
                           type="button"
                           className={`mc-save ${isSaved ? "saved" : ""}`}
@@ -908,32 +942,36 @@ export default function Home() {
                       <div className="mc-reach">
                         <span className="mc-reach-label">Rp10.000 cukup untuk</span>
                         <div className="mc-reach-row">
-                          <strong className="mc-reach-num">±{formatNum(unitsForBudget(m))}</strong>
+                          <strong className="mc-reach-num">±{formatNum(unitsForBudget(m, 10_000, usdRate))}</strong>
                           <span className="mc-reach-unit">{perImage ? "gambar" : "jawaban"}</span>
-                          <span className="mc-tier">{tier ?? "Per gambar"}</span>
+                          <span className="mc-tier">{perImage ? (m.id.includes("pro") ? "Pro Studio" : "Per gambar") : tier}</span>
                         </div>
-                        {!perImage && (
-                          <div className="mc-meter" aria-hidden="true">
-                            <span className="mc-meter-fill" />
-                          </div>
-                        )}
+                        <div className="mc-meter" aria-hidden="true">
+                          <span className="mc-meter-fill" />
+                        </div>
                       </div>
 
                       <dl className="mc-prices">
                         {perImage ? (
-                          <div>
-                            <dt>Per gambar</dt>
-                            <dd>{formatIdr(perImageIdr(m))}</dd>
-                          </div>
+                          <>
+                            <div>
+                              <dt>Biaya per gambar</dt>
+                              <dd>{formatIdr(perImageIdr(m, usdRate))}</dd>
+                            </div>
+                            <div>
+                              <dt>Resolusi &amp; Format</dt>
+                              <dd>{m.id.includes("pro") ? "2K HD Studio · PNG" : "1024px · WebP / PNG"}</dd>
+                            </div>
+                          </>
                         ) : (
                           <>
                             <div>
                               <dt>Input / 1 jt token</dt>
-                              <dd>{formatIdr(inputIdrPer1M(m))}</dd>
+                              <dd>{formatIdr(inputIdrPer1M(m, usdRate))}</dd>
                             </div>
                             <div>
                               <dt>Output / 1 jt token</dt>
-                              <dd>{formatIdr(outputIdrPer1M(m))}</dd>
+                              <dd>{formatIdr(outputIdrPer1M(m, usdRate))}</dd>
                             </div>
                           </>
                         )}
@@ -1231,6 +1269,7 @@ export default function Home() {
         open={detailModalOpen}
         model={selectedModel}
         onClose={() => setDetailModalOpen(false)}
+        usdRate={usdRate}
         onSelectTopUp={(model) => {
           const matchedPkg =
             retailPackages.find((p) =>

@@ -4,10 +4,10 @@ import type { Category, Provider, ModelItem, RetailPackage, PaymentMethod } from
 /** Gateway produksi. Domain api.juragantoken.co.id belum punya DNS, jadi semua panduan memakai host ini. */
 export const GATEWAY_ORIGIN = "https://www.juragantoken.co.id";
 export const GATEWAY_BASE_URL = `${GATEWAY_ORIGIN}/v1`;
-export const PRICING_SNAPSHOT_DATE = "27 Okt 2026";
+export const PRICING_SNAPSHOT_DATE = "4 Nov 2026";
 
-/** Kurs contoh (lihat DESIGN.md). */
-export const USD_RATE = 16_250;
+/** Kurs Realtime USD/IDR (Rp 18.134 per 4 Nov 2026). */
+export const USD_RATE = 18_134;
 /** Pengali harga jual ritel terhadap harga gateway. 1 = dijual sama dengan harga gateway. Diatur pemilik. */
 export const RETAIL_MARKUP = 1;
 
@@ -159,9 +159,10 @@ export const modelsCatalog: ModelItem[] = [
     name: "Qwen 3.5 Flash",
     providerId: "alibaba",
     category: "Chat Hemat",
-    description: "Model paling hemat di dunia. Chat harian, ringkasan, dan ekstraksi data masif tanpa takut boros.",
+    description: "Model reasoning & chat paling hemat di dunia dari Alibaba Cloud. Konteks 1 juta token, ideal untuk ekstraksi data masif dan bot percakapan.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
+    contextTokens: 1_000_000,
     ratio: 0.015,
     completionRatio: 9.66,
     featured: true
@@ -171,9 +172,10 @@ export const modelsCatalog: ModelItem[] = [
     name: "Qwen 3.6 35B A3B",
     providerId: "alibaba",
     category: "Ngoding",
-    description: "Model coding open-weights super tajam untuk Cursor dan VS Code. Efisiensi tinggi dengan harga sangat miring.",
+    description: "Model coding open-weights super tajam untuk Cursor dan VS Code. Efisiensi tinggi untuk sintaks kode dan bug fixing instan.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
+    contextTokens: 262_144,
     ratio: 0.13,
     completionRatio: 5.92
   },
@@ -182,9 +184,10 @@ export const modelsCatalog: ModelItem[] = [
     name: "Qwen 3.7 Max",
     providerId: "alibaba",
     category: "Tugas & Riset",
-    description: "Flagship tertinggi keluarga Qwen Alibaba: penalaran dokumen rumit, tugas multialat, dan pemahaman multilingual.",
+    description: "Flagship frontier tertinggi keluarga Qwen Alibaba: penalaran dokumen rumit, tugas multialat, dan pemahaman multilingual fasih.",
     inputs: ["teks"],
     endpoints: ["openai", "anthropic"],
+    contextTokens: 1_000_000,
     ratio: 0.855,
     completionRatio: 3.00,
     featured: true
@@ -194,7 +197,7 @@ export const modelsCatalog: ModelItem[] = [
     name: "Qwen Image 2.0",
     providerId: "alibaba",
     category: "Gambar",
-    description: "Buat dan edit gambar kreatif, poster promosi, dan desain visual yang memuat teks rapi.",
+    description: "Generasi gambar artistik dan ilustrasi kreatif dari teks prompt. Sangat mahir merender tipografi teks rapi di dalam poster promosi.",
     inputs: ["teks", "gambar"],
     endpoints: ["image"],
     ratio: 0,
@@ -206,7 +209,7 @@ export const modelsCatalog: ModelItem[] = [
     name: "Qwen Image 2.0 Pro",
     providerId: "alibaba",
     category: "Gambar",
-    description: "Versi Pro untuk foto visual produk, rendering detail tinggi, dan menjaga konsistensi subjek.",
+    description: "Versi Studio HD Pro untuk foto visual produk e-commerce, rendering resolusi tinggi 2K, dan konsistensi wajah subjek.",
     inputs: ["teks", "gambar"],
     endpoints: ["image"],
     ratio: 0,
@@ -443,34 +446,38 @@ export const modelsCatalog: ModelItem[] = [
     name: "Seed 1.6 Flash",
     providerId: "bytedance",
     category: "Chat Hemat",
-    description: "Chat harian dari ekosistem Doubao ByteDance dengan harga super murah. Cocok untuk bot percakapan harian.",
+    description: "Chat harian responsif dari ekosistem Doubao ByteDance dengan tarif super murah. Cocok untuk bot percakapan, FAQ, dan ringkasan kilat.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
+    contextTokens: 262_144,
     ratio: 0.041,
-    completionRatio: 4
+    completionRatio: 4,
+    featured: true
   },
   {
     id: "seed-2.0-lite",
     name: "Seed 2.0 Lite",
     providerId: "bytedance",
     category: "Chat Hemat",
-    description: "Model multimodal ringan ByteDance yang mendukung input teks, gambar, dan video ringkas.",
+    description: "Model multimodal ringan ByteDance dengan pemrosesan teks, gambar, dan video ringkas. Analisis frame visual dan transkrip konten secara instan.",
     inputs: ["teks", "gambar", "video"],
     endpoints: ["openai", "anthropic"],
+    contextTokens: 524_288,
     ratio: 0.1375,
     completionRatio: 8
   },
   {
     id: "seedream-4.5",
-    name: "Seedream 4.5",
+    name: "Seed Dream 4.5",
     providerId: "bytedance",
     category: "Gambar",
-    description: "Generate gambar artistik dan fotorealistis dari teks deskriptif dengan resolusi tajam dan estetika modern.",
+    description: "Generate gambar artistik dan fotorealistis dari teks deskriptif oleh ByteDance Seed. Resolusi tajam, pencahayaan sinematik, dan komposisi visual modern.",
     inputs: ["teks", "gambar"],
     endpoints: ["image"],
     ratio: 0,
     completionRatio: 0,
-    perImageUsd: 0.044
+    perImageUsd: 0.044,
+    featured: true
   },
 
   // ==========================================
@@ -502,20 +509,20 @@ export const modelsCatalog: ModelItem[] = [
 
 // Turunan harga. Semua angka dihitung dari rasio gateway agar tidak ada harga yang diketik manual.
 
-export const inputIdrPer1M = (m: ModelItem) => m.ratio * 2 * USD_RATE * RETAIL_MARKUP;
-export const outputIdrPer1M = (m: ModelItem) => inputIdrPer1M(m) * m.completionRatio;
-export const perImageIdr = (m: ModelItem) => (m.perImageUsd ?? 0) * USD_RATE * RETAIL_MARKUP;
+export const inputIdrPer1M = (m: ModelItem, rate = USD_RATE) => m.ratio * 2 * rate * RETAIL_MARKUP;
+export const outputIdrPer1M = (m: ModelItem, rate = USD_RATE) => inputIdrPer1M(m, rate) * m.completionRatio;
+export const perImageIdr = (m: ModelItem, rate = USD_RATE) => (m.perImageUsd ?? 0) * rate * RETAIL_MARKUP;
 export const isPerImage = (m: ModelItem) => m.perImageUsd !== undefined;
 
 /** Biaya satu jawaban (atau satu gambar) dalam rupiah. */
-export const unitCostIdr = (m: ModelItem) =>
+export const unitCostIdr = (m: ModelItem, rate = USD_RATE) =>
   isPerImage(m)
-    ? perImageIdr(m)
-    : (ANSWER_INPUT_TOKENS * inputIdrPer1M(m) + ANSWER_OUTPUT_TOKENS * outputIdrPer1M(m)) / 1_000_000;
+    ? perImageIdr(m, rate)
+    : (ANSWER_INPUT_TOKENS * inputIdrPer1M(m, rate) + ANSWER_OUTPUT_TOKENS * outputIdrPer1M(m, rate)) / 1_000_000;
 
 /** Berapa jawaban (atau gambar) yang didapat dari sejumlah rupiah. */
-export const unitsForBudget = (m: ModelItem, budgetIdr = BUDGET_SAMPLE_IDR) =>
-  Math.floor(budgetIdr / unitCostIdr(m));
+export const unitsForBudget = (m: ModelItem, budgetIdr = BUDGET_SAMPLE_IDR, rate = USD_RATE) =>
+  Math.floor(budgetIdr / unitCostIdr(m, rate));
 
 export type Tier = "Hemat" | "Seimbang" | "Premium";
 
@@ -527,9 +534,15 @@ export const tierOf = (m: ModelItem): Tier => {
   return "Premium";
 };
 
-/** Posisi 0..1 pada skala log 20..3.000 jawaban, untuk meter "seberapa jauh sepuluh ribu rupiah". Dibulatkan 3 desimal untuk mencegah selisih presisi float saat hidrasi SSR/klien. */
+/** Posisi 0..1 untuk meter "seberapa jauh sepuluh ribu rupiah". Untuk teks menggunakan skala log 20..3.000 jawaban, untuk model gambar menggunakan skala log 2..35 gambar. */
 export const reachScore = (m: ModelItem): number => {
   const units = Math.max(1, unitsForBudget(m));
+  if (isPerImage(m)) {
+    const minImg = Math.log(2);
+    const maxImg = Math.log(35);
+    const score = Math.min(1, Math.max(0.18, (Math.log(units) - minImg) / (maxImg - minImg)));
+    return Math.round(score * 1000) / 1000;
+  }
   const min = Math.log(20);
   const max = Math.log(3_000);
   const score = Math.min(1, Math.max(0, (Math.log(units) - min) / (max - min)));
@@ -538,7 +551,7 @@ export const reachScore = (m: ModelItem): number => {
 
 /** Aplikasi yang bisa langsung dipakai, diturunkan dari format endpoint gateway. */
 export const compatibleApps = (m: ModelItem): string[] => {
-  if (m.endpoints.includes("image")) return ["API gambar", "Python"];
+  if (m.endpoints.includes("image")) return ["API Gambar", "Python SDK", "REST API", "Teks-ke-Visual"];
   const apps: string[] = [];
   if (m.endpoints.includes("anthropic")) apps.push("Claude Code");
   if (m.endpoints.includes("openai")) apps.push("Cursor", "Chatbox");
