@@ -466,70 +466,99 @@ export default function Home() {
       {/* 3. Main Content Container - Full Width Company Profile Layout */}
       <div className="company-container">
         <main className="company-main">
-          {/* Executive Company Profile Hero */}
-          <section className="pro-hero" id="top">
-            <div className="pro-hero-badge">
-              <span className="pro-hero-badge-dot" />
-              <span>Universal AI Gateway &amp; Marketplace Resmi Indonesia</span>
+          {/* Breadcrumb & Live Status Strip */}
+          <div className="breadcrumb">
+            <span>Marketplace</span> / <span>Temukan</span>
+            <span className="demo-pill">Pratinjau · Akses Token Ritel Mahasiswa</span>
+          </div>
+
+          <div className="gateway-status-strip">
+            <div className="gateway-status-left">
+              <span className="live-pulse-dot" />
+              <strong>Gateway juragantoken.co.id</strong>
+              <span>· Claude Sonnet 5.5, Gemini 3.8 Flash, GPT-6, DeepSeek V4 &amp; Kimi K3 lewat satu API key</span>
             </div>
-
-            <h1 className="pro-hero-title">
-              Satu API Key untuk Semua Model AI Terbaik Dunia
-            </h1>
-
-            <p className="pro-hero-subtitle">
-              Akses Claude 3.7 Sonnet, OpenAI GPT-4o, Gemini 2.5 Flash, dan DeepSeek V3 tanpa kartu kredit luar negeri. Saldo permanen tanpa masa hangus, pembayaran instan QRIS Rupiah, dan jaminan 100% Zero-Training.
-            </p>
-
-            <div className="pro-hero-actions">
-              <a href="#katalog-retail" className="pro-btn-primary">
-                <span>Beli Token AI</span>
-                <span className="btn-arrow">↗</span>
-              </a>
-              <Link href="/docs" className="pro-btn-secondary">
-                <span>Dokumentasi API</span>
-              </Link>
+            <div className="gateway-status-right">
+              <span>Masa Aktif: <b>Permanen (Lifetime)</b></span>
               <button
                 type="button"
-                className="pro-btn-tertiary"
+                className="link-button"
                 onClick={() => setBalanceModalOpen(true)}
               >
-                <span>Cek Saldo Key</span>
+                Cek Saldo Key ↗
               </button>
             </div>
+          </div>
 
-            {/* 4 Pilar Keunggulan Platform */}
-            <div className="pro-pillars-grid">
-              <div className="pro-pillar-card">
-                <div className="pro-pillar-header">
-                  <span className="pro-pillar-tag">Keamanan Data</span>
-                </div>
-                <h3>100% Zero-Training Guarantee</h3>
-                <p>Prompt, data percakapan, dan kode Anda tidak pernah disimpan untuk melatih model AI apa pun.</p>
+          {/* Hero Section (Pola Asli Juragan Token dengan Tiket Pass & Animasi Kreatif) */}
+          <section className="hero" id="top">
+            <div className="hero-content">
+              <div className="eyebrow">
+                ✦ <span>Lebih hemat. Lebih banyak berkarya.</span>
+              </div>
+              <h1>
+                <span>Ide besar Anda berikutnya.</span>
+                <br />
+                <span className="hero-accent">Dengan harga lebih ringan.</span>
+              </h1>
+              <p>
+                Temukan token dan kredit API untuk AI favorit Anda. Berkarya, ngoding tugas kuliah, dan riset skripsi di mana pun tanpa kartu kredit internasional.
+              </p>
+              <div className="hero-actions">
+                <button type="button" className="primary-button" onClick={scrollToCatalog}>
+                  <span>Temukan Token Anda</span> ↗
+                </button>
+                <span className="hero-note">
+                  <Icon name="check" size={16} /> Bebas kartu kredit internasional
+                </span>
+              </div>
+              <RegionBadge />
+            </div>
+
+            {/* The Iconic Celestial Ticket Art dengan Animasi Bergerak Kreatif */}
+            <div className="hero-art" aria-hidden="true">
+              <div className="hero-aurora-glow" />
+              <div className="orbit orbit-one" />
+              <div className="orbit orbit-two" />
+              <span className="art-star star-one">✦</span>
+              <span className="art-star star-two">✧</span>
+              <div className="floating-tag">
+                <span className="online-dot" /> Mulai Rp 15.000
               </div>
 
-              <div className="pro-pillar-card">
-                <div className="pro-pillar-header">
-                  <span className="pro-pillar-tag">Pembayaran Lokal</span>
+              {/* Ticket Back (Pass Multi-AI) */}
+              <div className="art-ticket ticket-back">
+                <div className="art-ticket-head">
+                  ✳ MULTI-AI PASS <span>↗</span>
                 </div>
-                <h3>QRIS Instan Semua Bank &amp; E-Wallet</h3>
-                <p>Tanpa kartu kredit internasional. Bayar dalam hitungan detik via BCA, Mandiri, BRI, GoPay, dan OVO.</p>
+                <div className="ticket-brands">
+                  <span>✳</span>
+                  <span>◈</span>
+                  <span>ıı</span>
+                </div>
+                <div className="ticket-rule" />
+                <div className="ticket-bottom">
+                  MORE AI · MORE YOU <span>✦ ✦ ✦</span>
+                </div>
               </div>
 
-              <div className="pro-pillar-card">
-                <div className="pro-pillar-header">
-                  <span className="pro-pillar-tag">Developer Ready</span>
+              {/* Ticket Front (Juragan Token Voucher) */}
+              <div className="art-ticket ticket-front">
+                <div className="art-ticket-head">
+                  ✳ juragan token <span>↗</span>
                 </div>
-                <h3>OpenAI Compatible Universal Endpoint</h3>
-                <p>Cukup masukkan Base URL dan API Key di Cursor AI, Claude Code CLI, Windsurf, Chatbox, atau Python SDK.</p>
+                <div className="ticket-value">
+                  −90<span>%</span>
+                </div>
+                <div className="ticket-rule" />
+                <div className="ticket-bottom">
+                  <span>UNTUK IDE BESAR ANDA</span>
+                  <div className="barcode" />
+                </div>
               </div>
 
-              <div className="pro-pillar-card">
-                <div className="pro-pillar-header">
-                  <span className="pro-pillar-tag">Efisiensi Biaya</span>
-                </div>
-                <h3>Masa Aktif Saldo Selamanya</h3>
-                <p>Tidak ada biaya langganan bulanan hangus. Saldo kredit Anda tetap aktif dan aman tanpa batas waktu.</p>
+              <div className="art-caption">
+                ✧ <span>Biaya ringan. Peluang tanpa batas.</span>
               </div>
             </div>
           </section>

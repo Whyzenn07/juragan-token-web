@@ -451,204 +451,59 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
   padding: 32px 0 64px;
 }
 
-/* Executive Company Profile Hero */
-.pro-hero {
-  padding: 56px 0 40px;
-  text-align: center;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.pro-hero-badge {
-  display: inline-flex;
-  align-items: center;
+/* Breadcrumb & Demo Pill */
+.breadcrumb {
+  font-size: 11px;
+  display: flex;
   gap: 8px;
-  background: #f0f7ff;
-  border: 1px solid #d0e4ff;
-  color: #0369a1;
-  font-size: 12.5px;
-  font-weight: 700;
-  padding: 6px 16px;
+  align-items: center;
+  color: #64748b;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.demo-pill {
+  margin-left: auto;
+  background: #e8f2fc;
+  color: #0a58ca;
+  border: 1px solid #cfe0f3;
+  padding: 3px 10px;
   border-radius: 999px;
-  margin-bottom: 24px;
+  font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.2px;
 }
 
-.pro-hero-badge-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #0284c7;
-}
-
-.pro-hero-title {
-  font-family: var(--font-h, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-  font-size: clamp(32px, 4.4vw, 54px);
-  font-weight: 850;
-  line-height: 1.15;
-  color: #0a2442;
-  letter-spacing: -1.2px;
-  margin: 0 0 20px;
-}
-
-.pro-hero-subtitle {
-  font-size: clamp(15px, 1.3vw, 17.5px);
-  color: #556987;
-  line-height: 1.65;
-  max-width: 840px;
-  margin: 0 auto 32px;
-}
-
-.pro-hero-actions {
+/* 4. Iconic Hero Section */
+.hero {
+  border-radius: 16px;
+  min-height: 380px;
+  background: linear-gradient(135deg, #f0f6fd 0%, #e1effe 50%, #ebf3fd 100%);
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 56px;
+  padding: 42px 48px;
+  isolation: isolate;
+  border: 1px solid #d4e3f5;
+  box-shadow: 0 10px 30px -10px rgba(10, 88, 202, 0.08), 0 1px 3px rgba(10, 37, 64, 0.04);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.pro-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #0a58ca;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 13px 24px;
-  border-radius: 8px;
-  text-decoration: none;
-  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.25);
-  transition: all 0.2s ease;
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 50%, rgba(37, 99, 235, 0.12) 0%, rgba(147, 197, 253, 0.06) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
 }
 
-.pro-btn-primary:hover {
-  background: #084298;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(10, 88, 202, 0.35);
-}
-
-.pro-btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #1e293b;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 13px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.pro-btn-secondary:hover {
-  background: #f8fafc;
-  border-color: #94a3b8;
-  color: #0a58ca;
-}
-
-.pro-btn-tertiary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: #475569;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 13px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.pro-btn-tertiary:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-/* 4 Pilar Grid */
-.pro-pillars-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  text-align: left;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.pro-pillar-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px 20px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.pro-pillar-card:hover {
-  transform: translateY(-2px);
-  border-color: #cbd5e1;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
-}
-
-.pro-pillar-header {
-  margin-bottom: 12px;
-}
-
-.pro-pillar-tag {
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #0284c7;
-  background: #f0f9ff;
-  border: 1px solid #e0f2fe;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-.pro-pillar-card h3 {
-  font-size: 14.5px;
-  font-weight: 750;
-  color: #0f172a;
-  margin: 0 0 8px;
-  line-height: 1.35;
-}
-
-.pro-pillar-card p {
-  font-size: 12.5px;
-  color: #64748b;
-  line-height: 1.55;
-  margin: 0;
-}
-
-@media (max-width: 1024px) {
-  .pro-pillars-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .company-container {
-    padding: 0 16px;
-  }
-  .pro-hero {
-    padding: 36px 0 24px;
-  }
-  .pro-pillars-grid {
-    grid-template-columns: 1fr;
-  }
-  .pro-hero-actions {
+@media (max-width: 900px) {
+  .hero {
     flex-direction: column;
-    width: 100%;
-  }
-  .pro-btn-primary, .pro-btn-secondary, .pro-btn-tertiary {
-    width: 100%;
-    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 24px 28px;
+    min-height: auto;
   }
 }
 
@@ -788,65 +643,220 @@ main {
 /* Hero Celestial Ticket Art */
 .hero-art {
   position: absolute;
-  right: 12px;
+  right: 18px;
   top: 0;
   bottom: 0;
-  width: 42%;
-  min-width: 290px;
+  width: 44%;
+  min-width: 320px;
   overflow: hidden;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+/* Glowing Dynamic Aurora Halo (Inspired by juragantoken & classai) */
+.hero-aurora-glow {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  filter: blur(48px);
+  background: radial-gradient(circle, rgba(14, 116, 244, 0.28) 0%, rgba(99, 102, 241, 0.20) 45%, rgba(6, 182, 212, 0.12) 70%, transparent 85%);
+  pointer-events: none;
+  z-index: 1;
+  animation: auroraPulseGlow 7.5s ease-in-out infinite alternate;
+}
+
+@keyframes auroraPulseGlow {
+  0% {
+    transform: translateY(-50%) scale(0.92) rotate(0deg);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translateY(-46%) scale(1.15) rotate(50deg);
+    opacity: 0.95;
+    filter: blur(56px);
+  }
+  100% {
+    transform: translateY(-54%) scale(1.02) rotate(110deg);
+    opacity: 0.75;
+    filter: blur(44px);
+  }
+}
+
+/* Celestial Orbits (Planetary rotation rings) */
 .orbit {
   position: absolute;
-  width: 300px;
-  height: 300px;
-  border: 1px solid #cce0f5;
   border-radius: 50%;
-  top: 24px;
-  right: -3px;
-  transform: rotate(-24deg);
+  pointer-events: none;
+  transform-origin: center center;
 }
-.orbit-two {
-  width: 420px;
-  height: 200px;
-  right: -54px;
-  top: 72px;
-  border: 1px solid #bad6f2;
+
+.orbit-one {
+  width: 320px;
+  height: 320px;
+  border: 1px dashed rgba(147, 197, 253, 0.7);
+  top: 30px;
+  right: 18px;
+  animation: orbitClockwise 34s linear infinite;
 }
-.art-ticket {
-  width: 236px;
-  height: 154px;
+
+.orbit-one::after {
+  content: '';
   position: absolute;
-  box-shadow: 0 16px 30px rgba(10, 37, 64, 0.12);
-  border-radius: 10px;
-  padding: 15px 20px;
+  top: 26px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2563eb;
+  box-shadow: 0 0 8px #3b82f6, 0 0 16px rgba(37, 99, 235, 0.6);
 }
-.ticket-front {
-  background: #0a2f58;
-  color: #e0edfb;
-  top: 115px;
-  right: 32px;
-  transform: rotate(-10deg);
+
+.orbit-two {
+  width: 440px;
+  height: 220px;
+  right: -45px;
+  top: 80px;
+  border: 1px solid rgba(191, 219, 254, 0.55);
+  animation: orbitCounter 44s linear infinite;
 }
+
+.orbit-two::after {
+  content: '';
+  position: absolute;
+  bottom: 20px;
+  right: 28%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0284c7;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+@keyframes orbitClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbitCounter {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* Floating Tickets */
+.art-ticket {
+  width: 242px;
+  height: 156px;
+  position: absolute;
+  border-radius: 12px;
+  padding: 16px 20px;
+  user-select: none;
+  pointer-events: auto;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+  overflow: hidden;
+}
+
 .art-ticket:before, .art-ticket:after {
   content: '';
   position: absolute;
   width: 16px;
   height: 16px;
-  background: #eaf2fc;
+  background: #ebf3fd;
   border-radius: 50%;
-  top: 108px;
+  top: 110px;
+  z-index: 5;
 }
 .art-ticket:before { left: -8px; }
 .art-ticket:after { right: -8px; }
+
+/* Back Ticket (Multi-AI Pass) */
 .ticket-back {
-  background: #dcebf8;
+  background: linear-gradient(135deg, #e3eefc 0%, #d2e4f7 100%);
   border: 1px solid #bad3ee;
   color: #0b3d74;
   top: 56px;
   right: 64px;
-  transform: rotate(12deg);
+  z-index: 2;
+  box-shadow: 0 14px 28px rgba(10, 37, 64, 0.09);
+  animation: floatBackTicket 7s ease-in-out infinite 0.5s;
 }
+
+.ticket-back:hover {
+  transform: rotate(14deg) translate3d(6px, 8px, 0) scale(1.03) !important;
+  box-shadow: 0 20px 36px rgba(10, 37, 64, 0.15) !important;
+  z-index: 5;
+}
+
+/* Front Ticket (Juragan Token Voucher) */
+.ticket-front {
+  background: linear-gradient(145deg, #092a4e 0%, #0d3b6c 50%, #071f3a 100%);
+  color: #e0edfb;
+  top: 118px;
+  right: 32px;
+  z-index: 4;
+  box-shadow: 0 18px 38px rgba(10, 37, 64, 0.22), 0 4px 12px rgba(10, 88, 202, 0.25);
+  animation: floatFrontTicket 5.8s ease-in-out infinite;
+  border: 1px solid rgba(147, 197, 253, 0.25);
+}
+
+.ticket-front:hover {
+  transform: rotate(-7.5deg) translate3d(-6px, -18px, 0) scale(1.04) !important;
+  box-shadow: 0 28px 52px rgba(10, 37, 64, 0.3), 0 8px 20px rgba(10, 88, 202, 0.4) !important;
+}
+
+/* Light sheen shimmer sweep across the front ticket */
+.ticket-front::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -80%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  animation: ticketSheenSweep 6.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ticketSheenSweep {
+  0%, 70% {
+    left: -80%;
+  }
+  85%, 100% {
+    left: 140%;
+  }
+}
+
+@keyframes floatFrontTicket {
+  0%, 100% {
+    transform: rotate(-10deg) translate3d(0, 0, 0);
+    box-shadow: 0 18px 38px rgba(10, 37, 64, 0.22), 0 4px 12px rgba(10, 88, 202, 0.25);
+  }
+  50% {
+    transform: rotate(-7.5deg) translate3d(-4px, -13px, 0);
+    box-shadow: 0 26px 48px rgba(10, 37, 64, 0.28), 0 8px 22px rgba(10, 88, 202, 0.35);
+  }
+}
+
+@keyframes floatBackTicket {
+  0%, 100% {
+    transform: rotate(12deg) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: rotate(14.5deg) translate3d(5px, 11px, 0);
+  }
+}
+
 .art-ticket-head {
   display: flex;
   align-items: center;
@@ -856,6 +866,7 @@ main {
   letter-spacing: .4px;
 }
 .art-ticket-head > span:last-child { margin-left: auto; }
+
 .ticket-value {
   font-family: var(--font-h);
   font-size: 58px;
@@ -866,10 +877,12 @@ main {
   color: #fff;
 }
 .ticket-value span { font-size: 36px; letter-spacing: -1px; }
+
 .ticket-rule {
   border-bottom: 1px dashed #6b98cb;
   margin: 9px -14px;
 }
+
 .ticket-bottom {
   display: flex;
   align-items: center;
@@ -879,11 +892,13 @@ main {
   letter-spacing: 1px;
   font-weight: 700;
 }
+
 .barcode {
   height: 14px;
   width: 48px;
   background: repeating-linear-gradient(90deg, #93bde8 0 1px, transparent 1px 3px, #93bde8 3px 5px, transparent 5px 6px);
 }
+
 .ticket-brands {
   display: flex;
   gap: 12px;
@@ -899,25 +914,95 @@ main {
   display: grid;
   place-items: center;
 }
+
+/* Floating Pill Tag with live status dot */
 .floating-tag {
   background: #ffffff;
-  border: 1px solid #c9dff6;
-  border-radius: 6px;
-  padding: 7px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 7px 13px;
   position: absolute;
-  top: 32px;
+  top: 30px;
   right: 18px;
-  font-size: 8.5px;
+  font-size: 9px;
   color: var(--blue-deep);
   font-weight: 700;
-  transform: rotate(-5deg);
-  z-index: 2;
-  box-shadow: 0 4px 12px rgba(10, 37, 64, 0.08);
+  z-index: 6;
+  box-shadow: 0 6px 16px rgba(10, 37, 64, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: floatTagPill 4.8s ease-in-out infinite;
+  pointer-events: auto;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.floating-tag:hover {
+  transform: rotate(-2deg) scale(1.05) translateY(-4px) !important;
+  box-shadow: 0 10px 22px rgba(10, 88, 202, 0.2) !important;
+}
+
+@keyframes floatTagPill {
+  0%, 100% {
+    transform: rotate(-5deg) translateY(0);
+    box-shadow: 0 6px 16px rgba(10, 37, 64, 0.1);
+  }
+  50% {
+    transform: rotate(-3deg) translateY(-9px);
+    box-shadow: 0 12px 24px rgba(10, 88, 202, 0.16);
+  }
 }
 .floating-tag .online-dot { margin-right: 4px; }
-.art-star { position: absolute; color: #3b82f6; }
-.star-one { font-size: 28px; top: 236px; right: 265px; }
-.star-two { font-size: 34px; right: 8px; top: 95px; }
+
+/* Sparkling Stars */
+.art-star {
+  position: absolute;
+  color: #3b82f6;
+  z-index: 5;
+  user-select: none;
+  pointer-events: none;
+}
+
+.star-one {
+  font-size: 26px;
+  top: 238px;
+  right: 268px;
+  animation: starTwinkleOne 3.6s ease-in-out infinite;
+}
+
+.star-two {
+  font-size: 32px;
+  right: 10px;
+  top: 92px;
+  animation: starTwinkleTwo 4.4s ease-in-out infinite 1.2s;
+}
+
+@keyframes starTwinkleOne {
+  0%, 100% {
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.6;
+    filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3));
+  }
+  50% {
+    transform: scale(1.3) rotate(25deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.85));
+  }
+}
+
+@keyframes starTwinkleTwo {
+  0%, 100% {
+    transform: scale(0.9) rotate(0deg);
+    opacity: 0.55;
+    filter: drop-shadow(0 0 2px rgba(96, 165, 250, 0.3));
+  }
+  50% {
+    transform: scale(1.35) rotate(-30deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.9));
+  }
+}
+
 .art-caption {
   position: absolute;
   bottom: 18px;
@@ -927,6 +1012,32 @@ main {
   gap: 6px;
   font-size: 9.5px;
   font-weight: 600;
+  z-index: 5;
+}
+
+@media (max-width: 900px) {
+  .hero-art {
+    position: relative;
+    width: 100%;
+    min-width: 100%;
+    height: 270px;
+    right: 0;
+    top: 0;
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+  }
+  .hero-aurora-glow {
+    right: 50%;
+    transform: translate(50%, -50%);
+  }
+  .star-one {
+    left: 20px;
+    right: auto;
+  }
+  .star-two {
+    right: 20px;
+  }
 }
 
 /* 5. Trust Strip dengan Logo Resmi */
@@ -4040,7 +4151,22 @@ footer {
   height: 8px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  position: relative;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: livePulseRing 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  flex-shrink: 0;
+}
+@keyframes livePulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.75);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
 }
 .check-balance-btn {
   display: inline-flex;
