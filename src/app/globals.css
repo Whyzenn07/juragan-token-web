@@ -2243,7 +2243,7 @@ main {
   width: 100%;
 }
 
-/* Adaptive Fit: Centers and resizes gracefully when 1 or 2 cards are shown */
+/* Adaptive Fit: Centers and resizes gracefully when 1, 2, or 4 cards are shown */
 .model-grid[data-count="1"] {
   grid-template-columns: minmax(320px, 520px);
   justify-content: center;
@@ -2256,6 +2256,20 @@ main {
   justify-content: center;
   max-width: 1000px;
   margin: 0 auto;
+}
+
+.model-grid[data-count="4"] {
+  grid-template-columns: repeat(2, minmax(300px, 480px));
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Intelligent Layout: If a lone orphan card ever lands at the end of a 3-column row, center it cleanly in column 2 */
+@media (min-width: 992px) {
+  .model-grid:not([data-count="1"]):not([data-count="2"]):not([data-count="4"]) > .model-card:last-child:nth-child(3n + 1) {
+    grid-column: 2;
+  }
 }
 
 /* Catalog Suggestions Strip when only 1 or 2 models match filter */

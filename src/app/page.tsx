@@ -858,7 +858,10 @@ export default function Home() {
                     <select
                       id="provider-filter"
                       value={selectedProvider}
-                      onChange={(e) => setSelectedProvider(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedProvider(e.target.value);
+                        setActiveCategory("Semua");
+                      }}
                       aria-label="Filter berdasarkan AI Provider"
                     >
                       <option value="all">Semua Provider ({models.length})</option>

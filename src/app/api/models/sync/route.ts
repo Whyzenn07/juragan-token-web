@@ -75,47 +75,26 @@ export async function GET() {
 
       if (list.length > 0) {
         source = "gateway_live";
-        // Map newly discovered models from live gateway
+        // Update live pricing ratios for curated models from gateway
+        const ratioMap = new Map<string, { ratio: number; completionRatio: number }>();
         list.forEach((item) => {
-          const modelId = item.model_name || item.id || item.model || item.name;
+          const modelId = (item.model_name || item.id || item.model || item.name || "").toLowerCase().trim();
           if (!modelId) return;
-
-          const existing = modelsCatalog.find((m) => m.id.toLowerCase() === modelId.toLowerCase());
           const ratio = item.model_ratio ?? item.ratio ?? 1;
           const completionRatio = item.completion_ratio ?? item.completionRatio ?? 3;
+          ratioMap.set(modelId, { ratio, completionRatio });
+        });
 
-          if (existing) {
+        modelsCatalog.forEach((m) => {
+          const matched = ratioMap.get(m.id.toLowerCase());
+          if (matched) {
             remoteModels.push({
-              ...existing,
-              ratio,
-              completionRatio
+              ...m,
+              ratio: matched.ratio,
+              completionRatio: matched.completionRatio
             });
           } else {
-            // Auto-generate metadata for new model deployed to gateway
-            const perImage = item.type === "image" || modelId.includes("image") || modelId.includes("flux");
-            const isCode = modelId.includes("code") || modelId.includes("sonnet") || modelId.includes("opus");
-            remoteModels.push({
-              id: modelId,
-              name: modelId.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-              providerId: modelId.includes("claude")
-                ? "anthropic"
-                : modelId.includes("gemini")
-                ? "google"
-                : modelId.includes("deepseek")
-                ? "deepseek"
-                : modelId.includes("qwen")
-                ? "alibaba"
-                : modelId.includes("seed") || modelId.includes("bytedance")
-                ? "bytedance"
-                : "openai",
-              category: perImage ? "Gambar" : isCode ? "Ngoding" : "Tugas & Riset",
-              description: `Model baru terdeteksi di gateway Juragan Token. Pricing dihitung otomatis dengan rasio gateway ${ratio}x.`,
-              inputs: perImage ? ["teks"] : ["teks", "gambar"],
-              endpoints: perImage ? ["image"] : ["openai", "anthropic"],
-              contextTokens: 500_000,
-              ratio,
-              completionRatio: perImage ? 1 : completionRatio
-            });
+            remoteModels.push({ ...m });
           }
         });
       }
@@ -124,12 +103,9 @@ export async function GET() {
     source = "gateway_fallback";
   }
 
-  // Ensure curated top-tier models (ChatGPT 6 Astra, Gemini 4 Argon, Claude Opus 5.5, Fable 5.1) are always present
-  const combinedMap = new Map<string, ModelItem>();
-  modelsCatalog.forEach((m) => combinedMap.set(m.id, m));
-  remoteModels.forEach((m) => combinedMap.set(m.id, { ...combinedMap.get(m.id), ...m }));
-
-  const finalModels = Array.from(combinedMap.values()).map((m) => {
+  // Use the synchronized models list (or fallback to catalog if remote sync wasn't populated)
+  const baseModels = remoteModels.length > 0 ? remoteModels : modelsCatalog;
+  const finalModels = baseModels.map((m) => {
     const isImg = isPerImage(m);
     return {
       ...m,

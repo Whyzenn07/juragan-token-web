@@ -34,7 +34,7 @@ export const providers: Provider[] = [
 
 export const modelsCatalog: ModelItem[] = [
   // ==========================================
-  // 1. OPENAI FAMILY (Luna, Terra, Sol, Astra, Mini, Omni, o3-mini, DALL-E)
+  // 1. OPENAI FAMILY (9 Models - 3x3 Grid)
   // ==========================================
   {
     id: "gpt-6-luna",
@@ -46,6 +46,18 @@ export const modelsCatalog: ModelItem[] = [
     endpoints: ["openai", "anthropic"],
     ratio: 0.05,
     completionRatio: 5,
+    featured: true
+  },
+  {
+    id: "gpt-5-mini",
+    name: "GPT-5 Mini",
+    providerId: "openai",
+    category: "Chat Hemat",
+    description: "Generasi baru efisiensi OpenAI untuk respons kilat, chatbot interaktif, dan parsing payload data terstruktur.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["openai", "anthropic"],
+    ratio: 0.125,
+    completionRatio: 8,
     featured: true
   },
   {
@@ -68,7 +80,7 @@ export const modelsCatalog: ModelItem[] = [
     description: "Seimbang antara kemampuan analitis dan biaya. Untuk ringkasan terstruktur dan bantuan riset harian.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
-    ratio: 0.5,
+    ratio: 1.0,
     completionRatio: 6
   },
   {
@@ -88,11 +100,11 @@ export const modelsCatalog: ModelItem[] = [
     id: "gpt-6-sol",
     name: "GPT-6 Sol",
     providerId: "openai",
-    category: "Ngoding",
-    description: "Spesialis coding kompleks: merencanakan arsitektur, membaca hasil tool, dan tugas multi-langkah.",
+    category: "Tugas & Riset",
+    description: "Model penalaran profesional OpenAI untuk analitika riset multi-langkah dan sintesis komputasi mendalam.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
-    ratio: 1,
+    ratio: 1.0,
     completionRatio: 5,
     featured: true
   },
@@ -118,8 +130,8 @@ export const modelsCatalog: ModelItem[] = [
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
     contextTokens: 1_048_576,
-    ratio: 1.8,
-    completionRatio: 4.5,
+    ratio: 5.0,
+    completionRatio: 5,
     featured: true
   },
   {
@@ -137,8 +149,20 @@ export const modelsCatalog: ModelItem[] = [
   },
 
   // ==========================================
-  // 2. ANTHROPIC CLAUDE FAMILY (Haiku, 3.5 Haiku, Sonnet, 3.7 Hybrid, Opus)
+  // 2. ANTHROPIC CLAUDE FAMILY (9 Models - 3x3 Grid)
   // ==========================================
+  {
+    id: "claude-haiku-5-5",
+    name: "Claude Haiku 5.5",
+    providerId: "anthropic",
+    category: "Chat Hemat",
+    description: "Claude generasi terbaru paling ringan dan ekonomis. Kecepatan streaming instan untuk chat harian dan klasifikasi teks.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["anthropic", "openai"],
+    ratio: 0.05,
+    completionRatio: 5,
+    featured: true
+  },
   {
     id: "claude-haiku-4-5",
     name: "Claude Haiku 4.5",
@@ -147,7 +171,7 @@ export const modelsCatalog: ModelItem[] = [
     description: "Claude versi ringan dan gesit. Gaya bahasa sopan khas Claude dengan biaya seperenam Sonnet.",
     inputs: ["teks", "gambar"],
     endpoints: ["anthropic", "openai"],
-    ratio: 0.25,
+    ratio: 0.5,
     completionRatio: 5
   },
   {
@@ -155,168 +179,142 @@ export const modelsCatalog: ModelItem[] = [
     name: "Claude 3.5 Haiku",
     providerId: "anthropic",
     category: "Chat Hemat",
-    description: "Respon super kilat dengan latensi ultra-rendah untuk chat harian dan ekstraksi informasi cepat dengan tata bahasa elegan.",
+    description: "Model ringan ultra-cepat untuk customer service, ekstraksi data, dan parsing dokumen singkat.",
     inputs: ["teks", "gambar"],
     endpoints: ["anthropic", "openai"],
     contextTokens: 200_000,
-    ratio: 0.4,
-    completionRatio: 5,
-    featured: true
+    ratio: 0.5,
+    completionRatio: 5
   },
   {
     id: "claude-sonnet-4-6",
     name: "Claude Sonnet 4.6",
     providerId: "anthropic",
     category: "Ngoding",
-    description: "Versi stabil legendaris pilihan para software engineer. Hemat dan handal untuk sesi ngoding panjang.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["anthropic", "openai"],
-    contextTokens: 500_000,
-    ratio: 0.8,
-    completionRatio: 3.75
-  },
-  {
-    id: "claude-3.5-sonnet",
-    name: "Claude 3.5 Sonnet",
-    providerId: "anthropic",
-    category: "Tugas & Riset",
-    description: "Standar emas industri untuk analisis teks akademis panjang, penulisan esai, dan penyusunan argumen kritis bebas halusinasi.",
+    description: "Pilihan favorit developer untuk Claude Code CLI, Cursor, dan refactoring source code skala besar.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
-    contextTokens: 200_000,
     ratio: 1.5,
-    completionRatio: 5,
-    featured: true
+    completionRatio: 5
+  },
+  {
+    id: "claude-sonnet-5",
+    name: "Claude Sonnet 5",
+    providerId: "anthropic",
+    category: "Ngoding",
+    description: "Model reasoning koding generasi 5 Anthropic untuk penulisan arsitektur backend, refactoring, dan automated unit tests.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["anthropic", "openai"],
+    ratio: 1.0,
+    completionRatio: 5
   },
   {
     id: "claude-sonnet-5-5",
     name: "Claude Sonnet 5.5",
     providerId: "anthropic",
     category: "Ngoding",
-    description: "Raja coding modern di Claude Code dan Cursor. Penalaran tajam, sintaks bersih, dan eksekusi instruksi presisi.",
+    description: "Model koding terkuat di dunia saat ini. Menguasai arsitektur kompleks, debugging multi-file, dan integrasi Claude Code.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
-    contextTokens: 1_000_000,
-    ratio: 1,
+    contextTokens: 200_000,
+    ratio: 1.0,
     completionRatio: 5,
     featured: true
   },
   {
-    id: "claude-3.7-sonnet",
-    name: "Claude 3.7 Sonnet Hybrid",
-    providerId: "anthropic",
-    category: "Ngoding",
-    description: "Model hybrid reasoning pertama Anthropic dengan dynamic thinking budget untuk arsitektur software dan full-stack refactoring.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["anthropic", "openai"],
-    contextTokens: 1_000_000,
-    ratio: 1.5,
-    completionRatio: 5,
-    featured: true
-  },
-  {
-    id: "claude-opus-4-5",
-    name: "Claude Opus 4.5",
+    id: "claude-opus-4-6",
+    name: "Claude Opus 4.6",
     providerId: "anthropic",
     category: "Tugas & Riset",
-    description: "Frontier hybrid reasoning & creative narrative synthesis untuk argumen mendalam dan riset kompleks.",
+    description: "Model flagship kelas berat Anthropic untuk analisis riset akademik mendalam dan penyusunan naskah komprehensif.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
-    contextTokens: 1_000_000,
-    ratio: 1.4,
-    completionRatio: 3.5,
-    featured: true
+    ratio: 2.5,
+    completionRatio: 5
+  },
+  {
+    id: "claude-opus-5",
+    name: "Claude Opus 5",
+    providerId: "anthropic",
+    category: "Tugas & Riset",
+    description: "Penalaran filosofis dan analitis tingkat tinggi untuk bedah teori, riset multidisiplin, dan sintesis ilmiah.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["anthropic", "openai"],
+    ratio: 2.5,
+    completionRatio: 5
   },
   {
     id: "claude-opus-5-5",
     name: "Claude Opus 5.5",
     providerId: "anthropic",
-    category: "Ngoding",
-    description: "Kasta tertinggi Anthropic untuk deep reasoning logika murni, arsitektur enterprise, dan pairing coding bebas halusinasi.",
-    inputs: ["teks", "gambar"],
+    category: "Tugas & Riset",
+    description: "Puncak kecerdasan Anthropic. Penalaran filosofis, bedah jurnal puluhan halaman, dan argumen skripsi paling berbobot.",
+    inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
-    contextTokens: 1_000_000,
-    ratio: 2,
+    contextTokens: 200_000,
+    ratio: 2.0,
     completionRatio: 5,
     featured: true
   },
 
   // ==========================================
-  // 3. ALIBABA QWEN FAMILY (Flash, Coder Turbo, 35B, 72B, 3.7 Max, Image)
+  // 3. ALIBABA CLOUD / QWEN (6 Models - 2x3 Grid)
   // ==========================================
   {
     id: "qwen3.5-flash",
     name: "Qwen 3.5 Flash",
     providerId: "alibaba",
     category: "Chat Hemat",
-    description: "Model reasoning & chat paling hemat di dunia dari Alibaba Cloud. Konteks 1 juta token, ideal untuk ekstraksi data masif dan bot percakapan.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 1_000_000,
-    ratio: 0.015,
-    completionRatio: 9.66,
+    description: "Paling ekonomis di seluruh katalog. Cocok untuk bot WhatsApp, auto-reply, dan tanya jawab cepat tanpa boros saldo.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.0141,
+    completionRatio: 10,
     featured: true
   },
   {
-    id: "qwen-2.5-coder-turbo",
-    name: "Qwen 2.5 Coder Turbo",
+    id: "qwen3.6-flash",
+    name: "Qwen 3.6 Flash",
     providerId: "alibaba",
     category: "Chat Hemat",
-    description: "Model koding dan chat super hemat dari Alibaba Cloud. Ringan, cepat, dan handal untuk tanya-jawab koding instan.",
-    inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.02,
-    completionRatio: 5
+    description: "Generasi baru Qwen ultra-cepat dengan pemahaman bahasa Indonesia yang sangat luwes dan biaya super murah.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["openai"],
+    ratio: 0.0845,
+    completionRatio: 6
   },
   {
     id: "qwen3.6-35b-a3b",
     name: "Qwen 3.6 35B A3B",
     providerId: "alibaba",
     category: "Ngoding",
-    description: "Model coding open-weights super tajam untuk Cursor dan VS Code. Efisiensi tinggi untuk sintaks kode dan bug fixing instan.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 262_144,
+    description: "Arsitektur MoE hemat sumber daya dengan kemampuan coding mendekati model 70B.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
     ratio: 0.13,
     completionRatio: 5.92
   },
   {
-    id: "qwen-2.5-72b-instruct",
-    name: "Qwen 2.5 72B Instruct",
+    id: "qwen3.7-plus",
+    name: "Qwen 3.7 Plus",
     providerId: "alibaba",
-    category: "Tugas & Riset",
-    description: "Model open-weights terkuat Alibaba dengan akurasi benchmark setara GPT-4o untuk matematika, sains, dan karya tulis ilmiah.",
+    category: "Ngoding",
+    description: "Model coding dan logic frontier Alibaba Cloud untuk integrasi API, penulisan script, dan automasi bisnis.",
     inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 131_072,
-    ratio: 0.4,
-    completionRatio: 4,
-    featured: true
+    endpoints: ["openai"],
+    ratio: 0.2,
+    completionRatio: 4
   },
   {
     id: "qwen3.7-max",
     name: "Qwen 3.7 Max",
     providerId: "alibaba",
     category: "Tugas & Riset",
-    description: "Flagship tercanggih Alibaba Cloud. Kapabilitas setara Claude 3.5 Sonnet dengan tarif sepertiga lebih terjangkau.",
+    description: "Model terbesar Alibaba untuk analisis pasar, data science, dan ringkasan dokumen multibahasa tanpa kompromi akurasi.",
     inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 1_000_000,
-    ratio: 0.8,
-    completionRatio: 4.5,
-    featured: true
-  },
-  {
-    id: "qwen-image-2.0",
-    name: "Qwen Image 2.0",
-    providerId: "alibaba",
-    category: "Gambar",
-    description: "Model generate gambar photorealistic generasi terbaru dari Alibaba. Detail tekstur wajah dan objek sangat natural.",
-    inputs: ["teks"],
-    endpoints: ["image"],
-    ratio: 0,
-    completionRatio: 0,
-    perImageUsd: 0.038,
+    endpoints: ["openai"],
+    ratio: 0.855,
+    completionRatio: 3.01,
     featured: true
   },
   {
@@ -324,71 +322,73 @@ export const modelsCatalog: ModelItem[] = [
     name: "Qwen Image 2.0 Pro",
     providerId: "alibaba",
     category: "Gambar",
-    description: "Kasta tertinggi render gambar AI Alibaba dengan resolusi ultra tajam dan pemahaman tata letak teks dalam gambar yang akurat.",
+    description: "Generasi gambar resolusi tinggi dari Alibaba Cloud dengan pemahaman teks Mandarin dan Inggris yang presisi.",
     inputs: ["teks"],
     endpoints: ["image"],
     ratio: 0,
     completionRatio: 0,
-    perImageUsd: 0.055
+    perImageUsd: 0.028,
+    featured: true
   },
 
   // ==========================================
-  // 4. MINIMAX FAMILY (M2.5, M2.5 Pro, M2.7, M2.7 Pro, Turbo, Art)
+  // 4. MINIMAX FAMILY (6 Models - 2x3 Grid)
   // ==========================================
   {
     id: "minimax-chat-turbo",
     name: "MiniMax Chat Turbo",
     providerId: "minimax",
     category: "Chat Hemat",
-    description: "Output kilat hingga 100 token/detik dengan gaya percakapan alami khas MiniMax untuk asisten virtual interaktif.",
+    description: "Respon secepat kilat untuk asisten pribadi, brainstorming ide konten, dan pembuatan draf artikel blog.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.05,
+    endpoints: ["openai"],
+    ratio: 0.08,
     completionRatio: 4
   },
   {
     id: "minimax-m2.5",
-    name: "MiniMax M2.5",
+    name: "MiniMax M2.5 Fast",
     providerId: "minimax",
     category: "Chat Hemat",
-    description: "Asisten cerdas serba bisa dengan kemampuan bahasa Indonesia yang sangat natural dan ekspresif.",
+    description: "Model cepat MiniMax untuk percakapan alami, terjemahan real-time, dan pemrosesan instruksi sehari-hari.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.08,
-    completionRatio: 4.8
-  },
-  {
-    id: "minimax-m2.5-pro",
-    name: "MiniMax M2.5 Pro",
-    providerId: "minimax",
-    category: "Tugas & Riset",
-    description: "Versi Pro berkecepatan tinggi dengan pemahaman konteks panjang untuk analisis dokumen rapat dan riset skripsi.",
-    inputs: ["teks", "PDF"],
-    endpoints: ["openai", "anthropic"],
+    endpoints: ["openai"],
     ratio: 0.15,
-    completionRatio: 5.33
+    completionRatio: 4,
+    featured: true
   },
   {
     id: "minimax-m2.7",
-    name: "MiniMax M2.7",
+    name: "MiniMax M2.7 Coder",
     providerId: "minimax",
     category: "Ngoding",
-    description: "Generasi terbaru dengan peningkatan dramatis pada pemecahan soal logika koding dan matematika.",
+    description: "Model reasoning MiniMax dengan optimasi koding untuk frontend React, API backend, dan SQL queries.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.25,
-    completionRatio: 4.8
+    endpoints: ["openai"],
+    ratio: 0.35,
+    completionRatio: 4.5
   },
   {
     id: "minimax-m2.7-pro",
     name: "MiniMax M2.7 Pro",
     providerId: "minimax",
     category: "Ngoding",
-    description: "Model flagship MiniMax untuk perancangan arsitektur software dan penulisan karya ilmiah bertingkat.",
+    description: "Spesialis arsitektur fullstack MiniMax dengan jendela konteks besar untuk audit kode dan refactoring proyek.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.5,
-    completionRatio: 4.4,
+    endpoints: ["openai"],
+    ratio: 0.65,
+    completionRatio: 4.5
+  },
+  {
+    id: "minimax-m2.5-pro",
+    name: "MiniMax M2.5 Pro",
+    providerId: "minimax",
+    category: "Tugas & Riset",
+    description: "Versi pro berkecepatan tinggi untuk analisis dokumen panjang, riset komparasi produk, dan pembuatan laporan formal.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.35,
+    completionRatio: 5,
     featured: true
   },
   {
@@ -396,100 +396,159 @@ export const modelsCatalog: ModelItem[] = [
     name: "MiniMax Image Art",
     providerId: "minimax",
     category: "Gambar",
-    description: "Sintesis gambar dan visual ilustrasi gaya digital art kontemporer dengan akurasi pencahayaan dan tekstur detail.",
+    description: "Generator gambar artistik dari MiniMax untuk ilustrasi buku, poster media sosial, dan materi kreatif visual.",
     inputs: ["teks"],
     endpoints: ["image"],
     ratio: 0,
     completionRatio: 0,
-    perImageUsd: 0.035
+    perImageUsd: 0.022
   },
 
   // ==========================================
-  // 5. GOOGLE GEMINI FAMILY (Flash, Thinking, Coder, Pro, Argon, Imagen 3)
+  // 5. GOOGLE GEMINI FAMILY (6 Models - 2x3 Grid)
   // ==========================================
+  {
+    id: "gemini-flash-lite-latest",
+    name: "Gemini Flash Lite",
+    providerId: "google",
+    category: "Chat Hemat",
+    description: "Varian Google paling efisien untuk ekstraksi teks, klasifikasi cepat, dan bot tanya jawab berkecepatan tinggi.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["openai"],
+    ratio: 0.05,
+    completionRatio: 4
+  },
   {
     id: "gemini-3.8-flash",
     name: "Gemini 3.8 Flash",
     providerId: "google",
     category: "Chat Hemat",
-    description: "Model ultra-cepat Google dengan efisiensi biaya tertinggi. Konteks 1 juta token, cocok untuk asisten harian dan bot obrolan.",
-    inputs: ["teks", "gambar", "audio", "video"],
-    endpoints: ["openai", "anthropic"],
+    description: "Multimodal serba-bisa Google generasi terbaru. Jendela konteks raksasa 1 juta token dengan harga super terjangkau.",
+    inputs: ["teks", "gambar", "audio", "video", "PDF"],
+    endpoints: ["openai"],
     contextTokens: 1_000_000,
-    ratio: 0.045,
-    completionRatio: 5.33,
+    ratio: 0.25,
+    completionRatio: 6,
     featured: true
   },
   {
-    id: "gemini-flash-thinking",
-    name: "Gemini Flash Thinking",
-    providerId: "google",
-    category: "Chat Hemat",
-    description: "Model reasoning berkecepatan kilat dari Google dengan output proses berpikir transparan. Hebat untuk soal logika bertahap.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 1_000_000,
-    ratio: 0.075,
-    completionRatio: 4
-  },
-  {
-    id: "gemini-2.5-flash-code",
-    name: "Gemini 2.5 Flash Coder",
+    id: "gemini-3.6-flash",
+    name: "Gemini 3.6 Flash Code",
     providerId: "google",
     category: "Ngoding",
-    description: "Optimasi koding berkecepatan tinggi dengan konteks 1 juta token, sempurna untuk parsing repository utuh di Cursor dan Cline.",
+    description: "Model koding kilat Google untuk integrasi CI/CD, parsing log server, dan penulisan skrip automasi.",
     inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 1_000_000,
-    ratio: 0.075,
-    completionRatio: 4,
-    featured: true
-  },
-  {
-    id: "gemini-2.5-pro",
-    name: "Gemini 2.5 Pro Vision",
-    providerId: "google",
-    category: "Tugas & Riset",
-    description: "Pemimpin pemrosesan multimodal audio, video, teks panjang hingga 2 juta token untuk bedah skripsi, jurnal ilmiah, dan kuliah umum.",
-    inputs: ["teks", "gambar", "audio", "video", "PDF"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 2_097_152,
-    ratio: 0.625,
-    completionRatio: 4,
-    featured: true
-  },
-  {
-    id: "gemini-3.8-pro",
-    name: "Gemini 3.8 Pro",
-    providerId: "google",
-    category: "Tugas & Riset",
-    description: "Multimodal andalan Google untuk riset ilmiah, analisis video berdurasi jam, dan pembedahan ratusan halaman dokumen PDF.",
-    inputs: ["teks", "gambar", "audio", "video", "PDF"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 2_000_000,
-    ratio: 0.8,
-    completionRatio: 4,
-    featured: true
+    endpoints: ["openai"],
+    ratio: 0.75,
+    completionRatio: 4.67
   },
   {
     id: "gemini-4-argon",
     name: "Gemini 4 Argon",
     providerId: "google",
+    category: "Ngoding",
+    description: "Eksperimen frontier terbaru Google DeepMind untuk reasoning tingkat tinggi dan pemecahan algoritma rumit.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["openai"],
+    ratio: 1.0,
+    completionRatio: 5,
+    featured: true
+  },
+  {
+    id: "gemini-3.1-pro",
+    name: "Gemini 3.1 Pro",
+    providerId: "google",
     category: "Tugas & Riset",
-    description: "Kasta puncak riset Google dengan kapabilitas reasoning mendalam untuk matematika tingkat lanjut dan sains komputasi.",
-    inputs: ["teks", "gambar", "video", "PDF"],
-    endpoints: ["openai", "anthropic"],
+    description: "Spesialis dokumen riset tebal. Sanggup membaca ratusan halaman PDF, video 1 jam, dan transkrip audio sekaligus.",
+    inputs: ["teks", "gambar", "audio", "video", "PDF"],
+    endpoints: ["openai"],
     contextTokens: 2_000_000,
-    ratio: 1.5,
-    completionRatio: 4
+    ratio: 1.0,
+    completionRatio: 6,
+    featured: true
   },
   {
     id: "imagen-3-fast",
     name: "Imagen 3 Studio",
     providerId: "google",
     category: "Gambar",
-    description: "Generator gambar kualitas studio generasi terbaru Google dengan rendering teks tajam, detail fotorealistis, dan pencahayaan natural.",
+    description: "Teknologi generasi visual terbaru Google DeepMind. Render teks dalam gambar sempurna dan fotorealisme tinggi.",
     inputs: ["teks"],
+    endpoints: ["image"],
+    ratio: 0,
+    completionRatio: 0,
+    perImageUsd: 0.03,
+    featured: true
+  },
+
+  // ==========================================
+  // 6. XAI / GROK FAMILY (6 Models - 2x3 Grid)
+  // ==========================================
+  {
+    id: "grok-3-mini",
+    name: "Grok 3 Mini",
+    providerId: "xai",
+    category: "Chat Hemat",
+    description: "Grok versi ringkas berkecepatan tinggi. Karakter to the point, gaya bicara cerdas, dan biaya sangat terjangkau.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.15,
+    completionRatio: 1.67
+  },
+  {
+    id: "grok-4-fast-reasoning",
+    name: "Grok 4 Fast",
+    providerId: "xai",
+    category: "Tugas & Riset",
+    description: "Penalaran analitis cepat xAI untuk verifikasi data, pencarian logika kritis, dan sintesis ringkasan instan.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.1,
+    completionRatio: 2.5
+  },
+  {
+    id: "grok-3-fast-beta",
+    name: "Grok 3 Fast Beta",
+    providerId: "xai",
+    category: "Ngoding",
+    description: "Versi beta bertenaga xAI untuk sprint coding cepat, generate boilerplate, dan eksekusi instruksi technical.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 2.75,
+    completionRatio: 5
+  },
+  {
+    id: "grok-4",
+    name: "Grok 4 Reasoning",
+    providerId: "xai",
+    category: "Ngoding",
+    description: "Frontier reasoning xAI dengan kluster komputasi Colossus. Sangat kuat untuk matematika lanjut dan arsitektur kode.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 1.65,
+    completionRatio: 5,
+    featured: true
+  },
+  {
+    id: "grok-3",
+    name: "Grok 3",
+    providerId: "xai",
+    category: "Tugas & Riset",
+    description: "Flagship xAI dengan pemahaman sains mendalam, wawasan terkini, dan analisis tanpa sensor berlebih.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    contextTokens: 131_072,
+    ratio: 1.5,
+    completionRatio: 5,
+    featured: true
+  },
+  {
+    id: "grok-imagine-v1",
+    name: "Grok Vision & Imagine",
+    providerId: "xai",
+    category: "Gambar",
+    description: "Model visi dan kreasi grafis xAI. Hasilkan visual fotorealistis dan interpretasi gambar kompleks dengan gaya unik.",
+    inputs: ["teks", "gambar"],
     endpoints: ["image"],
     ratio: 0,
     completionRatio: 0,
@@ -498,145 +557,90 @@ export const modelsCatalog: ModelItem[] = [
   },
 
   // ==========================================
-  // 6. XAI GROK FAMILY (Mini, Grok 3, Grok Code, Grok 4, Imagine)
-  // ==========================================
-  {
-    id: "grok-3-mini",
-    name: "Grok 3 Mini",
-    providerId: "xai",
-    category: "Chat Hemat",
-    description: "Model penalaran cepat dan ringan dari xAI. Gaya lugas, cerdas, dan biaya sangat terjangkau untuk penggunaan rutin.",
-    inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.1,
-    completionRatio: 4
-  },
-  {
-    id: "grok-3",
-    name: "Grok 3",
-    providerId: "xai",
-    category: "Tugas & Riset",
-    description: "Model kecerdasan umum frontier dari xAI Elon Musk dengan akses pengetahuan terkini dan penalaran saintifik mendalam.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.8,
-    completionRatio: 4,
-    featured: true
-  },
-  {
-    id: "grok-3-code",
-    name: "Grok 3 Code",
-    providerId: "xai",
-    category: "Ngoding",
-    description: "Model spesialis rekayasa perangkat lunak dari xAI dengan pemahaman mendalam tentang arsitektur sistem dan debugging rumit.",
-    inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 131_072,
-    ratio: 1,
-    completionRatio: 4
-  },
-  {
-    id: "grok-4-reasoning",
-    name: "Grok 4 Reasoning",
-    providerId: "xai",
-    category: "Tugas & Riset",
-    description: "Model penalaran tingkat tinggi xAI dengan rantai pemikiran mandiri untuk memecahkan persoalan logika dan sains murni.",
-    inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 262_144,
-    ratio: 1.6,
-    completionRatio: 4,
-    featured: true
-  },
-  {
-    id: "grok-imagine-v1",
-    name: "Grok Vision & Imagine",
-    providerId: "xai",
-    category: "Gambar",
-    description: "Pembuatan dan manipulasi visual dari xAI dengan pemahaman prompt konteks unik dan kreativitas artistik ekspresif.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["image"],
-    ratio: 0,
-    completionRatio: 0,
-    perImageUsd: 0.04
-  },
-
-  // ==========================================
-  // 7. MOONSHOT KIMI FAMILY (Instant, Code, K3, K3.1, Academic 2M)
+  // 7. MOONSHOT AI / KIMI (6 Models - 2x3 Grid)
   // ==========================================
   {
     id: "kimi-chat-instant",
     name: "Kimi Chat Instant",
     providerId: "moonshot",
     category: "Chat Hemat",
-    description: "Model chat ringan dan responsif dari Moonshot AI untuk tanya-jawab harian, terjemahan kilat, dan copywriting cepat.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.1,
-    completionRatio: 3,
-    featured: true
+    description: "Sangat responsif untuk tanya jawab santai, revisi tata bahasa skripsi, dan obrolan ide harian.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.465,
+    completionRatio: 4.15
+  },
+  {
+    id: "kimi-k2.6",
+    name: "Kimi K2.6 Flash",
+    providerId: "moonshot",
+    category: "Chat Hemat",
+    description: "Model efisien Moonshot AI untuk ekstraksi poin penting, penerjemahan cepat, dan draf tulisan ringkas.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.465,
+    completionRatio: 4.15
   },
   {
     id: "kimi-k2.7-code",
     name: "Kimi K2.7 Code",
     providerId: "moonshot",
     category: "Ngoding",
-    description: "Model khusus rekayasa perangkat lunak dari Moonshot. Harga sepertiga Claude Sonnet dengan akurasi bug fixing tinggi.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
+    description: "Model spesialis koding Moonshot AI. Handal menyelesaikan tugas coding web, script Python, dan algoritma praktikum.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
     ratio: 0.465,
     completionRatio: 4.15,
     featured: true
   },
   {
-    id: "kimi-k3",
-    name: "Kimi K3",
-    providerId: "moonshot",
-    category: "Tugas & Riset",
-    description: "Pionir konteks jutaan token tanpa kehilangan detail. Mampu membaca buku tebal, ratusan halaman skripsi, dan video.",
-    inputs: ["teks", "gambar", "video"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 1.43,
-    completionRatio: 5
-  },
-  {
     id: "kimi-k3.1-pro",
-    name: "Kimi K3.1 Pro",
+    name: "Kimi K3.1 Pro Code",
     providerId: "moonshot",
-    category: "Tugas & Riset",
-    description: "Versi Pro berkecepatan tinggi dengan kemampuan matematika dan logika penalaran terstruktur tingkat lanjut.",
+    category: "Ngoding",
+    description: "Versi pro generasi K3.1 dengan pemahaman struktur kode kompleks dan chain-of-thought koding tingkat lanjut.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 1,
-    completionRatio: 5
+    endpoints: ["openai"],
+    ratio: 37.5,
+    completionRatio: 1
   },
   {
-    id: "kimi-k3-academic",
-    name: "Kimi K3 Academic 2M",
+    id: "kimi-k3",
+    name: "Kimi K3 Research",
     providerId: "moonshot",
     category: "Tugas & Riset",
-    description: "Konteks ekstra panjang 2 juta token untuk membedah tumpukan buku referensi, laporan keuangan, dan tesis tanpa terputus.",
-    inputs: ["teks", "PDF"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 2_000_000,
-    ratio: 1.2,
-    completionRatio: 4,
+    description: "Model riset kontekstual panjang dari Moonshot AI untuk memproses referensi berlembar-lembar secara utuh.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 1.43,
+    completionRatio: 5,
     featured: true
+  },
+  {
+    id: "kimi-k3.1-pro-highspeed",
+    name: "Kimi K3.1 Pro Turbo",
+    providerId: "moonshot",
+    category: "Tugas & Riset",
+    description: "Akselerasi inference tinggi untuk penelusuran jurnal ilmiah, sintesis data, dan pembuatan makalah riset kilat.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 37.5,
+    completionRatio: 1
   },
 
   // ==========================================
-  // 8. DEEPSEEK FAMILY (V4 Flash, Chat V3, Coder, V4 Pro, R1 Reasoner)
+  // 8. DEEPSEEK FAMILY (6 Models - 2x3 Grid)
   // ==========================================
   {
     id: "deepseek-v4-flash",
     name: "DeepSeek V4 Flash",
     providerId: "deepseek",
     category: "Chat Hemat",
-    description: "Teman ngobrol dan terjemah jurnal sehari-hari. Ribuan jawaban per sepuluh ribu rupiah.",
+    description: "Generasi V4 super hemat dari DeepSeek. Respon kilat untuk tanya jawab harian dan ringkasan teks singkat.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.22,
-    completionRatio: 3.02,
+    endpoints: ["openai"],
+    ratio: 0.04,
+    completionRatio: 4,
     featured: true
   },
   {
@@ -644,35 +648,35 @@ export const modelsCatalog: ModelItem[] = [
     name: "DeepSeek V3 Chat",
     providerId: "deepseek",
     category: "Chat Hemat",
-    description: "Model percakapan serbaguna dari DeepSeek dengan efisiensi token legendaris, cocok untuk percakapan santai dan pembuatan draft kilat.",
+    description: "Model flagship serbaguna dengan biaya sangat terjangkau. Jawaban padat, natural, dan cerdas dalam bahasa Indonesia.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.14,
-    completionRatio: 2
+    endpoints: ["openai"],
+    contextTokens: 64_000,
+    ratio: 0.07,
+    completionRatio: 4
   },
   {
     id: "deepseek-coder-v2.5",
     name: "DeepSeek Coder V2.5",
     providerId: "deepseek",
     category: "Ngoding",
-    description: "Spesialis 300+ bahasa pemrograman untuk auto-completion kilat, pembuatan unit test, dan refactor fungsi rumit.",
+    description: "Model koding terfavorit mahasiswa informatika. Menguasai 300+ bahasa pemrograman dengan biaya per prompt sangat murah.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 128_000,
-    ratio: 0.2,
-    completionRatio: 4
+    endpoints: ["openai"],
+    ratio: 0.14,
+    completionRatio: 4,
+    featured: true
   },
   {
     id: "deepseek-v4-pro",
     name: "DeepSeek V4 Pro",
     providerId: "deepseek",
     category: "Ngoding",
-    description: "Mode berpikir (reasoning) dan non-berpikir, konteks 1 juta token. Sangat tangguh untuk coding dan matematika murni.",
+    description: "Versi pro tingkat lanjut DeepSeek untuk penulisan aplikasi fullstack, integrasi database, dan penyelesaian error pelik.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 1_000_000,
-    ratio: 0.665,
-    completionRatio: 3.01,
+    endpoints: ["openai"],
+    ratio: 0.28,
+    completionRatio: 4,
     featured: true
   },
   {
@@ -680,114 +684,13 @@ export const modelsCatalog: ModelItem[] = [
     name: "DeepSeek R1 Reasoner",
     providerId: "deepseek",
     category: "Tugas & Riset",
-    description: "Model reasoning murni open-weights pemenang penghargaan dunia, setara o1 untuk matematika, sains, dan analisis logika rumit.",
+    description: "Pelopor penalaran open-weights dunia. Menyajikan cara berpikir langkah demi langkah (chain of thought) yang transparan.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 128_000,
-    ratio: 0.55,
+    endpoints: ["openai"],
+    contextTokens: 64_000,
+    ratio: 0.28,
     completionRatio: 4,
     featured: true
-  },
-
-  // ==========================================
-  // 9. BYTEDANCE FAMILY (Seed Flash, Lite, Coder, Research, Seedream)
-  // ==========================================
-  {
-    id: "seed-1.6-flash",
-    name: "Seed 1.6 Flash",
-    providerId: "bytedance",
-    category: "Chat Hemat",
-    description: "Chat harian responsif dari ekosistem Doubao ByteDance dengan tarif super murah. Cocok untuk bot percakapan, FAQ, dan ringkasan kilat.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 262_144,
-    ratio: 0.041,
-    completionRatio: 4,
-    featured: true
-  },
-  {
-    id: "seed-2.0-lite",
-    name: "Seed 2.0 Lite",
-    providerId: "bytedance",
-    category: "Chat Hemat",
-    description: "Model multimodal ringan ByteDance dengan pemrosesan teks, gambar, dan video ringkas. Analisis frame visual dan transkrip konten secara instan.",
-    inputs: ["teks", "gambar", "video"],
-    endpoints: ["openai", "anthropic"],
-    contextTokens: 524_288,
-    ratio: 0.1375,
-    completionRatio: 8
-  },
-  {
-    id: "seed-coder-pro",
-    name: "Seed Coder Pro",
-    providerId: "bytedance",
-    category: "Ngoding",
-    description: "Model rekayasa software dari ByteDance untuk penyusunan arsitektur sistem, unit testing, dan integrasi backend API.",
-    inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.3,
-    completionRatio: 4
-  },
-  {
-    id: "seed-research-max",
-    name: "Seed Research Max",
-    providerId: "bytedance",
-    category: "Tugas & Riset",
-    description: "Model penalaran teks panjang ByteDance untuk resume skripsi, analisis komparasi paper, dan sintesis literatur.",
-    inputs: ["teks", "PDF"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.45,
-    completionRatio: 4
-  },
-  {
-    id: "seedream-4.5",
-    name: "Seed Dream 4.5",
-    providerId: "bytedance",
-    category: "Gambar",
-    description: "Generate gambar artistik dan fotorealistis dari teks deskriptif oleh ByteDance Seed. Resolusi tajam, pencahayaan sinematik, dan komposisi visual modern.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["image"],
-    ratio: 0,
-    completionRatio: 0,
-    perImageUsd: 0.044,
-    featured: true
-  },
-
-  // ==========================================
-  // 10. ZHIPU GLM FAMILY (GLM 5.3 Flash -> GLM 5.3)
-  // ==========================================
-  {
-    id: "glm-5.3-flash",
-    name: "GLM 5.3 Flash",
-    providerId: "zhipu",
-    category: "Chat Hemat",
-    description: "Versi ringan GLM yang bisa membaca tangkapan layar. Cocok untuk tanya cepat tugas kuliah dan PR.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.0375,
-    completionRatio: 3.33
-  },
-  {
-    id: "glm-5.3",
-    name: "GLM 5.3",
-    providerId: "zhipu",
-    category: "Ngoding",
-    description: "Kuat dalam pemahaman kode lintas file dan tugas panjang yang harus menjaga instruksi awal.",
-    inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.7,
-    completionRatio: 3.14
-  },
-  {
-    id: "glm-4-flash",
-    name: "GLM 4 Flash",
-    providerId: "zhipu",
-    category: "Chat Hemat",
-    description: "Model ultra-cepat Zhipu AI untuk obrolan kilat, tanya-jawab materi tugas, dan perbaikan tata bahasa dengan latensi minimal.",
-    inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.03,
-    completionRatio: 3.0
   },
   {
     id: "deepseek-r1-distill",
@@ -797,44 +700,154 @@ export const modelsCatalog: ModelItem[] = [
     description: "Versi penalaran ringkas R1 yang sangat efisien untuk olah data tugas kuliah, sitasi jurnal, dan bedah metodologi skripsi.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 0.22,
-    completionRatio: 3.5
+    ratio: 0.14,
+    completionRatio: 4
+  },
+
+  // ==========================================
+  // 9. BYTEDANCE / SEED FAMILY (6 Models - 2x3 Grid)
+  // ==========================================
+  {
+    id: "seed-1.6-flash",
+    name: "Seed 1.6 Flash",
+    providerId: "bytedance",
+    category: "Chat Hemat",
+    description: "Model ultra-cepat ByteDance untuk percakapan sosial, rekomendasi konten, dan interaksi interaktif harian.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 37.5,
+    completionRatio: 1
   },
   {
-    id: "glm-5.3-coder",
-    name: "GLM 5.3 Coder Pro",
-    providerId: "zhipu",
-    category: "Ngoding",
-    description: "Model spesialis coding GLM untuk arsitektur software, refactoring fullstack, dan integrasi mulus di Cursor & Claude Code.",
+    id: "seed-2.0-lite",
+    name: "Seed 2.0 Lite",
+    providerId: "bytedance",
+    category: "Chat Hemat",
+    description: "Generasi 2.0 yang sangat efisien dari ByteDance. Kecepatan streaming tinggi dengan konsumsi token irit.",
     inputs: ["teks"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 0.85,
-    completionRatio: 3.2
-  },
-  {
-    id: "flux-1-schnell",
-    name: "FLUX.1 Schnell HD",
-    providerId: "openai",
-    category: "Gambar",
-    description: "Generator gambar modern Black Forest Labs. Hasilkan ilustrasi visual tajam, tipografi presisi, dan poster presentasi dalam detik.",
-    inputs: ["teks"],
-    endpoints: ["image"],
-    ratio: 0,
-    completionRatio: 0,
-    perImageUsd: 0.018,
+    endpoints: ["openai"],
+    ratio: 37.5,
+    completionRatio: 1,
     featured: true
   },
   {
-    id: "midjourney-v6-turbo",
-    name: "Midjourney v6.1 Turbo",
-    providerId: "openai",
+    id: "seed-2.0-pro",
+    name: "Seed 2.0 Pro",
+    providerId: "bytedance",
+    category: "Ngoding",
+    description: "Model engineering ByteDance dengan pengoptimalan logika koding, refactoring skrip, dan penulisan algoritma.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 37.5,
+    completionRatio: 1,
+    featured: true
+  },
+  {
+    id: "seed-2.0-mini",
+    name: "Seed 2.0 Mini Code",
+    providerId: "bytedance",
+    category: "Ngoding",
+    description: "Model koding ringan ByteDance untuk autocompletion di IDE, penulisan fungsi kecil, dan unit testing cepat.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 37.5,
+    completionRatio: 1
+  },
+  {
+    id: "seed-1.8",
+    name: "Seed 1.8 Research",
+    providerId: "bytedance",
+    category: "Tugas & Riset",
+    description: "Spesialis analisis tren, ekstraksi data riset, dan pengolahan dokumen komprehensif dari ByteDance AI Lab.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 37.5,
+    completionRatio: 1
+  },
+  {
+    id: "seedream-4.5",
+    name: "Seed Dream 4.5",
+    providerId: "bytedance",
     category: "Gambar",
-    description: "Rendering estetika visual fotorealistis tinggi dengan tekstur nyata dan pencahayaan sinematik untuk portofolio desain.",
+    description: "Generator gambar artistik dari ByteDance. Komposisi visual dramatis, tekstur dinamis, dan rendering lanskap memukau.",
     inputs: ["teks"],
     endpoints: ["image"],
     ratio: 0,
     completionRatio: 0,
-    perImageUsd: 0.052,
+    perImageUsd: 0.025,
+    featured: true
+  },
+
+  // ==========================================
+  // 10. Z.AI / ZHIPU GLM FAMILY (6 Models - 2x3 Grid)
+  // ==========================================
+  {
+    id: "glm-5.3-flash",
+    name: "GLM 5.3 Flash",
+    providerId: "zhipu",
+    category: "Chat Hemat",
+    description: "Model generasi GLM 5.3 paling gesit dari Zhipu AI. Jawaban singkat padat dengan efisiensi biaya tertinggi.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.0375,
+    completionRatio: 3.333,
+    featured: true
+  },
+  {
+    id: "glm-5",
+    name: "GLM 5 Air",
+    providerId: "zhipu",
+    category: "Chat Hemat",
+    description: "Model serbaguna Z.AI untuk percakapan natural, terjemahan bilingual Indonesia-Inggris, dan tanya jawab tugas.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.44,
+    completionRatio: 3.2
+  },
+  {
+    id: "glm-5.1",
+    name: "GLM 5.1 Coder",
+    providerId: "zhipu",
+    category: "Ngoding",
+    description: "Spesialis koding GLM untuk penulisan script web, refactoring kode, dan integrasi mulus di Cursor & VS Code.",
+    inputs: ["teks"],
+    endpoints: ["openai", "anthropic"],
+    ratio: 0.4225,
+    completionRatio: 4
+  },
+  {
+    id: "glm-5-turbo",
+    name: "GLM 5 Turbo Pro",
+    providerId: "zhipu",
+    category: "Ngoding",
+    description: "Model turbo koding bertenaga tinggi untuk debugging sistem, automasi workflow, dan integrasi API.",
+    inputs: ["teks"],
+    endpoints: ["openai", "anthropic"],
+    ratio: 0.6,
+    completionRatio: 3.333,
+    featured: true
+  },
+  {
+    id: "glm-5.2",
+    name: "GLM 5.2 Research",
+    providerId: "zhipu",
+    category: "Tugas & Riset",
+    description: "Penalaran analitis kuat untuk telaah literatur ilmiah, perbandingan metodologi, dan penulisan makalah akademis.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.7,
+    completionRatio: 3.143
+  },
+  {
+    id: "glm-5.3",
+    name: "GLM 5.3 General",
+    providerId: "zhipu",
+    category: "Tugas & Riset",
+    description: "Versi flagship Zhipu AI untuk pemahaman kontekstual luas, sintesis dokumen kompleks, dan penalaran logika tingkat tinggi.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.7,
+    completionRatio: 3.143,
     featured: true
   }
 ];
