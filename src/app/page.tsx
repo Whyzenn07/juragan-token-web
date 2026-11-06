@@ -463,177 +463,73 @@ export default function Home() {
         </div>
       )}
 
-      {/* 3. Layout Grid: Sidebar + Main Content (Pola ai-vouchers.com) */}
-      <div className="layout">
-        {/* Sidebar Nav */}
-        <aside className="sidebar" id="sidebar">
-          <div className="sidebar-label">Temukan</div>
-          <nav className="side-nav">
-            <button
-              type="button"
-              className={!viewSavedOnly ? "selected" : ""}
-              onClick={() => {
-                setViewSavedOnly(false);
-                setActiveCategory("Semua");
-              }}
-            >
-              <Icon name="search" size={16} />
-              <span>Semua Token</span>
-              <span className="nav-count">{models.length}</span>
-            </button>
-            <a href="#katalog-retail" className="side-link-btn">
-              <Icon name="bag" size={16} />
-              <span>Paket Multi-AI</span>
-              <span className="new-label">BARU</span>
-            </a>
-            <button
-              type="button"
-              className={viewSavedOnly ? "selected" : ""}
-              onClick={() => setViewSavedOnly(true)}
-            >
-              <Icon name="check" size={16} />
-              <span>Tersimpan</span>
-              <span className="nav-count">{savedIds.length}</span>
-            </button>
-            <button
-              type="button"
-              className="side-link-btn"
-              onClick={() => setBalanceModalOpen(true)}
-            >
-              <Icon name="bag" size={16} />
-              <span>Cek Saldo Key</span>
-            </button>
-          </nav>
-
-          <div className="sidebar-label category-label">Kategori AI</div>
-          <nav className="side-nav category-nav">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                className={activeCategory === cat && !viewSavedOnly ? "selected" : ""}
-                onClick={() => {
-                  setViewSavedOnly(false);
-                  setActiveCategory(cat);
-                  scrollToCatalog();
-                }}
-              >
-                <span>{cat}</span>
-              </button>
-            ))}
-          </nav>
-
-          <div className="sidebar-divider" />
-
-          <div className="sidebar-promo">
-            <div className="promo-icon">✦</div>
-            <h3>Pakai di Claude Code?</h3>
-            <p>Colokkan Base URL &amp; API Key tanpa kartu kredit dan tanpa batas kuota 5 jam.</p>
-            <a href="#panduan-setup" className="promo-btn">
-              Lihat Panduan Setup ↗
-            </a>
-          </div>
-
-          <div className="sidebar-bottom">
-            <span className="online-dot" />
-            <span>Saldo aktif permanen tanpa masa hangus</span>
-          </div>
-        </aside>
-
-        {/* Main Content Area */}
-        <main>
-          <div className="breadcrumb">
-            <span>Marketplace</span> / <span>Temukan</span>
-            <span className="demo-pill">Pratinjau · Akses Token Ritel Mahasiswa</span>
-          </div>
-
-          {/* Live Status Strip */}
-          <div className="gateway-status-strip">
-            <div className="gateway-status-left">
-              <span className="live-pulse-dot" />
-              <strong>Gateway juragantoken.co.id</strong>
-              <span>· Claude Sonnet 5.5, Gemini 3.8 Flash, GPT-6, DeepSeek V4 &amp; Kimi K3 lewat satu API key</span>
+      {/* 3. Main Content Container - Full Width Company Profile Layout */}
+      <div className="company-container">
+        <main className="company-main">
+          {/* Executive Company Profile Hero */}
+          <section className="pro-hero" id="top">
+            <div className="pro-hero-badge">
+              <span className="pro-hero-badge-dot" />
+              <span>Universal AI Gateway &amp; Marketplace Resmi Indonesia</span>
             </div>
-            <div className="gateway-status-right">
-              <span>Masa Aktif: <b>Permanen (Lifetime)</b></span>
+
+            <h1 className="pro-hero-title">
+              Satu API Key untuk Semua Model AI Terbaik Dunia
+            </h1>
+
+            <p className="pro-hero-subtitle">
+              Akses Claude 3.7 Sonnet, OpenAI GPT-4o, Gemini 2.5 Flash, dan DeepSeek V3 tanpa kartu kredit luar negeri. Saldo permanen tanpa masa hangus, pembayaran instan QRIS Rupiah, dan jaminan 100% Zero-Training.
+            </p>
+
+            <div className="pro-hero-actions">
+              <a href="#katalog-retail" className="pro-btn-primary">
+                <span>Beli Token AI</span>
+                <span className="btn-arrow">↗</span>
+              </a>
+              <Link href="/docs" className="pro-btn-secondary">
+                <span>Dokumentasi API</span>
+              </Link>
               <button
                 type="button"
-                className="link-button"
+                className="pro-btn-tertiary"
                 onClick={() => setBalanceModalOpen(true)}
               >
-                Cek Saldo Key ↗
+                <span>Cek Saldo Key</span>
               </button>
             </div>
-          </div>
 
-          {/* Hero Section (Pola ai-vouchers.com dengan Tiket Pass Biru-Putih) */}
-          <section className="hero" id="top">
-            <div className="hero-content">
-              <div className="eyebrow">
-                ✦ <span>Lebih hemat. Lebih banyak berkarya.</span>
-              </div>
-              <h1>
-                <span>Ide besar Anda berikutnya.</span>
-                <br />
-                <span className="hero-accent">Dengan harga lebih ringan.</span>
-              </h1>
-              <p>
-                Temukan token dan kredit API untuk AI favorit Anda. Berkarya, ngoding tugas kuliah, dan riset skripsi di mana pun tanpa kartu kredit internasional.
-              </p>
-              <div className="hero-actions">
-                <button type="button" className="primary-button" onClick={scrollToCatalog}>
-                  <span>Temukan Token Anda</span> ↗
-                </button>
-                <span className="hero-note">
-                  <Icon name="check" size={16} /> Bebas kartu kredit internasional
-                </span>
-              </div>
-              <RegionBadge />
-            </div>
-
-            {/* The Iconic Celestial Ticket Art (Desain ai-vouchers Versi Biru & Putih) */}
-            <div className="hero-art" aria-hidden="true">
-              <div className="orbit orbit-one" />
-              <div className="orbit orbit-two" />
-              <span className="art-star star-one">✦</span>
-              <span className="art-star star-two">✧</span>
-              <div className="floating-tag">
-                <span className="online-dot" /> Mulai Rp 15.000
+            {/* 4 Pilar Keunggulan Platform */}
+            <div className="pro-pillars-grid">
+              <div className="pro-pillar-card">
+                <div className="pro-pillar-header">
+                  <span className="pro-pillar-tag">Keamanan Data</span>
+                </div>
+                <h3>100% Zero-Training Guarantee</h3>
+                <p>Prompt, data percakapan, dan kode Anda tidak pernah disimpan untuk melatih model AI apa pun.</p>
               </div>
 
-              {/* Ticket Back (Pass Multi-AI) */}
-              <div className="art-ticket ticket-back">
-                <div className="art-ticket-head">
-                  ✳ MULTI-AI PASS <span>↗</span>
+              <div className="pro-pillar-card">
+                <div className="pro-pillar-header">
+                  <span className="pro-pillar-tag">Pembayaran Lokal</span>
                 </div>
-                <div className="ticket-brands">
-                  <span>✳</span>
-                  <span>◈</span>
-                  <span>ıı</span>
-                </div>
-                <div className="ticket-rule" />
-                <div className="ticket-bottom">
-                  MORE AI · MORE YOU <span>✦ ✦ ✦</span>
-                </div>
+                <h3>QRIS Instan Semua Bank &amp; E-Wallet</h3>
+                <p>Tanpa kartu kredit internasional. Bayar dalam hitungan detik via BCA, Mandiri, BRI, GoPay, dan OVO.</p>
               </div>
 
-              {/* Ticket Front (Juragan Token Voucher) */}
-              <div className="art-ticket ticket-front">
-                <div className="art-ticket-head">
-                  ✳ juragan token <span>↗</span>
+              <div className="pro-pillar-card">
+                <div className="pro-pillar-header">
+                  <span className="pro-pillar-tag">Developer Ready</span>
                 </div>
-                <div className="ticket-value">
-                  −90<span>%</span>
-                </div>
-                <div className="ticket-rule" />
-                <div className="ticket-bottom">
-                  <span>UNTUK IDE BESAR ANDA</span>
-                  <div className="barcode" />
-                </div>
+                <h3>OpenAI Compatible Universal Endpoint</h3>
+                <p>Cukup masukkan Base URL dan API Key di Cursor AI, Claude Code CLI, Windsurf, Chatbox, atau Python SDK.</p>
               </div>
 
-              <div className="art-caption">
-                ✧ <span>Biaya ringan. Peluang tanpa batas.</span>
+              <div className="pro-pillar-card">
+                <div className="pro-pillar-header">
+                  <span className="pro-pillar-tag">Efisiensi Biaya</span>
+                </div>
+                <h3>Masa Aktif Saldo Selamanya</h3>
+                <p>Tidak ada biaya langganan bulanan hangus. Saldo kredit Anda tetap aktif dan aman tanpa batas waktu.</p>
               </div>
             </div>
           </section>
@@ -824,6 +720,16 @@ export default function Home() {
                   <span className="chip-count">{categoryCount(cat)}</span>
                 </button>
               ))}
+              <button
+                type="button"
+                aria-pressed={viewSavedOnly}
+                className={`chip ${viewSavedOnly ? "active" : ""}`}
+                onClick={() => setViewSavedOnly(!viewSavedOnly)}
+              >
+                <Icon name="check" size={13} />
+                <span>Tersimpan</span>
+                <span className="chip-count">{savedIds.length}</span>
+              </button>
             </div>
 
             {/* Provider Quick Filter Strip */}
@@ -1247,8 +1153,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 10. Panduan Setup Interaktif */}
-          <SetupGuides />
         </main>
       </div>
 

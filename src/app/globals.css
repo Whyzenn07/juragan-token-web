@@ -438,43 +438,225 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
   flex-shrink: 0;
 }
 
+/* Company Profile Master Container */
+.company-container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 32px;
+  width: 100%;
+}
+
+.company-main {
+  width: 100%;
+  padding: 32px 0 64px;
+}
+
+/* Executive Company Profile Hero */
+.pro-hero {
+  padding: 56px 0 40px;
+  text-align: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.pro-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0f7ff;
+  border: 1px solid #d0e4ff;
+  color: #0369a1;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 24px;
+  letter-spacing: 0.2px;
+}
+
+.pro-hero-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0284c7;
+}
+
+.pro-hero-title {
+  font-family: var(--font-h, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: clamp(32px, 4.4vw, 54px);
+  font-weight: 850;
+  line-height: 1.15;
+  color: #0a2442;
+  letter-spacing: -1.2px;
+  margin: 0 0 20px;
+}
+
+.pro-hero-subtitle {
+  font-size: clamp(15px, 1.3vw, 17.5px);
+  color: #556987;
+  line-height: 1.65;
+  max-width: 840px;
+  margin: 0 auto 32px;
+}
+
+.pro-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 56px;
+}
+
+.pro-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a58ca;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 13px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.25);
+  transition: all 0.2s ease;
+}
+
+.pro-btn-primary:hover {
+  background: #084298;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(10, 88, 202, 0.35);
+}
+
+.pro-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pro-btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0a58ca;
+}
+
+.pro-btn-tertiary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pro-btn-tertiary:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* 4 Pilar Grid */
+.pro-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  text-align: left;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pro-pillar-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.pro-pillar-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.pro-pillar-header {
+  margin-bottom: 12px;
+}
+
+.pro-pillar-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #0284c7;
+  background: #f0f9ff;
+  border: 1px solid #e0f2fe;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.pro-pillar-card h3 {
+  font-size: 14.5px;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+
+.pro-pillar-card p {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .pro-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .company-container {
+    padding: 0 16px;
+  }
+  .pro-hero {
+    padding: 36px 0 24px;
+  }
+  .pro-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+  .pro-hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .pro-btn-primary, .pro-btn-secondary, .pro-btn-tertiary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Main Content Area */
 main {
   min-width: 0;
-  flex: 1;
-  padding: 24px 36px 60px;
-}
-.breadcrumb {
-  font-size: 10.5px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: #6a829a;
-  margin-bottom: 20px;
-  font-weight: 500;
-}
-.demo-pill {
-  margin-left: auto;
-  background: #e8f2fc;
-  color: var(--blue);
-  border: 1px solid #cfe0f3;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 9.5px;
-  font-weight: 700;
-}
-
-/* 4. Hero Section */
-.hero {
-  border-radius: 12px;
-  min-height: 330px;
-  background: #eaf2fc;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  padding: 36px 38px;
-  isolation: isolate;
-  border: 1px solid #d4e3f5;
+  width: 100%;
+  padding: 0 0 40px;
 }
 .hero-content {
   width: 58%;
