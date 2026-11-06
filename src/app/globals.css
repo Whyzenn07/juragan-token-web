@@ -1726,15 +1726,15 @@ main {
 .chf-item {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  font-size: 12.5px !important;
-  font-weight: 650 !important;
-  color: #334155 !important;
+  gap: 10px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  transition: transform 0.15s ease !important;
 }
 
-.chf-icon {
-  font-size: 14px;
-  line-height: 1;
+.chf-item:hover {
+  transform: translateY(-1px) !important;
 }
 
 @media (max-width: 768px) {

@@ -815,109 +815,117 @@ export default function Home() {
                 Harga dihitung langsung dari tarif resmi gateway ke Rupiah secara transparan — angka yang tertera adalah nilai riil yang dipotong dari saldo Anda.
               </p>
 
-              {/* Features Guarantee Bar - Enterprise SVG Icons, NO Emojis */}
+              {/* Features Guarantee Bar - Enterprise SVG Icons */}
               <div
                 className="catalog-hero-features"
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: "28px",
-                  paddingTop: "20px",
+                  paddingTop: "22px",
                   borderTop: "1px solid #e2e8f0",
                   flexWrap: "wrap",
                 }}
               >
+                {/* 1. Payment QRIS & VA */}
                 <div
                   className="chf-item"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "8px",
-                    fontSize: "12.5px",
-                    fontWeight: 650,
-                    color: "#334155",
+                    gap: "10px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#1e293b",
                   }}
                 >
                   <span
                     style={{
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "50%",
+                      width: "26px",
+                      height: "26px",
+                      borderRadius: "7px",
                       background: "#eff6ff",
                       border: "1px solid #bfdbfe",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
+                      color: "#0a58ca",
                     }}
                     aria-hidden="true"
                   >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="2.5" />
+                      <line x1="2" y1="10" x2="22" y2="10" />
                     </svg>
                   </span>
                   <span>Bayar Fleksibel via QRIS Instan &amp; Virtual Account</span>
                 </div>
 
+                {/* 2. Bank Indonesia Live Rate */}
                 <div
                   className="chf-item"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "8px",
-                    fontSize: "12.5px",
-                    fontWeight: 650,
-                    color: "#334155",
+                    gap: "10px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#1e293b",
                   }}
                 >
                   <span
                     style={{
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "50%",
-                      background: "#eff6ff",
-                      border: "1px solid #bfdbfe",
+                      width: "26px",
+                      height: "26px",
+                      borderRadius: "7px",
+                      background: "#f0fdf4",
+                      border: "1px solid #bbf7d0",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
+                      color: "#16a34a",
                     }}
                     aria-hidden="true"
                   >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4" />
                     </svg>
                   </span>
                   <span>Kurs Real-Time Bank Indonesia (Tanpa Markup)</span>
                 </div>
 
+                {/* 3. Claude Code & Cursor Developer Tooling */}
                 <div
                   className="chf-item"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "8px",
-                    fontSize: "12.5px",
-                    fontWeight: 650,
-                    color: "#334155",
+                    gap: "10px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#1e293b",
                   }}
                 >
                   <span
                     style={{
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "50%",
-                      background: "#eff6ff",
-                      border: "1px solid #bfdbfe",
+                      width: "26px",
+                      height: "26px",
+                      borderRadius: "7px",
+                      background: "#faf5ff",
+                      border: "1px solid #e9d5ff",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
+                      color: "#7e22ce",
                     }}
                     aria-hidden="true"
                   >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
                     </svg>
                   </span>
                   <span>Kompatibel Claude Code, Cursor, Cline &amp; SDK Resmi</span>
