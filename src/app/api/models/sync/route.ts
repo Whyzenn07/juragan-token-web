@@ -51,30 +51,37 @@ export async function GET() {
     rateSource = "snapshot_fallback";
   }
 
-  // 2. Fetch remote pricing models
+  // 2. Fetch remote pricing models from live gateway (api.tokotokenai.com / juragantoken.co.id)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-    const res = await fetch("https://www.juragantoken.co.id/api/pricing", {
+    let res = await fetch("https://api.tokotokenai.com/api/pricing", {
       signal: controller.signal,
       next: { revalidate: 300 }
-    });
+    }).catch(() => null);
+
+    if (!res || !res.ok) {
+      res = await fetch("https://www.juragantoken.co.id/api/pricing", {
+        signal: controller.signal,
+        next: { revalidate: 300 }
+      }).catch(() => null);
+    }
     clearTimeout(timeoutId);
 
-    if (res.ok) {
+    if (res && res.ok) {
       const data = await res.json();
-      const list: RemotePricingItem[] = Array.isArray(data) ? data : (data?.data || []);
+      const list: (RemotePricingItem & { model_name?: string; model_ratio?: number })[] = Array.isArray(data) ? data : (data?.data || []);
 
       if (list.length > 0) {
         source = "gateway_live";
         // Map newly discovered models from live gateway
         list.forEach((item) => {
-          const modelId = item.id || item.model || item.name;
+          const modelId = item.model_name || item.id || item.model || item.name;
           if (!modelId) return;
 
           const existing = modelsCatalog.find((m) => m.id.toLowerCase() === modelId.toLowerCase());
-          const ratio = item.ratio ?? 1;
+          const ratio = item.model_ratio ?? item.ratio ?? 1;
           const completionRatio = item.completion_ratio ?? item.completionRatio ?? 3;
 
           if (existing) {

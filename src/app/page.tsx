@@ -46,23 +46,39 @@ const formatNum = (val: number) => new Intl.NumberFormat("id-ID").format(val);
 
 function useScrollEffects(depsKey?: string) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const scrolledRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setIsScrolled(scrollY > 20);
+    let ticking = false;
+    const progressBar = document.querySelector<HTMLElement>(".scroll-progress-bar");
 
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalHeight > 0) {
-        setScrollProgress(Math.min(100, Math.max(0, (scrollY / totalHeight) * 100)));
+    const updateScrollMetrics = () => {
+      const scrollY = window.scrollY;
+      const nextScrolled = scrollY > 20;
+      if (nextScrolled !== scrolledRef.current) {
+        scrolledRef.current = nextScrolled;
+        setIsScrolled(nextScrolled);
+      }
+
+      if (progressBar) {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? Math.min(1, Math.max(0, scrollY / totalHeight)) : 0;
+        progressBar.style.transform = `scaleX(${progress})`;
+      }
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollMetrics);
+        ticking = true;
       }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+    updateScrollMetrics();
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
@@ -80,7 +96,7 @@ function useScrollEffects(depsKey?: string) {
           }
         });
       },
-      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px 60px 0px" }
     );
 
     const targets = document.querySelectorAll<HTMLElement>("[data-reveal]");
@@ -92,7 +108,7 @@ function useScrollEffects(depsKey?: string) {
     };
   }, [depsKey]);
 
-  return { isScrolled, scrollProgress };
+  return { isScrolled };
 }
 
 export default function Home() {
@@ -329,14 +345,14 @@ export default function Home() {
 
   // Kunci ini memicu animasi masuk kartu saat filter berganti, tapi tidak di setiap ketikan pencarian.
   const gridKey = `${activeCategory}-${selectedProvider}-${sortOption}-${viewSavedOnly ? "saved" : "all"}`;
-  const { isScrolled, scrollProgress } = useScrollEffects(gridKey);
+  const { isScrolled } = useScrollEffects(gridKey);
 
   return (
     <div className="site-canvas">
       {/* Scroll-driven top reading progress bar */}
       <div
         className="scroll-progress-bar"
-        style={{ transform: `scaleX(${scrollProgress / 100})` }}
+        style={{ transform: "scaleX(0)" }}
         aria-hidden="true"
       />
 
