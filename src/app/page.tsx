@@ -660,27 +660,45 @@ export default function Home() {
 
           {/* 5. Catalog Section: model riil dari gateway juragantoken.co.id */}
           <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
-            {/* Catalog Section Header - Elevated Executive Typography */}
-            <div className="section-heading catalog-heading-elevated">
-              <div className="section-heading-inner">
-                <div className="section-kicker-row">
-                  <span className="kicker-pill-modern">
-                    <span className="kicker-sparkle" aria-hidden="true">✦</span>
+            {/* 5. Catalog Section Header Card - Modern Executive Banner with Generous Spacing */}
+            <div className="catalog-header-card">
+              <div className="catalog-header-top">
+                <div className="catalog-kicker-group">
+                  <span className="chc-kicker-pill">
+                    <span className="chc-sparkle" aria-hidden="true">✦</span>
                     <span>KATALOG MODEL FRONTIER AI</span>
                   </span>
-                  <span className="kicker-meta-pill">
-                    <span className="kicker-dot-live" aria-hidden="true" />
+                  <span className="chc-status-pill">
+                    <span className="chc-dot-live" aria-hidden="true" />
                     <span>36 Model Gateway Terverifikasi</span>
                   </span>
+                  <span className="chc-badge-pill">
+                    <span>1 API Key Universal</span>
+                  </span>
                 </div>
+              </div>
 
-                <h2 className="catalog-title-modern">
-                  Pilih model, lihat seberapa jauh <span className="title-highlight">Rp10.000</span> Anda
-                </h2>
+              <h2 className="catalog-hero-title">
+                Pilih model, lihat seberapa jauh <span className="title-gradient-accent">Rp10.000</span> Anda
+              </h2>
 
-                <p className="catalog-subtitle-modern">
-                  <b>Satu API key universal</b> untuk semua model di bawah. Harga dihitung langsung dari tarif gateway resmi ke Rupiah secara transparan — angka di kartu sama dengan yang dipotong dari saldo.
-                </p>
+              <p className="catalog-hero-subtitle">
+                Satu API key untuk seluruh model terbaik dunia (Claude 3.7/3.5, GPT-4o, Gemini 2.0, DeepSeek R1). Harga dihitung langsung dari tarif resmi gateway ke Rupiah secara transparan — angka yang tertera adalah nilai riil yang dipotong dari saldo Anda.
+              </p>
+
+              <div className="catalog-hero-features">
+                <div className="chf-item">
+                  <span className="chf-icon" aria-hidden="true">⚡</span>
+                  <span>Bayar Fleksibel via QRIS Instan &amp; Virtual Account</span>
+                </div>
+                <div className="chf-item">
+                  <span className="chf-icon" aria-hidden="true">🔄</span>
+                  <span>Kurs Real-Time Bank Indonesia (Tanpa Markup)</span>
+                </div>
+                <div className="chf-item">
+                  <span className="chf-icon" aria-hidden="true">🛠️</span>
+                  <span>Kompatibel Claude Code, Cursor, Cline &amp; SDK Resmi</span>
+                </div>
               </div>
             </div>
 
