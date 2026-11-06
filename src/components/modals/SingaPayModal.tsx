@@ -25,13 +25,15 @@ function PaymentLogo({ type }: { type: string }) {
     mandiri: "/assets/payment-logos/mandiri.svg",
     permata: "/assets/payment-logos/permata.svg",
     cimb: "/assets/payment-logos/cimb.svg",
-    "cimb-niaga": "/assets/payment-logos/cimb.svg",
+    "cimb-niaga": "/assets/payment-logos/cimb-niaga.svg",
     bsi: "/assets/payment-logos/bsi.svg",
     qris: "/assets/payment-logos/qris.svg",
     gpn: "/assets/payment-logos/gpn.svg",
+    linkaja: "/assets/payment-logos/linkaja.svg",
   };
 
-  const src = logoMap[type.toLowerCase()];
+  const key = (type || "").toLowerCase().replace(/^(va-|transfer-)/, "");
+  const src = logoMap[key] || logoMap[(type || "").toLowerCase()];
   if (src) {
     return (
       /* eslint-disable-next-line @next/next/no-img-element */
@@ -41,7 +43,7 @@ function PaymentLogo({ type }: { type: string }) {
         loading="eager"
         style={{
           maxHeight: "22px",
-          maxWidth: "64px",
+          maxWidth: "58px",
           width: "auto",
           height: "auto",
           objectFit: "contain",
@@ -57,7 +59,6 @@ function PaymentLogo({ type }: { type: string }) {
     </span>
   );
 }
-
 
 export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const [selectedMethod, setSelectedMethod] = useState("qris");
@@ -677,11 +678,18 @@ Mohon dibantu konfirmasi ya!`;
           gap: 10px !important;
         }
         .cmc-brand-badge-box {
-          width: 72px !important;
-          height: 24px !important;
+          width: 76px !important;
+          height: 36px !important;
+          background: #ffffff !important;
+          border: 1px solid #e2e8f0 !important;
+          border-radius: 9px !important;
+          padding: 3px 6px !important;
           display: flex !important;
           align-items: center !important;
-          justify-content: flex-start !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+          transition: all 0.15s ease !important;
         }
         .cmc-option-text {
           display: flex !important;
@@ -1798,90 +1806,414 @@ Mohon dibantu konfirmasi ya!`;
             </div>
           </div>
 
-          {/* The QRIS Display Card with User's Uploaded Real QR Code */}
+          {/* ========================================================================= */}
+          {/* PROFESSIONAL MIDTRANS / XENDIT STYLE QRIS & VA DISPLAY CARD               */}
+          {/* ========================================================================= */}
           {selectedMethod === "qris" ? (
-            <div className="classai-qris-display-card" style={{ background: "#ffffff", border: "1.5px solid #e2e8f0", borderRadius: "16px", padding: "18px", textAlign: "center", marginBottom: "16px" }}>
-              <div className="cqdc-header">
-                <div className="cqdc-brand-row">
-                  <span className="cqdc-national-title" style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#dc2626", letterSpacing: "0.04em" }}>QRIS Standar Pembayaran Nasional</span>
-                  <span className="cqdc-merchant-name" style={{ display: "block", fontSize: "13px", fontWeight: 800, color: "#0f172a" }}>PT JURAGAN TOKEN INDONESIA</span>
-                </div>
-                <span className="cqdc-nmid" style={{ display: "block", fontSize: "11px", color: "#64748b", marginTop: "4px" }}>NMID: ID1020084920194</span>
-              </div>
-
-              {/* REAL SCAN-READY QRIS CODE IMAGE */}
-              <div className="classai-qris-image-wrapper" style={{ display: "flex", justifyContent: "center", padding: "12px", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", maxWidth: "260px", margin: "14px auto" }}>
+            <div
+              className="midtrans-qris-ticket"
+              style={{
+                background: "#ffffff",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: "18px",
+                boxShadow: "0 4px 20px -2px rgba(15, 23, 42, 0.08)",
+                overflow: "hidden",
+                marginBottom: "16px",
+              }}
+            >
+              {/* Top Official Banner with QRIS & GPN Logos */}
+              <div
+                style={{
+                  background: "#ffffff",
+                  padding: "14px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderBottom: "1px solid #f1f5f9",
+                }}
+              >
+                {/* Official QRIS Logo */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/qris-code.png"
-                  alt="QRIS Code Juragan Token"
-                  className="classai-qris-real-img"
-                  style={{ width: "230px", height: "230px", objectFit: "contain" }}
-                  onError={(e) => {
-                    // Fallback to /qris.png if images/ subfolder path differs
-                    e.currentTarget.src = "/qris.png";
-                  }}
+                  src="/assets/payment-logos/qris.svg"
+                  alt="QRIS - Quick Response Code Indonesian Standard"
+                  style={{ height: "26px", width: "auto", objectFit: "contain", display: "block" }}
+                />
+                {/* Official GPN Logo */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/assets/payment-logos/gpn.svg"
+                  alt="GPN - Gerbang Pembayaran Nasional"
+                  style={{ height: "24px", width: "auto", objectFit: "contain", display: "block" }}
                 />
               </div>
 
-              <p className="cqdc-scan-hint" style={{ fontSize: "12px", color: "#64748b", lineHeight: 1.5, margin: "10px 0" }}>
-                Scan kode QR di atas menggunakan aplikasi <b>BCA Mobile, Livin Mandiri, BRImo, BNI, GoPay, OVO, ShopeePay, atau DANA</b>.
-              </p>
+              {/* Red-Orange Accent Line */}
+              <div style={{ height: "3.5px", background: "linear-gradient(90deg, #dc2626 0%, #ea580c 100%)" }} />
 
-              {/* Amount Box */}
-              <div className="cqdc-amount-box" style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px", marginTop: "10px" }}>
-                <span className="cqdc-amount-label" style={{ display: "block", fontSize: "10.5px", color: "#64748b", fontWeight: 700 }}>TOTAL JUMLAH PEMBAYARAN:</span>
-                <div className="cqdc-amount-row" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "4px" }}>
-                  <strong className="cqdc-price" style={{ fontSize: "20px", fontWeight: 800, color: "#0a58ca" }}>{formatIdr(totalPrice)}</strong>
-                  <button
-                    type="button"
-                    className="cqdc-copy-btn"
-                    onClick={() => copyToClipboard(totalPrice.toString(), "amount")}
-                    style={{ border: "1px solid #cbd5e1", background: "#ffffff", borderRadius: "6px", padding: "3px 8px", fontSize: "11px", display: "inline-flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
-                  >
-                    <Icon name="copy" size={13} />
-                    <span>{copiedAmount ? "Tersalin! ✓" : "Salin Jumlah"}</span>
-                  </button>
+              {/* Merchant & National Standard Header */}
+              <div style={{ padding: "16px 20px 8px", textAlign: "center" }}>
+                <span style={{ display: "block", fontSize: "10.5px", fontWeight: 800, color: "#dc2626", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  STANDAR PEMBAYARAN NASIONAL
+                </span>
+                <h4 style={{ margin: "4px 0 2px", fontSize: "15px", fontWeight: 850, color: "#0f172a" }}>
+                  PT JURAGAN TOKEN INDONESIA
+                </h4>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#f1f5f9", padding: "3px 10px", borderRadius: "6px", marginTop: "4px" }}>
+                  <span style={{ fontSize: "11px", fontFamily: "monospace", fontWeight: 650, color: "#475569" }}>
+                    NMID: ID1020084920194 · A01
+                  </span>
+                </div>
+              </div>
+
+              {/* The Scan Frame with Professional Corner Aiming Brackets (Midtrans / Xendit Style) */}
+              <div style={{ padding: "10px 20px 14px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div
+                  style={{
+                    position: "relative",
+                    background: "#ffffff",
+                    padding: "16px",
+                    borderRadius: "14px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 8px rgba(15, 23, 42, 0.04)",
+                    width: "250px",
+                    height: "250px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {/* 4 Red Signature Corner Brackets */}
+                  <span style={{ position: "absolute", top: "6px", left: "6px", width: "18px", height: "18px", borderTop: "3px solid #dc2626", borderLeft: "3px solid #dc2626", borderTopLeftRadius: "5px" }} />
+                  <span style={{ position: "absolute", top: "6px", right: "6px", width: "18px", height: "18px", borderTop: "3px solid #dc2626", borderRight: "3px solid #dc2626", borderTopRightRadius: "5px" }} />
+                  <span style={{ position: "absolute", bottom: "6px", left: "6px", width: "18px", height: "18px", borderBottom: "3px solid #dc2626", borderLeft: "3px solid #dc2626", borderBottomLeftRadius: "5px" }} />
+                  <span style={{ position: "absolute", bottom: "6px", right: "6px", width: "18px", height: "18px", borderBottom: "3px solid #dc2626", borderRight: "3px solid #dc2626", borderBottomRightRadius: "5px" }} />
+
+                  {/* Real Scan-Ready QR Code */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/qris-code.png"
+                    alt="QRIS Code PT Juragan Token Indonesia"
+                    style={{ width: "210px", height: "210px", objectFit: "contain", display: "block" }}
+                    onError={(e) => { e.currentTarget.src = "/qris.png"; }}
+                  />
+                </div>
+
+                {/* Download QR Button */}
+                <a
+                  href="/images/qris-code.png"
+                  download={`QRIS-JuraganToken-${invoiceId || "INV"}.png`}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    marginTop: "12px",
+                    background: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    color: "#0a58ca",
+                    padding: "7px 16px",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    cursor: "pointer",
+                    boxShadow: "0 1px 3px rgba(10, 88, 202, 0.08)",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>Unduh Kode QR (Simpan Gambar)</span>
+                </a>
+              </div>
+
+              {/* Total Amount Strip */}
+              <div
+                style={{
+                  background: "#f8fafc",
+                  borderTop: "1px dashed #cbd5e1",
+                  borderBottom: "1px dashed #cbd5e1",
+                  padding: "12px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <span style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#64748b" }}>TOTAL PEMBAYARAN</span>
+                  <strong style={{ fontSize: "19px", fontWeight: 850, color: "#0a58ca" }}>{formatIdr(totalPrice)}</strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(totalPrice.toString(), "amount")}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    background: "#ffffff",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "7px",
+                    padding: "6px 12px",
+                    fontSize: "11.5px",
+                    fontWeight: 650,
+                    color: "#334155",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Icon name="copy" size={13} />
+                  <span>{copiedAmount ? "Tersalin! ✓" : "Salin Nominal"}</span>
+                </button>
+              </div>
+
+              {/* Supported Payment Apps Strip (Xendit / Midtrans footer) */}
+              <div style={{ padding: "14px 20px 18px", background: "#ffffff" }}>
+                <span style={{ display: "block", fontSize: "11px", fontWeight: 600, color: "#64748b", marginBottom: "10px", textAlign: "center" }}>
+                  Buka aplikasi mobile banking atau e-wallet pilihan Anda lalu scan QR di atas:
+                </span>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {["bca", "mandiri", "bri", "bni", "gopay", "ovo", "dana", "shopeepay", "linkaja"].map((m) => (
+                    <div
+                      key={m}
+                      style={{
+                        height: "26px",
+                        padding: "2px 7px",
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "6px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`/assets/payment-logos/${m === "shopeepay" ? "shopeepay.svg" : `${m}.svg`}`}
+                        alt={m.toUpperCase()}
+                        style={{ height: "15px", maxWidth: "44px", width: "auto", objectFit: "contain", display: "block" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "12px", fontSize: "11.5px", color: "#16a34a", fontWeight: 650 }}>
+                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#16a34a", display: "inline-block" }} />
+                  <span>Pembayaran terverifikasi otomatis dalam 10–30 detik</span>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="classai-destination-card" style={{ background: "#ffffff", border: "1.5px solid #e2e8f0", borderRadius: "16px", padding: "18px", marginBottom: "16px" }}>
-              <div className="cdc-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #f1f5f9" }}>
-                <strong style={{ fontSize: "15px", color: "#0f172a" }}>{currentMethod.name}</strong>
-                <span className="cdc-tag" style={{ fontSize: "11px", background: "#eff6ff", color: "#1d4ed8", fontWeight: 700, padding: "3px 8px", borderRadius: "6px" }}>Verifikasi Otomatis</span>
-              </div>
-
-              <div className="cdc-field" style={{ marginBottom: "12px" }}>
-                <span className="cdc-field-label" style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#64748b", marginBottom: "6px" }}>NOMOR VIRTUAL ACCOUNT / REKENING:</span>
-                <div className="cdc-code-box" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "8px 12px" }}>
-                  <code style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", letterSpacing: "0.05em" }}>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
-                  <button
-                    type="button"
-                    className="cdc-copy-btn"
-                    onClick={() => copyToClipboard(currentMethod.accountNumber || "8277 0812 3456 7890", "va")}
-                    style={{ border: "1px solid #0a58ca", background: "#0a58ca", color: "#ffffff", borderRadius: "6px", padding: "4px 10px", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}
+            <div
+              className="midtrans-va-ticket"
+              style={{
+                background: "#ffffff",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: "18px",
+                boxShadow: "0 4px 20px -2px rgba(15, 23, 42, 0.08)",
+                overflow: "hidden",
+                marginBottom: "16px",
+              }}
+            >
+              {/* Header with selected Bank Logo */}
+              <div
+                style={{
+                  background: "#ffffff",
+                  padding: "14px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderBottom: "1px solid #f1f5f9",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div
+                    style={{
+                      width: "74px",
+                      height: "34px",
+                      background: "#ffffff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "3px 6px",
+                      boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+                    }}
                   >
-                    {copiedVa ? "Tersalin! ✓" : "Salin No. VA"}
-                  </button>
+                    <PaymentLogo type={currentMethod.channelCode || currentMethod.id} />
+                  </div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 800, color: "#0f172a" }}>
+                      {currentMethod.name}
+                    </h4>
+                    <span style={{ fontSize: "11px", color: "#64748b" }}>Transfer Virtual Account Resmi</span>
+                  </div>
                 </div>
-                <span className="cdc-holder" style={{ display: "block", fontSize: "11px", color: "#64748b", marginTop: "6px" }}>Atas Nama: PT JURAGAN TOKEN INDONESIA</span>
+                <span
+                  style={{
+                    fontSize: "11px",
+                    background: "#eff6ff",
+                    color: "#0a58ca",
+                    border: "1px solid #bfdbfe",
+                    fontWeight: 700,
+                    padding: "4px 10px",
+                    borderRadius: "6px",
+                  }}
+                >
+                  Verifikasi Otomatis
+                </span>
               </div>
 
-              <div className="cqdc-amount-box" style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px", marginTop: "10px" }}>
-                <span className="cqdc-amount-label" style={{ display: "block", fontSize: "10.5px", color: "#64748b", fontWeight: 700 }}>TOTAL JUMLAH PEMBAYARAN:</span>
-                <div className="cqdc-amount-row" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "4px" }}>
-                  <strong className="cqdc-price" style={{ fontSize: "20px", fontWeight: 800, color: "#0a58ca" }}>{formatIdr(totalPrice)}</strong>
+              {/* Accent Line */}
+              <div style={{ height: "3.5px", background: "linear-gradient(90deg, #0a58ca 0%, #0284c7 100%)" }} />
+
+              {/* VA Code Field */}
+              <div style={{ padding: "18px 20px" }}>
+                <span style={{ display: "block", fontSize: "11px", fontWeight: 750, color: "#64748b", marginBottom: "6px" }}>
+                  NOMOR VIRTUAL ACCOUNT:
+                </span>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    background: "#f8fafc",
+                    border: "1.5px solid #cbd5e1",
+                    borderRadius: "10px",
+                    padding: "10px 14px",
+                  }}
+                >
+                  <code style={{ fontSize: "17px", fontWeight: 850, color: "#0a2540", letterSpacing: "0.06em", fontFamily: "monospace" }}>
+                    {currentMethod.accountNumber || "8277 0812 3456 7890"}
+                  </code>
                   <button
                     type="button"
-                    className="cqdc-copy-btn"
-                    onClick={() => copyToClipboard(totalPrice.toString(), "amount")}
-                    style={{ border: "1px solid #cbd5e1", background: "#ffffff", borderRadius: "6px", padding: "3px 8px", fontSize: "11px", display: "inline-flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
+                    onClick={() => copyToClipboard(currentMethod.accountNumber || "8277 0812 3456 7890", "va")}
+                    style={{
+                      border: "none",
+                      background: "#0a58ca",
+                      color: "#ffffff",
+                      borderRadius: "7px",
+                      padding: "6px 12px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                    }}
                   >
                     <Icon name="copy" size={13} />
-                    <span>{copiedAmount ? "Tersalin! ✓" : "Salin Jumlah"}</span>
+                    <span>{copiedVa ? "Tersalin! ✓" : "Salin No. VA"}</span>
                   </button>
                 </div>
+                <span style={{ display: "block", fontSize: "11.5px", color: "#64748b", marginTop: "6px" }}>
+                  Atas Nama: <strong style={{ color: "#0f172a" }}>PT JURAGAN TOKEN INDONESIA</strong>
+                </span>
+              </div>
+
+              {/* Total Amount Strip */}
+              <div
+                style={{
+                  background: "#f8fafc",
+                  borderTop: "1px dashed #cbd5e1",
+                  borderBottom: "1px dashed #cbd5e1",
+                  padding: "12px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <span style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#64748b" }}>TOTAL TRANSFER</span>
+                  <strong style={{ fontSize: "19px", fontWeight: 850, color: "#0a58ca" }}>{formatIdr(totalPrice)}</strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(totalPrice.toString(), "amount")}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    background: "#ffffff",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "7px",
+                    padding: "6px 12px",
+                    fontSize: "11.5px",
+                    fontWeight: 650,
+                    color: "#334155",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Icon name="copy" size={13} />
+                  <span>{copiedAmount ? "Tersalin! ✓" : "Salin Nominal"}</span>
+                </button>
+              </div>
+
+              {/* Step-by-Step Payment Instructions Tabs */}
+              <div style={{ padding: "16px 20px", background: "#ffffff" }}>
+                <span style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#64748b", marginBottom: "8px" }}>
+                  PETUNJUK PEMBAYARAN:
+                </span>
+                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                  {(["mbanking", "ibanking", "atm"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setGuideTab(tab)}
+                      style={{
+                        flex: 1,
+                        padding: "6px 10px",
+                        borderRadius: "8px",
+                        fontSize: "11.5px",
+                        fontWeight: guideTab === tab ? 750 : 600,
+                        border: guideTab === tab ? "1.5px solid #0a58ca" : "1px solid #e2e8f0",
+                        background: guideTab === tab ? "#eff6ff" : "#ffffff",
+                        color: guideTab === tab ? "#0a58ca" : "#64748b",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {tab === "mbanking" ? "m-Banking" : tab === "ibanking" ? "Internet Banking" : "ATM"}
+                    </button>
+                  ))}
+                </div>
+                <ol style={{ margin: 0, paddingLeft: "18px", fontSize: "12px", color: "#475569", lineHeight: 1.6 }}>
+                  {guideTab === "mbanking" && (
+                    <>
+                      <li>Buka aplikasi mobile banking bank Anda ({currentMethod.name}).</li>
+                      <li>Pilih menu <b>Transfer</b> &gt; <b>Virtual Account</b>.</li>
+                      <li>Masukkan Nomor Virtual Account: <b>{currentMethod.accountNumber || "8277 0812 3456 7890"}</b>.</li>
+                      <li>Pastikan nama penerima <b>PT JURAGAN TOKEN INDONESIA</b> dan nominal transfer <b>{formatIdr(totalPrice)}</b>.</li>
+                      <li>Masukkan PIN mobile banking Anda untuk menyelesaikan transaksi.</li>
+                    </>
+                  )}
+                  {guideTab === "ibanking" && (
+                    <>
+                      <li>Login ke portal Internet Banking bank Anda.</li>
+                      <li>Pilih menu <b>Pembayaran</b> / <b>Transfer ke Virtual Account</b>.</li>
+                      <li>Pilih rekening sumber dan masukkan nomor VA: <b>{currentMethod.accountNumber || "8277 0812 3456 7890"}</b>.</li>
+                      <li>Verifikasi tagihan atas nama <b>PT JURAGAN TOKEN INDONESIA</b>.</li>
+                      <li>Otorisasi transaksi menggunakan token internet banking Anda.</li>
+                    </>
+                  )}
+                  {guideTab === "atm" && (
+                    <>
+                      <li>Masukkan kartu ATM dan PIN Anda di mesin ATM.</li>
+                      <li>Pilih menu <b>Transaksi Lainnya</b> &gt; <b>Transfer</b> &gt; <b>Ke Rekening Virtual Account</b>.</li>
+                      <li>Masukkan nomor Virtual Account: <b>{currentMethod.accountNumber || "8277 0812 3456 7890"}</b>.</li>
+                      <li>Periksa detail pada layar konfirmasi, pastikan nama dan jumlah sesuai.</li>
+                      <li>Pilih <b>Ya</b> untuk memproses pembayaran dan simpan struk transaksi.</li>
+                    </>
+                  )}
+                </ol>
               </div>
             </div>
           )}
