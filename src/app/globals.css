@@ -8044,3 +8044,1035 @@ footer {
     transition: none !important;
   }
 }
+
+
+/* ============================================================= */
+/* CLASSAI-STYLE CHECKOUT MODAL & REAL QRIS DISPLAY ENGINE       */
+/* Exact 1:1 Match to router.classai.id/checkout Screenshots     */
+/* ============================================================= */
+
+.classai-checkout-modal {
+  width: 520px;
+  max-width: calc(100% - 20px);
+  padding: 24px 24px 0 24px;
+  border-radius: 22px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.04) !important;
+  overflow-y: auto;
+  max-height: 92vh;
+  position: relative;
+}
+
+/* 1. Header (Matching ClassAI Router Header) */
+.classai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 16px;
+}
+
+.classai-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.classai-logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.classai-brand-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.classai-brand-text strong {
+  color: #0a58ca;
+  font-weight: 800;
+}
+
+.classai-router-badge {
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.classai-header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.classai-billing-text {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.classai-close-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.classai-close-icon-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* 2. Top Notice Disclaimer Banner */
+.classai-disclaimer-banner {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.classai-disclaimer-banner p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #64748b;
+  margin: 0;
+}
+
+/* 3. Package Summary Card */
+.classai-order-summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.cosc-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cosc-badge {
+  font-size: 10px;
+  font-weight: 750;
+  color: #1d4ed8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cosc-pkg-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0a2540;
+}
+
+.cosc-pkg-token {
+  font-size: 12px;
+  color: #0284c7;
+  font-weight: 600;
+}
+
+.cosc-price {
+  font-size: 18px;
+  font-weight: 850;
+  color: #0a58ca;
+  font-family: var(--font-h), -apple-system, sans-serif;
+}
+
+/* 4. Customer Input Grid */
+.classai-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.cig-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.cig-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cig-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: #0f172a;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cig-input:focus {
+  outline: none;
+  border-color: #0066ff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+}
+
+/* 5. Payment Methods Stack */
+.classai-methods-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.classai-method-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.classai-method-card:hover {
+  border-color: #cbd5e1;
+}
+
+.classai-method-card.selected {
+  border: 2px solid #0066ff !important;
+  box-shadow: 0 4px 18px -2px rgba(0, 102, 255, 0.12) !important;
+}
+
+.cmc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cmc-left-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cmc-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cmc-icon-box.qris-blue {
+  background: #0066ff;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
+}
+
+.cmc-icon-box.slate-gray {
+  background: #f1f5f9;
+  color: #0066ff;
+}
+
+.cmc-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cmc-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmc-title {
+  font-size: 15px;
+  font-weight: 750;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.cmc-tercepat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 650;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.cmc-subtitle {
+  font-size: 12.5px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.cmc-right-action {
+  color: #64748b;
+  display: flex;
+  align-items: center;
+}
+
+/* Expanded List */
+.cmc-expanded-list {
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.cmc-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f8fafc;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cmc-option-row:last-child {
+  border-bottom: none;
+}
+
+.cmc-option-row:hover {
+  background: #f8fafc;
+}
+
+.cmc-option-row.active {
+  background: #f0f7ff;
+}
+
+.cmc-option-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cmc-brand-badge-box {
+  width: 78px;
+  height: 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.cmc-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cmc-option-name {
+  font-size: 14px;
+  font-weight: 750;
+  color: #0f172a;
+}
+
+.cmc-option-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.cmc-option-fee {
+  font-size: 11.5px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.cmc-radio-wrap {
+  padding-left: 8px;
+}
+
+.cmc-custom-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.cmc-custom-radio.checked {
+  border-color: #0066ff;
+  background: #ffffff;
+  position: relative;
+}
+
+.cmc-custom-radio.checked::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0066ff;
+  display: block;
+}
+
+/* 6. Sticky Bottom Action Bar */
+.classai-sticky-bottom {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid #e2e8f0;
+  padding: 14px 20px 18px 20px;
+  margin: 0 -24px 0 -24px;
+  box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.06);
+  z-index: 10;
+  border-radius: 0 0 22px 22px;
+}
+
+.csb-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.csb-total-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.csb-total-amount {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  font-family: var(--font-h), -apple-system, sans-serif;
+}
+
+.csb-btn-row {
+  display: flex;
+  gap: 12px;
+}
+
+.csb-btn-kembali {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 9999px;
+  padding: 12px 24px;
+  font-weight: 650;
+  font-size: 14.5px;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.csb-btn-kembali:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.csb-btn-bayar {
+  flex: 1;
+  background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 12px 24px;
+  font-weight: 750;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.35);
+  transition: all 0.15s ease;
+}
+
+.csb-btn-bayar:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 18px rgba(0, 102, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.csb-btn-bayar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* 7. QRIS Payment Display Screen (Real QR Code Frame) */
+.classai-payment-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.cpv-timer-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.cpv-status-badge {
+  font-size: 11.5px;
+  font-weight: 750;
+  color: #b45309;
+}
+
+.cpv-timer-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #78350f;
+}
+
+.cpv-timer-count strong {
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: 800;
+  color: #b45309;
+}
+
+.cpv-invoice-info-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cpv-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+}
+
+.cpv-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.cpv-val-copy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cpv-val-copy code {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.cpv-mini-copy-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 650;
+  color: #0a58ca;
+  cursor: pointer;
+}
+
+/* The QRIS Card */
+.classai-qris-display-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+  text-align: center;
+}
+
+.cqdc-header {
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cqdc-brand-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cqdc-national-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #dc2626;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cqdc-merchant-name {
+  font-size: 14px;
+  font-weight: 850;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.cqdc-nmid {
+  font-size: 11px;
+  color: #64748b;
+  font-family: monospace;
+}
+
+/* The Real QR Code Image Container */
+.classai-qris-image-wrapper {
+  margin: 12px auto;
+  width: 240px;
+  height: 240px;
+  padding: 10px;
+  background: #ffffff;
+  border: 2px solid #0f172a;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.classai-qris-real-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
+}
+
+.cqdc-scan-hint {
+  font-size: 12.5px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+
+.cqdc-scan-hint b {
+  color: #0f172a;
+}
+
+/* Total Amount Box */
+.cqdc-amount-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.cqdc-amount-label {
+  font-size: 10.5px;
+  font-weight: 750;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.cqdc-amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.cqdc-price {
+  font-size: 20px;
+  font-weight: 850;
+  color: #0a58ca;
+  font-family: var(--font-h), -apple-system, sans-serif;
+}
+
+.cqdc-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a58ca;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cqdc-copy-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+/* Bank Destination Card */
+.classai-destination-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 20px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cdc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.cdc-head strong {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.cdc-tag {
+  font-size: 11px;
+  font-weight: 650;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.cdc-field {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cdc-field-label {
+  font-size: 11px;
+  font-weight: 750;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.cdc-code-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cdc-code-box code {
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: 850;
+  color: #0a2540;
+  letter-spacing: 1px;
+}
+
+.cdc-copy-btn {
+  background: #0a58ca;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cdc-holder {
+  font-size: 12px;
+  color: #475569;
+}
+
+/* Action Buttons below payment card */
+.cpv-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cpv-verify-btn {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 13px 20px;
+  font-size: 14.5px;
+  font-weight: 750;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  transition: all 0.15s ease;
+}
+
+.cpv-verify-btn:hover {
+  filter: brightness(1.08);
+}
+
+.cpv-back-link-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px;
+  transition: color 0.15s ease;
+}
+
+.cpv-back-link-btn:hover {
+  color: #0a58ca;
+}
+
+.cpv-wa-help-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 9999px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cpv-wa-help-btn:hover {
+  background: #f8fafc;
+}
+
+/* 8. Success Confirmation View */
+.classai-success-view {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 24px;
+}
+
+.csv-badge-center {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.csv-title {
+  font-size: 20px;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 12px 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.csv-sub {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.csv-key-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.csv-key-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0a58ca;
+  letter-spacing: 0.04em;
+}
+
+.csv-key-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.csv-key-display code {
+  font-family: monospace;
+  font-size: 13.5px;
+  font-weight: 750;
+  color: #0f172a;
+  word-break: break-all;
+}
+
+.csv-copy-key-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0066ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.csv-key-note {
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.csv-setup-box {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.csb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.csb-tag {
+  font-weight: 800;
+  color: #1d4ed8;
+  font-size: 10.5px;
+}
+
+.csb-row code {
+  font-family: monospace;
+  color: #0a2540;
+}
+
+.csb-copy-sm {
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.csv-footer-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.csv-done-btn {
+  background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 13px 20px;
+  font-size: 14.5px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
+}
+
+.csv-wa-share-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 9999px;
+  padding: 11px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 540px) {
+  .classai-checkout-modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 18px 16px 0 16px;
+  }
+  .classai-input-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .classai-sticky-bottom {
+    margin: 0 -16px 0 -16px;
+    padding: 12px 16px 16px 16px;
+  }
+  .csb-btn-bayar {
+    font-size: 14px;
+    padding: 11px 18px;
+  }
+  .csb-btn-kembali {
+    padding: 11px 18px;
+  }
+}

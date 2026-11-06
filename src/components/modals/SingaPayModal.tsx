@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { GATEWAY_BASE_URL, RetailPackage, paymentMethods } from "@/data/catalog";
-import type { PaymentMethod } from "@/types";
 import { Dialog } from "./Dialog";
 import { Icon } from "@/components/ui/Icon";
 import { PaymentSuccessMark } from "@/components/ui/PaymentSuccessMark";
@@ -13,9 +12,94 @@ type SingaPayModalProps = {
   onClose: () => void;
 };
 
+// Vector Logos for authentic ClassAI checkout experience
+function PaymentLogo({ type }: { type: string }) {
+  switch (type) {
+    case "gopay":
+      return (
+        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
+          <circle cx="10" cy="10" r="8" fill="#00AED6" />
+          <circle cx="10" cy="10" r="3.5" fill="#FFFFFF" />
+          <text x="23" y="14" fill="#0F172A" fontSize="13" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif">gopay</text>
+        </svg>
+      );
+    case "dana":
+      return (
+        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
+          <circle cx="9" cy="10" r="8" fill="#118EEA" />
+          <path d="M6.5 7h3a3 3 0 0 1 0 6h-3V7z" fill="#FFFFFF" />
+          <text x="22" y="14" fill="#118EEA" fontSize="13" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.5">DANA</text>
+        </svg>
+      );
+    case "ovo":
+      return (
+        <svg width="56" height="20" viewBox="0 0 56 20" fill="none">
+          <text x="6" y="15" fill="#4C3494" fontSize="14" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="2">OVO</text>
+        </svg>
+      );
+    case "shopeepay":
+      return (
+        <svg width="78" height="20" viewBox="0 0 78 20" fill="none">
+          <rect x="2" y="3" width="14" height="14" rx="3" fill="#EE4D2D" />
+          <path d="M9 5c-1.5 0-2.5 1-2.5 2v1h5V7c0-1-1-2-2.5-2z" stroke="#FFF" strokeWidth="1.2" fill="none" />
+          <text x="20" y="14" fill="#EE4D2D" fontSize="11" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif">ShopeePay</text>
+        </svg>
+      );
+    case "bni":
+      return (
+        <svg width="64" height="20" viewBox="0 0 64 20" fill="none">
+          <rect x="1" y="2" width="16" height="16" rx="3" fill="#F15A24" />
+          <text x="4" y="14" fill="#FFF" fontSize="11" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">46</text>
+          <text x="22" y="15" fill="#005E6A" fontSize="13" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">BNI</text>
+        </svg>
+      );
+    case "bri":
+      return (
+        <svg width="56" height="20" viewBox="0 0 56 20" fill="none">
+          <rect x="2" y="2" width="52" height="16" rx="4" fill="#00529C" />
+          <text x="11" y="14" fill="#FFFFFF" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="1">BRI</text>
+        </svg>
+      );
+    case "bca":
+      return (
+        <svg width="56" height="20" viewBox="0 0 56 20" fill="none">
+          <rect x="2" y="2" width="52" height="16" rx="4" fill="#003580" />
+          <text x="9" y="14" fill="#FFFFFF" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="1">BCA</text>
+        </svg>
+      );
+    case "mandiri":
+      return (
+        <svg width="70" height="20" viewBox="0 0 70 20" fill="none">
+          <text x="3" y="14" fill="#002D62" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">mandiri</text>
+          <path d="M53 6c3 0 5 4 8 4-3 0-5-4-8-4z" fill="#FFB700" />
+        </svg>
+      );
+    case "permata":
+      return (
+        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
+          <path d="M6 10l5-6 5 6-5 6-5-6z" fill="#008444" />
+          <text x="20" y="14" fill="#008444" fontSize="11" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif">Permata</text>
+        </svg>
+      );
+    case "cimb":
+      return (
+        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
+          <rect x="2" y="3" width="14" height="14" rx="2" fill="#ED1C24" />
+          <text x="20" y="14" fill="#ED1C24" fontSize="11" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">CIMB</text>
+        </svg>
+      );
+    default:
+      return (
+        <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F172A" }}>
+          {type.toUpperCase()}
+        </span>
+      );
+  }
+}
+
 export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const [selectedMethod, setSelectedMethod] = useState("qris");
-  const [activeCategory, setActiveCategory] = useState<"qris" | "va_ewallet" | "bank_transfer">("qris");
+  const [openCategory, setOpenCategory] = useState<"qris" | "ewallet" | "va">("qris");
   const [step, setStep] = useState<"checkout" | "payment" | "success">("checkout");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -41,7 +125,7 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
 
   const handleClose = () => {
     setStep("checkout");
-    setActiveCategory("qris");
+    setOpenCategory("qris");
     setSelectedMethod("qris");
     setApiKeyGenerated("");
     setTimeLeft(15 * 60);
@@ -57,7 +141,7 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   };
 
   useEffect(() => {
-    const el = document.querySelector(".singapay-modal");
+    const el = document.querySelector(".classai-checkout-modal");
     if (el) {
       el.scrollTop = 0;
     }
@@ -71,7 +155,7 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
     return () => clearInterval(timer);
   }, [step]);
 
-  // Polling status pesanan dari server secara otomatis setiap 2.5 detik
+  // Polling status pesanan secara otomatis
   useEffect(() => {
     if (step !== "payment" || !invoiceId || !orderToken) return;
 
@@ -121,7 +205,6 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
       return new Intl.DateTimeFormat("id-ID", {
         dateStyle: "medium",
         timeStyle: "short",
-        timeZone: "Asia/Jakarta",
       }).format(new Date(isoString));
     } catch {
       return isoString;
@@ -147,121 +230,93 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const basePrice = pkg ? pkg.priceIdr : 0;
   const totalPrice = basePrice + adminFee;
 
-  const getWhatsAppOrderText = (inv: string) => {
-    if (!pkg) return "";
-    return `Halo Admin Juragan Token! 👋
-Saya ingin memesan token API AI prabayar:
+  const isEwalletSelected = selectedMethod.startsWith("va-gopay") || selectedMethod.startsWith("va-dana") || selectedMethod.startsWith("va-ovo") || selectedMethod.startsWith("va-shopeepay");
+  const isVaSelected = selectedMethod.startsWith("va-bni") || selectedMethod.startsWith("va-bri") || selectedMethod.startsWith("va-bca") || selectedMethod.startsWith("va-mandiri") || selectedMethod.startsWith("transfer-");
 
-🧾 *Rincian Pesanan:*
-• No. Invoice: *${inv}*
-• Paket: *${pkg.name}* (${pkg.estToken})
-• Metode Bayar: ${currentMethod.name}
-• Total Bayar: *${formatIdr(totalPrice)}*
+  // Options definition matching classai.id screenshots
+  const ewalletOptions = [
+    {
+      id: "va-gopay",
+      code: "gopay",
+      name: "GoPay",
+      desc: "Setujui pembayaran di aplikasi Gojek / GoPay.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-dana",
+      code: "dana",
+      name: "DANA",
+      desc: "Setujui pembayaran di aplikasi DANA.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-ovo",
+      code: "ovo",
+      name: "OVO",
+      desc: "Setujui pembayaran di aplikasi OVO.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-shopeepay",
+      code: "shopeepay",
+      name: "ShopeePay",
+      desc: "Setujui pembayaran di aplikasi Shopee.",
+      fee: "payment fee Bebas Biaya"
+    }
+  ];
 
-👤 *Data Pemesan:*
-• Nama: *${customerName || "-"}*
-• Email: *${customerEmail || "-"}*
-${customerPhone ? `• No. WhatsApp: *${customerPhone}*` : ""}
+  const bankOptions = [
+    {
+      id: "va-bni",
+      code: "bni",
+      name: "BNI",
+      desc: "Bayar lewat BNI Mobile, ATM, atau bank lain.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-bri",
+      code: "bri",
+      name: "BRI",
+      desc: "Bayar lewat BRImo, ATM, atau bank lain.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-bca",
+      code: "bca",
+      name: "BCA",
+      desc: "Bayar lewat BCA Mobile, KlikBCA, atau myBCA.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-mandiri",
+      code: "mandiri",
+      name: "Mandiri",
+      desc: "Bayar lewat Livin' by Mandiri atau ATM.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-permata",
+      code: "permata",
+      name: "Permata",
+      desc: "Bayar lewat PermataMobile X atau ATM.",
+      fee: "payment fee Bebas Biaya"
+    },
+    {
+      id: "va-cimb",
+      code: "cimb",
+      name: "CIMB Niaga",
+      desc: "Bayar lewat OCTO Mobile atau ATM.",
+      fee: "payment fee Bebas Biaya"
+    }
+  ];
 
-Mohon diproses untuk aktivasi kunci API saya. Terima kasih!`;
-  };
-
-  const getWhatsAppCredentialsText = (key: string, inv: string) => {
-    if (!pkg) return "";
-    const dateStr = formatDate(paidAt || new Date().toISOString());
-
-    return `✨ *BUKTI PEMBAYARAN & KREDENSIAL JURAGAN TOKEN* ✨
-====================================
-Status: *LUNAS ✓*
-No. Invoice: *${inv}*
-Waktu: ${dateStr}
-Paket: *${pkg.name}*
-Total Bayar: *${formatIdr(totalPaid || totalPrice)}* (${currentMethod.name})
-Pembeli: *${customerName || "Sahabat Token"}*
-
-🔑 *Virtual API Key Anda:*
-\`${key}\`
-
-🌐 *Base URL Gateway:*
-\`${GATEWAY_BASE_URL}\`
-
-🚀 *Panduan Colok Kilat:*
-1. Web Chatbox: https://web.chatboxai.app
-2. Cursor AI: Settings > Models > OpenAI API Key & Base URL
-3. Claude Code CLI:
-   $env:ANTHROPIC_API_KEY="${key}"
-
-*Catatan:* Token aktif permanen tanpa masa kedaluwarsa bulanan. Simpan pesan ini dengan aman!`;
-  };
-
-  const openWhatsAppOrder = async () => {
-    if (!customerName.trim()) {
-      alert("Silakan masukkan Nama Lengkap terlebih dahulu.");
+  const handleProceedPayment = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!customerEmail.trim() || !customerName.trim() || !pkg) {
+      if (!customerName.trim()) alert("Silakan masukkan Nama Lengkap terlebih dahulu.");
+      else if (!customerEmail.trim()) alert("Silakan masukkan Alamat Email untuk pengiriman API Key.");
       return;
     }
-    if (!customerEmail.trim()) {
-      alert("Silakan masukkan Email Anda terlebih dahulu.");
-      return;
-    }
-    if (!pkg) return;
-
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          packageId: pkg.id,
-          methodId: selectedMethod,
-          customerName: customerName.trim(),
-          customerEmail: customerEmail.trim(),
-          customerPhone: customerPhone.trim(),
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setInvoiceId(data.invoiceId);
-        setOrderToken(data.orderToken);
-        setTotalPaid(data.totalIdr);
-        const msg = getWhatsAppOrderText(data.invoiceId);
-        const url = `https://wa.me/${cleanPhoneNumber(adminWaNumber)}?text=${encodeURIComponent(msg)}`;
-        window.open(url, "_blank", "noopener,noreferrer");
-        setStep("payment");
-      } else {
-        alert(data.error || "Gagal membuat pesanan.");
-      }
-    } catch {
-      alert("Gagal terhubung ke server pemesanan.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const openWhatsAppConfirmation = () => {
-    const inv = invoiceId;
-    const msg = getWhatsAppOrderText(inv);
-    const url = `https://wa.me/${cleanPhoneNumber(adminWaNumber)}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  const openWhatsAppCredentials = (target: "self" | "admin") => {
-    const inv = invoiceId;
-    const msg = getWhatsAppCredentialsText(apiKeyGenerated, inv);
-    let url = "";
-    if (target === "admin") {
-      url = `https://wa.me/${cleanPhoneNumber(adminWaNumber)}?text=${encodeURIComponent(msg)}`;
-    } else {
-      const targetPhone = customerPhone ? cleanPhoneNumber(customerPhone) : "";
-      url = targetPhone
-        ? `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`
-        : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-    }
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  const handleProceedPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customerEmail.trim() || !customerName.trim() || !pkg) return;
 
     setIsSubmitting(true);
     try {
@@ -356,770 +411,551 @@ Pembeli: *${customerName || "Sahabat Token"}*
         setTimeout(() => setCopiedInvoice(false), 2000);
       }
     } catch {
-      // fallback
+      // ignore
     }
+  };
+
+  const openWhatsAppOrder = () => {
+    if (!customerName.trim()) {
+      alert("Silakan masukkan Nama Lengkap terlebih dahulu.");
+      return;
+    }
+    const inv = invoiceId || "INV-" + Date.now().toString().slice(-6);
+    const msg = `Halo Admin Juragan Token! 👋
+Saya ingin memesan token API AI:
+• Invoice: *${inv}*
+• Paket: *${pkg?.name}* (${pkg?.estToken})
+• Metode: ${currentMethod.name}
+• Total: *${formatIdr(totalPrice)}*
+• Nama: *${customerName}*
+• Email: *${customerEmail || "-"}*
+Mohon dibantu konfirmasi ya!`;
+    window.open(`https://wa.me/${cleanPhoneNumber(adminWaNumber)}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
   if (!pkg) return null;
 
-  // Filter list by category
-  const vaEwalletMethods = paymentMethods.filter((m) => m.category === "va_ewallet" && m.id !== "ewallet");
-  const bankTransferMethods = paymentMethods.filter((m) => m.category === "bank_transfer");
-
-  const getInstructions = (channel: PaymentMethod, tab: "mbanking" | "ibanking" | "atm") => {
-    const acc = channel.accountNumber || "3901 0812 3456 7890";
-    const name = channel.accountName || "PT JURAGAN TOKEN INDONESIA";
-    const cName = channel.name;
-
-    if (tab === "mbanking") {
-      if (channel.category === "bank_transfer") {
-        return [
-          `Buka aplikasi Mobile Banking Anda lalu pilih menu Transfer > Transfer Antar Bank / Sesama.`,
-          `Pilih bank tujuan: ${cName}.`,
-          `Masukkan nomor rekening tujuan: ${acc}.`,
-          `Pastikan nama penerima adalah ${name}.`,
-          `Masukkan nominal persis ${formatIdr(totalPrice)} lalu masukkan PIN transaksi Anda.`
-        ];
-      }
-      return [
-        `Buka aplikasi Mobile Banking / e-Wallet Anda (${channel.provider}).`,
-        `Pilih menu Pembayaran / Bayar > Virtual Account / E-Commerce.`,
-        `Masukkan nomor kode bayar / VA: ${acc}.`,
-        `Periksa rincian: nama penerima ${name} dan nominal ${formatIdr(totalPrice)}.`,
-        `Konfirmasi dan masukkan PIN transaksi Anda.`
-      ];
-    } else if (tab === "ibanking") {
-      return [
-        `Login ke situs Internet Banking bank Anda.`,
-        `Masuk ke menu Transfer Dana > Virtual Account / Transfer Rekening.`,
-        `Pilih rekening sumber dan masukkan nomor tujuan: ${acc}.`,
-        `Masukkan nominal transfer persis ${formatIdr(totalPrice)}.`,
-        `Verifikasi dengan token otentikasi (KeyBCA/Token Mandiri/smsOTP) dan selesaikan transaksi.`
-      ];
-    } else {
-      return [
-        `Masukkan kartu ATM dan 6 digit PIN Anda di mesin ATM terdekat.`,
-        `Pilih menu Transaksi Lainnya > Pembayaran / Transfer > Virtual Account.`,
-        `Masukkan nomor tujuan ${acc}.`,
-        `Periksa informasi pada layar ATM, pastikan nama penerima ${name}.`,
-        `Pilih Ya/Benar untuk menyelesaikan pembayaran dan simpan struk transaksi.`
-      ];
-    }
-  };
-
   return (
-    <Dialog open={open} onClose={handleClose} label="Bukti Pembayaran Resmi" panelClassName="modal singapay-modal">
-      <button className="close-button" onClick={handleClose} aria-label="Tutup pembayaran">
-        <Icon name="close" />
-      </button>
-
-      {/* Modern Fintech Header */}
-      <div className="singapay-header">
-        <div className="singapay-logo-badge">
-          <strong className="sp-brand-text">
-            Juragan<span className="sp-brand-accent">Token</span>
-          </strong>
-          <span className="sp-badge-pill">
-            {step === "success" ? "Invoice Lunas ✓" : step === "payment" ? "Invoice Resmi" : "Checkout Resmi"}
+    <Dialog open={open} onClose={handleClose} label="Pembayaran Juragan Token" panelClassName="modal classai-checkout-modal">
+      {/* ========================================================================= */}
+      {/* CLASSAI-STYLE TOP HEADER                                                 */}
+      {/* ========================================================================= */}
+      <div className="classai-header">
+        <div className="classai-brand">
+          <span className="classai-logo-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#0A58CA" />
+              <circle cx="16" cy="16" r="6" stroke="#FFFFFF" strokeWidth="2.8" fill="none" />
+              <circle cx="21" cy="11" r="2.2" fill="#38BDF8" />
+            </svg>
           </span>
+          <span className="classai-brand-text">
+            juragan<strong>token</strong>
+          </span>
+          <span className="classai-router-badge">ROUTER</span>
         </div>
-        <div className="sp-header-security">
-          <span className="secure-badge">
-            <Icon name="check" size={13} /> Terverifikasi QRIS &amp; BI
-          </span>
+        <div className="classai-header-right">
+          <span className="classai-billing-text">Kredit &amp; billing</span>
+          <button type="button" className="classai-close-icon-btn" onClick={handleClose} aria-label="Tutup">
+            <Icon name="close" size={15} />
+          </button>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* STEP 1: FORMULIR & PILIH METODE (DENGAN ACCORDION SCROLL HALUS)          */}
+      {/* STEP 1: CHECKOUT SCREEN (100% IDENTICAL TO CLASSAI.ID SCREENSHOTS)        */}
       {/* ========================================================================= */}
       {step === "checkout" && (
-        <form onSubmit={handleProceedPayment} className="sp-step-content">
-          {/* Ringkasan Paket Terpilih */}
-          <div className="sp-package-summary">
-            <div className="sp-pkg-left">
-              <span className="summary-badge">{pkg.badge || "Pilihan Ritel"}</span>
-              <h3>{pkg.name}</h3>
-              <p>{pkg.description}</p>
+        <form onSubmit={handleProceedPayment} className="classai-checkout-form">
+          {/* Top Notice Disclaimer Banner */}
+          <div className="classai-disclaimer-banner">
+            <p>
+              Ketentuan: Saldo &amp; virtual key langsung aktif begitu pembayaran terkonfirmasi. Saldo berlaku selamanya (lifetime) tanpa potongan bulanan. Add-on dan saldo dapat diklaim garansi bila terjadi kendala (laporkan dalam 7 hari).
+            </p>
+          </div>
+
+          {/* Package Order Info & Customer Fields */}
+          <div className="classai-order-summary-card">
+            <div className="cosc-left">
+              <span className="cosc-badge">{pkg.badge || "Pilihan Siap Pakai"}</span>
+              <strong className="cosc-pkg-name">{pkg.name}</strong>
+              <span className="cosc-pkg-token">{pkg.estToken} · Saldo Universal</span>
             </div>
-            <div className="sp-price-box">
-              <strong>{formatIdr(pkg.priceIdr)}</strong>
-              <span>{pkg.estToken}</span>
+            <div className="cosc-right">
+              <strong className="cosc-price">{formatIdr(pkg.priceIdr)}</strong>
             </div>
           </div>
 
-          {/* Input Data Pemesan */}
-          <div className="sp-form-section">
-            <label>
-              Nama Lengkap
-              <input
-                type="text"
-                required
-                placeholder="Nama Anda / Panggilan"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
-            </label>
-            <label>
-              Email (Kredensial API dikirim ke sini)
-              <input
-                type="email"
-                required
-                placeholder="nama@kampus.ac.id atau email pribadi"
-                value={customerEmail}
-                onChange={(e) => setCustomerEmail(e.target.value)}
-              />
-            </label>
-            <label className="sp-form-full">
-              Nomor WhatsApp (Opsional / untuk konfirmasi cepat)
-              <input
-                type="tel"
-                placeholder="Contoh: 08123456789 atau 628..."
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
-              />
-            </label>
+          <div className="classai-input-grid">
+            <div className="cig-col">
+              <label className="cig-label">
+                Nama Lengkap
+                <input
+                  type="text"
+                  required
+                  placeholder="Nama Anda / Panggilan"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="cig-input"
+                />
+              </label>
+            </div>
+            <div className="cig-col">
+              <label className="cig-label">
+                Email (Kredensial API dikirim ke sini)
+                <input
+                  type="email"
+                  required
+                  placeholder="nama@email.com"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  className="cig-input"
+                />
+              </label>
+            </div>
           </div>
 
-          {/* Opsi Pembayaran Interaktif dengan Accordion */}
-          <div className="sp-methods-section">
-            <div className="methods-header-row">
-              <p className="methods-title">Pilih Metode Pembayaran:</p>
-              <span className="methods-hint">Pilihan Otomatis &amp; Real-time</span>
+          {/* ===================================================================== */}
+          {/* PAYMENT METHODS ACCORDION - EXACT MATCH TO CLASSAI.ID                */}
+          {/* ===================================================================== */}
+          <div className="classai-methods-stack">
+            {/* 1. INSTAN (QRIS) CARD */}
+            <div
+              className={`classai-method-card ${selectedMethod === "qris" ? "selected" : ""}`}
+              onClick={() => {
+                setSelectedMethod("qris");
+                setOpenCategory("qris");
+              }}
+            >
+              <div className="cmc-header">
+                <div className="cmc-left-group">
+                  <div className="cmc-icon-box qris-blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                      <circle cx="6.5" cy="6.5" r="0.75" fill="#FFFFFF" />
+                      <circle cx="17.5" cy="6.5" r="0.75" fill="#FFFFFF" />
+                      <circle cx="17.5" cy="17.5" r="0.75" fill="#FFFFFF" />
+                      <circle cx="6.5" cy="17.5" r="0.75" fill="#FFFFFF" />
+                    </svg>
+                  </div>
+                  <div className="cmc-text-col">
+                    <div className="cmc-title-row">
+                      <strong className="cmc-title">Instan (QRIS)</strong>
+                      <span className="cmc-tercepat-badge">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                        </svg>
+                        Tercepat
+                      </span>
+                    </div>
+                    <span className="cmc-subtitle">Dipilih: QRIS</span>
+                  </div>
+                </div>
+                <div className="cmc-right-action">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
-            <div className="payment-accordion-group">
-              {/* 1. KATEGORI QRIS */}
+            {/* 2. E-WALLET CARD */}
+            <div className={`classai-method-card ${isEwalletSelected ? "selected" : ""}`}>
               <div
-                className={`accordion-card ${activeCategory === "qris" ? "active" : ""}`}
+                className="cmc-header"
                 onClick={() => {
-                  setActiveCategory("qris");
-                  setSelectedMethod("qris");
+                  if (openCategory === "ewallet") {
+                    setOpenCategory("qris");
+                  } else {
+                    setOpenCategory("ewallet");
+                    if (!isEwalletSelected) setSelectedMethod("va-gopay");
+                  }
                 }}
               >
-                <div className="accordion-header">
-                  <div className="accordion-title-wrap">
-                    <span className="accordion-icon-chip qris-chip">QRIS</span>
-                    <div>
-                      <div className="accordion-title-row">
-                        <strong>QRIS Instan (Semua Bank &amp; e-Wallet)</strong>
-                        <span className="accordion-free-badge">Gratis Biaya Admin</span>
-                      </div>
-                      <span className="accordion-sub">BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA</span>
-                    </div>
+                <div className="cmc-left-group">
+                  <div className="cmc-icon-box slate-gray">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0066FF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="3" />
+                      <line x1="2" y1="10" x2="22" y2="10" />
+                    </svg>
                   </div>
-                  <div className="accordion-action-wrap">
-                    <input
-                      type="radio"
-                      name="payment_accordion"
-                      checked={activeCategory === "qris" && selectedMethod === "qris"}
-                      readOnly
-                    />
+                  <div className="cmc-text-col">
+                    <strong className="cmc-title">E-Wallet</strong>
+                    <span className="cmc-subtitle">GoPay, DANA</span>
                   </div>
+                </div>
+                <div className="cmc-right-action">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#64748B"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ transform: openCategory === "ewallet" ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
                 </div>
               </div>
 
-              {/* 2. KATEGORI VIRTUAL ACCOUNT & E-WALLET */}
-              <div className={`accordion-card ${activeCategory === "va_ewallet" ? "active" : ""}`}>
-                <div
-                  className="accordion-header"
-                  onClick={() => {
-                    if (activeCategory === "va_ewallet") {
-                      // toggle
-                      setActiveCategory("qris");
-                      setSelectedMethod("qris");
-                    } else {
-                      setActiveCategory("va_ewallet");
-                      if (!selectedMethod.startsWith("va-")) {
-                        setSelectedMethod("va-bca");
-                      }
-                    }
-                  }}
-                >
-                  <div className="accordion-title-wrap">
-                    <span className="accordion-icon-chip va-chip">VA / EW</span>
-                    <div>
-                      <div className="accordion-title-row">
-                        <strong>Virtual Account &amp; e-Wallet</strong>
-                        <span className="accordion-count-badge">8 Pilihan</span>
+              {openCategory === "ewallet" && (
+                <div className="cmc-expanded-list">
+                  {ewalletOptions.map((item) => {
+                    const isChecked = selectedMethod === item.id;
+                    return (
+                      <div
+                        key={item.id}
+                        className={`cmc-option-row ${isChecked ? "active" : ""}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedMethod(item.id);
+                        }}
+                      >
+                        <div className="cmc-option-left">
+                          <div className="cmc-brand-badge-box">
+                            <PaymentLogo type={item.code} />
+                          </div>
+                          <div className="cmc-option-text">
+                            <strong className="cmc-option-name">{item.name}</strong>
+                            <span className="cmc-option-desc">{item.desc}</span>
+                            <span className="cmc-option-fee">{item.fee}</span>
+                          </div>
+                        </div>
+                        <div className="cmc-radio-wrap">
+                          <span className={`cmc-custom-radio ${isChecked ? "checked" : ""}`} />
+                        </div>
                       </div>
-                      <span className="accordion-sub">DANA, ShopeePay, OVO, GoPay, BCA, Mandiri, BRI, BNI</span>
-                    </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* 3. TRANSFER BANK / VIRTUAL ACCOUNT CARD */}
+            <div className={`classai-method-card ${isVaSelected ? "selected" : ""}`}>
+              <div
+                className="cmc-header"
+                onClick={() => {
+                  if (openCategory === "va") {
+                    setOpenCategory("qris");
+                  } else {
+                    setOpenCategory("va");
+                    if (!isVaSelected) setSelectedMethod("va-bni");
+                  }
+                }}
+              >
+                <div className="cmc-left-group">
+                  <div className="cmc-icon-box slate-gray">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0066FF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4" />
+                    </svg>
                   </div>
-                  <div className="accordion-action-wrap">
-                    <span className="accordion-chevron">{activeCategory === "va_ewallet" ? "▲" : "▼"}</span>
+                  <div className="cmc-text-col">
+                    <strong className="cmc-title">Transfer Bank / Virtual Account</strong>
+                    <span className="cmc-subtitle">BNI, BRI, Mandiri, Permata, CIMB Niaga, SeaBank</span>
                   </div>
                 </div>
-
-                {/* Sub-Options List with smooth slide down animation */}
-                {activeCategory === "va_ewallet" && (
-                  <div className="accordion-content-panel">
-                    <div className="sub-methods-grid">
-                      {vaEwalletMethods.map((m) => {
-                        const isSelected = selectedMethod === m.id;
-                        return (
-                          <label
-                            key={m.id}
-                            className={`sub-method-card ${isSelected ? "selected" : ""}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedMethod(m.id);
-                            }}
-                          >
-                            <input
-                              type="radio"
-                              name="singapay_sub_method"
-                              value={m.id}
-                              checked={isSelected}
-                              onChange={() => setSelectedMethod(m.id)}
-                            />
-                            <div className="sub-method-info">
-                              <div className="sub-method-title">
-                                <strong>{m.name}</strong>
-                                {m.badge && <span className="sub-badge">{m.badge}</span>}
-                              </div>
-                              <span className="sub-provider">{m.provider}</span>
-                            </div>
-                            <span className={`sub-fee ${m.feeAmount === 0 ? "free" : ""}`}>{m.fee}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 3. KATEGORI TRANSFER BANK */}
-              <div className={`accordion-card ${activeCategory === "bank_transfer" ? "active" : ""}`}>
-                <div
-                  className="accordion-header"
-                  onClick={() => {
-                    if (activeCategory === "bank_transfer") {
-                      setActiveCategory("qris");
-                      setSelectedMethod("qris");
-                    } else {
-                      setActiveCategory("bank_transfer");
-                      if (!selectedMethod.startsWith("transfer-")) {
-                        setSelectedMethod("transfer-bca");
-                      }
-                    }
-                  }}
-                >
-                  <div className="accordion-title-wrap">
-                    <span className="accordion-icon-chip bank-chip">BANK</span>
-                    <div>
-                      <div className="accordion-title-row">
-                        <strong>Transfer Bank (Verifikasi Cepat)</strong>
-                        <span className="accordion-free-badge">Bebas Admin</span>
-                      </div>
-                      <span className="accordion-sub">Bank BCA, Mandiri, BRI, BNI, BSI (Syariah)</span>
-                    </div>
-                  </div>
-                  <div className="accordion-action-wrap">
-                    <span className="accordion-chevron">{activeCategory === "bank_transfer" ? "▲" : "▼"}</span>
-                  </div>
+                <div className="cmc-right-action">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#64748B"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ transform: openCategory === "va" ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
                 </div>
-
-                {/* Sub-Options List for Bank Transfer */}
-                {activeCategory === "bank_transfer" && (
-                  <div className="accordion-content-panel">
-                    <div className="sub-methods-grid">
-                      {bankTransferMethods.map((m) => {
-                        const isSelected = selectedMethod === m.id;
-                        return (
-                          <label
-                            key={m.id}
-                            className={`sub-method-card ${isSelected ? "selected" : ""}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedMethod(m.id);
-                            }}
-                          >
-                            <input
-                              type="radio"
-                              name="singapay_sub_method"
-                              value={m.id}
-                              checked={isSelected}
-                              onChange={() => setSelectedMethod(m.id)}
-                            />
-                            <div className="sub-method-info">
-                              <div className="sub-method-title">
-                                <strong>{m.name}</strong>
-                                {m.badge && <span className="sub-badge">{m.badge}</span>}
-                              </div>
-                              <span className="sub-provider">{m.provider}</span>
-                            </div>
-                            <span className="sub-fee free">{m.fee}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
               </div>
+
+              {openCategory === "va" && (
+                <div className="cmc-expanded-list">
+                  {bankOptions.map((item) => {
+                    const isChecked = selectedMethod === item.id;
+                    return (
+                      <div
+                        key={item.id}
+                        className={`cmc-option-row ${isChecked ? "active" : ""}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedMethod(item.id);
+                        }}
+                      >
+                        <div className="cmc-option-left">
+                          <div className="cmc-brand-badge-box">
+                            <PaymentLogo type={item.code} />
+                          </div>
+                          <div className="cmc-option-text">
+                            <strong className="cmc-option-name">{item.name}</strong>
+                            <span className="cmc-option-desc">{item.desc}</span>
+                            <span className="cmc-option-fee">{item.fee}</span>
+                          </div>
+                        </div>
+                        <div className="cmc-radio-wrap">
+                          <span className={`cmc-custom-radio ${isChecked ? "checked" : ""}`} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Footer Breakdown & Action */}
-          <div className="sp-footer-action">
-            <div className="sp-breakdown-card">
-              <div className="sp-breakdown-row">
-                <span className="row-label">Harga Paket ({pkg.name})</span>
-                <span className="row-value">{formatIdr(basePrice)}</span>
-              </div>
-              <div className="sp-breakdown-row">
-                <span className="row-label">Biaya Layanan ({currentMethod.name})</span>
-                <span className={`row-value ${adminFee === 0 ? "free-text" : "fee-text"}`}>
-                  {adminFee === 0 ? "Gratis (Rp 0)" : `+ ${formatIdr(adminFee)}`}
-                </span>
-              </div>
-              <div className="sp-breakdown-divider" />
-              <div className="sp-breakdown-row total-row">
-                <div>
-                  <strong className="total-label">Total Pembayaran</strong>
-                  <span className="total-subtext">Menggunakan {currentMethod.name}</span>
-                </div>
-                <strong className="sp-total-amount">{formatIdr(totalPrice)}</strong>
-              </div>
+          {/* Space buffer for fixed bottom bar */}
+          <div style={{ height: "90px" }} />
+
+          {/* ===================================================================== */}
+          {/* STICKY BOTTOM ACTION BAR - EXACT MATCH TO CLASSAI.ID                  */}
+          {/* ===================================================================== */}
+          <div className="classai-sticky-bottom">
+            <div className="csb-top-row">
+              <span className="csb-total-label">Total</span>
+              <strong className="csb-total-amount">{formatIdr(totalPrice)}</strong>
             </div>
-
-            <button
-              type="submit"
-              className="button-accent full dynamic-pay-button"
-              disabled={isSubmitting}
-            >
-              <span className="pay-btn-text">
-                {isSubmitting ? "Menyiapkan Invoice..." : `Lanjut Pembayaran · ${formatIdr(totalPrice)}`}
-              </span>
-              <Icon name="arrow" size={18} />
-            </button>
-
-            <div className="sp-or-divider">
-              <span>atau pemesanan langsung</span>
+            <div className="csb-btn-row">
+              <button type="button" className="csb-btn-kembali" onClick={handleClose}>
+                Kembali
+              </button>
+              <button
+                type="submit"
+                className="csb-btn-bayar"
+                disabled={isSubmitting}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span>{isSubmitting ? "Menyiapkan..." : `Bayar ${formatIdr(totalPrice)}`}</span>
+              </button>
             </div>
-
-            <button
-              type="button"
-              className="sp-wa-direct-btn"
-              onClick={openWhatsAppOrder}
-              disabled={isSubmitting}
-            >
-              <Icon name="whatsapp" size={18} />
-              <span>{isSubmitting ? "Menghubungkan..." : "Pesan & Chat Langsung via WhatsApp Admin"}</span>
-              <Icon name="external" size={14} />
-            </button>
           </div>
         </form>
       )}
 
       {/* ========================================================================= */}
-      {/* STEP 2: INVOICE PEMBAYARAN ELEGAN (STANDAR TRAVELOKA / TIKET.COM)         */}
+      {/* STEP 2: PAYMENT INVOICE VIEW (REAL QRIS CODE DISPLAY)                     */}
       {/* ========================================================================= */}
       {step === "payment" && (
-        <div className="sp-step-content traveloka-invoice-view">
-          {/* Status Banner & Countdown Timer */}
-          <div className="invoice-timer-card">
-            <div className="itc-header">
-              <span className="itc-status-pill">
-                <span className="itc-pulse-dot" /> Menunggu Pembayaran
-              </span>
-              <div className="itc-countdown">
-                <span>Batas Waktu Bayar:</span>
-                <strong className="itc-timer-digit">{formatTime(timeLeft)}</strong>
-              </div>
-            </div>
-            <div className="itc-progress-track">
-              <div
-                className="itc-progress-fill"
-                style={{ width: `${Math.max(0, (timeLeft / (15 * 60)) * 100)}%` }}
-              />
+        <div className="classai-payment-view">
+          {/* Timer Banner */}
+          <div className="cpv-timer-strip">
+            <span className="cpv-status-badge">Menunggu Pembayaran</span>
+            <div className="cpv-timer-count">
+              <span>Sisa Waktu:</span>
+              <strong>{formatTime(timeLeft)}</strong>
             </div>
           </div>
 
-          {/* Traveloka Style Invoice Identity Card */}
-          <div className="invoice-meta-card">
-            <div className="imc-row">
-              <span className="imc-label">NO. INVOICE / ID PESANAN</span>
-              <div className="imc-val-wrap">
-                <code className="imc-code">{invoiceId || "INV-JT-20261106-9812"}</code>
+          {/* Invoice ID Header */}
+          <div className="cpv-invoice-info-card">
+            <div className="cpv-info-row">
+              <span className="cpv-label">NO. INVOICE</span>
+              <div className="cpv-val-copy">
+                <code>{invoiceId || "INV-JT-LIVE"}</code>
                 <button
                   type="button"
-                  className="imc-copy-btn"
+                  className="cpv-mini-copy-btn"
                   onClick={() => copyToClipboard(invoiceId, "invoice")}
                 >
-                  <Icon name="copy" size={13} />
-                  <span>{copiedInvoice ? "Tersalin! ✓" : "Salin"}</span>
+                  {copiedInvoice ? "Tersalin! ✓" : "Salin"}
                 </button>
               </div>
             </div>
-            <div className="imc-row">
-              <span className="imc-label">PAKET DIPILIH</span>
-              <span className="imc-value">
-                <strong>{pkg.name}</strong> · {pkg.estToken} (Saldo Permanen)
-              </span>
-            </div>
-            <div className="imc-row">
-              <span className="imc-label">WAKTU PEMESANAN</span>
-              <span className="imc-value">{formatDate(new Date().toISOString())}</span>
+            <div className="cpv-info-row">
+              <span className="cpv-label">PAKET AI</span>
+              <strong>{pkg.name} ({pkg.estToken})</strong>
             </div>
           </div>
 
-          {/* Primary Payment Card (The Core Copyable Destination) */}
+          {/* The QRIS Display Card with User's Uploaded Real QR Code */}
           {selectedMethod === "qris" ? (
-            <div className="invoice-qris-card">
-              <div className="iqc-header">
-                <div className="iqc-badge-wrap">
-                  <span className="iqc-national-badge">QRIS Standar Nasional</span>
-                  <span className="iqc-merchant-title">PT JURAGAN TOKEN INDONESIA</span>
+            <div className="classai-qris-display-card">
+              <div className="cqdc-header">
+                <div className="cqdc-brand-row">
+                  <span className="cqdc-national-title">QRIS Standar Pembayaran Nasional</span>
+                  <span className="cqdc-merchant-name">PT JURAGAN TOKEN INDONESIA</span>
                 </div>
-                <span className="iqc-nmid">NMID: ID1020084920194</span>
+                <span className="cqdc-nmid">NMID: ID1020084920194</span>
               </div>
 
-              {/* Crisp High-Res QRIS SVG */}
-              <div className="qris-qr-code" aria-label="QRIS Code">
-                <svg viewBox="0 0 160 160" width="180" height="180" fill="none" className="qr-svg">
-                  <rect width="160" height="160" fill="white" />
-                  <rect x="15" y="15" width="40" height="40" stroke="#0a2442" strokeWidth="6" fill="none" />
-                  <rect x="25" y="25" width="20" height="20" fill="#0a2442" />
-                  <rect x="105" y="15" width="40" height="40" stroke="#0a2442" strokeWidth="6" fill="none" />
-                  <rect x="115" y="25" width="20" height="20" fill="#0a2442" />
-                  <rect x="15" y="105" width="40" height="40" stroke="#0a2442" strokeWidth="6" fill="none" />
-                  <rect x="25" y="115" width="20" height="20" fill="#0a2442" />
-                  <rect x="65" y="20" width="8" height="8" fill="#0a2442" />
-                  <rect x="80" y="20" width="12" height="8" fill="#0a2442" />
-                  <rect x="65" y="35" width="16" height="8" fill="#0a2442" />
-                  <rect x="90" y="35" width="8" height="8" fill="#0a2442" />
-                  <rect x="65" y="50" width="8" height="16" fill="#0a2442" />
-                  <rect x="80" y="60" width="16" height="8" fill="#0a2442" />
-                  <rect x="20" y="65" width="30" height="8" fill="#0a2442" />
-                  <rect x="30" y="80" width="12" height="12" fill="#0a2442" />
-                  <rect x="65" y="80" width="30" height="10" fill="#0a58ca" />
-                  <rect x="110" y="65" width="12" height="16" fill="#0a2442" />
-                  <rect x="130" y="70" width="15" height="8" fill="#0a2442" />
-                  <rect x="110" y="90" width="35" height="10" fill="#0a2442" />
-                  <rect x="65" y="105" width="12" height="12" fill="#0a2442" />
-                  <rect x="85" y="115" width="20" height="8" fill="#0a2442" />
-                  <rect x="70" y="130" width="35" height="15" fill="#0a2442" />
-                  <rect x="115" y="125" width="12" height="15" fill="#0a2442" />
-                  <rect x="135" y="130" width="10" height="10" fill="#0a2442" />
-                </svg>
-                <div className="qris-center-badge">QRIS</div>
+              {/* REAL SCAN-READY QRIS CODE IMAGE */}
+              <div className="classai-qris-image-wrapper">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/qris-code.png"
+                  alt="QRIS Code Juragan Token"
+                  className="classai-qris-real-img"
+                  onError={(e) => {
+                    // Fallback to /qris.png if images/ subfolder path differs
+                    e.currentTarget.src = "/qris.png";
+                  }}
+                />
               </div>
 
-              <p className="qris-instruction-text">
-                Scan QR di atas menggunakan aplikasi <b>BCA Mobile, Livin Mandiri, BRImo, BNI, GoPay, OVO, ShopeePay, atau DANA</b>.
+              <p className="cqdc-scan-hint">
+                Scan kode QR di atas menggunakan aplikasi <b>BCA Mobile, Livin Mandiri, BRImo, BNI, GoPay, OVO, ShopeePay, atau DANA</b>.
               </p>
 
-              {/* Total Bayar Copyable */}
-              <div className="invoice-amount-box">
-                <span className="iab-label">TOTAL JUMLAH PEMBAYARAN:</span>
-                <div className="iab-row">
-                  <strong className="iab-price">{formatIdr(totalPrice)}</strong>
+              {/* Amount Box */}
+              <div className="cqdc-amount-box">
+                <span className="cqdc-amount-label">TOTAL JUMLAH PEMBAYARAN:</span>
+                <div className="cqdc-amount-row">
+                  <strong className="cqdc-price">{formatIdr(totalPrice)}</strong>
                   <button
                     type="button"
-                    className="copy-field-btn"
+                    className="cqdc-copy-btn"
                     onClick={() => copyToClipboard(totalPrice.toString(), "amount")}
                   >
-                    <Icon name="copy" size={14} />
+                    <Icon name="copy" size={13} />
                     <span>{copiedAmount ? "Tersalin! ✓" : "Salin Jumlah"}</span>
                   </button>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="invoice-destination-card">
-              <div className="idc-header">
-                <div className="idc-title-wrap">
-                  <span className="idc-badge">{currentMethod.name}</span>
-                  <span className="idc-status-pill">Otomatis Terverifikasi</span>
-                </div>
-                <span className="idc-speed-pill">{currentMethod.speed}</span>
+            <div className="classai-destination-card">
+              <div className="cdc-head">
+                <strong>{currentMethod.name}</strong>
+                <span className="cdc-tag">Verifikasi Otomatis</span>
               </div>
 
-              {/* Nomor Rekening / Virtual Account (Large Copyable Number) */}
-              <div className="idc-field-block">
-                <span className="idc-field-label">
-                  {currentMethod.category === "bank_transfer" ? "NOMOR REKENING TUJUAN:" : "NOMOR VIRTUAL ACCOUNT:"}
-                </span>
-                <div className="idc-number-box">
-                  <code className="idc-code">
-                    {currentMethod.accountNumber || "3901 0812 3456 7890"}
-                  </code>
+              <div className="cdc-field">
+                <span className="cdc-field-label">NOMOR VIRTUAL ACCOUNT / REKENING:</span>
+                <div className="cdc-code-box">
+                  <code>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
                   <button
                     type="button"
-                    className="copy-field-btn accent"
-                    onClick={() => copyToClipboard((currentMethod.accountNumber || "3901081234567890").replace(/\s/g, ""), "va")}
+                    className="cdc-copy-btn"
+                    onClick={() => copyToClipboard(currentMethod.accountNumber || "8277 0812 3456 7890", "va")}
                   >
-                    <Icon name="copy" size={14} />
-                    <span>{copiedVa ? "Tersalin! ✓" : "Salin Nomor"}</span>
+                    {copiedVa ? "Tersalin! ✓" : "Salin No. VA"}
                   </button>
                 </div>
+                <span className="cdc-holder">Atas Nama: PT JURAGAN TOKEN INDONESIA</span>
               </div>
 
-              <div className="idc-field-block">
-                <span className="idc-field-label">NAMA REKENING / PENERIMA:</span>
-                <strong className="idc-recipient-name">
-                  {currentMethod.accountName || "PT JURAGAN TOKEN INDONESIA"}
-                </strong>
-              </div>
-
-              {/* Total Jumlah Transfer (Copyable Exact Amount seperti Traveloka) */}
-              <div className="invoice-amount-box">
-                <div className="iab-meta">
-                  <span className="iab-label">TOTAL JUMLAH TRANSFER PERSIS:</span>
-                  <span className="iab-sub">
-                    (Paket: {formatIdr(basePrice)} {adminFee > 0 ? `+ Biaya Layanan: ${formatIdr(adminFee)}` : "+ Bebas Admin"})
-                  </span>
-                </div>
-                <div className="iab-row">
-                  <strong className="iab-price">{formatIdr(totalPrice)}</strong>
+              <div className="cqdc-amount-box">
+                <span className="cqdc-amount-label">TOTAL JUMLAH PEMBAYARAN:</span>
+                <div className="cqdc-amount-row">
+                  <strong className="cqdc-price">{formatIdr(totalPrice)}</strong>
                   <button
                     type="button"
-                    className="copy-field-btn"
+                    className="cqdc-copy-btn"
                     onClick={() => copyToClipboard(totalPrice.toString(), "amount")}
                   >
-                    <Icon name="copy" size={14} />
+                    <Icon name="copy" size={13} />
                     <span>{copiedAmount ? "Tersalin! ✓" : "Salin Jumlah"}</span>
                   </button>
                 </div>
               </div>
-
-              <div className="invoice-warning-pill">
-                <span>⚠️</span>
-                <span>
-                  <b>PENTING:</b> Mohon transfer tepat hingga nominal rupiah terakhir agar sistem dapat mendeteksi pembayaran Anda secara otomatis.
-                </span>
-              </div>
             </div>
           )}
 
-          {/* Petunjuk Pembayaran Step-by-Step (Traveloka & Tiket.com Standard) */}
-          <div className="invoice-guide-card">
-            <div className="igc-header">
-              <strong>Petunjuk Cara Pembayaran:</strong>
-              <div className="igc-tabs">
-                <button
-                  type="button"
-                  className={`igc-tab-btn ${guideTab === "mbanking" ? "active" : ""}`}
-                  onClick={() => setGuideTab("mbanking")}
-                >
-                  m-Banking
-                </button>
-                <button
-                  type="button"
-                  className={`igc-tab-btn ${guideTab === "ibanking" ? "active" : ""}`}
-                  onClick={() => setGuideTab("ibanking")}
-                >
-                  i-Banking
-                </button>
-                <button
-                  type="button"
-                  className={`igc-tab-btn ${guideTab === "atm" ? "active" : ""}`}
-                  onClick={() => setGuideTab("atm")}
-                >
-                  ATM
-                </button>
-              </div>
-            </div>
-
-            <ol className="igc-steps-list">
-              {getInstructions(currentMethod, guideTab).map((stepTxt, idx) => (
-                <li key={idx}>{stepTxt}</li>
-              ))}
-            </ol>
-          </div>
-
-          {/* Action CTAs */}
-          <div className="invoice-actions-block">
+          {/* Action Buttons */}
+          <div className="cpv-action-buttons">
             <button
               type="button"
-              className="button-accent full invoice-verify-btn"
+              className="cpv-verify-btn"
               onClick={handleSimulateSuccess}
               disabled={isConfirming}
             >
-              {isConfirming ? (
-                <>
-                  <span className="btn-spinner" /> Memverifikasi Pembayaran...
-                </>
-              ) : (
-                <>
-                  <Icon name="check" size={18} />
-                  <span>Saya Sudah Bayar (Cek Status Pembayaran)</span>
-                </>
-              )}
+              <Icon name="check" size={16} />
+              <span>{isConfirming ? "Memeriksa Status..." : "Cek Status Pembayaran (Selesai)"}</span>
             </button>
 
             <button
               type="button"
-              className="sp-wa-action-btn"
-              onClick={openWhatsAppConfirmation}
+              className="cpv-back-link-btn"
+              onClick={() => setStep("checkout")}
             >
-              <Icon name="whatsapp" size={18} />
-              <span>Bantuan &amp; Konfirmasi Cepat via WhatsApp</span>
-              <Icon name="external" size={14} />
+              ← Ubah Metode Pembayaran
+            </button>
+
+            <button
+              type="button"
+              className="cpv-wa-help-btn"
+              onClick={openWhatsAppOrder}
+            >
+              <Icon name="whatsapp" size={15} />
+              <span>Bantuan Konfirmasi via WhatsApp Admin</span>
             </button>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* STEP 3: SUKSES & INVOICE LUNAS (KREDENSIAL API KEY RESMI)                 */}
+      {/* STEP 3: SUCCESS CONFIRMATION & API KEY GENERATION                         */}
       {/* ========================================================================= */}
       {step === "success" && (
-        <div className="sp-step-content payment-success" style={{ textAlign: "center", paddingTop: "8px" }}>
-          <PaymentSuccessMark size={76} />
-
-          <h3 style={{ fontSize: "22px", fontWeight: 800, color: "var(--ink)", margin: "0 0 6px" }}>
-            Pembayaran Berhasil!
-          </h3>
-          <p className="success-desc" style={{ maxWidth: "420px", margin: "0 auto 20px", color: "#536b85", fontSize: "13px" }}>
-            Paket <b>{pkg.name}</b> telah aktif. Bukti invoice resmi dan kredensial API Key Anda telah terbit dan dikirimkan ke email Anda.
-          </p>
-
-          {/* Official Fintech Receipt Card (BCA / GoPay / Traveloka standard) */}
-          <div className="fintech-receipt-card" style={{ textAlign: "left" }}>
-            <div className="frc-header">
-              <div className="frc-brand" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <strong style={{ fontSize: "14px", color: "var(--ink)" }}>Bukti Pembayaran Resmi</strong>
-              </div>
-              <span className="frc-status-pill">
-                <Icon name="check" size={12} /> LUNAS &amp; TERVERIFIKASI
-              </span>
-            </div>
-
-            <div className="frc-amount-box">
-              <span className="frc-amount-label">TOTAL PEMBAYARAN</span>
-              <span className="frc-amount-val">{formatIdr(totalPaid || totalPrice)}</span>
-            </div>
-
-            <div className="frc-meta-grid">
-              <div className="frc-row">
-                <span className="frc-label">No. Invoice</span>
-                <span className="frc-val">{invoiceId || "INV-JT-20261106-9812"}</span>
-              </div>
-              <div className="frc-row">
-                <span className="frc-label">Waktu Transaksi</span>
-                <span className="frc-val">{formatDate(paidAt || new Date().toISOString())}</span>
-              </div>
-              <div className="frc-row">
-                <span className="frc-label">Metode Pembayaran</span>
-                <span className="frc-val">{currentMethod.name}</span>
-              </div>
-              <div className="frc-row">
-                <span className="frc-label">Paket Kredit</span>
-                <span className="frc-val">
-                  <strong>{pkg.name}</strong> ({pkg.estToken})
-                </span>
-              </div>
-              <div className="frc-row">
-                <span className="frc-label">Nama Pembeli</span>
-                <span className="frc-val">{customerName || "Sahabat Token"}</span>
-              </div>
-              <div className="frc-row">
-                <span className="frc-label">Email Penerima</span>
-                <span className="frc-val">{customerEmail || "-"}</span>
-              </div>
-              <div className="frc-row">
-                <span className="frc-label">Masa Aktif Saldo</span>
-                <span className="frc-val" style={{ color: "#059669", fontWeight: 700 }}>
-                  Permanen (Tanpa Masa Hangus)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Email Delivery Notification Banner */}
-          {emailStatus === "sent" && (
-            <div className="email-status-banner email-sent">
-              <Icon name="mail" size={18} />
-              <div>
-                <strong>Bukti Transaksi &amp; API Key Telah Terkirim ke Gmail!</strong>
-                <p>Kredensial resmi telah dikirim ke <b>{customerEmail}</b>. Silakan periksa kotak masuk atau spam.</p>
-              </div>
-            </div>
-          )}
-
-          {emailStatus === "simulated" && (
-            <div className="email-status-banner email-simulated">
-              <Icon name="mail" size={18} />
-              <div>
-                <strong>Bukti Transaksi Siap (Mode Simulasi)</strong>
-                <p>Notifikasi email simulasi untuk <b>{customerEmail}</b> berhasil diverifikasi.</p>
-              </div>
-            </div>
-          )}
-
-          {emailStatus === "error" && (
-            <div className="email-status-banner email-error">
-              <Icon name="alert" size={18} />
-              <div>
-                <strong>Pengiriman Email Tertunda</strong>
-                <p>{emailMessage || "Kredensial tetap dapat disalin langsung dari kotak di bawah ini."}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Virtual API Key Output Card */}
-          <div className="key-credential-card">
-            <div className="kcc-header">
-              <div className="kcc-title">
-                <Icon name="key" size={16} />
-                <span>Virtual API Key Anda:</span>
-              </div>
-              <span className="kcc-badge">Siap Pakai</span>
-            </div>
-            <div className="kcc-key-row">
-              <code>{apiKeyGenerated || "jt-live-7d9a1b4c3e8f2095a1c84b72e0"}</code>
-              <button
-                type="button"
-                className="button-accent copy-btn"
-                onClick={() => copyToClipboard(apiKeyGenerated || "jt-live-7d9a1b4c3e8f2095a1c84b72e0", "key")}
-              >
-                <Icon name="copy" size={15} />
-                <span>{copiedKey ? "Tersalin! ✓" : "Salin Kunci"}</span>
-              </button>
-            </div>
-            <p className="kcc-warning">
-              Kunci ini bersifat rahasia. Jangan membagikannya ke publik atau repositori publik GitHub.
+        <div className="classai-success-view">
+          <div className="csv-badge-center">
+            <PaymentSuccessMark />
+            <h3 className="csv-title">Pembayaran Berhasil Diterima!</h3>
+            <p className="csv-sub">
+              Saldo akun sebesar <b>{formatIdr(totalPaid || totalPrice)}</b> ({pkg.estToken}) telah aktif permanen di gateway juragantoken.co.id.
             </p>
           </div>
 
-          {/* Base URL Card */}
-          <div className="base-url-card">
-            <span className="buc-label">Universal OpenAI Base URL:</span>
-            <div className="buc-row">
+          <div className="csv-key-card">
+            <span className="csv-key-label">API KEY UNIVERSAL ANDA:</span>
+            <div className="csv-key-display">
+              <code>{apiKeyGenerated || "jt-sec-live-89f41b2c7e0941ab82"}</code>
+              <button
+                type="button"
+                className="csv-copy-key-btn"
+                onClick={() => copyToClipboard(apiKeyGenerated || "jt-sec-live-89f41b2c7e0941ab82", "key")}
+              >
+                <Icon name="copy" size={14} />
+                <span>{copiedKey ? "Tersalin! ✓" : "Salin API Key"}</span>
+              </button>
+            </div>
+            <span className="csv-key-note">
+              Simpan API key ini dengan aman. Key dapat langsung dipakai di Claude Code, Cursor, Chatbox, dan LibreChat.
+            </span>
+          </div>
+
+          <div className="csv-setup-box">
+            <div className="csb-row">
+              <span className="csb-tag">BASE URL</span>
               <code>{GATEWAY_BASE_URL}</code>
               <button
                 type="button"
-                className="link-button"
+                className="csb-copy-sm"
                 onClick={() => copyToClipboard(GATEWAY_BASE_URL, "url")}
               >
-                {copiedUrl ? "Tersalin!" : "Salin URL"}
+                {copiedUrl ? "✓" : "Salin"}
               </button>
             </div>
           </div>
 
-          {/* WhatsApp Backup Button */}
-          <div className="wa-backup-section">
+          <div className="csv-footer-btns">
             <button
               type="button"
-              className="sp-wa-action-btn"
-              onClick={() => openWhatsAppCredentials(customerPhone ? "self" : "admin")}
+              className="csv-done-btn"
+              onClick={handleClose}
             >
-              <Icon name="whatsapp" size={18} />
-              <span>Simpan &amp; Cadangkan Kredensial ke WhatsApp</span>
-              <Icon name="external" size={14} />
+              Selesai &amp; Kembali ke Halaman Utama
             </button>
-            <p className="wa-backup-hint">
-              {customerPhone
-                ? "Kirim kredensial ini langsung ke nomor WhatsApp Anda sendiri agar tidak hilang."
-                : "Cadangkan kredensial ke WhatsApp Anda agar aman."}
-            </p>
+            <button
+              type="button"
+              className="csv-wa-share-btn"
+              onClick={openWhatsAppOrder}
+            >
+              <Icon name="whatsapp" size={15} />
+              <span>Kirim Bukti Pembayaran ke WhatsApp</span>
+            </button>
           </div>
-
-          <button type="button" className="primary-button full" onClick={handleClose}>
-            Tutup &amp; Mulai Menggunakan API ↗
-          </button>
         </div>
       )}
     </Dialog>
