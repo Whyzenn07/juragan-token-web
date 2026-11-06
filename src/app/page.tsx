@@ -1212,41 +1212,152 @@ export default function Home() {
 
             {/* Fitur Tampilkan Lebih Banyak (E-Commerce Standard Pagination / Load More) */}
             {filteredModels.length > INITIAL_CATALOG_LIMIT && (
-              <div className="catalog-load-more-box" data-reveal="fade-up">
-                <div className="clm-status-row">
-                  <span className="clm-text">
-                    Menampilkan <b>{displayedModels.length}</b> dari <b>{filteredModels.length}</b> model
+              <div
+                className="catalog-load-more-box"
+                data-reveal="fade-up"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "14px",
+                  marginTop: "24px",
+                  marginBottom: "12px",
+                  padding: "20px 24px",
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "16px",
+                  boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
+                  width: "100%",
+                }}
+              >
+                {/* Status Bar & Progress Ratio */}
+                <div
+                  className="clm-status-row"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "14px",
+                    width: "100%",
+                    maxWidth: "480px",
+                  }}
+                >
+                  <span
+                    className="clm-text"
+                    style={{
+                      fontSize: "12.5px",
+                      color: "#475569",
+                      fontWeight: 500,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Menampilkan <strong style={{ color: "#0f172a", fontWeight: 700 }}>{displayedModels.length}</strong> dari <strong style={{ color: "#0f172a", fontWeight: 700 }}>{filteredModels.length}</strong> model
                   </span>
-                  <div className="clm-progress-bar" role="progressbar" aria-valuenow={displayedModels.length} aria-valuemin={0} aria-valuemax={filteredModels.length}>
+                  <div
+                    className="clm-progress-bar"
+                    role="progressbar"
+                    aria-valuenow={displayedModels.length}
+                    aria-valuemin={0}
+                    aria-valuemax={filteredModels.length}
+                    style={{
+                      flex: 1,
+                      height: "7px",
+                      background: "#e2e8f0",
+                      borderRadius: "999px",
+                      overflow: "hidden",
+                      position: "relative",
+                    }}
+                  >
                     <div
                       className="clm-progress-fill"
-                      style={{ width: `${Math.round((displayedModels.length / filteredModels.length) * 100)}%` }}
+                      style={{
+                        height: "100%",
+                        background: "linear-gradient(90deg, #0a58ca 0%, #3b82f6 100%)",
+                        borderRadius: "999px",
+                        width: `${Math.round((displayedModels.length / filteredModels.length) * 100)}%`,
+                        transition: "width 0.35s ease",
+                      }}
                     />
                   </div>
-                  <span className="clm-pct">
+                  <span
+                    className="clm-pct"
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: 750,
+                      color: "#0a58ca",
+                      fontFamily: "monospace",
+                      background: "#eff6ff",
+                      border: "1px solid #bfdbfe",
+                      borderRadius: "6px",
+                      padding: "2px 8px",
+                      minWidth: "40px",
+                      textAlign: "center",
+                    }}
+                  >
                     {Math.round((displayedModels.length / filteredModels.length) * 100)}%
                   </span>
                 </div>
 
-                <div className="clm-actions-row">
-                  {hasMore ? (
+                {/* Action Buttons */}
+                <div
+                  className="clm-actions-row"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    marginTop: "2px",
+                  }}
+                >
+                  {hasMore && (
                     <>
                       <button
                         type="button"
                         className="clm-btn-primary"
                         onClick={() => setVisibleCount((prev) => Math.min(prev + 6, filteredModels.length))}
                         aria-label={`Tampilkan 6 model berikutnya, tersisa ${filteredModels.length - displayedModels.length} model`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          background: "#0a58ca",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "10px",
+                          padding: "10px 22px",
+                          fontSize: "13px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          boxShadow: "0 3px 10px rgba(10, 88, 202, 0.25)",
+                          transition: "all 0.15s ease",
+                        }}
                       >
                         <span>Tampilkan Lebih Banyak (+{Math.min(6, filteredModels.length - displayedModels.length)})</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <polyline points="6 9 12 15 18 9" />
                         </svg>
                       </button>
+
                       <button
                         type="button"
                         className="clm-btn-secondary"
                         onClick={() => setVisibleCount(filteredModels.length)}
                         aria-label={`Tampilkan seluruh ${filteredModels.length} model`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          background: "#ffffff",
+                          color: "#0a58ca",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "10px",
+                          padding: "9px 18px",
+                          fontSize: "13px",
+                          fontWeight: 650,
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
                       >
                         <span>Tampilkan Semua ({filteredModels.length})</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1255,7 +1366,7 @@ export default function Home() {
                         </svg>
                       </button>
                     </>
-                  ) : null}
+                  )}
 
                   {isExpanded && (
                     <button
@@ -1269,6 +1380,20 @@ export default function Home() {
                         }
                       }}
                       aria-label="Tampilkan lebih sedikit model (kembali ke tampilan ringkas)"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        background: "#ffffff",
+                        color: "#475569",
+                        border: "1.5px solid #e2e8f0",
+                        borderRadius: "10px",
+                        padding: "9px 18px",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                      }}
                     >
                       <span>Tampilkan Lebih Sedikit</span>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
