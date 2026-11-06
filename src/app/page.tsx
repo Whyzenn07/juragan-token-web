@@ -44,26 +44,55 @@ const formatIdr = (val: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
 const formatNum = (val: number) => new Intl.NumberFormat("id-ID").format(val);
 
-function useReveal() {
+function useScrollEffects(depsKey?: string) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
   useEffect(() => {
-    if (typeof window === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    if (typeof window === "undefined") return;
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 20);
+
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0) {
+        setScrollProgress(Math.min(100, Math.max(0, (scrollY / totalHeight) * 100)));
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
+        el.classList.add("is-revealed");
+      });
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("in");
-          observer.unobserve(entry.target);
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+            observer.unobserve(entry.target);
+          }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -5% 0px" }
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
     );
-    targets.forEach((target) => {
-      target.classList.add("reveal");
-      observer.observe(target);
-    });
-    return () => observer.disconnect();
-  }, []);
+
+    const targets = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    targets.forEach((target) => observer.observe(target));
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
+    };
+  }, [depsKey]);
+
+  return { isScrolled, scrollProgress };
 }
 
 export default function Home() {
@@ -146,8 +175,6 @@ export default function Home() {
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
   const navRef = useRef<HTMLElement>(null);
   const linkRefs = useRef<Record<string, HTMLElement | null>>({});
-
-  useReveal();
 
   // Sliding indicator calculation: follows hovered item or active section
   useEffect(() => {
@@ -302,9 +329,17 @@ export default function Home() {
 
   // Kunci ini memicu animasi masuk kartu saat filter berganti, tapi tidak di setiap ketikan pencarian.
   const gridKey = `${activeCategory}-${selectedProvider}-${sortOption}-${viewSavedOnly ? "saved" : "all"}`;
+  const { isScrolled, scrollProgress } = useScrollEffects(gridKey);
 
   return (
     <div className="site-canvas">
+      {/* Scroll-driven top reading progress bar */}
+      <div
+        className="scroll-progress-bar"
+        style={{ transform: `scaleX(${scrollProgress / 100})` }}
+        aria-hidden="true"
+      />
+
       <a href="#catalog" className="skip-link">
         Langsung ke katalog voucher
       </a>
@@ -319,7 +354,7 @@ export default function Home() {
       </div>
 
       {/* 2. Site Header (Sesuai ai-vouchers tapi Biru + Putih) */}
-      <header className="header">
+      <header className={`header ${isScrolled ? "scrolled" : ""}`}>
         <a className="brand" href="#top" aria-label="Juragan Token Beranda">
           <span className="brand-mark" aria-hidden="true">
             <BrandMark />
@@ -499,7 +534,7 @@ export default function Home() {
             <span className="demo-pill">Pratinjau · Akses Token Ritel Mahasiswa</span>
           </div>
 
-          <div className="gateway-status-strip">
+          <div className="gateway-status-strip" data-reveal="fade-up">
             <div className="gateway-status-left">
               <span className="live-pulse-dot" />
               <strong>Gateway juragantoken.co.id</strong>
@@ -591,7 +626,7 @@ export default function Home() {
           </section>
 
           {/* 4. Trust Strip dengan Logo Resmi Perusahaan AI (Anthropic, OpenAI, Google, DeepSeek, dll) */}
-          <div className="trust-strip">
+          <div className="trust-strip" data-reveal="fade-up">
             <span className="trust-lead">Model AI terdepan yang didukung:</span>
             <div className="provider-wordmark" title="Anthropic - Claude Sonnet 5.5">
               <ProviderLogo provider="anthropic" size={18} />
@@ -663,6 +698,7 @@ export default function Home() {
             {/* 5. Catalog Section Header Card - Modern Executive Corporate Banner */}
             <div
               className="catalog-header-card"
+              data-reveal="scale"
               style={{
                 position: "relative",
                 background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
@@ -934,7 +970,7 @@ export default function Home() {
             </div>
 
             {/* Filter Bar */}
-            <div className="filter-bar">
+            <div className="filter-bar" data-reveal="fade-up">
               <label className="search">
                 <Icon name="search" size={18} />
                 <input
@@ -975,7 +1011,7 @@ export default function Home() {
             </div>
 
             {/* Category Chips Bar */}
-            <div className="category-chips" role="group" aria-label="Filter kategori model">
+            <div className="category-chips" role="group" aria-label="Filter kategori model" data-reveal="fade-up">
               {categories.map((cat) => (
                 <button
                   key={cat}
@@ -1087,6 +1123,8 @@ export default function Home() {
                     <article
                       key={m.id}
                       className="model-card"
+                      data-reveal="fade-up"
+                      data-delay={Math.min((index % 4) * 60, 240)}
                       data-tier={tier ?? "image"}
                       style={{ "--i": Math.min(index, 9), "--reach": reachScore(m) } as React.CSSProperties}
                       onMouseMove={(e) => {
@@ -1201,6 +1239,7 @@ export default function Home() {
             {/* Executive Retail Header Card */}
             <div
               className="retail-header-card"
+              data-reveal="scale"
               style={{
                 position: "relative",
                 background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
@@ -1472,10 +1511,12 @@ export default function Home() {
             </div>
 
             <div className="retail-packages-grid">
-              {retailPackages.map((pkg) => (
+              {retailPackages.map((pkg, index) => (
                 <article
                   key={pkg.id}
                   className={`package-card ${pkg.featured ? "featured" : ""}`}
+                  data-reveal="fade-up"
+                  data-delay={Math.min(index * 80, 240)}
                   onMouseMove={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     e.currentTarget.style.setProperty("--cursor-x", `${e.clientX - rect.left}px`);
@@ -1535,7 +1576,7 @@ export default function Home() {
           </section>
 
           {/* 7. Bundle Banner (Pola ai-vouchers.com) */}
-          <section className="bundle-banner">
+          <section className="bundle-banner" data-reveal="scale">
             <div className="bundle-mini-art">
               <span>✳</span>
               <span>◈</span>
@@ -1557,7 +1598,7 @@ export default function Home() {
           <SetupGuides />
 
           {/* 9. FAQ Section */}
-          <section className="faq-section" id="faq" aria-labelledby="faq-heading">
+          <section className="faq-section" id="faq" aria-labelledby="faq-heading" data-reveal="fade-up">
             <div className="section-kicker">JURAGAN TOKEN</div>
             <h2 id="faq-heading">Pertanyaan Umum (FAQ)</h2>
             <p className="faq-section-lead">
@@ -1698,7 +1739,7 @@ export default function Home() {
       </div>
 
       {/* 11. Footer Global Multi-Kolom Profesional (Full Width) */}
-      <footer className="site-pro-footer">
+      <footer className="site-pro-footer" data-reveal="fade-in">
         <div className="spf-container">
           <div className="spf-main-grid">
             {/* Kolom 1: Brand & Profil Platform */}

@@ -83,10 +83,13 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
   align-items: center;
   padding: 0 34px;
   gap: 48px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 40;
+  transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .brand {
   display: flex;
@@ -7395,5 +7398,146 @@ footer {
   }
 }
 
+/* ============================================================= */
+/* Scroll-Driven Animations & Reveal Engine (AOS / GSAP Standard) */
+/* ============================================================= */
 
+/* Top Reading Progress Bar */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0a58ca 0%, #0284c7 50%, #38bdf8 100%);
+  transform-origin: 0 50%;
+  z-index: 10000;
+  pointer-events: none;
+  transition: transform 0.08s ease-out;
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.4);
+}
 
+/* Header Scrolled Elevation (Scroll-driven header to hero) */
+.header.scrolled {
+  height: 68px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-bottom-color: rgba(207, 224, 245, 0.9) !important;
+  box-shadow: 0 6px 24px -4px rgba(10, 37, 64, 0.08), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Base Reveal Rules */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+[data-reveal="scale"] {
+  opacity: 0;
+  transform: translateY(24px) scale(0.97);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+[data-reveal="fade-in"] {
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity;
+}
+
+[data-reveal="fade-left"] {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+[data-reveal="fade-right"] {
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+/* Revealed State */
+[data-reveal].is-revealed {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+/* Stagger Delays */
+[data-delay="50"]  { transition-delay: 50ms !important; }
+[data-delay="60"]  { transition-delay: 60ms !important; }
+[data-delay="80"]  { transition-delay: 80ms !important; }
+[data-delay="100"] { transition-delay: 100ms !important; }
+[data-delay="120"] { transition-delay: 120ms !important; }
+[data-delay="150"] { transition-delay: 150ms !important; }
+[data-delay="160"] { transition-delay: 160ms !important; }
+[data-delay="180"] { transition-delay: 180ms !important; }
+[data-delay="200"] { transition-delay: 200ms !important; }
+[data-delay="240"] { transition-delay: 240ms !important; }
+[data-delay="250"] { transition-delay: 250ms !important; }
+[data-delay="300"] { transition-delay: 300ms !important; }
+[data-delay="320"] { transition-delay: 320ms !important; }
+[data-delay="400"] { transition-delay: 400ms !important; }
+
+/* Hero Entrance Sequence */
+@keyframes heroEntranceSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-content > * {
+  animation: heroEntranceSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-content .eyebrow { animation-delay: 0.05s; }
+.hero-content h1 { animation-delay: 0.12s; }
+.hero-content p { animation-delay: 0.18s; }
+.hero-content .hero-actions { animation-delay: 0.24s; }
+.hero-content .region-badge { animation-delay: 0.3s; }
+
+/* Celestial ticket art entrance */
+@keyframes heroArtEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.hero-art {
+  animation: heroArtEntrance 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+/* Accessibility: Disable motion for users who requested it */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal="scale"],
+  [data-reveal="fade-in"],
+  [data-reveal="fade-left"],
+  [data-reveal="fade-right"] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .hero-content > *,
+  .hero-art,
+  .scroll-progress-bar {
+    animation: none !important;
+    transition: none !important;
+  }
+}
