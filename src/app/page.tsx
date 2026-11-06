@@ -176,6 +176,15 @@ export default function Home() {
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [viewSavedOnly, setViewSavedOnly] = useState(false);
 
+  // Batas awal tampilan model katalog (Standar E-Commerce agar tidak memenuhi seluruh halaman)
+  const INITIAL_CATALOG_LIMIT = 6;
+  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_CATALOG_LIMIT);
+
+  // Reset pagination saat pengguna mengganti filter, kategori, provider, atau kata kunci pencarian
+  useEffect(() => {
+    setVisibleCount(INITIAL_CATALOG_LIMIT);
+  }, [searchQuery, activeCategory, selectedProvider, viewSavedOnly]);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const catalogRef = useRef<HTMLElement>(null);
 
@@ -346,6 +355,11 @@ export default function Home() {
   // Kunci ini memicu animasi masuk kartu saat filter berganti, tapi tidak di setiap ketikan pencarian.
   const gridKey = `${activeCategory}-${selectedProvider}-${sortOption}-${viewSavedOnly ? "saved" : "all"}`;
   const { isScrolled } = useScrollEffects(gridKey);
+
+  // Slicing model yang ditampilkan sesuai batas aktif (Load More)
+  const displayedModels = filteredModels.slice(0, visibleCount);
+  const hasMore = filteredModels.length > visibleCount;
+  const isExpanded = visibleCount > INITIAL_CATALOG_LIMIT;
 
   return (
     <div className="site-canvas">
@@ -955,9 +969,9 @@ export default function Home() {
                 {filteredModels.length === 0 ? (
                   <span style={{ color: "#ef4444", fontWeight: 600 }}>0 model ditemukan</span>
                 ) : viewSavedOnly ? (
-                  <span>Menampilkan <b>{filteredModels.length} model tersimpan</b></span>
+                  <span>Menampilkan <b>{displayedModels.length} dari {filteredModels.length} model tersimpan</b></span>
                 ) : (
-                  <span>Menampilkan <b>{filteredModels.length} model AI</b></span>
+                  <span>Menampilkan <b>{displayedModels.length} dari {filteredModels.length} model AI</b></span>
                 )}
               </span>
               <span>
@@ -970,7 +984,7 @@ export default function Home() {
               id="model-grid"
               key={gridKey}
               className="model-grid"
-              data-count={filteredModels.length}
+              data-count={displayedModels.length}
               aria-live="polite"
             >
               {filteredModels.length === 0 ? (
@@ -1077,7 +1091,7 @@ export default function Home() {
                   )}
                 </div>
               ) : (
-                filteredModels.map((m, index) => {
+                displayedModels.map((m, index) => {
                   const p = providerById(m.providerId);
                   const isSaved = savedIds.includes(m.id);
                   const perImage = isPerImage(m);
@@ -1195,6 +1209,76 @@ export default function Home() {
                 })
               )}
             </div>
+
+            {/* Fitur Tampilkan Lebih Banyak (E-Commerce Standard Pagination / Load More) */}
+            {filteredModels.length > INITIAL_CATALOG_LIMIT && (
+              <div className="catalog-load-more-box" data-reveal="fade-up">
+                <div className="clm-status-row">
+                  <span className="clm-text">
+                    Menampilkan <b>{displayedModels.length}</b> dari <b>{filteredModels.length}</b> model
+                  </span>
+                  <div className="clm-progress-bar" role="progressbar" aria-valuenow={displayedModels.length} aria-valuemin={0} aria-valuemax={filteredModels.length}>
+                    <div
+                      className="clm-progress-fill"
+                      style={{ width: `${Math.round((displayedModels.length / filteredModels.length) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="clm-pct">
+                    {Math.round((displayedModels.length / filteredModels.length) * 100)}%
+                  </span>
+                </div>
+
+                <div className="clm-actions-row">
+                  {hasMore ? (
+                    <>
+                      <button
+                        type="button"
+                        className="clm-btn-primary"
+                        onClick={() => setVisibleCount((prev) => Math.min(prev + 6, filteredModels.length))}
+                        aria-label={`Tampilkan 6 model berikutnya, tersisa ${filteredModels.length - displayedModels.length} model`}
+                      >
+                        <span>Tampilkan Lebih Banyak (+{Math.min(6, filteredModels.length - displayedModels.length)})</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="clm-btn-secondary"
+                        onClick={() => setVisibleCount(filteredModels.length)}
+                        aria-label={`Tampilkan seluruh ${filteredModels.length} model`}
+                      >
+                        <span>Tampilkan Semua ({filteredModels.length})</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <line x1="7" y1="17" x2="17" y2="7" />
+                          <polyline points="7 7 17 7 17 17" />
+                        </svg>
+                      </button>
+                    </>
+                  ) : null}
+
+                  {isExpanded && (
+                    <button
+                      type="button"
+                      className="clm-btn-collapse"
+                      onClick={() => {
+                        setVisibleCount(INITIAL_CATALOG_LIMIT);
+                        const gridEl = document.getElementById("model-grid");
+                        if (gridEl) {
+                          gridEl.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                      }}
+                      aria-label="Tampilkan lebih sedikit model (kembali ke tampilan ringkas)"
+                    >
+                      <span>Tampilkan Lebih Sedikit</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="18 15 12 9 6 15" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Catalog Suggestions Strip when only 1 or 2 models match current filter */}
             {filteredModels.length > 0 && filteredModels.length <= 2 && (

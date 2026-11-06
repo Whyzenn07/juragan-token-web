@@ -927,15 +927,15 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 /* Company Profile Master Container */
 .company-container {
-  max-width: 1280px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 20px;
   width: 100%;
 }
 
 .company-main {
   width: 100%;
-  padding: 24px 0 52px;
+  padding: 14px 0 32px;
 }
 
 /* Breadcrumb & Demo Pill */
@@ -962,14 +962,14 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 /* 4. Iconic Hero Section */
 .hero {
-  border-radius: 16px;
-  min-height: 380px;
+  border-radius: 14px;
+  min-height: 300px;
   background: linear-gradient(135deg, #f0f6fd 0%, #e1effe 50%, #ebf3fd 100%);
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
-  padding: 42px 48px;
+  padding: 26px 30px;
   isolation: isolate;
   border: 1px solid #d4e3f5;
   box-shadow: 0 10px 30px -10px rgba(10, 88, 202, 0.08), 0 1px 3px rgba(10, 37, 64, 0.04);
@@ -1616,8 +1616,8 @@ main {
 /* 6. Catalog Section */
 .catalog, #panduan-setup, #faq, #katalog-retail { scroll-margin-top: 96px; }
 .catalog {
-  padding-top: 36px;
-  padding-bottom: 60px;
+  padding-top: 16px;
+  padding-bottom: 24px;
 }
 
 /* ------------------------------------------------------------- */
@@ -1630,10 +1630,10 @@ main {
   position: relative;
   background: linear-gradient(135deg, #f0f7ff 0%, #eaf4fd 55%, #e2effc 100%);
   border: 1px solid rgba(186, 216, 248, 0.9);
-  border-radius: 22px;
-  padding: 36px 42px;
-  margin-top: 32px;
-  margin-bottom: 28px;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-top: 16px;
+  margin-bottom: 14px;
   box-shadow: 
     0 1px 3px rgba(15, 23, 42, 0.03),
     0 14px 34px -6px rgba(10, 88, 202, 0.08),
@@ -1641,7 +1641,7 @@ main {
   overflow: hidden;
   display: grid;
   grid-template-columns: 1.18fr 0.82fr;
-  gap: 36px;
+  gap: 20px;
   align-items: center;
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
@@ -1912,14 +1912,14 @@ main {
 .catalog-toolbar-panel {
   background: #ffffff;
   border: 1px solid #dce6f2;
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: 0 4px 18px -2px rgba(10, 88, 202, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
-  padding: 16px 20px;
-  margin-top: 24px;
-  margin-bottom: 20px;
+  padding: 12px 16px;
+  margin-top: 14px;
+  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 /* Top Row: Search + Select Controls */
@@ -2243,7 +2243,7 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   font-weight: 500;
   flex-wrap: wrap;
   gap: 8px;
@@ -2253,31 +2253,26 @@ main {
 .model-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 12px;
   align-items: stretch;
   width: 100%;
 }
 
 /* Adaptive Fit: Centers and resizes gracefully when 1, 2, or 4 cards are shown */
 .model-grid[data-count="1"] {
-  grid-template-columns: minmax(320px, 520px);
-  justify-content: center;
-  max-width: 600px;
-  margin: 0 auto;
+  grid-template-columns: minmax(320px, 460px);
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .model-grid[data-count="2"] {
-  grid-template-columns: repeat(2, minmax(300px, 480px));
-  justify-content: center;
-  max-width: 1000px;
-  margin: 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
 }
 
 .model-grid[data-count="4"] {
-  grid-template-columns: repeat(2, minmax(300px, 480px));
-  justify-content: center;
-  max-width: 1000px;
-  margin: 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
 }
 
 /* Intelligent Layout: If a lone orphan card ever lands at the end of a 3-column row, center it cleanly in column 2 */
@@ -2495,7 +2490,7 @@ main {
   border: 1px solid #d7e4f1;
   border-radius: 14px;
   background: #ffffff;
-  padding: 20px 20px 18px;
+  padding: 15px 15px 13px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -3170,8 +3165,8 @@ main {
 /* 10. Setup Guides */
 .setup-guides-section {
   border-top: 1px solid var(--line);
-  padding-top: 36px;
-  margin-top: 40px;
+  padding-top: 22px;
+  margin-top: 24px;
 }
 .setup-header { margin-bottom: 24px; }
 .setup-header h2 { font-size: 24px; letter-spacing: -.7px; color: var(--ink); }
@@ -3303,9 +3298,9 @@ main {
 
 /* 11. FAQ Section */
 .faq-section {
-  padding: 60px 0 40px;
+  padding: 24px 0 16px;
   border-top: 1px solid var(--line);
-  margin-top: 50px;
+  margin-top: 24px;
 }
 .faq-section .section-kicker {
   margin-bottom: 6px;
@@ -7737,16 +7732,16 @@ footer {
   width: 100%;
   border-top: 1px solid #e2e8f0;
   background: #ffffff;
-  padding: 64px 0 36px;
-  margin-top: 80px;
+  padding: 36px 0 20px;
+  margin-top: 32px;
   font-size: 13.5px;
   color: #64748b;
 }
 
 .spf-container {
-  max-width: 1380px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 20px;
 }
 
 .spf-main-grid {
@@ -9062,4 +9057,130 @@ footer {
   .csb-btn-kembali {
     padding: 11px 18px;
   }
+}
+
+/* ========================================================================= */
+/* E-Commerce Catalog Load More / Pagination Controls                         */
+/* ========================================================================= */
+.catalog-load-more-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  padding: 16px 20px;
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(10, 88, 202, 0.04);
+}
+
+.clm-status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.clm-text {
+  font-size: 12px;
+  color: #475569;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.clm-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.clm-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0a58ca, #3b82f6);
+  border-radius: 999px;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.clm-pct {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0a58ca;
+  font-family: monospace;
+}
+
+.clm-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.clm-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a58ca;
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(10, 88, 202, 0.2);
+  transition: all 0.15s ease;
+}
+
+.clm-btn-primary:hover {
+  background: #084298;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.3);
+}
+
+.clm-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #0a58ca;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clm-btn-secondary:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.clm-btn-collapse {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clm-btn-collapse:hover {
+  background: #f1f5f9;
+  color: #0f172a;
 }
