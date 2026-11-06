@@ -376,16 +376,19 @@ export default function Home() {
 
       {/* 1. Top Announcement */}
       <div className="announcement">
-        <span>✧</span>
+        <div className="announcement-container">
+          <span>✧</span>
         <span>Ide besar layak mendapatkan akses AI terbaik. Mulai Rp 15.000 tanpa kartu kredit.</span>
         <button type="button" className="announcement-link" onClick={scrollToCatalog}>
           Kenali Juragan Token ↗
         </button>
+        </div>
       </div>
 
       {/* 2. Site Header (Sesuai ai-vouchers tapi Biru + Putih) */}
       <header className={`header ${isScrolled ? "scrolled" : ""}`}>
-        <a className="brand" href="#top" aria-label="Juragan Token Beranda">
+        <div className="header-container">
+          <a className="brand" href="#top" aria-label="Juragan Token Beranda">
           <span className="brand-mark" aria-hidden="true">
             <BrandMark />
           </span>
@@ -491,6 +494,7 @@ export default function Home() {
           >
             <Icon name={mobileMenuOpen ? "close" : "menu"} />
           </button>
+        </div>
         </div>
       </header>
 

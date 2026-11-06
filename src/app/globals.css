@@ -50,16 +50,22 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 /* 1. Announcement Bar */
 .announcement {
+  background: #0a58ca;
+  color: #ffffff;
   height: 38px;
-  background: #0a2540;
-  color: #eaf2fb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 11.5px;
   letter-spacing: .15px;
-  padding: 0 1rem;
+  font-size: 12px;
+  width: 100%;
+}
+.announcement-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
   text-align: center;
 }
 .announcement > span:first-child {
@@ -79,16 +85,23 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 .header {
   height: 76px;
   border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  padding: 0 max(24px, calc((100% - 1060px) / 2 + 24px));
-  gap: 36px;
   background: #ffffff !important;
   position: sticky;
   top: 0;
   z-index: 50;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  width: 100%;
+}
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
 }
 .brand {
   display: flex;
@@ -927,7 +940,7 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 /* Company Profile Master Container */
 .company-container {
-  max-width: 1060px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
   width: 100%;
@@ -935,7 +948,7 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 .company-main {
   width: 100%;
-  padding: 20px 0 44px;
+  padding: 20px 0 48px;
 }
 
 /* Breadcrumb & Demo Pill */
@@ -963,13 +976,13 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 /* 4. Iconic Hero Section */
 .hero {
   border-radius: 16px;
-  min-height: 330px;
+  min-height: 350px;
   background: linear-gradient(135deg, #f0f6fd 0%, #e1effe 50%, #ebf3fd 100%);
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
-  padding: 30px 34px;
+  padding: 38px 44px;
   isolation: isolate;
   border: 1px solid #d4e3f5;
   box-shadow: 0 10px 30px -10px rgba(10, 88, 202, 0.08), 0 1px 3px rgba(10, 37, 64, 0.04);
@@ -1631,7 +1644,7 @@ main {
   background: linear-gradient(135deg, #f0f7ff 0%, #eaf4fd 55%, #e2effc 100%);
   border: 1px solid rgba(186, 216, 248, 0.9);
   border-radius: 18px;
-  padding: 24px 28px;
+  padding: 28px 34px;
   margin-top: 24px;
   margin-bottom: 22px;
   box-shadow: 
@@ -2253,7 +2266,7 @@ main {
 .model-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
   align-items: stretch;
   width: 100%;
 }
@@ -5773,7 +5786,25 @@ footer {
 }
 
 @media (max-width: 640px) {
-  .announcement { font-size: 10px; height: 34px; padding: 0 10px; }
+  .announcement {
+  background: #0a58ca;
+  color: #ffffff;
+  height: 38px;
+  letter-spacing: .15px;
+  font-size: 12px;
+  width: 100%;
+}
+.announcement-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
   .announcement-link { font-size: 10px; }
   .header { height: 68px; padding: 0 16px; }
   .brand { font-size: 20px; }
@@ -7739,9 +7770,10 @@ footer {
 }
 
 .spf-container {
-  max-width: 1060px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
+  width: 100%;
 }
 
 .spf-main-grid {
@@ -7870,9 +7902,10 @@ footer {
     padding: 44px 0 28px;
   }
   .spf-container {
-  max-width: 1060px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
+  width: 100%;
 }
   .spf-main-grid {
     grid-template-columns: 1fr;
@@ -9185,4 +9218,24 @@ footer {
 .clm-btn-collapse:hover {
   background: #f1f5f9;
   color: #0f172a;
+}
+
+@media (max-width: 1240px) {
+  .header-container,
+  .announcement-container,
+  .company-container,
+  .spf-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container,
+  .announcement-container,
+  .company-container,
+  .spf-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
