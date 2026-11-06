@@ -321,8 +321,8 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
   height: 6.5px !important;
   border-radius: 50% !important;
   background: #10b981 !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3) !important;
-  animation: pulseLive 2s infinite !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25) !important;
+  animation: none !important;
 }
 
 .gcm-rate-hero-row {
@@ -1622,145 +1622,272 @@ main {
 }
 
 /* ------------------------------------------------------------- */
-/* Catalog Header Card (Executive Corporate SaaS Banner) */
-/* ------------------------------------------------------------- */
-.catalog-header-card {
+/* ============================================================= */
+/* Executive Banner Header Cards (Catalog & Retail Multi-AI)     */
+/* Anti-Slop, High-Contrast Modern SaaS Executive Styling        */
+/* ============================================================= */
+
+.catalog-header-card,
+.retail-header-card {
   position: relative !important;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
-  border: 1px solid #dce6f2 !important;
-  border-radius: 18px !important;
-  padding: 38px 44px !important;
-  margin-top: 44px !important;
-  margin-bottom: 38px !important;
-  box-shadow: 0 4px 20px -2px rgba(10, 88, 202, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  background: #ffffff !important;
+  background-image: 
+    radial-gradient(ellipse 70% 80% at 95% 15%, rgba(10, 88, 202, 0.055) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 5% 90%, rgba(2, 132, 199, 0.04) 0%, transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 65%, #f1f6fd 100%) !important;
+  border: 1px solid rgba(195, 214, 237, 0.9) !important;
+  border-radius: 20px !important;
+  padding: 42px 48px !important;
+  margin-top: 40px !important;
+  margin-bottom: 36px !important;
+  box-shadow: 
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 12px 36px -4px rgba(10, 88, 202, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
   overflow: hidden !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
 }
 
-.catalog-header-card:hover {
-  border-color: #bad8f8 !important;
-  box-shadow: 0 10px 28px -4px rgba(10, 88, 202, 0.1) !important;
+.catalog-header-card:hover,
+.retail-header-card:hover {
+  border-color: #93c5fd !important;
+  box-shadow: 
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 16px 44px -6px rgba(10, 88, 202, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
 }
 
-.catalog-kicker-group {
+/* Top Accent Gradient Border */
+.ebc-top-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #0a58ca 0%, #0284c7 48%, #38bdf8 100%);
+  border-radius: 20px 20px 0 0;
+  z-index: 2;
+}
+
+/* Kicker Row */
+.catalog-kicker-group,
+.retail-kicker-group {
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
   flex-wrap: wrap !important;
-  margin-bottom: 18px !important;
+  margin-bottom: 20px !important;
+  position: relative !important;
+  z-index: 2 !important;
 }
 
-.chc-kicker-pill {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  background: #eff6ff !important;
-  border: 1px solid #bfdbfe !important;
-  color: #1d4ed8 !important;
-  padding: 5px 13px !important;
-  border-radius: 9999px !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-  font-family: var(--font-h) !important;
-}
-
-.chc-status-pill {
+/* Pill 1: Context Kicker (Clean Static SVG, NO emoji/cartoon) */
+.chc-kicker-pill,
+.rhc-kicker-pill {
   display: inline-flex !important;
   align-items: center !important;
   gap: 7px !important;
+  background: #edf5ff !important;
+  border: 1px solid #bfdbfe !important;
+  color: #0a58ca !important;
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  font-family: var(--font-h) !important;
+  box-shadow: 0 1px 2px rgba(10, 88, 202, 0.05) !important;
+}
+
+/* Pill 2: Status Pill with Static Solid Green Dot (ZERO ANIMATION) */
+.chc-status-pill,
+.rhc-status-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
   background: #f0fdf4 !important;
   border: 1px solid #bbf7d0 !important;
   color: #15803d !important;
-  padding: 5px 13px !important;
+  padding: 6px 14px !important;
   border-radius: 9999px !important;
   font-size: 11.5px !important;
   font-weight: 650 !important;
-  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.06) !important;
+  font-family: var(--font-h) !important;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.05) !important;
 }
 
-.chc-badge-pill {
+/* 100% Static Crisp Dot - Zero Pulsation, Zero Animation */
+.ebc-solid-dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #10b981 !important;
+  box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.22) !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  animation: none !important;
+}
+
+/* Pill 3: Enterprise Assurance */
+.chc-badge-pill,
+.rhc-badge-pill {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 7px !important;
   background: #f8fafc !important;
   border: 1px solid #e2e8f0 !important;
   color: #475569 !important;
-  padding: 5px 13px !important;
+  padding: 6px 14px !important;
   border-radius: 9999px !important;
   font-size: 11.5px !important;
   font-weight: 600 !important;
+  font-family: var(--font-h) !important;
 }
 
-.catalog-hero-title {
+/* Main Headlines */
+.catalog-hero-title,
+.retail-hero-title {
   position: relative !important;
-  z-index: 1 !important;
-  font-size: 30px !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.03em !important;
-  line-height: 1.25 !important;
+  z-index: 2 !important;
+  font-size: 32px !important;
+  font-weight: 850 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.22 !important;
   color: #0a2540 !important;
   font-family: var(--font-h) !important;
-  margin: 0 0 12px 0 !important;
+  margin: 0 0 14px 0 !important;
 }
 
-.catalog-hero-subtitle {
+.hero-gradient-text {
+  color: #0a58ca !important;
+  background: linear-gradient(135deg, #0a58ca 0%, #0284c7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+
+/* Subtitles */
+.catalog-hero-subtitle,
+.retail-hero-subtitle {
   position: relative !important;
-  z-index: 1 !important;
+  z-index: 2 !important;
   font-size: 14.5px !important;
-  line-height: 1.65 !important;
+  line-height: 1.7 !important;
   color: #475569 !important;
-  max-width: 860px !important;
-  margin: 0 0 24px 0 !important;
+  max-width: 880px !important;
+  margin: 0 0 26px 0 !important;
 }
 
-.catalog-hero-features {
+.catalog-hero-subtitle strong,
+.catalog-hero-subtitle b,
+.retail-hero-subtitle strong,
+.retail-hero-subtitle b {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+/* Feature Guarantee Strip (4-Item Grid) */
+.ebc-features-strip {
   position: relative !important;
-  z-index: 1 !important;
+  z-index: 2 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 14px !important;
+  padding-top: 22px !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.95) !important;
+}
+
+.ebc-feature-item {
   display: flex !important;
   align-items: center !important;
-  gap: 28px !important;
-  padding-top: 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  flex-wrap: wrap !important;
-}
-
-.chf-item {
-  display: inline-flex !important;
-  align-items: center !important;
   gap: 10px !important;
-  font-size: 13px !important;
+  padding: 10px 14px !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(226, 232, 240, 0.85) !important;
+  border-radius: 11px !important;
+  font-size: 12.5px !important;
   font-weight: 600 !important;
   color: #1e293b !important;
-  transition: transform 0.15s ease !important;
+  line-height: 1.4 !important;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease !important;
 }
 
-.chf-item:hover {
-  transform: translateY(-1px) !important;
+.ebc-feature-item:hover {
+  transform: translateY(-1.5px) !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.ebc-feature-icon {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 7px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.ebc-feature-icon.icon-blue {
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  color: #0a58ca !important;
+}
+
+.ebc-feature-icon.icon-green {
+  background: #f0fdf4 !important;
+  border: 1px solid #bbf7d0 !important;
+  color: #16a34a !important;
+}
+
+.ebc-feature-icon.icon-purple {
+  background: #faf5ff !important;
+  border: 1px solid #e9d5ff !important;
+  color: #7e22ce !important;
+}
+
+.ebc-feature-icon.icon-amber {
+  background: #fffbeb !important;
+  border: 1px solid #fde68a !important;
+  color: #d97706 !important;
+}
+
+@media (max-width: 1024px) {
+  .ebc-features-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
 @media (max-width: 768px) {
-  .catalog-header-card {
-    padding: 26px 20px;
-    margin-top: 24px;
-    margin-bottom: 24px;
-    border-radius: 14px;
+  .catalog-header-card,
+  .retail-header-card {
+    padding: 26px 20px !important;
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+    border-radius: 16px !important;
   }
-  .catalog-hero-title {
-    font-size: 24px;
-    letter-spacing: -0.025em;
+  .catalog-hero-title,
+  .retail-hero-title {
+    font-size: 24px !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.25 !important;
   }
-  .catalog-hero-subtitle {
-    font-size: 13px;
-    line-height: 1.55;
-    margin-bottom: 16px;
+  .catalog-hero-subtitle,
+  .retail-hero-subtitle {
+    font-size: 13.5px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 18px !important;
   }
-  .catalog-hero-features {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding-top: 14px;
+  .ebc-features-strip {
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+    padding-top: 16px !important;
+  }
+  .ebc-feature-item {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
   }
 }
 
@@ -4263,8 +4390,8 @@ footer {
   height: 8px;
   border-radius: 50%;
   background: #f59e0b;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
-  animation: itcPulse 1.8s infinite;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+  animation: none !important;
 }
 
 @keyframes itcPulse {
@@ -5598,8 +5725,8 @@ footer {
   background: #10b981;
   position: relative;
   display: inline-block;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  animation: livePulseRing 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.25);
+  animation: none !important;
   flex-shrink: 0;
 }
 @keyframes livePulseRing {
@@ -5740,14 +5867,14 @@ footer {
 }
 
 .gsp-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.25);
   flex-shrink: 0;
   display: inline-block;
-  animation: pulseLive 2s infinite;
+  animation: none !important;
 }
 
 @keyframes pulseLive {
@@ -7368,8 +7495,8 @@ footer {
   height: 8px;
   background: #16a34a;
   border-radius: 50%;
-  box-shadow: 0 0 0 rgba(22, 163, 74, 0.4);
-  animation: pulseGreen 1.8s infinite;
+  box-shadow: 0 0 0 2.5px rgba(22, 163, 74, 0.25);
+  animation: none !important;
 }
 @keyframes pulseGreen {
   0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.6); }

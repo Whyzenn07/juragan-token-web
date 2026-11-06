@@ -55,13 +55,28 @@ export function Icon({
   );
 }
 
-// Tiga balok miring: jalur kredit bertingkat. Kandidat logo, menunggu persetujuan pemilik.
+// Official Juragan Token Brand Mark (Static, Crisp, Corporate Fintech Emblem)
 export function BrandMark({ className = "brand-mark" }: { className?: string }) {
   return (
-    <svg className={className} aria-hidden="true" viewBox="0 0 40 32" fill="none">
-      <path d="M2 28 14 4h8L10 28H2Z" fill="currentColor" />
-      <path d="M15 28 27 4h8L23 28h-8Z" fill="currentColor" opacity=".68" />
-      <path d="M28 28 36 12h2L30 28h-2Z" fill="currentColor" opacity=".36" />
+    <svg className={className} aria-hidden="true" viewBox="0 0 36 28" fill="none">
+      <defs>
+        <linearGradient id="jtBrandGrad" x1="2" y1="2" x2="34" y2="26" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#0a58ca" />
+          <stop offset="1" stopColor="#0284c7" />
+        </linearGradient>
+      </defs>
+      <rect x="1" y="1" width="34" height="26" rx="6" fill="url(#jtBrandGrad)" />
+      <path
+        d="M10 8h10a2 2 0 0 1 2 2v1.5H12a1.5 1.5 0 0 0-1.5 1.5V17a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2z"
+        fill="#ffffff"
+        opacity="0.95"
+      />
+      <path
+        d="M26 20H16a2 2 0 0 1-2-2v-1.5h10a1.5 1.5 0 0 0 1.5-1.5V11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2z"
+        fill="#ffffff"
+        opacity="0.75"
+      />
+      <circle cx="18" cy="14" r="2.2" fill="#38bdf8" />
     </svg>
   );
 }
