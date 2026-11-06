@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   BrandMark,
+  CurrencyRateModal,
   Icon,
   ModelDetailModal,
   ProviderLogo,
@@ -132,7 +133,6 @@ export default function Home() {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const catalogRef = useRef<HTMLElement>(null);
-  const currencyPopoverRef = useRef<HTMLDivElement>(null);
 
   const NAV_ITEMS = [
     { id: "catalog", label: "Jelajahi Token", href: "#catalog" },
@@ -225,27 +225,6 @@ export default function Home() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  // Close currency popover when clicking outside or pressing Escape
-  useEffect(() => {
-    if (!currencyModalOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (currencyPopoverRef.current && !currencyPopoverRef.current.contains(e.target as Node)) {
-        setCurrencyModalOpen(false);
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setCurrencyModalOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [currencyModalOpen]);
 
   const toggleSave = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -395,85 +374,24 @@ export default function Home() {
         </nav>
 
         <div className="header-right">
-          {/* Interactive Indonesia (IDR) & Real-Time BI Rate Popover */}
-          <div className="currency-nav-wrap" ref={currencyPopoverRef}>
-            <button
-              type="button"
-              className={`region-indicator interactive ${currencyModalOpen ? "active" : ""}`}
-              onClick={() => setCurrencyModalOpen(!currencyModalOpen)}
-              aria-expanded={currencyModalOpen}
-              title="Klik untuk melihat & menyegarkan kurs USD/IDR Bank Indonesia secara real-time"
-            >
-              <span className="flag-badge-svg" aria-hidden="true">
-                <svg width="18" height="12" viewBox="0 0 18 12" fill="none" style={{ borderRadius: "2px", overflow: "hidden", display: "block" }}>
-                  <rect width="18" height="6" fill="#e11d48" />
-                  <rect y="6" width="18" height="6" fill="#ffffff" />
-                  <rect width="18" height="12" stroke="#cbd5e1" strokeWidth="0.5" rx="1" />
-                </svg>
-              </span>
-              <span>Indonesia (IDR)</span>
-              <span className="currency-chevron" aria-hidden="true">{currencyModalOpen ? "▲" : "▼"}</span>
-            </button>
-
-            {currencyModalOpen && (
-              <div className="currency-popover-card" role="dialog" aria-label="Kurs Real-Time Bank Indonesia">
-                <div className="cpc-header">
-                  <div className="cpc-title-row">
-                    <span className="cpc-flag">🇮🇩</span>
-                    <div>
-                      <strong>Kurs Real-Time BI &amp; Pasar</strong>
-                      <span className="cpc-sub">Bank Indonesia (JISDOR) &amp; Live Forex</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="cpc-close-btn"
-                    onClick={() => setCurrencyModalOpen(false)}
-                    aria-label="Tutup popover kurs"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <div className="cpc-rate-box">
-                  <span className="cpc-rate-label">KURS AKTIF SAAT INI</span>
-                  <div className="cpc-rate-display">
-                    <span className="cpc-usd">1 USD =</span>
-                    <strong className="cpc-idr">Rp {formatNum(usdRate)}</strong>
-                  </div>
-                  <div className="cpc-rate-meta">
-                    <span className="cpc-status-pill">
-                      <span className="cpc-dot" /> Live ({models.length} Model Aktif)
-                    </span>
-                    <span className="cpc-source">Live BI / JISDOR</span>
-                  </div>
-                </div>
-
-                <p className="cpc-explanation">
-                  Semua harga kredit token di Juragan Token dikonversi langsung dari tarif USD gateway resmi ke Rupiah (IDR) secara transparan mengikuti kurs resmi Bank Indonesia tanpa markup tersembunyi.
-                </p>
-
-                {syncNotification && (
-                  <div className="cpc-success-toast">
-                    <Icon name="check" size={14} />
-                    <span>{syncNotification}</span>
-                  </div>
-                )}
-
-                <div className="cpc-action-row">
-                  <button
-                    type="button"
-                    className={`cpc-refresh-btn ${isSyncing ? "syncing" : ""}`}
-                    onClick={handleSyncPricing}
-                    disabled={isSyncing}
-                  >
-                    <span className={`cpc-icon ${isSyncing ? "spin" : ""}`}>↻</span>
-                    <span>{isSyncing ? "Menyinkronkan Kurs..." : "Segarkan Kurs BI & Harga Sekarang"}</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Interactive Indonesia (IDR) Trigger -> Opens Bank Indonesia Live Rate Modal */}
+          <button
+            type="button"
+            className="region-indicator interactive"
+            onClick={() => setCurrencyModalOpen(true)}
+            title="Klik untuk melihat kurs real-time Bank Indonesia (BI) & segarkan harga"
+            aria-label="Lihat Kurs Real-Time Bank Indonesia"
+          >
+            <span className="flag-badge-svg" aria-hidden="true">
+              <svg width="18" height="12" viewBox="0 0 18 12" fill="none" style={{ borderRadius: "2px", overflow: "hidden", display: "block" }}>
+                <rect width="18" height="6" fill="#e11d48" />
+                <rect y="6" width="18" height="6" fill="#ffffff" />
+                <rect width="18" height="12" stroke="#cbd5e1" strokeWidth="0.5" rx="1" />
+              </svg>
+            </span>
+            <span>Indonesia (IDR)</span>
+            <span className="currency-pill-badge" aria-hidden="true">BI Live</span>
+          </button>
           <span className="header-divider" />
           <Link href="/docs" className="header-docs-link">
             <span>Dokumentasi API</span>
@@ -539,6 +457,23 @@ export default function Home() {
             <a href="#faq" onClick={() => setMobileMenuOpen(false)}>
               Bantuan &amp; FAQ
             </a>
+            <button
+              type="button"
+              className="mobile-currency-btn"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setCurrencyModalOpen(true);
+              }}
+            >
+              <span className="flag-badge-svg" aria-hidden="true">
+                <svg width="16" height="11" viewBox="0 0 18 12" fill="none">
+                  <rect width="18" height="6" fill="#e11d48" />
+                  <rect y="6" width="18" height="6" fill="#ffffff" />
+                  <rect width="18" height="12" stroke="#cbd5e1" strokeWidth="0.5" rx="1" />
+                </svg>
+              </span>
+              <span>Kurs Real-Time BI (Rp {formatNum(usdRate)}) ↗</span>
+            </button>
           </nav>
           <div className="mobile-drawer-footer">
             <button
@@ -1386,6 +1321,18 @@ export default function Home() {
           setSelectedPackage(retailPackages[1]);
           setSingaPayOpen(true);
         }}
+      />
+
+      {/* Bank Indonesia Real-Time Currency Rate Modal */}
+      <CurrencyRateModal
+        open={currencyModalOpen}
+        onClose={() => setCurrencyModalOpen(false)}
+        usdRate={usdRate}
+        totalModels={models.length}
+        syncStatus={syncStatus}
+        isSyncing={isSyncing}
+        syncNotification={syncNotification}
+        onSyncPricing={handleSyncPricing}
       />
     </div>
   );

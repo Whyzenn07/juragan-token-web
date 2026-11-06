@@ -212,235 +212,302 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
   color: #0284c7;
 }
 
-/* Currency Popover Card (BI & Live Forex Real-Time Sync) */
-.currency-popover-card {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: 360px;
-  background: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #dbeafe;
-  box-shadow: 0 16px 40px -8px rgba(10, 37, 64, 0.16), 0 0 0 1px rgba(10, 88, 202, 0.06);
-  padding: 18px 20px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: left;
-}
-
-@keyframes popoverFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.cpc-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.cpc-title-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.cpc-flag {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.cpc-title-row strong {
-  display: block;
-  font-size: 13.5px;
+.currency-pill-badge {
+  font-size: 9.5px;
   font-weight: 800;
-  color: #0f172a;
-  font-family: var(--font-h);
-}
-
-.cpc-sub {
-  display: block;
-  font-size: 11px;
-  color: #64748b;
-  margin-top: 1px;
-}
-
-.cpc-close-btn {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 4px 6px;
+  letter-spacing: 0.4px;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 1px 6px;
   border-radius: 4px;
-  transition: all 0.15s ease;
-  line-height: 1;
+  margin-left: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
 }
 
-.cpc-close-btn:hover {
-  background: #f1f5f9;
-  color: #0f172a;
+.region-indicator.interactive:hover .currency-pill-badge {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
 }
 
-.cpc-rate-box {
-  background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
-  border: 1px solid #cfe0f5;
-  border-radius: 10px;
-  padding: 14px 16px;
+/* ------------------------------------------------------------- */
+/* Currency Rate Modal (Bank Indonesia Real-time Live Forex)     */
+/* ------------------------------------------------------------- */
+.currency-rate-modal {
+  width: 540px;
+  max-width: calc(100% - 24px);
+  padding: 24px;
+}
+
+.crm-header {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-right: 44px;
+}
+
+.crm-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  color: #0284c7;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid #bae6fd;
+}
+
+.crm-header-text {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-.cpc-rate-label {
+.crm-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.crm-flag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.6px;
-  color: #0369a1;
-  text-transform: uppercase;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
-.cpc-rate-display {
+.crm-bi-pill {
+  font-size: 10px;
+  font-weight: 800;
+  color: #0284c7;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.crm-header-text h3 {
+  font-size: 18px;
+  color: var(--ink);
+  font-weight: 800;
+  margin: 0;
+}
+
+.crm-header-text p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Rate Hero Card */
+.crm-rate-hero {
+  background: linear-gradient(135deg, #0a2540 0%, #06326b 100%);
+  border-radius: 12px;
+  padding: 20px 22px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 10px 24px -6px rgba(10, 37, 64, 0.25);
+  border: 1px solid #1e3a5f;
+}
+
+.crm-rate-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.crm-rate-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #93c5fd;
+  text-transform: uppercase;
+  font-family: var(--font-h);
+}
+
+.crm-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #6ee7b7;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.crm-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.4);
+  animation: pulseLive 2s infinite;
+}
+
+.crm-rate-val-row {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 10px;
 }
 
-.cpc-usd {
-  font-size: 13px;
-  color: #64748b;
+.crm-usd-base {
+  font-size: 16px;
+  color: #94a3b8;
   font-weight: 600;
 }
 
-.cpc-idr {
-  font-size: 20px;
+.crm-idr-val {
+  font-size: 28px;
+  color: #ffffff;
   font-weight: 900;
-  color: #0f172a;
   letter-spacing: -0.5px;
   font-family: var(--font-mono);
 }
 
-.cpc-rate-meta {
+.crm-rate-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px dashed #dbeafe;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 11px;
+  color: #cbd5e1;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.cpc-status-pill {
+.crm-footer-item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #047857;
+}
+
+.crm-footer-item b {
+  color: #ffffff;
+}
+
+/* Transparency Cards */
+.crm-transparency-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.crm-trans-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.crm-tc-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.crm-tc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.crm-tc-body strong {
+  font-size: 12.5px;
+  color: #0f172a;
   font-weight: 700;
 }
 
-.cpc-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
-  animation: pulseLive 2s infinite;
-}
-
-.cpc-source {
-  color: #64748b;
-  font-weight: 600;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  padding: 1px 7px;
-  border-radius: 4px;
-  font-size: 10.5px;
-}
-
-.cpc-explanation {
+.crm-tc-body p {
   font-size: 11.5px;
   color: #64748b;
-  line-height: 1.5;
+  line-height: 1.4;
   margin: 0;
 }
 
-.cpc-success-toast {
+/* Success Toast */
+.crm-success-toast {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: #ecfdf5;
   border: 1px solid #86efac;
   color: #065f46;
-  padding: 9px 12px;
-  border-radius: 8px;
-  font-size: 11.5px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 650;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
   animation: fadeInDown 0.25s ease;
 }
 
-.cpc-action-row {
+/* Actions */
+.crm-actions {
   display: flex;
-  margin-top: 2px;
-}
-
-.cpc-refresh-btn {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   gap: 8px;
-  background: #0a58ca;
-  color: #ffffff;
-  border: 1px solid #0a58ca;
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(10, 88, 202, 0.18);
-  font-family: inherit;
 }
 
-.cpc-refresh-btn:hover:not(:disabled) {
-  background: #084298;
-  border-color: #084298;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.26);
-}
-
-.cpc-refresh-btn:disabled {
-  opacity: 0.75;
-  cursor: not-allowed;
-}
-
-.cpc-icon {
-  font-size: 14px;
+.crm-spin-icon {
+  font-size: 16px;
   line-height: 1;
+  display: inline-block;
 }
 
-.cpc-icon.spin {
-  display: inline-block;
+.crm-spin-icon.spinning {
   animation: spinSync 0.8s linear infinite;
 }
 
-@media (max-width: 640px) {
-  .currency-popover-card {
-    width: min(340px, calc(100vw - 32px));
-    right: -50px;
-    padding: 14px 16px;
-  }
+.crm-dismiss-btn {
+  width: 100%;
+  text-align: center;
+  padding: 8px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.mobile-currency-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  color: #0369a1;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
 }
 
 .flag-badge-svg {

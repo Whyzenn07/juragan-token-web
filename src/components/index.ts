@@ -9,6 +9,7 @@ export * from "./modals/Dialog";
 export * from "./modals/ModelDetailModal";
 export * from "./modals/SingaPayModal";
 export * from "./modals/TokenBalanceModal";
+export * from "./modals/CurrencyRateModal";
 
 // Sections
 export * from "./sections/SetupGuides";
