@@ -12,90 +12,52 @@ type SingaPayModalProps = {
   onClose: () => void;
 };
 
-// Vector Logos for authentic ClassAI checkout experience
+// Official authentic vector logos from idn-finlogos (Xendit / Midtrans standard)
 function PaymentLogo({ type }: { type: string }) {
-  switch (type) {
-    case "gopay":
-      return (
-        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
-          <circle cx="10" cy="10" r="8" fill="#00AED6" />
-          <circle cx="10" cy="10" r="3.5" fill="#FFFFFF" />
-          <text x="23" y="14" fill="#0F172A" fontSize="13" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif">gopay</text>
-        </svg>
-      );
-    case "dana":
-      return (
-        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
-          <circle cx="9" cy="10" r="8" fill="#118EEA" />
-          <path d="M6.5 7h3a3 3 0 0 1 0 6h-3V7z" fill="#FFFFFF" />
-          <text x="22" y="14" fill="#118EEA" fontSize="13" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.5">DANA</text>
-        </svg>
-      );
-    case "ovo":
-      return (
-        <svg width="56" height="20" viewBox="0 0 56 20" fill="none">
-          <text x="6" y="15" fill="#4C3494" fontSize="14" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="2">OVO</text>
-        </svg>
-      );
-    case "shopeepay":
-      return (
-        <svg width="78" height="20" viewBox="0 0 78 20" fill="none">
-          <rect x="2" y="3" width="14" height="14" rx="3" fill="#EE4D2D" />
-          <path d="M9 5c-1.5 0-2.5 1-2.5 2v1h5V7c0-1-1-2-2.5-2z" stroke="#FFF" strokeWidth="1.2" fill="none" />
-          <text x="20" y="14" fill="#EE4D2D" fontSize="11" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif">ShopeePay</text>
-        </svg>
-      );
-    case "bni":
-      return (
-        <svg width="64" height="20" viewBox="0 0 64 20" fill="none">
-          <rect x="1" y="2" width="16" height="16" rx="3" fill="#F15A24" />
-          <text x="4" y="14" fill="#FFF" fontSize="11" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">46</text>
-          <text x="22" y="15" fill="#005E6A" fontSize="13" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">BNI</text>
-        </svg>
-      );
-    case "bri":
-      return (
-        <svg width="56" height="20" viewBox="0 0 56 20" fill="none">
-          <rect x="2" y="2" width="52" height="16" rx="4" fill="#00529C" />
-          <text x="11" y="14" fill="#FFFFFF" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="1">BRI</text>
-        </svg>
-      );
-    case "bca":
-      return (
-        <svg width="56" height="20" viewBox="0 0 56 20" fill="none">
-          <rect x="2" y="2" width="52" height="16" rx="4" fill="#003580" />
-          <text x="9" y="14" fill="#FFFFFF" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="1">BCA</text>
-        </svg>
-      );
-    case "mandiri":
-      return (
-        <svg width="70" height="20" viewBox="0 0 70 20" fill="none">
-          <text x="3" y="14" fill="#002D62" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">mandiri</text>
-          <path d="M53 6c3 0 5 4 8 4-3 0-5-4-8-4z" fill="#FFB700" />
-        </svg>
-      );
-    case "permata":
-      return (
-        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
-          <path d="M6 10l5-6 5 6-5 6-5-6z" fill="#008444" />
-          <text x="20" y="14" fill="#008444" fontSize="11" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif">Permata</text>
-        </svg>
-      );
-    case "cimb":
-      return (
-        <svg width="68" height="20" viewBox="0 0 68 20" fill="none">
-          <rect x="2" y="3" width="14" height="14" rx="2" fill="#ED1C24" />
-          <text x="20" y="14" fill="#ED1C24" fontSize="11" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif">CIMB</text>
-        </svg>
-      );
-    default:
-      return (
-        <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F172A" }}>
-          {type.toUpperCase()}
-        </span>
-      );
+  const logoMap: Record<string, string> = {
+    gopay: "/assets/payment-logos/gopay.svg",
+    dana: "/assets/payment-logos/dana.svg",
+    ovo: "/assets/payment-logos/ovo.svg",
+    shopeepay: "/assets/payment-logos/shopeepay.svg",
+    bni: "/assets/payment-logos/bni.svg",
+    bri: "/assets/payment-logos/bri.svg",
+    bca: "/assets/payment-logos/bca.svg",
+    mandiri: "/assets/payment-logos/mandiri.svg",
+    permata: "/assets/payment-logos/permata.svg",
+    cimb: "/assets/payment-logos/cimb.svg",
+    "cimb-niaga": "/assets/payment-logos/cimb.svg",
+    bsi: "/assets/payment-logos/bsi.svg",
+    qris: "/assets/payment-logos/qris.svg",
+    gpn: "/assets/payment-logos/gpn.svg",
+  };
+
+  const src = logoMap[type.toLowerCase()];
+  if (src) {
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={src}
+        alt={type.toUpperCase()}
+        loading="eager"
+        style={{
+          maxHeight: "22px",
+          maxWidth: "64px",
+          width: "auto",
+          height: "auto",
+          objectFit: "contain",
+          display: "block",
+        }}
+      />
+    );
   }
+
+  return (
+    <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F172A" }}>
+      {type.toUpperCase()}
+    </span>
+  );
 }
+
 
 export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const [selectedMethod, setSelectedMethod] = useState("qris");

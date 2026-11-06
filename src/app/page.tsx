@@ -711,106 +711,81 @@ export default function Home() {
 
           {/* 5. Catalog Section: model riil dari gateway juragantoken.co.id */}
           <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
-            {/* 5. Catalog Section Header Card - Modern Executive Corporate Banner */}
-            <div
-              className="catalog-header-card"
-              data-reveal="scale"
-              style={{
-                position: "relative",
-                background: "#ffffff",
-                backgroundImage: "radial-gradient(ellipse 70% 80% at 95% 15%, rgba(10, 88, 202, 0.055) 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 5% 90%, rgba(2, 132, 199, 0.04) 0%, transparent 55%), linear-gradient(180deg, #ffffff 0%, #f8fbff 65%, #f1f6fd 100%)",
-                border: "1px solid rgba(195, 214, 237, 0.9)",
-                borderRadius: "20px",
-                padding: "38px 42px",
-                marginTop: "32px",
-                marginBottom: "28px",
-                boxShadow: "0 1px 2px rgba(15, 23, 42, 0.03), 0 12px 36px -4px rgba(10, 88, 202, 0.07)",
-                overflow: "hidden",
-              }}
-            >
-              {/* Top Accent Gradient Border */}
-              <div className="ebc-top-line" aria-hidden="true" style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3.5px", background: "linear-gradient(90deg, #0a58ca 0%, #0284c7 48%, #38bdf8 100%)", borderRadius: "20px 20px 0 0", zIndex: 2 }} />
+            {/* 5. Catalog Section Header Card - DPSBuddy Style */}
+            <div className="dps-banner-card" data-reveal="scale">
+              {/* Left Column: Heading & Primary Action */}
+              <div className="dps-banner-left">
+                <div className="dps-pill-header">
+                  <span className="dps-pill-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+                  </span>
+                  <span className="dps-pill-title">Katalog Frontier AI</span>
+                  <span className="dps-pill-badge green">LIVE BI RATE</span>
+                  <span className="dps-pill-sub">1 API Key Universal</span>
+                </div>
 
-              {/* Badges / Status row */}
-              <div className="catalog-kicker-group" style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "18px", position: "relative", zIndex: 2 }}>
-                <span className="chc-kicker-pill" style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "#edf5ff", border: "1px solid #bfdbfe", color: "#0a58ca", padding: "6px 14px", borderRadius: "9999px", fontSize: "11px", fontWeight: 750, letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, display: "block" }}>
-                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                  </svg>
-                  <span>Katalog Frontier AI</span>
-                </span>
+                <h2 className="dps-banner-title">
+                  Pilih model, lihat seberapa jauh{" "}
+                  <span className="hero-gradient-text">Rp10.000</span> Anda.
+                </h2>
 
-                <span className="chc-status-pill" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#15803d", padding: "6px 14px", borderRadius: "9999px", fontSize: "11.5px", fontWeight: 650 }}>
-                  <span className="ebc-solid-dot" aria-hidden="true" style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#10b981", boxShadow: "0 0 0 2.5px rgba(16, 185, 129, 0.22)", display: "inline-block", flexShrink: 0 }} />
-                  <span>{models.length} Model Gateway Terverifikasi</span>
-                </span>
+                <p className="dps-banner-desc">
+                  Satu API key untuk seluruh model terbaik dunia (Claude 3.7, GPT-4o, Gemini 2.0, DeepSeek R1). Harga dihitung langsung dari kurs resmi Bank Indonesia tanpa markup — hanya bayar token riil yang Anda gunakan.
+                </p>
 
-                <span className="chc-badge-pill" style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", padding: "6px 14px", borderRadius: "9999px", fontSize: "11.5px", fontWeight: 600 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, display: "block" }}>
-                    <path d="M21 2l-2 2m-2-2l2 2m0 0l-5 5 2 2-7 7H3v-6l7-7 2 2 5-5z" />
-                  </svg>
-                  <span>1 API Key Universal</span>
-                </span>
+                <div className="dps-action-row">
+                  <button
+                    type="button"
+                    className="dps-btn-primary"
+                    onClick={() => {
+                      searchInputRef.current?.focus();
+                      const el = document.getElementById("search");
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }}
+                  >
+                    <span>Jelajahi &amp; Cari Model</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </button>
+                  <span className="dps-meta-text">
+                    <span>Claude Code</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Cursor</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Chatbox</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Web SDK</span>
+                  </span>
+                </div>
               </div>
 
-              {/* Main Headline */}
-              <h2 className="catalog-hero-title" style={{ position: "relative", zIndex: 2, fontSize: "30px", fontWeight: 850, letterSpacing: "-0.03em", lineHeight: 1.25, color: "#0a2540", margin: "0 0 12px 0" }}>
-                Pilih model, lihat seberapa jauh{" "}
-                <span className="hero-gradient-text">Rp10.000</span> Anda
-              </h2>
-
-              {/* Subtitle */}
-              <p className="catalog-hero-subtitle" style={{ position: "relative", zIndex: 2, fontSize: "14px", lineHeight: 1.65, color: "#475569", maxWidth: "860px", margin: "0 0 22px 0" }}>
-                Satu API key untuk seluruh model terbaik dunia (<b>Claude 3.7/3.5</b>, <b>GPT-4o</b>, <b>Gemini 2.0</b>, <b>DeepSeek R1</b>).
-                Harga dihitung langsung dari tarif resmi gateway ke Rupiah secara transparan — <b>angka yang tertera adalah nilai riil yang dipotong dari saldo Anda</b>.
-              </p>
-
-              {/* Features Guarantee Bar - Enterprise SVG Icons */}
-              <div className="ebc-features-strip" style={{ position: "relative", zIndex: 2, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", paddingTop: "20px", borderTop: "1px solid rgba(226, 232, 240, 0.95)" }}>
-                {/* 1. Payment QRIS & VA */}
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-blue" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#eff6ff", border: "1px solid #bfdbfe", color: "#0a58ca", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <rect x="2" y="5" width="20" height="14" rx="2.5" />
-                      <line x1="2" y1="10" x2="22" y2="10" />
-                    </svg>
-                  </span>
-                  <span>Bayar QRIS Instan &amp; Virtual Account</span>
+              {/* Right Column: DPSBuddy Comparison Stack */}
+              <div className="dps-banner-right">
+                <div className="dps-compare-card">
+                  <div className="dps-card-kicker">
+                    <span className="dps-card-dot gray" aria-hidden="true" />
+                    <span>API GATEWAY BIASA</span>
+                  </div>
+                  <p className="dps-card-body">
+                    Tarif USD fluktuatif, kena biaya konversi bank 3–5%, dan harus deposit minimal $5–$20 terpisah di tiap provider.
+                  </p>
                 </div>
 
-                {/* 2. Bank Indonesia Live Rate */}
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-green" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4" />
-                    </svg>
-                  </span>
-                  <span>Kurs Real-Time Bank Indonesia (Tanpa Markup)</span>
-                </div>
-
-                {/* 3. Claude Code & Cursor Developer Tooling */}
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-purple" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#faf5ff", border: "1px solid #e9d5ff", color: "#7e22ce", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <polyline points="16 18 22 12 16 6" />
-                      <polyline points="8 6 2 12 8 18" />
-                    </svg>
-                  </span>
-                  <span>Kompatibel Claude Code, Cursor, Cline &amp; SDK</span>
-                </div>
-
-                {/* 4. Potongan Saldo Riil */}
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-amber" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#fffbeb", border: "1px solid #fde68a", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                      <path d="m9 12 2 2 4-4" />
-                    </svg>
-                  </span>
-                  <span>Tarif Riil 1:1 Tanpa Biaya Tersembunyi</span>
+                <div className="dps-compare-card highlight">
+                  <div className="dps-card-kicker">
+                    <span className="dps-card-dot blue" aria-hidden="true" />
+                    <span>JURAGAN TOKEN GATEWAY</span>
+                  </div>
+                  <p className="dps-card-body">
+                    Tarif Rupiah transparan. Rp 10.000 cukup untuk puluhan hingga ratusan jawaban cerdas, terpotong presisi per token tanpa deposit besar.
+                  </p>
                 </div>
               </div>
             </div>
@@ -1268,103 +1243,76 @@ export default function Home() {
 
           {/* 6. Paket Prabayar Ritel Mahasiswa Section (Pola Paket ai-vouchers) */}
           <section className="catalog" id="katalog-retail">
-            {/* Executive Retail Header Card */}
-            <div
-              className="retail-header-card"
-              data-reveal="scale"
-              style={{
-                position: "relative",
-                background: "#ffffff",
-                backgroundImage: "radial-gradient(ellipse 70% 80% at 95% 15%, rgba(10, 88, 202, 0.055) 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 5% 90%, rgba(2, 132, 199, 0.04) 0%, transparent 55%), linear-gradient(180deg, #ffffff 0%, #f8fbff 65%, #f1f6fd 100%)",
-                border: "1px solid rgba(195, 214, 237, 0.9)",
-                borderRadius: "20px",
-                padding: "38px 42px",
-                marginTop: "32px",
-                marginBottom: "28px",
-                boxShadow: "0 1px 2px rgba(15, 23, 42, 0.03), 0 12px 36px -4px rgba(10, 88, 202, 0.07)",
-                overflow: "hidden",
-              }}
-            >
-              {/* Top Accent Gradient Line */}
-              <div className="ebc-top-line" aria-hidden="true" style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3.5px", background: "linear-gradient(90deg, #0a58ca 0%, #0284c7 48%, #38bdf8 100%)", borderRadius: "20px 20px 0 0", zIndex: 2 }} />
+            {/* 6. Paket Prabayar Ritel Mahasiswa - DPSBuddy Style */}
+            <div className="dps-banner-card" data-reveal="scale">
+              {/* Left Column: Heading & Primary Action */}
+              <div className="dps-banner-left">
+                <div className="dps-pill-header">
+                  <span className="dps-pill-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    </svg>
+                  </span>
+                  <span className="dps-pill-title">Paket Ritel</span>
+                  <span className="dps-pill-badge blue">PRABAYAR</span>
+                  <span className="dps-pill-sub">Mulai Rp 15.000</span>
+                </div>
 
-              {/* Badges Row */}
-              <div className="retail-kicker-group" style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "18px", position: "relative", zIndex: 2 }}>
-                {/* Badge 1: Kicker Mahasiswa & Developer */}
-                <span className="rhc-kicker-pill" style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "#edf5ff", border: "1px solid #bfdbfe", color: "#0a58ca", padding: "6px 14px", borderRadius: "9999px", fontSize: "11px", fontWeight: 750, letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, display: "block" }}>
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                  </svg>
-                  <span>Paket Pilihan Mahasiswa &amp; Developer</span>
-                </span>
+                <h2 className="dps-banner-title">
+                  Satu saldo prabayar,{" "}
+                  <span className="hero-gradient-text">bebas semua AI</span>.
+                </h2>
 
-                {/* Badge 2: Harga Mulai */}
-                <span className="rhc-status-pill" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#15803d", padding: "6px 14px", borderRadius: "9999px", fontSize: "11.5px", fontWeight: 650 }}>
-                  <span className="ebc-solid-dot" aria-hidden="true" style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#10b981", boxShadow: "0 0 0 2.5px rgba(16, 185, 129, 0.22)", display: "inline-block", flexShrink: 0 }} />
-                  <span>Mulai Rp 15.000</span>
-                </span>
+                <p className="dps-banner-desc">
+                  Untuk siapa saja, bukan hanya tim teknis. Kami siapkan saldo prabayar fleksibel mulai Rp 15.000 tanpa kartu kredit — langsung siap pakai untuk riset skripsi, praktikum koding, dan chat harian.
+                </p>
 
-                {/* Badge 3: Tanpa Langganan */}
-                <span className="rhc-badge-pill" style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", padding: "6px 14px", borderRadius: "9999px", fontSize: "11.5px", fontWeight: 600 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, display: "block" }}>
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    <path d="m9 12 2 2 4-4" />
-                  </svg>
-                  <span>Tanpa Biaya Bulanan · Saldo Aktif Selamanya</span>
-                </span>
+                <div className="dps-action-row">
+                  <button
+                    type="button"
+                    className="dps-btn-primary"
+                    onClick={() => {
+                      const el = document.querySelector(".retail-packages-grid");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    <span>Pilih Paket Sekarang</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <polyline points="19 12 12 19 5 12" />
+                    </svg>
+                  </button>
+                  <span className="dps-meta-text">
+                    <span>QRIS Instan</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Saldo No Expiry</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Garansi 100%</span>
+                  </span>
+                </div>
               </div>
 
-              {/* Main Title */}
-              <h2 className="retail-hero-title" style={{ position: "relative", zIndex: 2, fontSize: "30px", fontWeight: 850, letterSpacing: "-0.03em", lineHeight: 1.25, color: "#0a2540", margin: "0 0 12px 0" }}>
-                Paket Prabayar{" "}
-                <span className="hero-gradient-text">Multi–AI</span> Siap Pakai
-              </h2>
-
-              {/* Subtitle */}
-              <p className="retail-hero-subtitle" style={{ position: "relative", zIndex: 2, fontSize: "14px", lineHeight: 1.65, color: "#475569", maxWidth: "860px", margin: "0 0 22px 0" }}>
-                Isi saldo fleksibel nominal terjangkau mulai <b>Rp 15.000</b> tanpa kartu kredit. Satu saldo universal untuk seluruh model terbaik dunia (<b>Claude Sonnet</b>, <b>GPT-4o</b>, <b>Gemini 2.0</b>, <b>DeepSeek R1</b>) — langsung siap pakai untuk riset tugas, bedah jurnal PDF, skripsi, dan sprint ngoding.
-              </p>
-
-              {/* High-Value 4-Pill Feature Grid */}
-              <div className="ebc-features-strip" style={{ position: "relative", zIndex: 2, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", paddingTop: "20px", borderTop: "1px solid rgba(226, 232, 240, 0.95)" }}>
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-blue" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#eff6ff", border: "1px solid #bfdbfe", color: "#0a58ca", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
-                  </span>
-                  <span>Saldo Aktif Selamanya (No Expiry)</span>
+              {/* Right Column: DPSBuddy Comparison Stack */}
+              <div className="dps-banner-right">
+                <div className="dps-compare-card">
+                  <div className="dps-card-kicker">
+                    <span className="dps-card-dot gray" aria-hidden="true" />
+                    <span>LANGGANAN AI BIASA</span>
+                  </div>
+                  <p className="dps-card-body">
+                    Wajib bayar $20/bln (Rp 330.000) per provider, wajib kartu kredit luar negeri, dan kuota sisa hangus tiap akhir bulan.
+                  </p>
                 </div>
 
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-green" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <rect x="2" y="5" width="20" height="14" rx="2" />
-                      <line x1="2" y1="10" x2="22" y2="10" />
-                    </svg>
-                  </span>
-                  <span>Bayar QRIS Instan &amp; Virtual Account</span>
-                </div>
-
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-purple" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#faf5ff", border: "1px solid #e9d5ff", color: "#7e22ce", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <polyline points="16 18 22 12 16 6" />
-                      <polyline points="8 6 2 12 8 18" />
-                    </svg>
-                  </span>
-                  <span>Kompatibel Claude Code, Cursor &amp; Chatbox</span>
-                </div>
-
-                <div className="ebc-feature-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.85)", border: "1px solid rgba(226, 232, 240, 0.95)", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, color: "#1e293b" }}>
-                  <span className="ebc-feature-icon icon-amber" aria-hidden="true" style={{ width: "26px", height: "26px", borderRadius: "7px", background: "#fffbeb", border: "1px solid #fde68a", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                    </svg>
-                  </span>
-                  <span>Aktivasi Instan &amp; Key Siap Pakai</span>
+                <div className="dps-compare-card highlight">
+                  <div className="dps-card-kicker">
+                    <span className="dps-card-dot blue" aria-hidden="true" />
+                    <span>JURAGAN TOKEN PRABAYAR</span>
+                  </div>
+                  <p className="dps-card-body">
+                    Cukup isi Rp 15.000 via QRIS. 1 saldo untuk semua model AI (Claude, GPT, DeepSeek). Saldo aktif selamanya tanpa kedaluwarsa.
+                  </p>
                 </div>
               </div>
             </div>
