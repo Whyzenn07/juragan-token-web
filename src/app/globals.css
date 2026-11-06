@@ -5833,65 +5833,89 @@ footer {
   width: 100%;
   border-top: 1px solid #e2e8f0;
   background: #ffffff;
-  border-radius: 16px;
-  padding: 48px 40px 28px;
-  margin-top: 64px;
-  font-size: 13px;
-  color: #475569;
+  padding: 64px 0 36px;
+  margin-top: 80px;
+  font-size: 13.5px;
+  color: #64748b;
 }
-.site-pro-footer .spf-title { margin-top: 4px; }
-.site-pro-footer .spf-bottom-bar { width: 100%; }
+
+.spf-container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
 .spf-main-grid {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
-  gap: 36px;
-  margin-bottom: 40px;
+  grid-template-columns: 2.2fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
 }
-.spf-desc {
-  font-size: 13px;
-  color: #64748b;
-  line-height: 1.6;
-  margin: 12px 0 16px;
-  max-width: 320px;
-}
-.spf-pill-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.spf-trust-pill {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #0369a1;
-  background: #f0f9ff;
-  border: 1px solid #e0f2fe;
-  padding: 4px 10px;
-  border-radius: 6px;
+
+.spf-col-brand .footer-brand {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  width: fit-content;
-}
-.spf-title {
-  font-size: 13px;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--font-h, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 20px;
   font-weight: 800;
+  color: #0a2442;
+  letter-spacing: -0.4px;
+}
+
+.spf-col-brand .footer-brand .brand-mark {
+  width: 26px;
+  height: 20px;
+  color: var(--blue, #0a58ca);
+}
+
+.spf-col-brand .footer-brand .brand-light {
+  font-weight: 400;
+  color: #64748b;
+}
+
+.spf-col-brand .footer-brand .brand-dot {
+  color: var(--blue, #0a58ca);
+}
+
+.spf-desc {
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 16px 0 16px;
+  max-width: 340px;
+}
+
+.spf-meta-info {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.2px;
+}
+
+.spf-col-heading {
+  font-size: 11.5px;
+  font-weight: 700;
   color: #0f172a;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 14px;
+  letter-spacing: 0.8px;
+  margin: 4px 0 16px;
 }
+
 .spf-links {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 11px;
 }
+
 .spf-links a,
 .spf-link-btn {
   font-size: 13px;
-  color: #475569;
+  color: #64748b;
   text-decoration: none;
   background: transparent;
   border: none;
@@ -5900,10 +5924,12 @@ footer {
   cursor: pointer;
   transition: color 0.15s ease;
 }
+
 .spf-links a:hover,
 .spf-link-btn:hover {
   color: var(--blue, #0a58ca);
 }
+
 .spf-bottom-bar {
   border-top: 1px solid #f1f5f9;
   padding-top: 24px;
@@ -5911,53 +5937,52 @@ footer {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 14px;
-  font-size: 12px;
+  gap: 16px;
+  font-size: 12.5px;
   color: #94a3b8;
 }
-.spf-bottom-badges {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.spf-bottom-badges span {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #475569;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-.spf-links a.spf-wa-link {
-  color: #16a34a;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.spf-col-brand .footer-brand {
-  font-size: 20px;
-  font-weight: 800;
-  color: #0a2442;
-  text-decoration: none;
+
+.spf-copy {
+  color: #94a3b8;
 }
 
-@media (max-width: 900px) {
+.spf-bottom-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.spf-sep {
+  color: #cbd5e1;
+}
+
+@media (max-width: 960px) {
   .spf-main-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 28px;
+    gap: 36px;
   }
 }
+
 @media (max-width: 600px) {
+  .site-pro-footer {
+    padding: 44px 0 28px;
+  }
+  .spf-container {
+    padding: 0 20px;
+  }
   .spf-main-grid {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
   .spf-bottom-bar {
     flex-direction: column;
-    text-align: center;
+    align-items: flex-start;
+    gap: 12px;
   }
 }
+
 
 
