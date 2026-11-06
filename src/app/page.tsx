@@ -969,115 +969,159 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Filter Bar */}
-            <div className="filter-bar" data-reveal="fade-up">
-              <label className="search">
-                <Icon name="search" size={18} />
-                <input
-                  ref={searchInputRef}
-                  id="search"
-                  type="search"
-                  placeholder="Cari AI, model (Claude, GPT, DeepSeek)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery ? (
+            {/* Unified Catalog Control Toolbar (Clean, Executive, Anti-Slop) */}
+            <div className="catalog-toolbar-panel" data-reveal="fade-up">
+              {/* Top Row: Search input + Provider & Sort Dropdowns */}
+              <div className="toolbar-top-row">
+                <div className="toolbar-search-wrapper">
+                  <Icon name="search" size={17} />
+                  <input
+                    ref={searchInputRef}
+                    id="search"
+                    type="search"
+                    placeholder="Cari model AI, provider (Claude, GPT, DeepSeek)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    aria-label="Cari model AI"
+                  />
+                  {searchQuery ? (
+                    <button
+                      type="button"
+                      className="clear-search-btn"
+                      onClick={() => setSearchQuery("")}
+                      aria-label="Hapus kata kunci pencarian"
+                    >
+                      ✕
+                    </button>
+                  ) : (
+                    <kbd className="search-kbd">/</kbd>
+                  )}
+                </div>
+
+                <div className="toolbar-selects-group">
+                  {/* Provider Select Dropdown */}
+                  <div className="toolbar-select-box">
+                    <label htmlFor="provider-filter" className="ts-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                        <polyline points="2 17 12 22 22 17" />
+                        <polyline points="2 12 12 17 22 12" />
+                      </svg>
+                      <span>Provider:</span>
+                    </label>
+                    <select
+                      id="provider-filter"
+                      value={selectedProvider}
+                      onChange={(e) => setSelectedProvider(e.target.value)}
+                      aria-label="Filter berdasarkan AI Provider"
+                    >
+                      <option value="all">Semua Provider ({models.length})</option>
+                      {providers.map((p) => {
+                        const count = models.filter((m) => m.providerId === p.id).length;
+                        if (count === 0) return null;
+                        const displayLabel =
+                          p.id === "alibaba"
+                            ? "Qwen (Alibaba)"
+                            : p.id === "bytedance"
+                            ? "ByteDance (Seed)"
+                            : p.id === "openai"
+                            ? "OpenAI (GPT)"
+                            : p.id === "anthropic"
+                            ? "Anthropic (Claude)"
+                            : p.company;
+                        return (
+                          <option key={p.id} value={p.id}>
+                            {displayLabel} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+
+                  {/* Sort Select Dropdown */}
+                  <div className="toolbar-select-box">
+                    <label htmlFor="sort-select" className="ts-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <line x1="21" y1="10" x2="7" y2="10" />
+                        <line x1="21" y1="6" x2="3" y2="6" />
+                        <line x1="21" y1="14" x2="11" y2="14" />
+                        <line x1="21" y1="18" x2="15" y2="18" />
+                      </svg>
+                      <span>Urutkan:</span>
+                    </label>
+                    <select
+                      id="sort-select"
+                      value={sortOption}
+                      onChange={(e) => setSortOption(e.target.value as SortOption)}
+                      aria-label="Urutan tampilan katalog model"
+                    >
+                      <option value="provider">Per Provider (OpenAI, Claude, Qwen...)</option>
+                      <option value="featured">Pilihan Unggulan</option>
+                      <option value="cheapest">Paling hemat</option>
+                      <option value="priciest">Harga tertinggi</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Divider Line */}
+              <div className="toolbar-divider" aria-hidden="true" />
+
+              {/* Bottom Row: Segmented Category Tabs + Tersimpan + Reset Button */}
+              <div className="toolbar-bottom-row">
+                <div className="category-segmented-control" role="group" aria-label="Filter kategori model">
+                  {categories.map((cat) => {
+                    const isActive = activeCategory === cat && !viewSavedOnly;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        aria-pressed={isActive}
+                        className={`segmented-tab ${isActive ? "active" : ""}`}
+                        onClick={() => {
+                          setViewSavedOnly(false);
+                          setActiveCategory(cat);
+                        }}
+                      >
+                        <span>{cat}</span>
+                        <span className="tab-badge">{categoryCount(cat)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="toolbar-actions-group">
                   <button
                     type="button"
-                    className="clear-search-btn"
-                    onClick={() => setSearchQuery("")}
-                    aria-label="Hapus kata kunci"
+                    aria-pressed={viewSavedOnly}
+                    className={`saved-toggle-btn ${viewSavedOnly ? "active" : ""}`}
+                    onClick={() => setViewSavedOnly(!viewSavedOnly)}
+                    title={viewSavedOnly ? "Tampilkan semua model" : "Hanya tampilkan model yang Anda simpan"}
                   >
-                    ✕
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={viewSavedOnly ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <span>Tersimpan</span>
+                    <span className="saved-badge">{savedIds.length}</span>
                   </button>
-                ) : (
-                  <kbd>/</kbd>
-                )}
-              </label>
 
-              <label className="sort-label" htmlFor="sort">
-                <span>Urutkan</span>
-                <select
-                  id="sort"
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value as SortOption)}
-                >
-                  <option value="provider">Per Provider (OpenAI, Claude, Qwen...)</option>
-                  <option value="featured">Pilihan Unggulan</option>
-                  <option value="cheapest">Paling hemat</option>
-                  <option value="priciest">Harga tertinggi</option>
-                </select>
-              </label>
-            </div>
-
-            {/* Category Chips Bar */}
-            <div className="category-chips" role="group" aria-label="Filter kategori model" data-reveal="fade-up">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  aria-pressed={activeCategory === cat && !viewSavedOnly}
-                  className={`chip ${activeCategory === cat && !viewSavedOnly ? "active" : ""}`}
-                  onClick={() => {
-                    setViewSavedOnly(false);
-                    setActiveCategory(cat);
-                  }}
-                >
-                  {cat}
-                  <span className="chip-count">{categoryCount(cat)}</span>
-                </button>
-              ))}
-              <button
-                type="button"
-                aria-pressed={viewSavedOnly}
-                className={`chip ${viewSavedOnly ? "active" : ""}`}
-                onClick={() => setViewSavedOnly(!viewSavedOnly)}
-              >
-                <Icon name="check" size={13} />
-                <span>Tersimpan</span>
-                <span className="chip-count">{savedIds.length}</span>
-              </button>
-            </div>
-
-            {/* Provider Quick Filter Strip */}
-            <div className="provider-filter-strip" role="group" aria-label="Filter berdasarkan AI Provider">
-              <span className="pfs-label">Provider:</span>
-              <div className="pfs-list">
-                <button
-                  type="button"
-                  className={`chip provider-chip ${selectedProvider === "all" ? "active" : ""}`}
-                  onClick={() => setSelectedProvider("all")}
-                >
-                  Semua
-                  <span className="chip-count">{models.length}</span>
-                </button>
-                {providers.map((p) => {
-                  const count = models.filter((m) => m.providerId === p.id).length;
-                  if (count === 0) return null;
-                  const displayLabel =
-                    p.id === "alibaba"
-                      ? "Qwen (Alibaba)"
-                      : p.id === "bytedance"
-                      ? "ByteDance (Seed)"
-                      : p.id === "openai"
-                      ? "OpenAI (GPT)"
-                      : p.id === "anthropic"
-                      ? "Anthropic (Claude)"
-                      : p.company;
-                  return (
+                  {(searchQuery || selectedProvider !== "all" || activeCategory !== "Semua" || viewSavedOnly) && (
                     <button
-                      key={p.id}
                       type="button"
-                      className={`chip provider-chip ${selectedProvider === p.id ? "active" : ""}`}
-                      onClick={() => setSelectedProvider(selectedProvider === p.id ? "all" : p.id)}
-                      title={`Tampilkan hanya model dari ${displayLabel}`}
+                      className="reset-filters-btn"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSelectedProvider("all");
+                        setActiveCategory("Semua");
+                        setViewSavedOnly(false);
+                      }}
+                      title="Reset semua filter ke tampilan default"
                     >
-                      <ProviderLogo provider={p.id} size={14} />
-                      <span>{displayLabel}</span>
-                      <span className="chip-count">{count}</span>
+                      <span>Reset Filter</span>
+                      <span aria-hidden="true">✕</span>
                     </button>
-                  );
-                })}
+                  )}
+                </div>
               </div>
             </div>
 
@@ -1106,6 +1150,7 @@ export default function Home() {
                     className="primary-button"
                     onClick={() => {
                       setActiveCategory("Semua");
+                      setSelectedProvider("all");
                       setSearchQuery("");
                       setViewSavedOnly(false);
                     }}
