@@ -2114,6 +2114,98 @@ main {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
   align-items: stretch;
+  width: 100%;
+}
+
+/* Adaptive Fit: Centers and resizes gracefully when 1 or 2 cards are shown */
+.model-grid[data-count="1"] {
+  grid-template-columns: minmax(320px, 520px);
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.model-grid[data-count="2"] {
+  grid-template-columns: repeat(2, minmax(300px, 480px));
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Catalog Suggestions Strip when only 1 or 2 models match filter */
+.catalog-suggestions-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #f8fbff;
+  border: 1px solid #d4e2f1;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.css-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.css-sparkle {
+  color: #0a58ca;
+  font-size: 16px;
+}
+
+.css-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.css-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0a58ca;
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.css-pill-btn:hover {
+  background: #084298;
+  transform: translateY(-1px);
+}
+
+.css-pill-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  color: #64748b;
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.css-pill-btn-outline:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
 }
 
 /* Catalog Empty State (Clean, Centered, Helpful Card) */

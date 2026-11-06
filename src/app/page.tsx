@@ -1142,7 +1142,13 @@ export default function Home() {
             </div>
 
             {/* Model Cards Grid */}
-            <div id="model-grid" key={gridKey} className="model-grid" aria-live="polite">
+            <div
+              id="model-grid"
+              key={gridKey}
+              className="model-grid"
+              data-count={filteredModels.length}
+              aria-live="polite"
+            >
               {filteredModels.length === 0 ? (
                 <div className="empty-state" data-reveal="scale">
                   <div className="empty-state-icon" aria-hidden="true">
@@ -1365,6 +1371,50 @@ export default function Home() {
                 })
               )}
             </div>
+
+            {/* Catalog Suggestions Strip when only 1 or 2 models match current filter */}
+            {filteredModels.length > 0 && filteredModels.length <= 2 && (
+              <div className="catalog-suggestions-strip" data-reveal="fade-up">
+                <div className="css-left">
+                  <span className="css-sparkle">✦</span>
+                  <span>
+                    Menampilkan <b>{filteredModels.length} model</b> untuk filter ini. Ingin melihat lebih banyak pilihan?
+                  </span>
+                </div>
+                <div className="css-actions">
+                  {selectedProvider !== "all" && (
+                    <button
+                      type="button"
+                      className="css-pill-btn"
+                      onClick={() => setSelectedProvider("all")}
+                    >
+                      Buka Semua Provider ({models.length}) ↗
+                    </button>
+                  )}
+                  {activeCategory !== "Semua" && (
+                    <button
+                      type="button"
+                      className="css-pill-btn"
+                      onClick={() => setActiveCategory("Semua")}
+                    >
+                      Buka Semua Kategori ({models.length}) ↗
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="css-pill-btn-outline"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSelectedProvider("all");
+                      setActiveCategory("Semua");
+                      setViewSavedOnly(false);
+                    }}
+                  >
+                    Reset Filter ✕
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* 6. Paket Prabayar Ritel Mahasiswa Section (Pola Paket ai-vouchers) */}
