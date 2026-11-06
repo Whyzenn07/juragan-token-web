@@ -49,8 +49,44 @@ export function Dialog({ open, onClose, label, panelClassName, align = "center",
 
   if (!open) return null;
   return (
-    <div className={`overlay ${align}`} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <section ref={panelRef} className={panelClassName} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1}>
+    <div
+      className={`overlay ${align}`}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: "rgba(10, 25, 47, 0.72)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        display: "flex",
+        alignItems: align === "center" ? "center" : "stretch",
+        justifyContent: align === "center" ? "center" : "flex-end",
+        padding: "16px",
+        overflowY: "auto",
+      }}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        ref={panelRef}
+        className={panelClassName}
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+        tabIndex={-1}
+        style={{
+          position: "relative",
+          background: "#ffffff",
+          borderRadius: "20px",
+          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.08)",
+          maxHeight: "92vh",
+          overflowY: "auto",
+          width: "100%",
+          boxSizing: "border-box",
+          outline: "none",
+        }}
+      >
         {children}
       </section>
     </div>
