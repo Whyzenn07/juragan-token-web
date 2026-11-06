@@ -233,410 +233,418 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 }
 
 /* ------------------------------------------------------------- */
-/* Google Finance Currency Converter Widget Modal                */
+/* Google Finance Currency Converter Widget Modal (Light Executive) */
 /* ------------------------------------------------------------- */
 .google-currency-modal {
-  width: 680px;
-  max-width: calc(100% - 24px);
-  background: #202124;
-  color: #e8eaed;
-  border-radius: 16px;
-  border: 1px solid #3c4043;
-  padding: 24px 28px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  overflow: hidden;
-  position: relative;
+  width: 680px !important;
+  max-width: calc(100% - 24px) !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-radius: 18px !important;
+  border: 1px solid #dce6f2 !important;
+  padding: 28px 32px !important;
+  box-shadow: 0 24px 64px -12px rgba(10, 37, 64, 0.22), 0 0 0 1px rgba(10, 37, 64, 0.05) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  overflow: hidden !important;
+  position: relative !important;
 }
 
 .gcm-close-btn {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #303134;
-  border: 1px solid #3c4043;
-  color: #9aa0a6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  z-index: 10;
+  position: absolute !important;
+  top: 18px !important;
+  right: 18px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  z-index: 10 !important;
 }
 
 .gcm-close-btn:hover {
-  background: #3c4043;
-  color: #ffffff;
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
 }
 
 .gcm-top-section {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 22px;
+  display: flex !important;
+  flex-direction: column !important;
+  margin-bottom: 22px !important;
 }
 
 .gcm-title-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 4px !important;
 }
 
 .gcm-kicker-label {
-  color: #9aa0a6;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.1px;
+  color: #475569 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.1px !important;
 }
 
 .gcm-meta-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-right: 36px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding-right: 36px !important;
 }
 
 .gcm-live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(52, 168, 83, 0.14);
-  border: 1px solid rgba(52, 168, 83, 0.35);
-  color: #81c995;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 999px;
-  letter-spacing: 0.3px;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+  color: #065f46 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 3px 9px !important;
+  border-radius: 9999px !important;
+  letter-spacing: 0.2px !important;
 }
 
 .gcm-pulse-dot {
-  width: 6.5px;
-  height: 6.5px;
-  border-radius: 50%;
-  background: #34a853;
-  box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.4);
-  animation: pulseLive 2s infinite;
+  width: 6.5px !important;
+  height: 6.5px !important;
+  border-radius: 50% !important;
+  background: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3) !important;
+  animation: pulseLive 2s infinite !important;
 }
 
 .gcm-rate-hero-row {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 20px;
-  align-items: flex-start;
-  margin-top: 2px;
+  display: grid !important;
+  grid-template-columns: 1.15fr 1fr !important;
+  gap: 20px !important;
+  align-items: flex-start !important;
+  margin-top: 2px !important;
 }
 
 .gcm-rate-text-col {
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .gcm-big-rate {
-  font-size: 42px;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-variant-numeric: tabular-nums;
+  font-size: 42px !important;
+  font-weight: 800 !important;
+  color: #0a2540 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.1 !important;
+  font-family: var(--font-h), -apple-system, sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
 }
 
 .gcm-currency-target {
-  font-size: 20px;
-  font-weight: 600;
-  color: #e8eaed;
-  margin-top: 4px;
-  letter-spacing: -0.2px;
+  font-size: 20px !important;
+  font-weight: 650 !important;
+  color: #1e293b !important;
+  margin-top: 4px !important;
+  letter-spacing: -0.2px !important;
 }
 
 .gcm-timestamp-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #9aa0a6;
-  font-size: 11.5px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-  line-height: 1.4;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  margin-top: 10px !important;
+  flex-wrap: wrap !important;
+  line-height: 1.4 !important;
 }
 
 .gcm-sep {
-  color: #5f6368;
+  color: #cbd5e1 !important;
 }
 
 .gcm-source {
-  color: #bdc1c6;
+  color: #64748b !important;
 }
 
 /* Chart Column */
 .gcm-chart-col {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
 }
 
 .gcm-timeframe-tabs {
-  display: flex;
-  gap: 4px;
-  justify-content: flex-end;
-  border-bottom: 1px solid #303134;
-  padding-bottom: 6px;
+  display: flex !important;
+  gap: 4px !important;
+  justify-content: flex-end !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding-bottom: 6px !important;
 }
 
 .gcm-tf-btn {
-  background: transparent;
-  border: none;
-  color: #9aa0a6;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: #64748b !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 3px 9px !important;
+  border-radius: 9999px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  font-family: inherit !important;
 }
 
 .gcm-tf-btn:hover {
-  color: #e8eaed;
-  background: rgba(255, 255, 255, 0.06);
+  color: #0f172a !important;
+  background: #f1f5f9 !important;
 }
 
 .gcm-tf-btn.active {
-  color: #8ab4f8;
-  background: rgba(138, 180, 248, 0.18);
+  color: #0a58ca !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  font-weight: 750 !important;
 }
 
 .gcm-chart-wrapper {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-  height: 94px;
+  display: flex !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+  height: 94px !important;
 }
 
 .gcm-y-labels {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: #70757a;
-  font-size: 10px;
-  font-family: monospace;
-  text-align: right;
-  min-width: 44px;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  color: #64748b !important;
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  font-family: monospace !important;
+  textAlign: right !important;
+  min-width: 48px !important;
 }
 
 .gcm-svg-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  position: relative !important;
 }
 
 .gcm-sparkline {
-  width: 100%;
-  height: 72px;
-  overflow: visible;
+  width: 100% !important;
+  height: 72px !important;
+  overflow: visible !important;
 }
 
 .gcm-x-labels {
-  display: flex;
-  justify-content: space-between;
-  color: #70757a;
-  font-size: 10px;
-  padding-top: 2px;
+  display: flex !important;
+  justify-content: space-between !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  padding-top: 2px !important;
 }
 
 /* Two-Way Converter Input */
 .gcm-converter-box {
-  background: #18191c;
-  border: 1px solid #303134;
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  padding: 16px 18px !important;
+  margin-bottom: 18px !important;
 }
 
 .gcm-converter-inner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
 }
 
 .gcm-input-card {
-  flex: 1;
-  background: #202124;
-  border: 1px solid #3c4043;
-  border-radius: 8px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: border-color 0.15s ease;
+  flex: 1 !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 .gcm-input-card:focus-within {
-  border-color: #8ab4f8;
-  box-shadow: 0 0 0 1px #8ab4f8;
+  border-color: #0a58ca !important;
+  box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.12) !important;
 }
 
 .gcm-number-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 700;
-  width: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  letter-spacing: -0.02em;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: #0f172a !important;
+  font-size: 22px !important;
+  font-weight: 750 !important;
+  width: 100% !important;
+  font-family: var(--font-h), -apple-system, sans-serif !important;
+  letter-spacing: -0.02em !important;
 }
 
 .gcm-currency-select {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: #9aa0a6;
-  font-size: 11.5px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-size: 12px !important;
 }
 
 .gcm-currency-name {
-  color: #bdc1c6;
-  font-weight: 600;
+  color: #334155 !important;
+  font-weight: 600 !important;
 }
 
 .gcm-currency-code {
-  color: #8ab4f8;
-  font-weight: 700;
+  color: #0a58ca !important;
+  font-weight: 750 !important;
 }
 
 .gcm-swap-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .gcm-swap-button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #303134;
-  border: 1px solid #3c4043;
-  color: #8ab4f8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0a58ca !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+  transition: all 0.2s ease !important;
 }
 
 .gcm-swap-button:hover {
-  background: #3c4043;
-  color: #ffffff;
-  transform: rotate(180deg);
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+  color: #0a58ca !important;
+  transform: rotate(180deg) !important;
 }
 
 /* Info and Action Footer */
 .gcm-info-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
 }
 
 .gcm-info-text {
-  font-size: 12px;
-  color: #9aa0a6;
-  line-height: 1.5;
+  font-size: 12.5px !important;
+  color: #475569 !important;
+  line-height: 1.55 !important;
 }
 
 .gcm-info-text b {
-  color: #e8eaed;
+  color: #0a2540 !important;
+  font-weight: 700 !important;
 }
 
 .gcm-sync-alert {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.35);
-  color: #4ade80;
-  padding: 9px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+  color: #065f46 !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  font-size: 12.5px !important;
+  font-weight: 650 !important;
 }
 
 .gcm-action-bar {
-  display: flex;
-  justify-content: flex-end;
+  display: flex !important;
+  justify-content: flex-end !important;
 }
 
 .gcm-refresh-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #1a73e8;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 13px;
-  font-weight: 650;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
-  font-family: inherit;
-  width: 100%;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  background: linear-gradient(135deg, #0a58ca 0%, #0284c7 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 11px 22px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  font-family: inherit !important;
+  width: 100% !important;
+  box-shadow: 0 2px 8px rgba(10, 88, 202, 0.25) !important;
 }
 
 .gcm-refresh-btn:hover:not(:disabled) {
-  background: #1967d2;
-  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.35) !important;
+  transform: translateY(-1px) !important;
 }
 
 .gcm-refresh-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
 }
 
 .gcm-spin-icon {
-  font-size: 15px;
-  line-height: 1;
-  display: inline-block;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  display: inline-block !important;
 }
 
 .gcm-spin-icon.spinning {
-  animation: spinSync 0.8s linear infinite;
+  animation: spinSync 0.8s linear infinite !important;
 }
 
 @media (max-width: 640px) {
   .google-currency-modal {
-    padding: 20px 16px;
+    padding: 22px 18px !important;
   }
   .gcm-rate-hero-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
   .gcm-big-rate {
-    font-size: 34px;
+    font-size: 34px !important;
   }
   .gcm-currency-target {
-    font-size: 18px;
+    font-size: 18px !important;
   }
   .gcm-converter-inner {
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: column !important;
+    gap: 10px !important;
   }
   .gcm-input-card {
-    width: 100%;
+    width: 100% !important;
   }
   .gcm-swap-button {
-    transform: rotate(90deg);
+    transform: rotate(90deg) !important;
   }
   .gcm-swap-button:hover {
-    transform: rotate(270deg);
+    transform: rotate(270deg) !important;
   }
 }
 
