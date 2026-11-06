@@ -660,29 +660,28 @@ export default function Home() {
 
           {/* 5. Catalog Section: model riil dari gateway juragantoken.co.id */}
           <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
-            <div className="section-heading">
-              <div>
-                <div className="section-kicker">
-                  <span className="kicker-pill">✦ KATALOG FRONTIER MODEL</span>
+            {/* Catalog Section Header - Elevated Executive Typography */}
+            <div className="section-heading catalog-heading-elevated">
+              <div className="section-heading-inner">
+                <div className="section-kicker-row">
+                  <span className="kicker-pill-modern">
+                    <span className="kicker-sparkle" aria-hidden="true">✦</span>
+                    <span>KATALOG MODEL FRONTIER AI</span>
+                  </span>
+                  <span className="kicker-meta-pill">
+                    <span className="kicker-dot-live" aria-hidden="true" />
+                    <span>36 Model Gateway Terverifikasi</span>
+                  </span>
                 </div>
-                <h2>Pilih model, lihat seberapa jauh Rp10.000 Anda</h2>
-                <p>
-                  Satu API key untuk semua model di bawah. Harga dihitung langsung dari tarif gateway, jadi angka di kartu sama dengan yang dipotong dari saldo.
+
+                <h2 className="catalog-title-modern">
+                  Pilih model, lihat seberapa jauh <span className="title-highlight">Rp10.000</span> Anda
+                </h2>
+
+                <p className="catalog-subtitle-modern">
+                  <b>Satu API key universal</b> untuk semua model di bawah. Harga dihitung langsung dari tarif gateway resmi ke Rupiah secara transparan — angka di kartu sama dengan yang dipotong dari saldo.
                 </p>
               </div>
-              <button
-                type="button"
-                className="text-button"
-                onClick={() => {
-                  setActiveCategory("Semua");
-                  setSelectedProvider("all");
-                  setSearchQuery("");
-                  setViewSavedOnly(false);
-                  setSortOption("provider");
-                }}
-              >
-                Hapus filter
-              </button>
             </div>
 
             {/* Filter Bar */}
