@@ -2319,6 +2319,49 @@ main {
   color: #ffffff;
 }
 
+/* 8. Retail Header Card (Executive Student Packages Banner) */
+.retail-header-card {
+  position: relative !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+  border: 1px solid #dce6f2 !important;
+  border-radius: 18px !important;
+  padding: 36px 42px !important;
+  margin-top: 16px !important;
+  margin-bottom: 32px !important;
+  box-shadow: 0 4px 20px -2px rgba(10, 88, 202, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  overflow: hidden !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.retail-header-card:hover {
+  border-color: #bad8f8 !important;
+  box-shadow: 0 10px 28px -4px rgba(10, 88, 202, 0.1) !important;
+}
+
+@media (max-width: 768px) {
+  .retail-header-card {
+    padding: 26px 20px !important;
+    margin-top: 14px !important;
+    margin-bottom: 24px !important;
+    border-radius: 14px !important;
+  }
+  .retail-hero-title {
+    font-size: 24px !important;
+    letter-spacing: -0.025em !important;
+  }
+  .retail-hero-subtitle {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+    margin-bottom: 16px !important;
+  }
+  .retail-hero-features {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    padding-top: 14px !important;
+  }
+}
+
 /* 8. Paket Retail Cards (Pola ai-vouchers) */
 .retail-packages-grid {
   display: grid;

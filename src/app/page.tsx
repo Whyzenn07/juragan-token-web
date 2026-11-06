@@ -1193,11 +1193,276 @@ export default function Home() {
 
           {/* 6. Paket Prabayar Ritel Mahasiswa Section (Pola Paket ai-vouchers) */}
           <section className="catalog" id="katalog-retail">
-            <div className="section-heading">
-              <div>
-                <div className="section-kicker">PAKET PILIHAN MAHASISWA</div>
-                <h2>Paket Prabayar Multi-AI Siap Pakai</h2>
-                <p>Isi saldo nominal terjangkau mulai Rp 15.000 untuk kebutuhan kuliah dan ngoding.</p>
+            {/* Executive Retail Header Card */}
+            <div
+              className="retail-header-card"
+              style={{
+                position: "relative",
+                background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+                border: "1px solid #dce6f2",
+                borderRadius: "18px",
+                padding: "36px 42px",
+                marginTop: "16px",
+                marginBottom: "32px",
+                boxShadow: "0 4px 20px -2px rgba(10, 88, 202, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03)",
+                overflow: "hidden",
+              }}
+            >
+              {/* Subtle top accent gradient line */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "3px",
+                  background: "linear-gradient(90deg, #0a58ca 0%, #0284c7 50%, #38bdf8 100%)",
+                }}
+                aria-hidden="true"
+              />
+
+              {/* Badges Row */}
+              <div
+                className="retail-kicker-group"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  marginBottom: "16px",
+                }}
+              >
+                {/* Badge 1: Kicker Mahasiswa */}
+                <span
+                  className="rhc-kicker-pill"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    background: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    color: "#1d4ed8",
+                    padding: "5px 13px",
+                    borderRadius: "9999px",
+                    fontSize: "11px",
+                    fontWeight: 750,
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                  </svg>
+                  <span>Paket Pilihan Mahasiswa</span>
+                </span>
+
+                {/* Badge 2: Harga Mulai */}
+                <span
+                  className="rhc-status-pill"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    background: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                    color: "#15803d",
+                    padding: "5px 13px",
+                    borderRadius: "9999px",
+                    fontSize: "11.5px",
+                    fontWeight: 650,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "6.5px",
+                      height: "6.5px",
+                      borderRadius: "50%",
+                      background: "#16a34a",
+                      boxShadow: "0 0 0 2px rgba(22, 163, 74, 0.25)",
+                      display: "inline-block",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span>Mulai Rp 15.000</span>
+                </span>
+
+                {/* Badge 3: Tanpa Langganan */}
+                <span
+                  className="rhc-badge-pill"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    background: "#f8fafc",
+                    border: "1px solid #e2e8f0",
+                    color: "#475569",
+                    padding: "5px 13px",
+                    borderRadius: "9999px",
+                    fontSize: "11.5px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  <span>Tanpa Biaya Bulanan · Saldo Aktif Selamanya</span>
+                </span>
+              </div>
+
+              {/* Main Title */}
+              <h2
+                className="retail-hero-title"
+                style={{
+                  fontSize: "30px",
+                  fontWeight: 850,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.25,
+                  color: "#0a2540",
+                  fontFamily: "var(--font-h), -apple-system, sans-serif",
+                  margin: "0 0 10px 0",
+                }}
+              >
+                Paket Prabayar{" "}
+                <span
+                  style={{
+                    color: "#0a58ca",
+                    background: "linear-gradient(135deg, #0a58ca 0%, #0284c7 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontWeight: 900,
+                  }}
+                >
+                  Multi-AI
+                </span>{" "}
+                Siap Pakai
+              </h2>
+
+              {/* Subtitle */}
+              <p
+                className="retail-hero-subtitle"
+                style={{
+                  fontSize: "14.5px",
+                  lineHeight: 1.65,
+                  color: "#475569",
+                  maxWidth: "820px",
+                  margin: "0 0 22px 0",
+                }}
+              >
+                Isi saldo fleksibel nominal terjangkau mulai <b>Rp 15.000</b> tanpa kartu kredit. Satu saldo universal untuk seluruh model terbaik dunia (Claude Sonnet 5.5, GPT-4o, Gemini 2.0, DeepSeek R1) — langsung siap pakai untuk riset tugas, bedah jurnal PDF, skripsi, dan sprint ngoding.
+              </p>
+
+              {/* Bottom Feature Strip with Dedicated Crisp SVG Icons */}
+              <div
+                className="retail-hero-features"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "28px",
+                  paddingTop: "20px",
+                  borderTop: "1px solid #e2e8f0",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div
+                  className="rhf-item"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "9px",
+                    fontSize: "12.5px",
+                    fontWeight: 600,
+                    color: "#1e293b",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "6px",
+                      background: "#eff6ff",
+                      border: "1px solid #bfdbfe",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      color: "#0a58ca",
+                    }}
+                    aria-hidden="true"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </span>
+                  <span>Saldo Tidak Pernah Hangus (No Expiry)</span>
+                </div>
+
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "9px",
+                    fontSize: "12.5px",
+                    fontWeight: 600,
+                    color: "#1e293b",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "6px",
+                      background: "#f0fdf4",
+                      border: "1px solid #bbf7d0",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      color: "#16a34a",
+                    }}
+                    aria-hidden="true"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="2" />
+                      <line x1="2" y1="10" x2="22" y2="10" />
+                    </svg>
+                  </span>
+                  <span>Bayar QRIS Instan &amp; Virtual Account</span>
+                </div>
+
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "9px",
+                    fontSize: "12.5px",
+                    fontWeight: 600,
+                    color: "#1e293b",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "6px",
+                      background: "#faf5ff",
+                      border: "1px solid #e9d5ff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      color: "#7e22ce",
+                    }}
+                    aria-hidden="true"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  </span>
+                  <span>Kompatibel Claude Code, Cursor &amp; Chatbox</span>
+                </div>
               </div>
             </div>
 
