@@ -2116,6 +2116,123 @@ main {
   align-items: stretch;
 }
 
+/* Catalog Empty State (Clean, Centered, Helpful Card) */
+.empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 28px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 20px;
+  margin: 8px 0 32px;
+  box-shadow: 0 4px 20px -2px rgba(10, 88, 202, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  transition: all 0.25s ease;
+}
+
+.empty-state-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #0a58ca;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.1);
+}
+
+.empty-state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.empty-state h4 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0a2540;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.empty-state p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #536b85;
+  max-width: 520px;
+  margin: 0 0 24px;
+}
+
+.empty-state p b {
+  color: #0a2540;
+}
+
+.empty-state-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.empty-state-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a58ca;
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.empty-state-btn-primary:hover {
+  background: #084298;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(10, 88, 202, 0.32);
+}
+
+.empty-state-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #475569;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.empty-state-btn-secondary:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
 @keyframes modelCardFadeUp {
   from {
     opacity: 0;

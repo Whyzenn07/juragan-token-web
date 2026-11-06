@@ -1128,7 +1128,13 @@ export default function Home() {
             {/* Results Meta */}
             <div className="results-meta">
               <span>
-                {viewSavedOnly ? `${filteredModels.length} model tersimpan` : `${filteredModels.length} model`}
+                {filteredModels.length === 0 ? (
+                  <span style={{ color: "#ef4444", fontWeight: 600 }}>0 model ditemukan</span>
+                ) : viewSavedOnly ? (
+                  <span>Menampilkan <b>{filteredModels.length} model tersimpan</b></span>
+                ) : (
+                  <span>Menampilkan <b>{filteredModels.length} model AI</b></span>
+                )}
               </span>
               <span>
                 1 jawaban ≈ {formatNum(ANSWER_INPUT_TOKENS)} token masuk + {formatNum(ANSWER_OUTPUT_TOKENS)} token keluar · kurs realtime Rp{formatNum(usdRate)}/US$ · tarif gateway per {PRICING_SNAPSHOT_DATE}
@@ -1138,25 +1144,107 @@ export default function Home() {
             {/* Model Cards Grid */}
             <div id="model-grid" key={gridKey} className="model-grid" aria-live="polite">
               {filteredModels.length === 0 ? (
-                <div className="empty-state">
-                  <h4>{viewSavedOnly ? "Belum ada model tersimpan" : "Tidak ada model yang cocok"}</h4>
-                  <p>
-                    {viewSavedOnly
-                      ? "Tekan bintang di kartu model untuk menyimpannya di sini."
-                      : `Tidak ada hasil untuk "${searchQuery}". Coba nama provider seperti Claude, Gemini, atau DeepSeek.`}
-                  </p>
-                  <button
-                    type="button"
-                    className="primary-button"
-                    onClick={() => {
-                      setActiveCategory("Semua");
-                      setSelectedProvider("all");
-                      setSearchQuery("");
-                      setViewSavedOnly(false);
-                    }}
-                  >
-                    Tampilkan semua model
-                  </button>
+                <div className="empty-state" data-reveal="scale">
+                  <div className="empty-state-icon" aria-hidden="true">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      <line x1="8" y1="11" x2="14" y2="11" />
+                    </svg>
+                  </div>
+
+                  {viewSavedOnly ? (
+                    <>
+                      <span className="empty-state-badge">Daftar Tersimpan Kosong</span>
+                      <h4>Belum Ada Model yang Anda Simpan</h4>
+                      <p>
+                        Klik ikon bintang pada kartu model AI mana saja di katalog untuk menyimpannya ke daftar favorit agar mudah ditemukan kembali.
+                      </p>
+                      <div className="empty-state-actions">
+                        <button
+                          type="button"
+                          className="empty-state-btn-primary"
+                          onClick={() => setViewSavedOnly(false)}
+                        >
+                          <span>Jelajahi Semua Model AI</span> ↗
+                        </button>
+                      </div>
+                    </>
+                  ) : searchQuery ? (
+                    <>
+                      <span className="empty-state-badge">Pencarian Tidak Ditemukan</span>
+                      <h4>Tidak Ada Hasil untuk &ldquo;{searchQuery}&rdquo;</h4>
+                      <p>
+                        Tidak ada model yang cocok dengan kata kunci pencarian. Coba kata kunci lain atau cari provider populer seperti <b>Claude</b>, <b>GPT</b>, <b>Gemini</b>, atau <b>DeepSeek</b>.
+                      </p>
+                      <div className="empty-state-actions">
+                        <button
+                          type="button"
+                          className="empty-state-btn-primary"
+                          onClick={() => {
+                            setSearchQuery("");
+                            setActiveCategory("Semua");
+                            setSelectedProvider("all");
+                          }}
+                        >
+                          <span>Hapus Pencarian &amp; Tampilkan Semua</span> ✕
+                        </button>
+                      </div>
+                    </>
+                  ) : selectedProvider !== "all" && activeCategory !== "Semua" ? (
+                    <>
+                      <span className="empty-state-badge">Filter Kombinasi Kosong</span>
+                      <h4>
+                        Tidak Ada Model {providerById(selectedProvider).company} di Kategori &ldquo;{activeCategory}&rdquo;
+                      </h4>
+                      <p>
+                        Provider <b>{providerById(selectedProvider).company}</b> saat ini memiliki total{" "}
+                        <b>{models.filter((m) => m.providerId === selectedProvider).length} model</b> di kategori lainnya. Anda dapat beralih untuk melihat seluruh model provider ini atau mereset filter.
+                      </p>
+                      <div className="empty-state-actions">
+                        <button
+                          type="button"
+                          className="empty-state-btn-primary"
+                          onClick={() => setActiveCategory("Semua")}
+                        >
+                          <span>Lihat Semua Model {providerById(selectedProvider).company} ({models.filter((m) => m.providerId === selectedProvider).length})</span> ↗
+                        </button>
+                        <button
+                          type="button"
+                          className="empty-state-btn-secondary"
+                          onClick={() => {
+                            setActiveCategory("Semua");
+                            setSelectedProvider("all");
+                            setSearchQuery("");
+                          }}
+                        >
+                          <span>Reset Semua Filter</span> ✕
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="empty-state-badge">Katalog Kosong</span>
+                      <h4>Tidak Ada Model yang Cocok</h4>
+                      <p>
+                        Kombinasi filter yang Anda pilih saat ini tidak menghasilkan model AI. Silakan reset filter untuk kembali menampilkan seluruh 36 model AI kami.
+                      </p>
+                      <div className="empty-state-actions">
+                        <button
+                          type="button"
+                          className="empty-state-btn-primary"
+                          onClick={() => {
+                            setActiveCategory("Semua");
+                            setSelectedProvider("all");
+                            setSearchQuery("");
+                            setViewSavedOnly(false);
+                          }}
+                        >
+                          <span>Tampilkan Semua 36 Model</span> ↗
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 filteredModels.map((m, index) => {
