@@ -777,8 +777,67 @@ export const modelsCatalog: ModelItem[] = [
     endpoints: ["openai", "anthropic"],
     ratio: 0.7,
     completionRatio: 3.14
+  },
+  {
+    id: "glm-4-flash",
+    name: "GLM 4 Flash",
+    providerId: "zhipu",
+    category: "Chat Hemat",
+    description: "Model ultra-cepat Zhipu AI untuk obrolan kilat, tanya-jawab materi tugas, dan perbaikan tata bahasa dengan latensi minimal.",
+    inputs: ["teks"],
+    endpoints: ["openai", "anthropic"],
+    ratio: 0.03,
+    completionRatio: 3.0
+  },
+  {
+    id: "deepseek-r1-distill",
+    name: "DeepSeek R1 Distill",
+    providerId: "deepseek",
+    category: "Tugas & Riset",
+    description: "Versi penalaran ringkas R1 yang sangat efisien untuk olah data tugas kuliah, sitasi jurnal, dan bedah metodologi skripsi.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.22,
+    completionRatio: 3.5
+  },
+  {
+    id: "glm-5.3-coder",
+    name: "GLM 5.3 Coder Pro",
+    providerId: "zhipu",
+    category: "Ngoding",
+    description: "Model spesialis coding GLM untuk arsitektur software, refactoring fullstack, dan integrasi mulus di Cursor & Claude Code.",
+    inputs: ["teks"],
+    endpoints: ["openai", "anthropic"],
+    ratio: 0.85,
+    completionRatio: 3.2
+  },
+  {
+    id: "flux-1-schnell",
+    name: "FLUX.1 Schnell HD",
+    providerId: "openai",
+    category: "Gambar",
+    description: "Generator gambar modern Black Forest Labs. Hasilkan ilustrasi visual tajam, tipografi presisi, dan poster presentasi dalam detik.",
+    inputs: ["teks"],
+    endpoints: ["image"],
+    ratio: 0,
+    completionRatio: 0,
+    perImageUsd: 0.018,
+    featured: true
+  },
+  {
+    id: "midjourney-v6-turbo",
+    name: "Midjourney v6.1 Turbo",
+    providerId: "openai",
+    category: "Gambar",
+    description: "Rendering estetika visual fotorealistis tinggi dengan tekstur nyata dan pencahayaan sinematik untuk portofolio desain.",
+    inputs: ["teks"],
+    endpoints: ["image"],
+    ratio: 0,
+    completionRatio: 0,
+    perImageUsd: 0.052,
+    featured: true
   }
-];;
+];
 
 // Turunan harga. Semua angka dihitung dari rasio gateway agar tidak ada harga yang diketik manual.
 

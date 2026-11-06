@@ -77,18 +77,17 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 /* 2. Header */
 .header {
-  height: 80px;
-  border-bottom: 1px solid var(--line);
+  height: 76px;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  padding: 0 34px;
-  gap: 48px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 0 28px;
+  gap: 36px;
+  background: #ffffff !important;
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 50;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .brand {
@@ -928,15 +927,15 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 /* Company Profile Master Container */
 .company-container {
-  max-width: 1360px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 24px;
   width: 100%;
 }
 
 .company-main {
   width: 100%;
-  padding: 32px 0 64px;
+  padding: 24px 0 52px;
 }
 
 /* Breadcrumb & Demo Pill */
@@ -2239,7 +2238,7 @@ main {
 .model-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  gap: 18px;
   align-items: stretch;
   width: 100%;
 }
@@ -2825,48 +2824,7 @@ main {
   color: #ffffff;
 }
 
-/* 8. Retail Header Card (Executive Student Packages Banner) */
-.retail-header-card {
-  position: relative !important;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
-  border: 1px solid #dce6f2 !important;
-  border-radius: 18px !important;
-  padding: 36px 42px !important;
-  margin-top: 16px !important;
-  margin-bottom: 32px !important;
-  box-shadow: 0 4px 20px -2px rgba(10, 88, 202, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
-  overflow: hidden !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-}
-
-.retail-header-card:hover {
-  border-color: #bad8f8 !important;
-  box-shadow: 0 10px 28px -4px rgba(10, 88, 202, 0.1) !important;
-}
-
-@media (max-width: 768px) {
-  .retail-header-card {
-    padding: 26px 20px !important;
-    margin-top: 14px !important;
-    margin-bottom: 24px !important;
-    border-radius: 14px !important;
-  }
-  .retail-hero-title {
-    font-size: 24px !important;
-    letter-spacing: -0.025em !important;
-  }
-  .retail-hero-subtitle {
-    font-size: 13px !important;
-    line-height: 1.55 !important;
-    margin-bottom: 16px !important;
-  }
-  .retail-hero-features {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 10px !important;
-    padding-top: 14px !important;
-  }
-}
+/* Duplicate retail header card removed for consistency */
 
 /* 8. Paket Retail Cards (Pola ai-vouchers) */
 .retail-packages-grid {
