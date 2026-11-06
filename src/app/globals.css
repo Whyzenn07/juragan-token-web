@@ -233,264 +233,411 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 }
 
 /* ------------------------------------------------------------- */
-/* Currency Rate Modal (Bank Indonesia Real-time Live Forex)     */
+/* Google Finance Currency Converter Widget Modal                */
 /* ------------------------------------------------------------- */
-.currency-rate-modal {
-  width: 540px;
+.google-currency-modal {
+  width: 680px;
   max-width: calc(100% - 24px);
-  padding: 24px;
+  background: #202124;
+  color: #e8eaed;
+  border-radius: 16px;
+  border: 1px solid #3c4043;
+  padding: 24px 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow: hidden;
+  position: relative;
 }
 
-.crm-header {
+.gcm-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #303134;
+  border: 1px solid #3c4043;
+  color: #9aa0a6;
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  padding-right: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
 }
 
-.crm-icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-  color: #0284c7;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  border: 1px solid #bae6fd;
+.gcm-close-btn:hover {
+  background: #3c4043;
+  color: #ffffff;
 }
 
-.crm-header-text {
+.gcm-top-section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  margin-bottom: 22px;
 }
 
-.crm-kicker {
+.gcm-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.gcm-kicker-label {
+  color: #9aa0a6;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.gcm-meta-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 2px;
-  flex-wrap: wrap;
+  padding-right: 36px;
 }
 
-.crm-flag-chip {
+.gcm-live-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  color: #475569;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  padding: 2px 7px;
-  border-radius: 4px;
-}
-
-.crm-bi-pill {
-  font-size: 10px;
-  font-weight: 800;
-  color: #0284c7;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  padding: 2px 7px;
-  border-radius: 4px;
+  background: rgba(52, 168, 83, 0.14);
+  border: 1px solid rgba(52, 168, 83, 0.35);
+  color: #81c995;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
   letter-spacing: 0.3px;
 }
 
-.crm-header-text h3 {
-  font-size: 18px;
-  color: var(--ink);
-  font-weight: 800;
-  margin: 0;
-}
-
-.crm-header-text p {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.45;
-  margin: 0;
-}
-
-/* Rate Hero Card */
-.crm-rate-hero {
-  background: linear-gradient(135deg, #0a2540 0%, #06326b 100%);
-  border-radius: 12px;
-  padding: 20px 22px;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 18px;
-  box-shadow: 0 10px 24px -6px rgba(10, 37, 64, 0.25);
-  border: 1px solid #1e3a5f;
-}
-
-.crm-rate-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.crm-rate-label {
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  color: #93c5fd;
-  text-transform: uppercase;
-  font-family: var(--font-h);
-}
-
-.crm-live-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  color: #6ee7b7;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 10.5px;
-  font-weight: 700;
-}
-
-.crm-live-dot {
-  width: 6px;
-  height: 6px;
+.gcm-pulse-dot {
+  width: 6.5px;
+  height: 6.5px;
   border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.4);
+  background: #34a853;
+  box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.4);
   animation: pulseLive 2s infinite;
 }
 
-.crm-rate-val-row {
+.gcm-rate-hero-row {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+.gcm-rate-text-col {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  flex-direction: column;
 }
 
-.crm-usd-base {
-  font-size: 16px;
-  color: #94a3b8;
-  font-weight: 600;
-}
-
-.crm-idr-val {
-  font-size: 28px;
+.gcm-big-rate {
+  font-size: 42px;
+  font-weight: 700;
   color: #ffffff;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  font-family: var(--font-mono);
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
-.crm-rate-footer {
+.gcm-currency-target {
+  font-size: 20px;
+  font-weight: 600;
+  color: #e8eaed;
+  margin-top: 4px;
+  letter-spacing: -0.2px;
+}
+
+.gcm-timestamp-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 11px;
-  color: #cbd5e1;
+  gap: 6px;
+  color: #9aa0a6;
+  font-size: 11.5px;
+  margin-top: 10px;
   flex-wrap: wrap;
+  line-height: 1.4;
+}
+
+.gcm-sep {
+  color: #5f6368;
+}
+
+.gcm-source {
+  color: #bdc1c6;
+}
+
+/* Chart Column */
+.gcm-chart-col {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.crm-footer-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.gcm-timeframe-tabs {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  border-bottom: 1px solid #303134;
+  padding-bottom: 6px;
 }
 
-.crm-footer-item b {
-  color: #ffffff;
+.gcm-tf-btn {
+  background: transparent;
+  border: none;
+  color: #9aa0a6;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
 }
 
-/* Transparency Cards */
-.crm-transparency-grid {
+.gcm-tf-btn:hover {
+  color: #e8eaed;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.gcm-tf-btn.active {
+  color: #8ab4f8;
+  background: rgba(138, 180, 248, 0.18);
+}
+
+.gcm-chart-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  height: 94px;
+}
+
+.gcm-y-labels {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 18px;
+  justify-content: space-between;
+  color: #70757a;
+  font-size: 10px;
+  font-family: monospace;
+  text-align: right;
+  min-width: 44px;
 }
 
-.crm-trans-card {
+.gcm-svg-container {
+  flex: 1;
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 12px 14px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
 }
 
-.crm-tc-icon {
-  font-size: 18px;
-  line-height: 1;
-  flex-shrink: 0;
+.gcm-sparkline {
+  width: 100%;
+  height: 72px;
+  overflow: visible;
+}
+
+.gcm-x-labels {
+  display: flex;
+  justify-content: space-between;
+  color: #70757a;
+  font-size: 10px;
   padding-top: 2px;
 }
 
-.crm-tc-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+/* Two-Way Converter Input */
+.gcm-converter-box {
+  background: #18191c;
+  border: 1px solid #303134;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
 }
 
-.crm-tc-body strong {
-  font-size: 12.5px;
-  color: #0f172a;
+.gcm-converter-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gcm-input-card {
+  flex: 1;
+  background: #202124;
+  border: 1px solid #3c4043;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s ease;
+}
+
+.gcm-input-card:focus-within {
+  border-color: #8ab4f8;
+  box-shadow: 0 0 0 1px #8ab4f8;
+}
+
+.gcm-number-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.gcm-currency-select {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #9aa0a6;
+  font-size: 11.5px;
+}
+
+.gcm-currency-name {
+  color: #bdc1c6;
+  font-weight: 600;
+}
+
+.gcm-currency-code {
+  color: #8ab4f8;
   font-weight: 700;
 }
 
-.crm-tc-body p {
-  font-size: 11.5px;
-  color: #64748b;
-  line-height: 1.4;
-  margin: 0;
-}
-
-/* Success Toast */
-.crm-success-toast {
+.gcm-swap-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #ecfdf5;
-  border: 1px solid #86efac;
-  color: #065f46;
-  padding: 11px 16px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 650;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
-  animation: fadeInDown 0.25s ease;
+  justify-content: center;
 }
 
-/* Actions */
-.crm-actions {
+.gcm-swap-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #303134;
+  border: 1px solid #3c4043;
+  color: #8ab4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gcm-swap-button:hover {
+  background: #3c4043;
+  color: #ffffff;
+  transform: rotate(180deg);
+}
+
+/* Info and Action Footer */
+.gcm-info-footer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-.crm-spin-icon {
-  font-size: 16px;
+.gcm-info-text {
+  font-size: 12px;
+  color: #9aa0a6;
+  line-height: 1.5;
+}
+
+.gcm-info-text b {
+  color: #e8eaed;
+}
+
+.gcm-sync-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gcm-action-bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.gcm-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #1a73e8;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  font-family: inherit;
+  width: 100%;
+}
+
+.gcm-refresh-btn:hover:not(:disabled) {
+  background: #1967d2;
+  transform: translateY(-1px);
+}
+
+.gcm-refresh-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.gcm-spin-icon {
+  font-size: 15px;
   line-height: 1;
   display: inline-block;
 }
 
-.crm-spin-icon.spinning {
+.gcm-spin-icon.spinning {
   animation: spinSync 0.8s linear infinite;
 }
 
-.crm-dismiss-btn {
-  width: 100%;
-  text-align: center;
-  padding: 8px;
-  color: #64748b;
-  font-size: 12px;
+@media (max-width: 640px) {
+  .google-currency-modal {
+    padding: 20px 16px;
+  }
+  .gcm-rate-hero-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .gcm-big-rate {
+    font-size: 34px;
+  }
+  .gcm-currency-target {
+    font-size: 18px;
+  }
+  .gcm-converter-inner {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .gcm-input-card {
+    width: 100%;
+  }
+  .gcm-swap-button {
+    transform: rotate(90deg);
+  }
+  .gcm-swap-button:hover {
+    transform: rotate(270deg);
+  }
 }
 
 .mobile-currency-btn {
