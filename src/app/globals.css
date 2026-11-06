@@ -5829,14 +5829,21 @@ footer {
 }
 
 .site-pro-footer {
+  display: block;
+  width: 100%;
   border-top: 1px solid #e2e8f0;
   background: #ffffff;
-  padding: 56px 0 32px;
+  border-radius: 16px;
+  padding: 48px 40px 28px;
   margin-top: 64px;
+  font-size: 13px;
+  color: #475569;
 }
+.site-pro-footer .spf-title { margin-top: 4px; }
+.site-pro-footer .spf-bottom-bar { width: 100%; }
 .spf-main-grid {
   display: grid;
-  grid-template-columns: 2.2fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
   gap: 36px;
   margin-bottom: 40px;
 }
@@ -5912,9 +5919,29 @@ footer {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11.5px;
-  color: #64748b;
   flex-wrap: wrap;
+}
+.spf-bottom-badges span {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.spf-links a.spf-wa-link {
+  color: #16a34a;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.spf-col-brand .footer-brand {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0a2442;
+  text-decoration: none;
 }
 
 @media (max-width: 900px) {

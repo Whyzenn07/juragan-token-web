@@ -248,19 +248,20 @@ export async function syncBidirectionalStore(): Promise<{
   let syncedOrders = 0;
 
   // 3. Push data lokal yang belum ada di Cloud ke Supabase
-  for (const localKey of Object.values(localDb.keys)) {
-    const exists = cloudKeys.some((ck) => ck.hash === localKey.hash);
-    if (!exists) {
-      const ok = await syncKeyToSupabase(localKey);
-      if (ok) syncedKeys++;
-    }
-  }
-
+  // Order harus dikirim lebih dulu agar foreign key keys.order_id terpenuhi
   for (const localOrder of Object.values(localDb.orders)) {
     const exists = cloudOrders.some((co) => co.id === localOrder.id);
     if (!exists) {
       const ok = await syncOrderToSupabase(localOrder);
       if (ok) syncedOrders++;
+    }
+  }
+
+  for (const localKey of Object.values(localDb.keys)) {
+    const exists = cloudKeys.some((ck) => ck.hash === localKey.hash);
+    if (!exists) {
+      const ok = await syncKeyToSupabase(localKey);
+      if (ok) syncedKeys++;
     }
   }
 

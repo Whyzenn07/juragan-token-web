@@ -1330,7 +1330,7 @@ export default function Home() {
                       href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Halo Admin Juragan Token, saya butuh informasi / bantuan teknis.")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: "#16a34a", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}
+                                             className="spf-wa-link"
                     >
                       <Icon name="whatsapp" size={14} />
                       <span>WhatsApp Admin ↗</span>
@@ -1351,11 +1351,9 @@ export default function Home() {
                 © 2026 Juragan Token Indonesia. Hak Cipta Dilindungi Undang-Undang.
               </span>
               <div className="spf-bottom-badges">
-                <span>🛡️ Zero-Training Guarantee</span>
-                <span>•</span>
-                <span>⚡ Gateway IDR Otomatis</span>
-                <span>•</span>
-                <span>🇮🇩 QRIS Standar Nasional</span>
+                <span>Zero-Training Guarantee</span>
+                <span>Gateway IDR Otomatis</span>
+                <span>QRIS Standar Nasional</span>
               </div>
             </div>
           </footer>
