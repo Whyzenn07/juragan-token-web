@@ -46,9 +46,29 @@ create table if not exists public.keys (
 create index if not exists idx_keys_order_id on public.keys (order_id);
 create index if not exists idx_keys_status on public.keys (status);
 
--- 3. ROW LEVEL SECURITY (RLS) POLICIES
+-- 3. TABEL AUDIT LOG PEMAKAIAN API: public.usage_logs
+create table if not exists public.usage_logs (
+    id bigserial primary key,
+    key_hash text not null references public.keys(hash) on delete cascade,
+    key_last4 text,
+    model text not null,
+    provider text not null default 'gemini',
+    prompt_tokens integer not null default 0,
+    completion_tokens integer not null default 0,
+    total_tokens integer not null default 0,
+    cost_idr integer not null default 0,
+    remaining_balance_idr integer not null default 0,
+    ip_address text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create index if not exists idx_usage_logs_key_hash on public.usage_logs (key_hash);
+create index if not exists idx_usage_logs_created_at on public.usage_logs (created_at desc);
+
+-- 4. ROW LEVEL SECURITY (RLS) POLICIES
 alter table public.orders enable row level security;
 alter table public.keys enable row level security;
+alter table public.usage_logs enable row level security;
 
 drop policy if exists "Allow public order insertion" on public.orders;
 create policy "Allow public order insertion" on public.orders for insert with check (true);
@@ -65,7 +85,13 @@ create policy "Allow keys lookup by hash" on public.keys for select using (true)
 drop policy if exists "Allow keys insert on payment" on public.keys;
 create policy "Allow keys insert on payment" on public.keys for insert with check (true);
 
--- 4. RESTORE BACKUP DATA YANG SUDAH ADA
+drop policy if exists "Allow insert usage_logs" on public.usage_logs;
+create policy "Allow insert usage_logs" on public.usage_logs for insert with check (true);
+
+drop policy if exists "Allow read usage_logs" on public.usage_logs;
+create policy "Allow read usage_logs" on public.usage_logs for select using (true);
+
+-- 5. RESTORE BACKUP DATA YANG SUDAH ADA
 insert into public.orders (
     id, token_hash, customer_name, customer_email, customer_phone,
     package_id, package_name, est_package, base_idr, fee_idr, total_idr,

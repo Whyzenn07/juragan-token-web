@@ -1,9 +1,6 @@
 import { sha256 } from "./keys";
 import { query, mutate, type KeyRecord } from "./store";
-import { syncKeyToSupabase } from "./supabase-sync";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+import { syncKeyToSupabase, syncUsageLogToSupabase, getSupabaseConfig } from "./supabase-sync";
 
 export type AuthResult = {
   ok: boolean;
@@ -42,12 +39,13 @@ export async function authenticateGatewayKey(authHeader: string | null): Promise
   let record = await query((db) => db.keys[hash]);
 
   // 2. Jika tidak ada di lokal, cek di Supabase Cloud
-  if (!record && SUPABASE_URL && SUPABASE_KEY) {
+  const { url: sbUrl, key: sbKey, isConfigured: sbConfigured } = getSupabaseConfig();
+  if (!record && sbConfigured) {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/keys?hash=eq.${hash}&select=*`, {
+      const res = await fetch(`${sbUrl}/rest/v1/keys?hash=eq.${hash}&select=*`, {
         headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
+          apikey: sbKey,
+          Authorization: `Bearer ${sbKey}`,
         },
       });
       if (res.ok) {
@@ -165,6 +163,7 @@ export function calculateUsageCost(model: string, promptTokens: number, completi
  */
 export async function deductKeyBalance(keyHash: string, costIdr: number): Promise<number> {
   let remaining = 0;
+  const { url: sbUrl, key: sbKey, isConfigured: sbConfigured } = getSupabaseConfig();
 
   // 1. Update di local store
   const updatedRecord = await mutate((db) => {
@@ -182,22 +181,22 @@ export async function deductKeyBalance(keyHash: string, costIdr: number): Promis
     syncKeyToSupabase(updatedRecord).catch((err) => {
       console.warn("[GATEWAY DEDUCT] Gagal sync pengurangan saldo ke Supabase:", err);
     });
-  } else if (SUPABASE_URL && SUPABASE_KEY) {
+  } else if (sbConfigured) {
     // Jika tidak ada di local store, patch langsung ke Supabase
     try {
-      const getRes = await fetch(`${SUPABASE_URL}/rest/v1/keys?hash=eq.${keyHash}&select=balance_idr`, {
-        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      const getRes = await fetch(`${sbUrl}/rest/v1/keys?hash=eq.${keyHash}&select=balance_idr`, {
+        headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` },
       });
       if (getRes.ok) {
         const rows = await getRes.json();
         if (rows && rows.length > 0) {
           const newBal = Math.max(0, (rows[0].balance_idr || 0) - costIdr);
           remaining = newBal;
-          await fetch(`${SUPABASE_URL}/rest/v1/keys?hash=eq.${keyHash}`, {
+          await fetch(`${sbUrl}/rest/v1/keys?hash=eq.${keyHash}`, {
             method: "PATCH",
             headers: {
-              apikey: SUPABASE_KEY,
-              Authorization: `Bearer ${SUPABASE_KEY}`,
+              apikey: sbKey,
+              Authorization: `Bearer ${sbKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ balance_idr: newBal }),
@@ -242,34 +241,9 @@ export async function recordUsageLog(params: RecordUsageParams): Promise<void> {
     if (db.usageLogs.length > 200) db.usageLogs = db.usageLogs.slice(0, 200);
   }).catch(() => undefined);
 
-  // 2. Kirim ke Supabase jika tabel usage_logs ada
-  if (SUPABASE_URL && SUPABASE_KEY) {
-    try {
-      fetch(`${SUPABASE_URL}/rest/v1/usage_logs`, {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          key_hash: params.keyHash,
-          key_last4: params.keyLast4,
-          model: params.model,
-          provider: params.provider,
-          prompt_tokens: params.promptTokens,
-          completion_tokens: params.completionTokens,
-          total_tokens: params.totalTokens,
-          cost_idr: params.costIdr,
-          remaining_balance_idr: params.remainingBalanceIdr,
-          created_at: now,
-        }),
-      }).catch((err) => {
-        // Abaikan jika tabel belum ada atau sedang dibuat
-        console.warn("[GATEWAY USAGE LOG] Cloud log notice:", err.message);
-      });
-    } catch {
-      // background
-    }
-  }
+  // 2. Kirim ke Supabase public.usage_logs
+  syncUsageLogToSupabase({
+    ...params,
+    createdAt: now,
+  }).catch(() => undefined);
 }

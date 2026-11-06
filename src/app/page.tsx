@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
   BrandMark,
   Icon,
@@ -382,6 +383,9 @@ export default function Home() {
             <span>Indonesia (IDR)</span>
           </div>
           <span className="header-divider" />
+          <Link href="/docs" className="header-docs-link">
+            <span>Dokumentasi API</span>
+          </Link>
           <button
             type="button"
             className="check-balance-btn"
@@ -431,6 +435,12 @@ export default function Home() {
             <a href="#katalog-retail" onClick={() => setMobileMenuOpen(false)}>
               Paket Prabayar Ritel
             </a>
+            <Link href="/docs" onClick={() => setMobileMenuOpen(false)}>
+              Dokumentasi API &amp; Panduan ↗
+            </Link>
+            <Link href="/status" onClick={() => setMobileMenuOpen(false)}>
+              Status Sistem (Live) ↗
+            </Link>
             <a href="#panduan-setup" onClick={() => setMobileMenuOpen(false)}>
               Panduan Setup Claude Code &amp; Cursor
             </a>
@@ -1240,26 +1250,114 @@ export default function Home() {
           {/* 10. Panduan Setup Interaktif */}
           <SetupGuides />
 
-          {/* 11. Footer */}
-          <footer>
-            <a className="footer-brand" href="#top">
-              ✳ juragan token.
-            </a>
-            <span>Membuka dunia penuh peluang AI dengan harga ramah kantong mahasiswa.</span>
-            <a href="#panduan-setup" className="footer-link">
-              Panduan Integrasi API ↗
-            </a>
-            <a
-              href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Halo Admin Juragan Token, saya butuh informasi / bantuan mengenai pemesanan token.")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-link"
-              style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#16a34a", fontWeight: 700 }}
-            >
-              <Icon name="whatsapp" size={14} />
-              <span>Bantuan WhatsApp ↗</span>
-            </a>
-            <span>© 2026 Juragan Token</span>
+          {/* 11. Footer Multi-Kolom Profesional */}
+          <footer className="site-pro-footer">
+            <div className="spf-main-grid">
+              {/* Kolom 1: Brand & Misi */}
+              <div className="spf-col spf-col-brand">
+                <a className="footer-brand" href="#top">
+                  ✳ juragan token.
+                </a>
+                <p className="spf-desc">
+                  Platform marketplace &amp; Universal AI Gateway kredit Multi-AI prabayar lokal pertama di Indonesia. Akses Claude, GPT, Gemini, dan DeepSeek tanpa kartu kredit internasional.
+                </p>
+                <div className="spf-pill-row">
+                  <span className="spf-trust-pill">
+                    <Icon name="check" size={13} /> Masa Aktif Saldo Selamanya
+                  </span>
+                  <span className="spf-trust-pill">
+                    <Icon name="bolt" size={13} /> Uptime Gateway 99.98%
+                  </span>
+                </div>
+              </div>
+
+              {/* Kolom 2: Produk & Layanan */}
+              <div className="spf-col">
+                <h4 className="spf-title">Produk &amp; Layanan</h4>
+                <ul className="spf-links">
+                  <li>
+                    <a href="#katalog-retail">Paket Token Ritel</a>
+                  </li>
+                  <li>
+                    <a href="#catalog">Katalog 12+ Model AI</a>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="spf-link-btn"
+                      onClick={() => setBalanceModalOpen(true)}
+                    >
+                      Cek Saldo API Key ↗
+                    </button>
+                  </li>
+                  <li>
+                    <a href="#panduan-setup">Panduan Setup 1-Menit</a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Kolom 3: Developer & Dokumentasi */}
+              <div className="spf-col">
+                <h4 className="spf-title">Dokumentasi API</h4>
+                <ul className="spf-links">
+                  <li>
+                    <Link href="/docs">Dokumentasi Resmi ↗</Link>
+                  </li>
+                  <li>
+                    <Link href="/docs">Integrasi Cursor &amp; Windsurf</Link>
+                  </li>
+                  <li>
+                    <Link href="/docs">Integrasi Claude Code CLI</Link>
+                  </li>
+                  <li>
+                    <Link href="/status">Status Sistem (Live) ↗</Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Kolom 4: Legal & Bantuan */}
+              <div className="spf-col">
+                <h4 className="spf-title">Legal &amp; Kontak</h4>
+                <ul className="spf-links">
+                  <li>
+                    <Link href="/terms">Syarat &amp; Ketentuan</Link>
+                  </li>
+                  <li>
+                    <Link href="/privacy">Kebijakan Privasi (Zero-Training)</Link>
+                  </li>
+                  <li>
+                    <a
+                      href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Halo Admin Juragan Token, saya butuh informasi / bantuan teknis.")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#16a34a", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}
+                    >
+                      <Icon name="whatsapp" size={14} />
+                      <span>WhatsApp Admin ↗</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://t.me/juragantoken" target="_blank" rel="noopener noreferrer">
+                      Telegram: @juragantoken ↗
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="spf-bottom-bar">
+              <span className="spf-copy">
+                © 2026 Juragan Token Indonesia. Hak Cipta Dilindungi Undang-Undang.
+              </span>
+              <div className="spf-bottom-badges">
+                <span>🛡️ Zero-Training Guarantee</span>
+                <span>•</span>
+                <span>⚡ Gateway IDR Otomatis</span>
+                <span>•</span>
+                <span>🇮🇩 QRIS Standar Nasional</span>
+              </div>
+            </div>
           </footer>
         </main>
       </div>

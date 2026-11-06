@@ -724,6 +724,64 @@ Pembeli: *${customerName || "Sahabat Token"}*
               </div>
             </div>
 
+            {/* Tampilan API Key Langsung di Layar */}
+            {apiKeyGenerated && (
+              <div
+                style={{
+                  marginTop: "16px",
+                  padding: "14px 16px",
+                  background: "#0a2442",
+                  borderRadius: "8px",
+                  color: "#ffffff",
+                  textAlign: "left",
+                  border: "1px solid #1e3a5f",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                  <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.5px", color: "#93c5fd", textTransform: "uppercase" }}>
+                    Kunci Virtual API Key Anda
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(apiKeyGenerated, "key")}
+                    style={{
+                      background: copiedKey ? "#16a34a" : "#0a58ca",
+                      color: "#ffffff",
+                      border: "none",
+                      padding: "5px 12px",
+                      borderRadius: "5px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      transition: "background 0.2s ease",
+                    }}
+                  >
+                    <Icon name={copiedKey ? "check" : "copy"} size={13} />
+                    <span>{copiedKey ? "Tersalin!" : "Salin Kunci"}</span>
+                  </button>
+                </div>
+                <code
+                  style={{
+                    display: "block",
+                    fontFamily: "monospace",
+                    fontSize: "13px",
+                    color: "#60a5fa",
+                    wordBreak: "break-all",
+                    background: "rgba(255,255,255,0.06)",
+                    padding: "8px 10px",
+                    borderRadius: "6px",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    fontWeight: 600,
+                  }}
+                >
+                  {apiKeyGenerated}
+                </code>
+              </div>
+            )}
+
             {/* Notifikasi Pengiriman Kredensial via Gmail */}
             <div
               style={{
@@ -754,24 +812,53 @@ Pembeli: *${customerName || "Sahabat Token"}*
             </div>
           </div>
 
-          <button
-            type="button"
-            className="button-primary full"
-            onClick={handleClose}
-            style={{
-              marginTop: "20px",
-              height: "46px",
-              fontSize: "14px",
-              fontWeight: 700,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-            }}
-          >
-            <span>Selesai &amp; Kembali ke Halaman Utama</span>
-            <Icon name="arrow" size={16} />
-          </button>
+          {/* Action Buttons: Direct to Gmail & Selesai */}
+          <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+            <a
+              href="https://mail.google.com"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                flex: 1,
+                height: "46px",
+                background: "#0a58ca",
+                color: "#ffffff",
+                textDecoration: "none",
+                borderRadius: "8px",
+                fontSize: "13px",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                boxShadow: "0 2px 8px rgba(10,88,202,0.25)",
+              }}
+            >
+              <Icon name="mail" size={16} />
+              <span>Buka Inbox Gmail ↗</span>
+            </a>
+            <button
+              type="button"
+              className="button-primary"
+              onClick={handleClose}
+              style={{
+                flex: 1,
+                height: "46px",
+                fontSize: "13px",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                background: "#f1f5f9",
+                color: "#334155",
+                border: "1px solid #cbd5e1",
+              }}
+            >
+              <span>Selesai</span>
+              <Icon name="arrow" size={15} />
+            </button>
+          </div>
         </div>
       )}
     </Dialog>
