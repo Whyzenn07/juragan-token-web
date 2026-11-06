@@ -660,43 +660,266 @@ export default function Home() {
 
           {/* 5. Catalog Section: model riil dari gateway juragantoken.co.id */}
           <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
-            {/* 5. Catalog Section Header Card - Modern Executive Banner with Generous Spacing */}
-            <div className="catalog-header-card">
-              <div className="catalog-header-top">
-                <div className="catalog-kicker-group">
-                  <span className="chc-kicker-pill">
-                    <span className="chc-sparkle" aria-hidden="true">✦</span>
-                    <span>KATALOG MODEL FRONTIER AI</span>
-                  </span>
-                  <span className="chc-status-pill">
-                    <span className="chc-dot-live" aria-hidden="true" />
-                    <span>36 Model Gateway Terverifikasi</span>
-                  </span>
-                  <span className="chc-badge-pill">
-                    <span>1 API Key Universal</span>
-                  </span>
-                </div>
+            {/* 5. Catalog Section Header Card - Modern Executive Corporate Banner */}
+            <div
+              className="catalog-header-card"
+              style={{
+                position: "relative",
+                background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+                border: "1px solid #dce6f2",
+                borderRadius: "18px",
+                padding: "38px 44px",
+                marginTop: "44px",
+                marginBottom: "38px",
+                boxShadow: "0 4px 20px -2px rgba(10, 88, 202, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03)",
+                overflow: "hidden",
+              }}
+            >
+              {/* Subtle top accent gradient line */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "3px",
+                  background: "linear-gradient(90deg, #0a58ca 0%, #0284c7 50%, #38bdf8 100%)",
+                }}
+                aria-hidden="true"
+              />
+
+              {/* Badges / Status row */}
+              <div
+                className="catalog-kicker-group"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  marginBottom: "18px",
+                }}
+              >
+                <span
+                  className="chc-kicker-pill"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    background: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    color: "#1d4ed8",
+                    padding: "5px 13px",
+                    borderRadius: "9999px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                    <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+                  </svg>
+                  <span>Katalog Frontier AI</span>
+                </span>
+
+                <span
+                  className="chc-status-pill"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    background: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                    color: "#15803d",
+                    padding: "5px 13px",
+                    borderRadius: "9999px",
+                    fontSize: "11.5px",
+                    fontWeight: 650,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "7px",
+                      height: "7px",
+                      borderRadius: "50%",
+                      background: "#16a34a",
+                      boxShadow: "0 0 0 2px rgba(22, 163, 74, 0.25)",
+                      display: "inline-block",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span>36 Model Gateway Terverifikasi</span>
+                </span>
+
+                <span
+                  className="chc-badge-pill"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    background: "#f8fafc",
+                    border: "1px solid #e2e8f0",
+                    color: "#475569",
+                    padding: "5px 13px",
+                    borderRadius: "9999px",
+                    fontSize: "11.5px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M21 2l-2 2m-2-2l2 2m0 0l-5 5 2 2-7 7H3v-6l7-7 2 2 5-5z" />
+                  </svg>
+                  <span>1 API Key Universal</span>
+                </span>
               </div>
 
-              <h2 className="catalog-hero-title">
-                Pilih model, lihat seberapa jauh <span className="title-gradient-accent">Rp10.000</span> Anda
+              {/* Main Headline */}
+              <h2
+                className="catalog-hero-title"
+                style={{
+                  fontSize: "30px",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.25,
+                  color: "#0a2540",
+                  margin: "0 0 12px 0",
+                }}
+              >
+                Pilih model, lihat seberapa jauh{" "}
+                <span
+                  style={{
+                    color: "#0a58ca",
+                    background: "linear-gradient(135deg, #0a58ca 0%, #0284c7 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontWeight: 900,
+                  }}
+                >
+                  Rp10.000
+                </span>{" "}
+                Anda
               </h2>
 
-              <p className="catalog-hero-subtitle">
-                Satu API key untuk seluruh model terbaik dunia (Claude 3.7/3.5, GPT-4o, Gemini 2.0, DeepSeek R1). Harga dihitung langsung dari tarif resmi gateway ke Rupiah secara transparan — angka yang tertera adalah nilai riil yang dipotong dari saldo Anda.
+              {/* Subtitle */}
+              <p
+                className="catalog-hero-subtitle"
+                style={{
+                  fontSize: "14.5px",
+                  lineHeight: 1.65,
+                  color: "#475569",
+                  maxWidth: "860px",
+                  margin: "0 0 24px 0",
+                }}
+              >
+                Satu API key untuk seluruh model terbaik dunia (Claude 3.7/3.5, GPT-4o, Gemini 2.0, DeepSeek R1).
+                Harga dihitung langsung dari tarif resmi gateway ke Rupiah secara transparan — angka yang tertera adalah nilai riil yang dipotong dari saldo Anda.
               </p>
 
-              <div className="catalog-hero-features">
-                <div className="chf-item">
-                  <span className="chf-icon" aria-hidden="true">⚡</span>
+              {/* Features Guarantee Bar - Enterprise SVG Icons, NO Emojis */}
+              <div
+                className="catalog-hero-features"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "28px",
+                  paddingTop: "20px",
+                  borderTop: "1px solid #e2e8f0",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div
+                  className="chf-item"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "12.5px",
+                    fontWeight: 650,
+                    color: "#334155",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      background: "#eff6ff",
+                      border: "1px solid #bfdbfe",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                    aria-hidden="true"
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
                   <span>Bayar Fleksibel via QRIS Instan &amp; Virtual Account</span>
                 </div>
-                <div className="chf-item">
-                  <span className="chf-icon" aria-hidden="true">🔄</span>
+
+                <div
+                  className="chf-item"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "12.5px",
+                    fontWeight: 650,
+                    color: "#334155",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      background: "#eff6ff",
+                      border: "1px solid #bfdbfe",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                    aria-hidden="true"
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
                   <span>Kurs Real-Time Bank Indonesia (Tanpa Markup)</span>
                 </div>
-                <div className="chf-item">
-                  <span className="chf-icon" aria-hidden="true">🛠️</span>
+
+                <div
+                  className="chf-item"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "12.5px",
+                    fontWeight: 650,
+                    color: "#334155",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      background: "#eff6ff",
+                      border: "1px solid #bfdbfe",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                    aria-hidden="true"
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
                   <span>Kompatibel Claude Code, Cursor, Cline &amp; SDK Resmi</span>
                 </div>
               </div>

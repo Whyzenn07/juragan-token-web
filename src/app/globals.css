@@ -1611,159 +1611,117 @@ main {
 }
 
 /* ------------------------------------------------------------- */
-/* Catalog Header Card (Executive SaaS Banner with High Breathing Room) */
+/* Catalog Header Card (Executive Corporate SaaS Banner) */
 /* ------------------------------------------------------------- */
 .catalog-header-card {
-  position: relative;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 45%, #eff6ff 100%);
-  border: 1px solid #cfe0f5;
-  border-radius: 18px;
-  padding: 38px 44px;
-  margin-top: 28px;
-  margin-bottom: 34px;
-  box-shadow: 0 10px 32px -8px rgba(10, 88, 202, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
-  overflow: hidden;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+  border: 1px solid #dce6f2 !important;
+  border-radius: 18px !important;
+  padding: 38px 44px !important;
+  margin-top: 44px !important;
+  margin-bottom: 38px !important;
+  box-shadow: 0 4px 20px -2px rgba(10, 88, 202, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  overflow: hidden !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .catalog-header-card:hover {
-  border-color: #93c5fd;
-  box-shadow: 0 14px 40px -8px rgba(10, 88, 202, 0.12);
-}
-
-.catalog-header-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.catalog-header-top {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 16px;
+  border-color: #bad8f8 !important;
+  box-shadow: 0 10px 28px -4px rgba(10, 88, 202, 0.1) !important;
 }
 
 .catalog-kicker-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 18px !important;
 }
 
 .chc-kicker-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #0a58ca 0%, #0284c7 100%);
-  color: #ffffff;
-  padding: 5px 14px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  font-family: var(--font-h);
-  box-shadow: 0 2px 8px rgba(10, 88, 202, 0.25);
-}
-
-.chc-sparkle {
-  color: #93c5fd;
-  font-size: 13px;
-  line-height: 1;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  color: #1d4ed8 !important;
+  padding: 5px 13px !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  font-family: var(--font-h) !important;
 }
 
 .chc-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #ffffff;
-  border: 1px solid #bbf7d0;
-  color: #15803d;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 750;
-  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.08);
-}
-
-.chc-dot-live {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #16a34a;
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.3);
-  animation: pulseLive 2s infinite;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  background: #f0fdf4 !important;
+  border: 1px solid #bbf7d0 !important;
+  color: #15803d !important;
+  padding: 5px 13px !important;
+  border-radius: 9999px !important;
+  font-size: 11.5px !important;
+  font-weight: 650 !important;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.06) !important;
 }
 
 .chc-badge-pill {
-  display: inline-flex;
-  align-items: center;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  color: #475569;
-  padding: 4px 11px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+  padding: 5px 13px !important;
+  border-radius: 9999px !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
 }
 
 .catalog-hero-title {
-  position: relative;
-  z-index: 1;
-  font-size: 32px;
-  font-weight: 850;
-  letter-spacing: -0.035em;
-  line-height: 1.25;
-  color: #0a2540;
-  font-family: var(--font-h);
-  margin: 0 0 12px 0;
-}
-
-.title-gradient-accent {
-  color: #0a58ca;
-  background: linear-gradient(135deg, #0a58ca 0%, #0284c7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 900;
-  display: inline-block;
-  padding: 0 2px;
+  position: relative !important;
+  z-index: 1 !important;
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.25 !important;
+  color: #0a2540 !important;
+  font-family: var(--font-h) !important;
+  margin: 0 0 12px 0 !important;
 }
 
 .catalog-hero-subtitle {
-  position: relative;
-  z-index: 1;
-  font-size: 14.5px;
-  line-height: 1.65;
-  color: #475569;
-  max-width: 860px;
-  margin: 0 0 22px 0;
+  position: relative !important;
+  z-index: 1 !important;
+  font-size: 14.5px !important;
+  line-height: 1.65 !important;
+  color: #475569 !important;
+  max-width: 860px !important;
+  margin: 0 0 24px 0 !important;
 }
 
 .catalog-hero-features {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(207, 224, 245, 0.8);
-  flex-wrap: wrap;
+  position: relative !important;
+  z-index: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 28px !important;
+  padding-top: 20px !important;
+  border-top: 1px solid #e2e8f0 !important;
+  flex-wrap: wrap !important;
 }
 
 .chf-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  font-weight: 650;
-  color: #334155;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 12.5px !important;
+  font-weight: 650 !important;
+  color: #334155 !important;
 }
 
 .chf-icon {
