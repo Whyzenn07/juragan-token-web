@@ -1,8 +1,8 @@
 # Product Requirement Document (PRD): Juragan Token
 
-**Versi Dokumen:** 2.0.0  
+**Versi Dokumen:** 2.1.0  
 **Status:** Living Document / Production-Ready Architecture  
-**Tanggal Pembaruan:** 4 November 2026  
+**Tanggal Pembaruan:** 6 November 2026  
 **Platform:** Web Application (Next.js 16.4.2 App Router, TypeScript, Vanilla CSS, Supabase Cloud)  
 **Repository:** `Whyzenn07/juragan-token-web`  
 
@@ -18,7 +18,7 @@ Banyak developer, periset, mahasiswa, dan pembuat konten di Indonesia yang ingin
 
 ### 1.2 Solusi: Juragan Token
 **Juragan Token** adalah platform marketplace & gateway kredit Multi-AI prabayar lokal pertama di Indonesia yang berfungsi sebagai:
-- **Toko Ritel & Kasir Pembayaran IDR:** Memungkinkan pembelian kredit API mulai dari **Rp 15.000** menggunakan metode pembayaran lokal Indonesia (**QRIS Instan**, Virtual Account **BCA, Mandiri, BRI** melalui SingaPay, serta pemesanan cepat via WhatsApp).
+- **Toko Ritel & Kasir Pembayaran IDR:** Memungkinkan pembelian kredit API mulai dari **Rp 15.000** menggunakan metode pembayaran lokal Indonesia (**QRIS Instan**, Virtual Account & e-Wallet **DANA, ShopeePay, OVO, GoPay, BCA, Mandiri, BRI, BNI**, serta Transfer Bank **BCA, Mandiri, BRI, BNI, BSI**).
 - **Universal OpenAI-Compatible AI Gateway:** Menyediakan **1 Virtual API Key (`jt-live-...`)** dengan Base URL standar (`https://www.juragantoken.co.id/v1`) yang dapat langsung dicolokkan ke berbagai *coding tools* dan klien populer (Cursor AI, Windsurf, Claude Code CLI, Chatbox, dan Python SDK).
 - **Hybrid Upstream Routing:** 
   1. *Direct Engine:* Permintaan Google Gemini diproses langsung secara lokal ke Google AI Studio (`gemini-3.8-flash`) menggunakan Master Key berkecepatan tinggi.
@@ -45,18 +45,22 @@ flowchart TD
     Choice -->|Beli Token Langsung| Retail[Katalog Paket Ritel: 4 Pilihan]
     Retail --> SelectPkg[Pilih Paket: Starter, Pro, Studio, Enterprise]
     
-    SelectPkg --> OpenCheckout[Buka SingaPay Modal: Step 1 Formulir]
+    SelectPkg --> OpenCheckout[Buka SingaPay Modal: Step 1 Formulir & Accordion]
     OpenCheckout --> InputData[Isi Nama, Email, & No. WhatsApp]
-    InputData --> SelectPayment[Pilih Metode: QRIS / BCA / Mandiri / BRI VA]
+    InputData --> SelectAccordion[Pilih Kategori: QRIS / VA & e-Wallet / Transfer Bank]
+    SelectAccordion --> SelectChannel[Pilih Channel: DANA, ShopeePay, OVO, GoPay, BCA, Mandiri, BRI, BNI, BSI]
     
-    SelectPayment --> StepPay[Step 2: Layar Pembayaran & Timer 15 Menit]
-    StepPay --> UserPay[User Melakukan Pembayaran QRIS / VA]
+    SelectChannel --> StepInvoice[Step 2: Layar Invoice Standar Traveloka / Tiket.com]
+    StepInvoice --> CountdownTimer[Timer 15 Menit + Progress Bar Berjalan]
+    StepInvoice --> CopyDetails[Fitur 1-Klik Salin: No. Invoice, No. Rek/VA, Nominal Persis]
+    StepInvoice --> GuideTabs[Petunjuk Cara Bayar: m-Banking, i-Banking, ATM]
     
+    StepInvoice --> UserPay[User Melakukan Transfer / Scan QRIS]
     UserPay --> VerifyPay{Verifikasi Pembayaran}
-    VerifyPay -->|Berhasil| GenerateKey[Generate Kunci CSPRNG: jt-live-xxxx]
+    VerifyPay -->|Otomatis / Cek Status| GenerateKey[Generate Kunci CSPRNG: jt-live-xxxx]
     
     GenerateKey --> StepSuccess[Step 3: Layar Sukses & Kredensial API Key]
-    StepSuccess --> SendEmailTrigger[Trigger POST /api/send-receipt via Nodemailer]
+    StepSuccess --> SendEmailTrigger[Trigger POST /api/send-receipt via Gmail SMTP]
     StepSuccess --> BackupWA[Opsi Cadangkan Kredensial ke WhatsApp]
     
     StepSuccess --> SetupGuide[Lihat Panduan Setup 1-Menit di Beranda]
@@ -165,10 +169,47 @@ sequenceDiagram
 | **Audit Usage Logging** | `public.usage_logs` | Pencatatan riwayat pemakaian API setiap kali request inferensi selesai (mencatat model, provider, prompt tokens, completion tokens, biaya IDR, dan sisa saldo). |
 | **Portal Cek Saldo Key** | `TokenBalanceModal.tsx`<br>`/api/keys/check` | Modal verifikasi saldo sisa IDR, estimasi token, status keaktifan permanen, proteksi rate-limiting (10 req/menit), masking kunci (`jt-live-...xxxx`), dan tombol 1-klik "Tempel Kunci Terakhir". |
 | **Panduan Setup 4-in-1** | `SetupGuides.tsx` | Tab panduan interaktif siap salin dengan deteksi otomatis Base URL origin (`http://localhost:3000/v1` di dev, atau `https://www.juragantoken.co.id/v1` saat live) untuk: Cursor AI, Claude Code CLI, Chatbox, dan Python SDK. |
-| **Sistem Checkout SingaPay** | `SingaPayModal.tsx` | Modal checkout 3 langkah: input identitas pembeli, pemilihan metode bayar (QRIS/VA), layar instruksi dengan timer 15 menit, dan layar sukses yang mengekspos API Key + Base URL. |
+| **Sistem Checkout Multi-Channel & Accordion** | `SingaPayModal.tsx` | Modal checkout 3 langkah dengan navigasi accordion interaktif bersusun halus (QRIS, VA & e-Wallet, Transfer Bank), validasi form, breakdown transparan, dan integrasi WhatsApp. |
+| **Invoice Standar Traveloka / Tiket.com** | `SingaPayModal.tsx` (Step 2) | Layar invoice pembayaran resmi OTA benchmark: countdown timer 15 menit dengan progress bar, tombol 1-klik salin nomor invoice, salin nomor rekening/VA, salin nominal persis, serta petunjuk pembayaran multi-tab (m-Banking, i-Banking, ATM). |
 | **Integrasi Notifikasi WhatsApp** | `SingaPayModal.tsx`, `page.tsx` | Pesan langsung via WhatsApp Admin di Step 1, konfirmasi bayar WhatsApp di Step 2, cadangkan kredensial ke WhatsApp pribadi/admin di Step 3, serta link bantuan WhatsApp di footer (`081226983990`). |
 | **Layanan Email Kuitansi** | `/api/send-receipt/route.ts` | Endpoint server-side berbasis Nodemailer untuk mengirim bukti bayar resmi dan kredensial API Key dengan template HTML responsif Navy Blue branded. |
 | **SEO & OpenGraph Metadata** | `src/app/layout.tsx` | Metadata komersial profesional: Title, Description berdaya konversi tinggi, OpenGraph WhatsApp preview, Twitter card, Canonical URL, dan bebas dari kata "simulasi". |
+
+---
+
+### 3.1 Arsitektur Pembayaran & Standar Desain Invoice (Benchmark Traveloka & Tiket.com)
+
+Untuk menciptakan pengalaman pembayaran yang terpercaya, modern, dan berstandar *company profile enterprise*, sistem pembayaran Juragan Token mengadopsi standar alur transaksi platform OTA tier-1 (Traveloka dan Tiket.com):
+
+#### 1. Pengelompokan Kanal Pembayaran (Interactive Accordion)
+Pengguna disajikan 3 kelompok kategori utama yang dilengkapi micro-animation *slide-down* mulus:
+1. **QRIS Instan (Semua Bank & e-Wallet):**
+   - Mendukung BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA, dan LinkAja.
+   - Status: Bebas Biaya Admin, verifikasi 1 detik otomatis.
+2. **Virtual Account & e-Wallet (Otomatis):**
+   - Menampilkan 8 pilihan: **DANA, ShopeePay, OVO, GoPay, BCA Virtual Account, Mandiri Virtual Account, BRI Virtual Account (BRIVA), BNI Virtual Account**.
+   - Dilengkapi badge biaya transparan (Bebas Biaya s/d Rp 1.000).
+3. **Transfer Bank (Verifikasi Cepat & Syariah):**
+   - Menampilkan 5 bank nasional: **Bank Central Asia (BCA), Bank Mandiri, Bank Rakyat Indonesia (BRI), Bank Negara Indonesia (BNI), Bank Syariah Indonesia (BSI)**.
+   - Status: Bebas Biaya Admin, rekening resmi terverifikasi.
+
+#### 2. Layar Invoice Resmi (Traveloka & Tiket.com Style)
+Saat pengguna melanjutkan ke Step 2, sistem merender lembar invoice resmi dengan elemen-elemen kunci:
+- **Timer Penghitung Mundur (Countdown Timer):** Timer dinamis 15:00 menit dengan progress bar visual berwarna emas/amber untuk kepastian waktu transfer.
+- **Identitas Invoice & Order ID:** Nomor invoice resmi unik (misal: `INV-20261106-XXXX`) dengan tombol **1-Klik "Salin No. Invoice"**.
+- **Blok Tujuan Pembayaran (High-Conversion Destination):**
+  - Untuk VA/Transfer Bank: Menampilkan Nomor Rekening / Nomor VA dalam tipografi monospace tebal berjarak (`letter-spacing: 1.2px`) dengan tombol **1-Klik "Salin Nomor"** (disertai feedback visual *"Tersalin! ✓"*).
+  - Nama Rekening Penerima Resmi: `PT JURAGAN TOKEN INDONESIA`.
+  - Untuk QRIS: Menampilkan vector barcode QRIS Standar Pembayaran Nasional beresolusi tinggi dengan NMID terdaftar dan tombol simpan kode.
+- **Nominal Transfer Persis (Exact Amount Protection):**
+  - Menampilkan angka rupiah total dalam font besar tebal dengan tombol **1-Klik "Salin Jumlah"** agar pelanggan tidak keliru memasukkan nominal transfer.
+  - Kotak peringatan (*Caution Pill*): Memberikan instruksi bahwa transfer harus tepat hingga digit terakhir untuk pencocokan otomatis.
+- **Petunjuk Cara Pembayaran Multi-Tab:**
+  - Dilengkapi tab interaktif: `m-Banking`, `i-Banking`, dan `ATM`.
+  - Langkah-langkah instruktif spesifik disesuaikan secara dinamis menurut bank/channel yang dipilih pembeli.
+- **Verifikasi Ganda (Dual Verification):**
+  - Tombol primer *"Saya Sudah Bayar (Cek Status Pembayaran)"* yang memicu pengecekan live ke server endpoint `/api/orders/[id]/confirm`.
+  - Tombol sekunder *"Konfirmasi Cepat via WhatsApp"* yang otomatis menyusun format pesan rapi ke WhatsApp Admin.
 
 ---
 

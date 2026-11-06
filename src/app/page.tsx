@@ -635,7 +635,9 @@ export default function Home() {
           <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
             <div className="section-heading">
               <div>
-                <div className="section-kicker">Katalog model</div>
+                <div className="section-kicker">
+                  <span className="kicker-pill">✦ KATALOG FRONTIER MODEL</span>
+                </div>
                 <h2>Pilih model, lihat seberapa jauh Rp10.000 Anda</h2>
                 <p>
                   Satu API key untuk semua model di bawah. Harga dihitung langsung dari tarif gateway, jadi angka di kartu sama dengan yang dipotong dari saldo.

@@ -616,11 +616,200 @@ export const retailPackages: RetailPackage[] = [
 ];
 
 export const paymentMethods: PaymentMethod[] = [
-  { id: "qris", name: "QRIS Instan (Semua Bank & e-Wallet)", fee: "Gratis Biaya Admin", feeAmount: 0, provider: "BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, Dana", speed: "1 Detik Verifikasi" },
-  { id: "va-bca", name: "BCA Virtual Account", fee: "Rp 1.000", feeAmount: 1000, provider: "BCA Mobile / myBCA / KlikBCA", speed: "Otomatis Real-time" },
-  { id: "va-mandiri", name: "Mandiri Virtual Account", fee: "Rp 1.000", feeAmount: 1000, provider: "Livin by Mandiri", speed: "Otomatis Real-time" },
-  { id: "va-bri", name: "BRI Virtual Account (BRIVA)", fee: "Rp 1.000", feeAmount: 1000, provider: "BRImo / ATM BRI", speed: "Otomatis Real-time" },
-  { id: "ewallet", name: "e-Wallet (Dana / GoPay / ShopeePay)", fee: "Bebas Biaya", feeAmount: 0, provider: "Scan atau Notifikasi Aplikasi", speed: "Instan" }
+  // 1. QRIS Instan
+  {
+    id: "qris",
+    category: "qris",
+    channelCode: "qris",
+    name: "QRIS Instan (Semua Bank & e-Wallet)",
+    fee: "Gratis Biaya Admin",
+    feeAmount: 0,
+    provider: "BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA, LinkAja",
+    speed: "1 Detik Verifikasi Otomatis",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Bebas Biaya Admin"
+  },
+
+  // 2. Virtual Account & e-Wallet
+  {
+    id: "va-dana",
+    category: "va_ewallet",
+    channelCode: "dana",
+    name: "DANA",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "Saldo DANA / Virtual Account DANA",
+    speed: "Otomatis Real-time",
+    accountNumber: "3901 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Instan"
+  },
+  {
+    id: "va-shopeepay",
+    category: "va_ewallet",
+    channelCode: "shopeepay",
+    name: "ShopeePay",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "Aplikasi Shopee / ShopeePay",
+    speed: "Otomatis Real-time",
+    accountNumber: "893 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Instan"
+  },
+  {
+    id: "va-ovo",
+    category: "va_ewallet",
+    channelCode: "ovo",
+    name: "OVO",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "OVO Cash / OVO Premier",
+    speed: "Otomatis Real-time",
+    accountNumber: "8099 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Instan"
+  },
+  {
+    id: "va-gopay",
+    category: "va_ewallet",
+    channelCode: "gopay",
+    name: "GoPay",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "Aplikasi GoPay / Gojek",
+    speed: "Otomatis Real-time",
+    accountNumber: "70001 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Instan"
+  },
+  {
+    id: "va-bca",
+    category: "va_ewallet",
+    channelCode: "bca_va",
+    name: "BCA Virtual Account",
+    fee: "Rp 1.000",
+    feeAmount: 1000,
+    provider: "BCA Mobile / myBCA / KlikBCA",
+    speed: "Otomatis Real-time",
+    accountNumber: "3901 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Populer"
+  },
+  {
+    id: "va-mandiri",
+    category: "va_ewallet",
+    channelCode: "mandiri_va",
+    name: "Mandiri Virtual Account",
+    fee: "Rp 1.000",
+    feeAmount: 1000,
+    provider: "Livin by Mandiri",
+    speed: "Otomatis Real-time",
+    accountNumber: "88708 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Populer"
+  },
+  {
+    id: "va-bri",
+    category: "va_ewallet",
+    channelCode: "bri_va",
+    name: "BRI Virtual Account (BRIVA)",
+    fee: "Rp 1.000",
+    feeAmount: 1000,
+    provider: "BRImo / ATM BRI",
+    speed: "Otomatis Real-time",
+    accountNumber: "12800 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+  {
+    id: "va-bni",
+    category: "va_ewallet",
+    channelCode: "bni_va",
+    name: "BNI Virtual Account",
+    fee: "Rp 1.000",
+    feeAmount: 1000,
+    provider: "BNI Mobile Banking / ATM BNI",
+    speed: "Otomatis Real-time",
+    accountNumber: "8277 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+  {
+    id: "ewallet",
+    category: "va_ewallet",
+    channelCode: "dana",
+    name: "e-Wallet (DANA / GoPay / ShopeePay)",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "Scan atau Notifikasi Aplikasi",
+    speed: "Instan",
+    accountNumber: "3901 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+
+  // 3. Transfer Bank
+  {
+    id: "transfer-bca",
+    category: "bank_transfer",
+    channelCode: "bca",
+    name: "Bank Central Asia (BCA)",
+    fee: "Gratis Admin",
+    feeAmount: 0,
+    provider: "Rekening BCA (014) · Verifikasi Cepat",
+    speed: "Verifikasi 1-3 Menit",
+    accountNumber: "8831 2948 10",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Prioritas"
+  },
+  {
+    id: "transfer-mandiri",
+    category: "bank_transfer",
+    channelCode: "mandiri",
+    name: "Bank Mandiri",
+    fee: "Gratis Admin",
+    feeAmount: 0,
+    provider: "Rekening Mandiri (008) · Verifikasi Cepat",
+    speed: "Verifikasi 1-3 Menit",
+    accountNumber: "137 00 2938 1823",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+  {
+    id: "transfer-bri",
+    category: "bank_transfer",
+    channelCode: "bri",
+    name: "Bank Rakyat Indonesia (BRI)",
+    fee: "Gratis Admin",
+    feeAmount: 0,
+    provider: "Rekening BRI (002) · Verifikasi Cepat",
+    speed: "Verifikasi 1-3 Menit",
+    accountNumber: "0341 01 002938 503",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+  {
+    id: "transfer-bni",
+    category: "bank_transfer",
+    channelCode: "bni",
+    name: "Bank Negara Indonesia (BNI)",
+    fee: "Gratis Admin",
+    feeAmount: 0,
+    provider: "Rekening BNI (009) · Verifikasi Cepat",
+    speed: "Verifikasi 1-3 Menit",
+    accountNumber: "0823 9182 34",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+  {
+    id: "transfer-bsi",
+    category: "bank_transfer",
+    channelCode: "bsi",
+    name: "Bank Syariah Indonesia (BSI)",
+    fee: "Gratis Admin",
+    feeAmount: 0,
+    provider: "Rekening BSI (451) · Bebas Biaya & Syariah",
+    speed: "Verifikasi 1-3 Menit",
+    accountNumber: "721 829 3841",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Syariah"
+  }
 ];
 
 export const providerById = (id: string) => providers.find((provider) => provider.id === id) as Provider;
+

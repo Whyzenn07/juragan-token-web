@@ -46,6 +46,8 @@ export type RetailPackage = {
   featured?: boolean;
 };
 
+export type PaymentCategory = "qris" | "va_ewallet" | "bank_transfer";
+
 export type PaymentMethod = {
   id: string;
   name: string;
@@ -53,4 +55,9 @@ export type PaymentMethod = {
   feeAmount: number;
   provider: string;
   speed: string;
+  category?: PaymentCategory;
+  channelCode?: string;
+  accountNumber?: string;
+  accountName?: string;
+  badge?: string;
 };
