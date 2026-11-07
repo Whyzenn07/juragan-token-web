@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { GATEWAY_BASE_URL, RetailPackage, paymentMethods } from "@/data/catalog";
 import { Dialog } from "./Dialog";
-import { Icon } from "@/components/ui/Icon";
+import { Icon, BrandMark } from "@/components/ui/Icon";
 import { PaymentSuccessMark } from "@/components/ui/PaymentSuccessMark";
 
 type SingaPayModalProps = {
@@ -446,17 +446,6 @@ Mohon dibantu konfirmasi ya!`;
         .classai-brand-text strong {
           color: #0a58ca !important;
           font-weight: 800 !important;
-        }
-        .classai-router-badge {
-          background: #0f172a !important;
-          color: #ffffff !important;
-          font-size: 10px !important;
-          font-weight: 800 !important;
-          padding: 3px 8px !important;
-          border-radius: 6px !important;
-          letter-spacing: 0.08em !important;
-          text-transform: uppercase !important;
-        }
         .classai-header-right {
           display: flex !important;
           align-items: center !important;
@@ -1214,30 +1203,11 @@ Mohon dibantu konfirmasi ya!`;
         }}
       >
         <div className="classai-brand" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span className="classai-logo-icon" aria-hidden="true" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-              <rect width="32" height="32" rx="8" fill="#0A58CA" />
-              <circle cx="16" cy="16" r="6" stroke="#FFFFFF" strokeWidth="2.8" fill="none" />
-              <circle cx="21" cy="11" r="2.2" fill="#38BDF8" />
-            </svg>
+          <span className="brand-mark" aria-hidden="true" style={{ width: "28px", height: "22px", display: "inline-flex", alignItems: "center" }}>
+            <BrandMark />
           </span>
           <span className="classai-brand-text" style={{ fontSize: "18px", fontWeight: 700, color: "#0f172a", letterSpacing: "-0.02em" }}>
-            juragan<strong style={{ color: "#0a58ca", fontWeight: 800 }}>token</strong>
-          </span>
-          <span
-            className="classai-router-badge"
-            style={{
-              background: "#0f172a",
-              color: "#ffffff",
-              fontSize: "10px",
-              fontWeight: 800,
-              padding: "3px 8px",
-              borderRadius: "6px",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-          >
-            ROUTER
+            juragan<span className="brand-light" style={{ color: "#0a58ca", fontWeight: 500 }}>token</span><span className="brand-dot" style={{ color: "#0284c7" }}>.</span>
           </span>
         </div>
         <div className="classai-header-right" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
