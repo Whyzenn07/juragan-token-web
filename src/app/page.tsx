@@ -1214,42 +1214,24 @@ export default function Home() {
               )}
             </div>
 
-            {/* Fitur Tampilkan Lebih Banyak (Executive Standard Pagination / Load More) */}
+            {/* Fitur Tampilkan Semua / Tampilkan Lebih Sedikit (Clean Single Toggle) */}
             {filteredModels.length > INITIAL_CATALOG_LIMIT && (
               <div className="catalog-pagination-wrap" data-reveal="fade-up">
-                {/* Executive Action Buttons */}
+                {/* Single Toggle Action Button */}
                 <div className="cpe-actions-row">
-                  {hasMore && (
-                    <>
-                      <button
-                        type="button"
-                        className="cpe-btn-primary"
-                        onClick={() => setVisibleCount((prev) => Math.min(prev + 6, filteredModels.length))}
-                        aria-label={`Muat 6 model berikutnya, tersisa ${filteredModels.length - displayedModels.length} model`}
-                      >
-                        <span>Muat Lebih Banyak Model</span>
-                        <span className="cpe-badge">+{Math.min(6, filteredModels.length - displayedModels.length)}</span>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                      </button>
-
-                      <button
-                        type="button"
-                        className="cpe-btn-secondary"
-                        onClick={() => setVisibleCount(filteredModels.length)}
-                        aria-label={`Tampilkan seluruh ${filteredModels.length} model`}
-                      >
-                        <span>Tampilkan Semua ({filteredModels.length})</span>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <line x1="7" y1="17" x2="17" y2="7" />
-                          <polyline points="7 7 17 7 17 17" />
-                        </svg>
-                      </button>
-                    </>
-                  )}
-
-                  {isExpanded && (
+                  {!isExpanded ? (
+                    <button
+                      type="button"
+                      className="cpe-btn-primary"
+                      onClick={() => setVisibleCount(filteredModels.length)}
+                      aria-label={`Tampilkan semua ${filteredModels.length} model AI`}
+                    >
+                      <span>Tampilkan Semua ({filteredModels.length})</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </button>
+                  ) : (
                     <button
                       type="button"
                       className="cpe-btn-ghost"
@@ -1262,44 +1244,19 @@ export default function Home() {
                       }}
                       aria-label="Tampilkan lebih sedikit model (kembali ke tampilan ringkas)"
                     >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <polyline points="18 15 12 9 6 15" />
                       </svg>
-                      <span>Tampilkan Ringkas ({INITIAL_CATALOG_LIMIT} Model)</span>
+                      <span>Tampilkan Lebih Sedikit</span>
                     </button>
                   )}
                 </div>
 
-                {/* Precision Status & Micro Indicator */}
+                {/* Status Counter */}
                 <div className="cpe-status-bar">
                   <span className="cpe-counter">
                     Menampilkan <strong className="cpe-strong">{displayedModels.length}</strong> dari <strong className="cpe-strong">{filteredModels.length}</strong> model AI
                   </span>
-                  {hasMore && (
-                    <>
-                      <div
-                        className="cpe-micro-track"
-                        aria-hidden="true"
-                        title={`${Math.round((displayedModels.length / filteredModels.length) * 100)}% ditampilkan`}
-                      >
-                        <div
-                          className="cpe-micro-fill"
-                          style={{ width: `${Math.round((displayedModels.length / filteredModels.length) * 100)}%` }}
-                        />
-                      </div>
-                      <span className="cpe-remaining">
-                        • tersisa {filteredModels.length - displayedModels.length} model
-                      </span>
-                    </>
-                  )}
-                  {!hasMore && filteredModels.length > INITIAL_CATALOG_LIMIT && (
-                    <span className="cpe-all-shown">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span>Seluruh model telah ditampilkan</span>
-                    </span>
-                  )}
                 </div>
               </div>
             )}

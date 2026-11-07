@@ -9182,8 +9182,8 @@ footer {
   color: #ffffff;
   border: 1px solid #0a2540;
   border-radius: 9999px;
-  padding: 10px 22px;
-  font-size: 13px;
+  padding: 10px 24px;
+  font-size: 13.5px;
   font-weight: 650;
   cursor: pointer;
   letter-spacing: -0.01em;
@@ -9202,61 +9202,33 @@ footer {
   transform: translateY(0);
 }
 
-.cpe-badge {
-  background: rgba(255, 255, 255, 0.18);
-  padding: 2px 7px;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-}
-
-.cpe-btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  color: #475569;
-  border: 1px solid #d1d5db;
-  border-radius: 9999px;
-  padding: 9px 18px;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  letter-spacing: -0.01em;
-  transition: all 0.15s ease;
-}
-
-.cpe-btn-secondary:hover {
-  background: #f8fafc;
-  color: #0a58ca;
-  border-color: #93c5fd;
-  transform: translateY(-1px);
-}
-
-.cpe-btn-secondary:active {
-  transform: translateY(0);
-}
-
 .cpe-btn-ghost {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: #ffffff;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  color: #475569;
+  border: 1px solid #cbd5e1;
   border-radius: 9999px;
-  padding: 9px 18px;
-  font-size: 12.5px;
+  padding: 10px 24px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
   letter-spacing: -0.01em;
-  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cpe-btn-ghost:hover {
-  background: #f1f5f9;
+  background: #f8fafc;
   color: #0f172a;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.cpe-btn-ghost:active {
+  transform: translateY(0);
 }
 
 @media (max-width: 1240px) {
