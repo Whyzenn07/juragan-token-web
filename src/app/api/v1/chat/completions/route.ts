@@ -195,16 +195,16 @@ export async function POST(req: NextRequest) {
   const sanitizeGemini = (p: any, m: string) => {
     // Parameter yang tidak didukung atau memicu 400 di Google OpenAI endpoint:
     const {
-      frequency_penalty,
-      presence_penalty,
-      logit_bias,
-      logprobs,
-      top_logprobs,
-      user,
-      seed,
-      store,
-      metadata,
-      service_tier,
+      frequency_penalty: _frequency_penalty,
+      presence_penalty: _presence_penalty,
+      logit_bias: _logit_bias,
+      logprobs: _logprobs,
+      top_logprobs: _top_logprobs,
+      user: _user,
+      seed: _seed,
+      store: _store,
+      metadata: _metadata,
+      service_tier: _service_tier,
       ...rest
     } = p;
 
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
 
     // Hapus 'strict: true' jika ada di response_format karena sering ditolak Google
     if (sanitized.response_format && typeof sanitized.response_format === "object") {
-      const { strict, ...rfRest } = sanitized.response_format;
+      const { strict: _strict, ...rfRest } = sanitized.response_format;
       sanitized.response_format = rfRest;
     }
 
@@ -285,7 +285,7 @@ export async function POST(req: NextRequest) {
     return { res: lastRes, modelUsed: lastModel };
   };
 
-  let upstreamPayload = {
+  const upstreamPayload = {
     ...body,
     model: targetModel,
   };

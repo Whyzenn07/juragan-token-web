@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GATEWAY_BASE_URL, GATEWAY_ORIGIN } from "@/data/catalog";
+import { GATEWAY_ORIGIN } from "@/data/catalog";
 import { Icon } from "@/components/ui/Icon";
 
 export function SetupGuides() {
@@ -10,8 +10,11 @@ export function SetupGuides() {
   const [origin, setOrigin] = useState(GATEWAY_ORIGIN);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setOrigin(window.location.origin);
+    if (typeof window !== "undefined" && window.location.origin !== GATEWAY_ORIGIN) {
+      const timer = setTimeout(() => {
+        setOrigin(window.location.origin);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, []);
 

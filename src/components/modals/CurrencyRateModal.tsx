@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "./Dialog";
-import { Icon } from "@/components/ui/Icon";
 
 type CurrencyRateModalProps = {
   open: boolean;
@@ -98,11 +97,14 @@ export function CurrencyRateModal({
 
   // Sync idrInput whenever usdRate changes
   useEffect(() => {
-    const num = parseFloat(usdInput.replace(/,/g, "")) || 0;
-    if (!isSwapped) {
-      setIdrInput(num === 0 ? "" : (num * usdRate).toLocaleString("id-ID", { maximumFractionDigits: 2 }));
-    }
-  }, [usdRate]);
+    const timer = setTimeout(() => {
+      const num = parseFloat(usdInput.replace(/,/g, "")) || 0;
+      if (!isSwapped) {
+        setIdrInput(num === 0 ? "" : (num * usdRate).toLocaleString("id-ID", { maximumFractionDigits: 2 }));
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [usdRate, isSwapped, usdInput]);
 
   const handleUsdChange = (val: string) => {
     setUsdInput(val);

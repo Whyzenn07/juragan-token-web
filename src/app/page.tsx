@@ -181,9 +181,12 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState<number>(INITIAL_CATALOG_LIMIT);
 
   // Reset pagination saat pengguna mengganti filter, kategori, provider, atau kata kunci pencarian
-  useEffect(() => {
+  const [prevFilterKey, setPrevFilterKey] = useState("");
+  const currentFilterKey = `${searchQuery}|${activeCategory}|${selectedProvider}|${viewSavedOnly}`;
+  if (prevFilterKey !== currentFilterKey) {
+    setPrevFilterKey(currentFilterKey);
     setVisibleCount(INITIAL_CATALOG_LIMIT);
-  }, [searchQuery, activeCategory, selectedProvider, viewSavedOnly]);
+  }
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const catalogRef = useRef<HTMLElement>(null);
@@ -358,7 +361,6 @@ export default function Home() {
 
   // Slicing model yang ditampilkan sesuai batas aktif (Load More)
   const displayedModels = filteredModels.slice(0, visibleCount);
-  const hasMore = filteredModels.length > visibleCount;
   const isExpanded = visibleCount > INITIAL_CATALOG_LIMIT;
 
   return (

@@ -73,11 +73,10 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const [step, setStep] = useState<"checkout" | "payment" | "success">("checkout");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
   const [orderToken, setOrderToken] = useState("");
   const [totalPaid, setTotalPaid] = useState<number | null>(null);
-  const [paidAt, setPaidAt] = useState<string>("");
+  const [_paidAt, setPaidAt] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 menit
   const [apiKeyGenerated, setApiKeyGenerated] = useState("");
   const [copiedKey, setCopiedKey] = useState(false);
@@ -86,8 +85,8 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const [copiedAmount, setCopiedAmount] = useState(false);
   const [copiedInvoice, setCopiedInvoice] = useState(false);
   const [guideTab, setGuideTab] = useState<"mbanking" | "ibanking" | "atm">("mbanking");
-  const [emailStatus, setEmailStatus] = useState<"none" | "idle" | "sending" | "sent" | "simulated" | "error">("idle");
-  const [emailMessage, setEmailMessage] = useState("");
+  const [_emailStatus, setEmailStatus] = useState<"none" | "idle" | "sending" | "sent" | "simulated" | "error">("idle");
+  const [_emailMessage, setEmailMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -105,12 +104,15 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
 
   useEffect(() => {
     if (open && typeof window !== "undefined") {
-      try {
-        const last = sessionStorage.getItem("jt_last_api_key");
-        if (last) setSavedKeyHint(last);
-      } catch {
-        // ignore
-      }
+      const timer = setTimeout(() => {
+        try {
+          const last = sessionStorage.getItem("jt_last_api_key");
+          if (last) setSavedKeyHint(last);
+        } catch {
+          // ignore
+        }
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [open]);
 
@@ -228,7 +230,7 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const formatIdr = (val: number) =>
     new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
 
-  const formatDate = (isoString: string) => {
+  const _formatDate = (isoString: string) => {
     try {
       return new Intl.DateTimeFormat("id-ID", {
         dateStyle: "medium",
@@ -374,7 +376,6 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
           methodId: selectedMethod,
           customerName: customerName.trim(),
           customerEmail: customerEmail.trim(),
-          customerPhone: customerPhone.trim(),
           existingApiKey: checkoutMode === "topup" ? targetApiKey.trim() : undefined,
         }),
       });

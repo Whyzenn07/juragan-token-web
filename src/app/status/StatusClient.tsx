@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Icon } from "@/components/ui/Icon";
-import { GATEWAY_BASE_URL } from "@/data/catalog";
+import { useCallback, useEffect, useState } from "react";
 
 type HealthState = {
   loading: boolean;
@@ -25,7 +23,7 @@ export function StatusClient() {
     lastChecked: "",
   });
 
-  const checkLiveStatus = async () => {
+  const checkLiveStatus = useCallback(async () => {
     try {
       const res = await fetch("/api/supabase/status");
       if (res.ok) {
@@ -45,13 +43,18 @@ export function StatusClient() {
         lastChecked: new Date().toLocaleTimeString("id-ID"),
       }));
     }
-  };
+  }, []);
 
   useEffect(() => {
-    checkLiveStatus();
+    const timer = setTimeout(() => {
+      checkLiveStatus();
+    }, 0);
     const interval = setInterval(checkLiveStatus, 15000);
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [checkLiveStatus]);
 
   const services = [
     {

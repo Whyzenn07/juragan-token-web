@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { modelsCatalog, GATEWAY_BASE_URL, inputIdrPer1M, providerById } from "@/data/catalog";
 import { Icon } from "@/components/ui/Icon";
 

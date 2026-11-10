@@ -30,12 +30,15 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
 
   useEffect(() => {
     if (open && typeof window !== "undefined") {
-      try {
-        const saved = sessionStorage.getItem("jt_last_api_key");
-        if (saved) setLastPurchasedKey(saved);
-      } catch {
-        // Abaikan jika storage dinonaktifkan
-      }
+      const timer = setTimeout(() => {
+        try {
+          const saved = sessionStorage.getItem("jt_last_api_key");
+          if (saved) setLastPurchasedKey(saved);
+        } catch {
+          // Abaikan jika storage dinonaktifkan
+        }
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [open]);
 

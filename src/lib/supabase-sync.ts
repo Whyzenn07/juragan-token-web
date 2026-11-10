@@ -1,4 +1,4 @@
-import type { Order, KeyRecord, UsageLog } from "./store";
+import type { Order, KeyRecord } from "./store";
 import { query, mutate } from "./store";
 
 export function getSupabaseConfig() {
