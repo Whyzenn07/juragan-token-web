@@ -1810,6 +1810,14 @@ main {
   transform: translateY(0);
 }
 
+.dps-btn-primary svg {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dps-btn-primary:hover svg {
+  transform: translateX(3px);
+}
+
 .dps-meta-text {
   font-size: 12px;
   font-weight: 550;
