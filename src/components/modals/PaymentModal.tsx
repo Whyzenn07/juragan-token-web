@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GATEWAY_BASE_URL, RetailPackage, paymentMethods } from "@/data/catalog";
+import { GATEWAY_BASE_URL, RetailPackage, ModelItem, paymentMethods, unitsForBudget } from "@/data/catalog";
 import { Dialog } from "./Dialog";
 import { Icon, BrandMark } from "@/components/ui/Icon";
+import { ProviderLogo } from "@/components/ui/ProviderLogo";
 import { PaymentSuccessMark } from "@/components/ui/PaymentSuccessMark";
 
 type SingaPayModalProps = {
   open: boolean;
   pkg: RetailPackage | null;
+  model?: ModelItem | null;
   onClose: () => void;
 };
 
@@ -67,7 +69,7 @@ function PaymentLogo({ type }: { type: string }) {
   );
 }
 
-export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
+export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps) {
   const [selectedMethod, setSelectedMethod] = useState("qris");
   const [openCategory, setOpenCategory] = useState<"qris" | "ewallet" | "va">("qris");
   const [step, setStep] = useState<"checkout" | "payment" | "success">("checkout");
@@ -1358,16 +1360,37 @@ Mohon dibantu konfirmasi ya!`;
               marginBottom: "16px",
             }}
           >
-            <div className="cosc-left" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span className="cosc-badge" style={{ fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                {pkg.badge || "Pilihan Siap Pakai"}
-              </span>
-              <strong className="cosc-pkg-name" style={{ fontSize: "15px", fontWeight: 800, color: "#0a2540" }}>
-                {pkg.name}
-              </strong>
-              <span className="cosc-pkg-token" style={{ fontSize: "12px", color: "#475569" }}>
-                {pkg.estToken} · Saldo Universal
-              </span>
+            <div className="cosc-left" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              {model && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    background: "#ffffff",
+                    border: "1px solid #dbeafe",
+                    flexShrink: 0,
+                  }}
+                >
+                  <ProviderLogo provider={model.providerId} size={26} />
+                </span>
+              )}
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                <span className="cosc-badge" style={{ fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  {pkg.badge || "Pilihan Siap Pakai"}
+                </span>
+                <strong className="cosc-pkg-name" style={{ fontSize: "15px", fontWeight: 800, color: "#0a2540" }}>
+                  {pkg.name}
+                </strong>
+                <span className="cosc-pkg-token" style={{ fontSize: "12px", color: "#475569" }}>
+                  {model
+                    ? `±${new Intl.NumberFormat("id-ID").format(unitsForBudget(model, pkg.priceIdr))} Interaksi · ${model.name} · Saldo Universal`
+                    : `${pkg.estToken} · Saldo Universal`}
+                </span>
+              </div>
             </div>
             <div className="cosc-right">
               <strong className="cosc-price" style={{ fontSize: "18px", fontWeight: 800, color: "#0a58ca", letterSpacing: "-0.02em" }}>
@@ -1414,7 +1437,12 @@ Mohon dibantu konfirmasi ya!`;
                 gap: "6px",
               }}
             >
-              <span>✨</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="7.5" cy="15.5" r="4.5" />
+                <path d="M10.7 12.3 21 2" />
+                <path d="m16 7 3 3" />
+                <path d="m14 9 2 2" />
+              </svg>
               <span>Terbitkan Kunci Baru</span>
             </button>
             <button
@@ -1444,7 +1472,11 @@ Mohon dibantu konfirmasi ya!`;
                 gap: "6px",
               }}
             >
-              <span>⚡</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 16V8" />
+                <path d="m8.5 11.5 3.5-3.5 3.5 3.5" />
+              </svg>
               <span>Top-Up Kunci yang Ada</span>
             </button>
           </div>

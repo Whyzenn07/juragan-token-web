@@ -169,6 +169,7 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState<ModelItem | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<RetailPackage | null>(null);
+  const [checkoutModel, setCheckoutModel] = useState<ModelItem | null>(null);
   const [singaPayOpen, setSingaPayOpen] = useState(false);
   const [balanceModalOpen, setBalanceModalOpen] = useState(false);
   const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
@@ -321,6 +322,7 @@ export default function Home() {
       matched = retailPackages.find((p) => p.id === "pkt-mhs-uji") || retailPackages[0];
     }
     setSelectedPackage(matched);
+    setCheckoutModel(model);
     setSingaPayOpen(true);
   };
 
@@ -1439,6 +1441,7 @@ export default function Home() {
                     className="button-accent full"
                     onClick={() => {
                       setSelectedPackage(pkg);
+                      setCheckoutModel(null);
                       setSingaPayOpen(true);
                     }}
                   >
@@ -1729,12 +1732,7 @@ export default function Home() {
         onClose={() => setDetailModalOpen(false)}
         usdRate={usdRate}
         onSelectTopUp={(model) => {
-          const matchedPkg =
-            retailPackages.find((p) =>
-              p.recommendedModel.toLowerCase().includes(model.name.split(" ")[0].toLowerCase())
-            ) || retailPackages[1];
-          setSelectedPackage(matchedPkg);
-          setSingaPayOpen(true);
+          handleBuyTokenForModel(model);
         }}
       />
 
@@ -1742,6 +1740,7 @@ export default function Home() {
       <SingaPayModal
         open={singaPayOpen}
         pkg={selectedPackage}
+        model={checkoutModel}
         onClose={() => setSingaPayOpen(false)}
       />
 
@@ -1752,6 +1751,7 @@ export default function Home() {
         onTopUp={() => {
           setBalanceModalOpen(false);
           setSelectedPackage(retailPackages[1]);
+          setCheckoutModel(null);
           setSingaPayOpen(true);
         }}
       />
