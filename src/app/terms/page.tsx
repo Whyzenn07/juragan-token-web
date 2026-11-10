@@ -72,7 +72,7 @@ export default function TermsPage() {
             <section className="legal-section">
               <h2>3. Sistem Pembayaran &amp; Penerbitan API Key</h2>
               <ul>
-                <li>Pembayaran diproses secara instan melalui sistem <b>SingaPay</b> menggunakan <b>QRIS Standar Pembayaran Nasional</b> serta Virtual Account bank resmi Indonesia (BCA, Mandiri, BRI, BNI, Permata).</li>
+                <li>Pembayaran diproses secara instan melalui sistem <b>SingaPay</b> menggunakan <b>QRIS Standar Pembayaran Nasional</b> serta Virtual Account bank resmi Indonesia (BCA, Mandiri, BRI, BNI, SeaBank, Permata).</li>
                 <li>Setelah transaksi lunas dan diverifikasi oleh sistem, satu <b>Virtual API Key unik (<code>jt-live-...</code>)</b> akan langsung diterbitkan di layar pemesanan dan dikirimkan ke alamat email pembeli.</li>
                 <li>Pengguna bertanggung jawab penuh atas kerahasiaan API Key masing-masing. Juragan Token tidak pernah meminta kunci rahasia Anda di luar formulir autentikasi resmi.</li>
               </ul>

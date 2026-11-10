@@ -1079,6 +1079,43 @@ export const paymentMethods: PaymentMethod[] = [
     accountName: "PT JURAGAN TOKEN INDONESIA"
   },
   {
+    id: "va-seabank",
+    category: "va_ewallet",
+    channelCode: "seabank_va",
+    name: "SeaBank Virtual Account",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "Aplikasi SeaBank / Transfer Bank",
+    speed: "Otomatis Real-time",
+    accountNumber: "7820 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Instan"
+  },
+  {
+    id: "va-permata",
+    category: "va_ewallet",
+    channelCode: "permata_va",
+    name: "Permata Virtual Account",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "PermataMobile X / ATM Permata",
+    speed: "Otomatis Real-time",
+    accountNumber: "8528 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+  {
+    id: "va-cimb",
+    category: "va_ewallet",
+    channelCode: "cimb_va",
+    name: "CIMB Niaga Virtual Account",
+    fee: "Bebas Biaya",
+    feeAmount: 0,
+    provider: "OCTO Mobile / ATM CIMB Niaga",
+    speed: "Otomatis Real-time",
+    accountNumber: "1199 0812 3456 7890",
+    accountName: "PT JURAGAN TOKEN INDONESIA"
+  },
+  {
     id: "ewallet",
     category: "va_ewallet",
     channelCode: "dana",
@@ -1153,6 +1190,19 @@ export const paymentMethods: PaymentMethod[] = [
     accountNumber: "721 829 3841",
     accountName: "PT JURAGAN TOKEN INDONESIA",
     badge: "Syariah"
+  },
+  {
+    id: "transfer-seabank",
+    category: "bank_transfer",
+    channelCode: "seabank",
+    name: "PT Bank Seabank Indonesia (SeaBank)",
+    fee: "Gratis Admin",
+    feeAmount: 0,
+    provider: "Rekening SeaBank (535) · Verifikasi Cepat",
+    speed: "Verifikasi 1-3 Menit",
+    accountNumber: "9012 3847 1928",
+    accountName: "PT JURAGAN TOKEN INDONESIA",
+    badge: "Digital Bank"
   }
 ];
 

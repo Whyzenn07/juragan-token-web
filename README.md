@@ -52,7 +52,7 @@ Juragan Token menghubungkan ekosistem pembayaran lokal Indonesia dengan API mode
 ```
 
 ### Nilai Tambah Utama:
-1. **Bebas Kartu Kredit Internasional**: Pembelian kredit instan mulai **Rp 15.000** via **QRIS**, Virtual Account (BCA, Mandiri, BRI, BNI, Permata, CIMB, BSI), dan e-Wallet (GoPay, OVO, DANA, ShopeePay, LinkAja).
+1. **Bebas Kartu Kredit Internasional**: Pembelian kredit instan mulai **Rp 15.000** via **QRIS**, Virtual Account (BCA, Mandiri, BRI, BNI, SeaBank, Permata, CIMB, BSI), dan e-Wallet (GoPay, OVO, DANA, ShopeePay, LinkAja).
 2. **Universal OpenAI-Compatible**: URL `https://juragantoken.com/v1` langsung cocok dengan SDK resmi `openai` di Node.js/Python, Cursor IDE, Claude Code CLI, LibreChat, Chatbox, dan Aider.
 3. **Masa Aktif Selamanya**: Saldo prabayar berlaku permanen tanpa sistem kedaluwarsa bulanan (*no use-it-or-lose-it*).
 4. **Keamanan Kriptografis Zero-Knowledge**: Server hanya menyimpan hash SHA-256 dari API Key. Kunci mentah `jt-live-...` hanya ditampilkan satu kali ke pembeli saat checkout berhasil dan dikirimkan via email tanda terima.

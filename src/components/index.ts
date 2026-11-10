@@ -7,7 +7,7 @@ export * from "./ui/PaymentSuccessMark";
 // Modals
 export * from "./modals/Dialog";
 export * from "./modals/ModelDetailModal";
-export * from "./modals/SingaPayModal";
+export * from "./modals/PaymentModal";
 export * from "./modals/TokenBalanceModal";
 export * from "./modals/CurrencyRateModal";
 
