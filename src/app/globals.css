@@ -9955,11 +9955,11 @@ footer {
   display: block;
 }
 
-/* Instructions Block (Gambar 1) */
+/* Instructions Block (Gambar 1) - Impeccable Refinement */
 .cpv-instruction-block {
-  padding: 16px;
+  padding: 18px 20px 16px;
   background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
   margin: 14px 18px 18px;
 }
@@ -9971,65 +9971,76 @@ footer {
   margin-bottom: 12px;
 }
 
-.cpv-instruction-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 800;
-  color: #0a58ca;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  padding: 3px 8px;
-  border-radius: 6px;
-  letter-spacing: 0.04em;
+.cpv-instruction-title {
+  font-size: 13px;
+  font-weight: 750;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.cpv-instruction-sub {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .cpv-instruction-tabs {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
   margin-bottom: 12px;
-  background: #e2e8f0;
+  background: #f1f5f9;
   padding: 3px;
   border-radius: 9px;
+  border: 1px solid #e2e8f0;
 }
 
 .cpv-instruction-tabs .cpv-tab-btn {
-  border: none;
+  flex: 1;
+  border: 1px solid transparent !important;
   background: transparent;
   color: #64748b;
-  border-radius: 6px;
-  padding: 6px 8px;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cpv-instruction-tabs .cpv-tab-btn:hover:not(.active) {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .cpv-instruction-tabs .cpv-tab-btn.active {
   background: #ffffff !important;
   color: #0a58ca !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
-  border: none !important;
+  border: 1px solid #e2e8f0 !important;
+  font-weight: 750 !important;
 }
 
 .cpv-instruction-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 4px 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
 .cpv-instruction-item {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 9px 12px;
-  transition: all 0.15s ease;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.cpv-instruction-item:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+.cpv-instruction-item:last-child {
+  border-bottom: none;
 }
 
 .cpv-step-badge {
@@ -10039,7 +10050,7 @@ footer {
   border-radius: 50%;
   background: #eff6ff;
   color: #0a58ca;
-  border: 1.5px solid #bfdbfe;
+  border: 1px solid #bfdbfe;
   font-size: 11px;
   font-weight: 800;
   display: flex;
@@ -10064,23 +10075,36 @@ footer {
   background: #eff6ff;
   color: #0a58ca;
   font-weight: 750;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 5px;
-  font-size: 11.5px;
-  font-family: monospace;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   border: 1px solid #bfdbfe;
+  white-space: nowrap !important;
+  display: inline-block;
+  letter-spacing: 0.04em;
 }
 
 .cpv-instruction-tip {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 9px;
-  padding: 9px 12px;
+  background: #f8fafc;
+  border-left: 3px solid #0a58ca;
+  border-radius: 0 8px 8px 0;
+  padding: 8px 12px;
   margin-top: 10px;
   font-size: 11.5px;
-  color: #0369a1;
-  line-height: 1.4;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.cpv-instruction-tip svg {
+  color: #0a58ca;
+  flex-shrink: 0;
+}
+
+.cpv-instruction-tip strong {
+  color: #0f172a;
+  font-weight: 750;
 }

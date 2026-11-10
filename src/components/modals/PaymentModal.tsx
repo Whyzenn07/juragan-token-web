@@ -2428,17 +2428,8 @@ Mohon dibantu konfirmasi ya!`;
               {/* Step-by-Step Payment Instructions - Structured Fintech Block */}
               <div className="cpv-instruction-block">
                 <div className="cpv-instruction-head">
-                  <span className="cpv-instruction-badge">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="16" x2="12" y2="12" />
-                      <line x1="12" y1="8" x2="12.01" y2="8" />
-                    </svg>
-                    PANDUAN PEMBAYARAN RESMI
-                  </span>
-                  <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 600 }}>
-                    Pilih kanal transfer Anda:
-                  </span>
+                  <span className="cpv-instruction-title">Petunjuk Transfer Virtual Account</span>
+                  <span className="cpv-instruction-sub">Pilih kanal pembayaran:</span>
                 </div>
 
                 <div className="cpv-instruction-tabs">
