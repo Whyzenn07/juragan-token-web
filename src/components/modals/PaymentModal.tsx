@@ -2428,8 +2428,15 @@ Mohon dibantu konfirmasi ya!`;
               {/* Step-by-Step Payment Instructions - Structured Fintech Block */}
               <div className="cpv-instruction-block">
                 <div className="cpv-instruction-head">
-                  <span className="cpv-instruction-title">Petunjuk Transfer Virtual Account</span>
-                  <span className="cpv-instruction-sub">Pilih kanal pembayaran:</span>
+                  <div className="cpv-instruction-badge">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                    <span>PANDUAN PEMBAYARAN RESMI</span>
+                  </div>
+                  <span className="cpv-instruction-sub">Pilih kanal transfer Anda:</span>
                 </div>
 
                 <div className="cpv-instruction-tabs">
@@ -2463,7 +2470,24 @@ Mohon dibantu konfirmasi ya!`;
                       <div className="cpv-instruction-item">
                         <div className="cpv-step-badge">3</div>
                         <div className="cpv-step-text">
-                          Masukkan Nomor Virtual Account: <code>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
+                          <span className="cpv-step-label">Masukkan nomor Virtual Account tujuan:</span>
+                          <div className="cpv-step-va-box">
+                            <span className="cpv-step-va-num">
+                              {currentMethod.accountNumber || "8277 0812 3456 7890"}
+                            </span>
+                            <button
+                              type="button"
+                              className="cpv-step-va-copy"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyToClipboard(currentMethod.accountNumber || "8277 0812 3456 7890", "va");
+                              }}
+                              title="Salin Nomor VA"
+                            >
+                              <Icon name="copy" size={12} />
+                              <span>{copiedVa ? "Tersalin! ✓" : "Salin"}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div className="cpv-instruction-item">
@@ -2497,7 +2521,24 @@ Mohon dibantu konfirmasi ya!`;
                       <div className="cpv-instruction-item">
                         <div className="cpv-step-badge">3</div>
                         <div className="cpv-step-text">
-                          Pilih rekening sumber dan masukkan nomor VA: <code>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
+                          <span className="cpv-step-label">Pilih rekening sumber dan masukkan nomor Virtual Account:</span>
+                          <div className="cpv-step-va-box">
+                            <span className="cpv-step-va-num">
+                              {currentMethod.accountNumber || "8277 0812 3456 7890"}
+                            </span>
+                            <button
+                              type="button"
+                              className="cpv-step-va-copy"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyToClipboard(currentMethod.accountNumber || "8277 0812 3456 7890", "va");
+                              }}
+                              title="Salin Nomor VA"
+                            >
+                              <Icon name="copy" size={12} />
+                              <span>{copiedVa ? "Tersalin! ✓" : "Salin"}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div className="cpv-instruction-item">
@@ -2531,7 +2572,24 @@ Mohon dibantu konfirmasi ya!`;
                       <div className="cpv-instruction-item">
                         <div className="cpv-step-badge">3</div>
                         <div className="cpv-step-text">
-                          Ketikkan nomor Virtual Account: <code>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
+                          <span className="cpv-step-label">Ketikkan nomor Virtual Account tujuan:</span>
+                          <div className="cpv-step-va-box">
+                            <span className="cpv-step-va-num">
+                              {currentMethod.accountNumber || "8277 0812 3456 7890"}
+                            </span>
+                            <button
+                              type="button"
+                              className="cpv-step-va-copy"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyToClipboard(currentMethod.accountNumber || "8277 0812 3456 7890", "va");
+                              }}
+                              title="Salin Nomor VA"
+                            >
+                              <Icon name="copy" size={12} />
+                              <span>{copiedVa ? "Tersalin! ✓" : "Salin"}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div className="cpv-instruction-item">

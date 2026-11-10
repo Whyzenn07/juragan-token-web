@@ -9955,9 +9955,9 @@ footer {
   display: block;
 }
 
-/* Instructions Block (Gambar 1) - Impeccable Refinement */
+/* Instructions Block - Structured Fintech Polish */
 .cpv-instruction-block {
-  padding: 18px 20px 16px;
+  padding: 16px 18px 16px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 14px;
@@ -9968,79 +9968,93 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
-.cpv-instruction-title {
-  font-size: 13px;
-  font-weight: 750;
-  color: #0f172a;
-  letter-spacing: -0.01em;
+.cpv-instruction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0a58ca;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 4px 10px;
+  border-radius: 7px;
+  letter-spacing: 0.03em;
+}
+
+.cpv-instruction-badge svg {
+  color: #0a58ca;
+  flex-shrink: 0;
 }
 
 .cpv-instruction-sub {
   font-size: 11.5px;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 550;
 }
 
 .cpv-instruction-tabs {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   width: 100%;
   margin-bottom: 12px;
-  background: #f1f5f9;
-  padding: 3px;
+  background: #e2e8f0;
+  padding: 4px;
   border-radius: 9px;
-  border: 1px solid #e2e8f0;
 }
 
 .cpv-instruction-tabs .cpv-tab-btn {
   flex: 1;
-  border: 1px solid transparent !important;
+  border: 1.5px solid transparent !important;
   background: transparent;
-  color: #64748b;
+  color: #475569;
   border-radius: 7px;
   padding: 7px 10px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
 }
 
 .cpv-instruction-tabs .cpv-tab-btn:hover:not(.active) {
   color: #0f172a;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .cpv-instruction-tabs .cpv-tab-btn.active {
   background: #ffffff !important;
   color: #0a58ca !important;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1.5px solid #0a58ca !important;
+  box-shadow: 0 1px 3px rgba(10, 88, 202, 0.12) !important;
   font-weight: 750 !important;
 }
 
 .cpv-instruction-list {
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 4px 14px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  gap: 8px;
 }
 
 .cpv-instruction-item {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.cpv-instruction-item:last-child {
-  border-bottom: none;
+.cpv-instruction-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.05);
 }
 
 .cpv-step-badge {
@@ -10050,19 +10064,30 @@ footer {
   border-radius: 50%;
   background: #eff6ff;
   color: #0a58ca;
-  border: 1px solid #bfdbfe;
+  border: 1.5px solid #bfdbfe;
   font-size: 11px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .cpv-step-text {
-  font-size: 12px;
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
   color: #334155;
   line-height: 1.5;
+}
+
+.cpv-step-label {
+  display: block;
+  font-size: 12.5px;
+  color: #1e293b;
+  font-weight: 550;
+  margin-bottom: 6px;
+  line-height: 1.45;
 }
 
 .cpv-step-text strong,
@@ -10071,40 +10096,78 @@ footer {
   font-weight: 750;
 }
 
-.cpv-step-text code {
-  background: #eff6ff;
-  color: #0a58ca;
-  font-weight: 750;
-  padding: 2px 7px;
-  border-radius: 5px;
-  font-size: 12px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+/* Dedicated VA Box inside Step 3 - Guaranteed Fit, Never Truncated */
+.cpv-step-va-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #f0f7ff;
   border: 1px solid #bfdbfe;
-  white-space: nowrap !important;
-  display: inline-block;
-  letter-spacing: 0.04em;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-top: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cpv-step-va-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0a58ca;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.cpv-step-va-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  color: #0a58ca;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.cpv-step-va-copy:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+.cpv-step-va-copy:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .cpv-instruction-tip {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #f8fafc;
-  border-left: 3px solid #0a58ca;
-  border-radius: 0 8px 8px 0;
-  padding: 8px 12px;
-  margin-top: 10px;
+  gap: 9px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 9px;
+  padding: 9px 12px;
+  margin-top: 12px;
   font-size: 11.5px;
-  color: #475569;
+  color: #0369a1;
   line-height: 1.45;
 }
 
 .cpv-instruction-tip svg {
-  color: #0a58ca;
+  color: #0284c7;
   flex-shrink: 0;
 }
 
 .cpv-instruction-tip strong {
-  color: #0f172a;
+  color: #0c4a6e;
   font-weight: 750;
 }
