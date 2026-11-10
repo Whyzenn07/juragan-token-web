@@ -2113,6 +2113,15 @@ main {
 .segmented-tab:hover {
   color: #0a2540;
   background: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1px);
+}
+.segmented-tab:active {
+  transform: translateY(1px) scale(0.97);
+  transition-duration: 0.05s;
+}
+.segmented-tab:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 2px;
 }
 
 .segmented-tab.active {
@@ -2163,6 +2172,15 @@ main {
   border-color: #0a58ca;
   color: #0a58ca;
   background: #f8fbff;
+  transform: translateY(-1px);
+}
+.saved-toggle-btn:active {
+  transform: translateY(1px) scale(0.96);
+  transition-duration: 0.05s;
+}
+.saved-toggle-btn:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 2px;
 }
 
 .saved-toggle-btn.active {
@@ -2615,6 +2633,15 @@ main {
   background: #ffffff;
   color: #f59e0b;
   border-color: #f59e0b;
+  transform: scale(1.08);
+}
+.mc-save:active {
+  transform: scale(0.88);
+  transition-duration: 0.05s;
+}
+.mc-save:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
 }
 .mc-save.saved {
   background: #fffbeb;
@@ -2828,15 +2855,39 @@ main {
   font-weight: 700;
   letter-spacing: 0.1px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 6px rgba(10, 88, 202, 0.22);
+  user-select: none;
 }
 .mc-buy-btn:hover {
   background: #084298;
   border-color: #084298;
   color: #ffffff;
   box-shadow: 0 4px 14px rgba(10, 88, 202, 0.38);
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
+}
+.mc-buy-btn:active,
+.model-card .mc-buy-btn:active,
+.model-card:hover .mc-buy-btn:active {
+  background: #063478 !important;
+  border-color: #063478 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(10, 88, 202, 0.25) !important;
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 0.05s;
+}
+.mc-buy-btn:focus-visible {
+  outline: 2px solid #0a58ca !important;
+  outline-offset: 3px !important;
+}
+.mc-buy-btn:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 .mc-buy-btn .mc-buy-arrow {
   display: inline-flex !important;
@@ -3120,7 +3171,10 @@ main {
   border-radius: 8px;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(10, 88, 202, 0.25) !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .package-card .button-accent:hover {
   background: #084298 !important;
@@ -3128,6 +3182,24 @@ main {
   color: #ffffff !important;
   box-shadow: 0 6px 16px rgba(10, 88, 202, 0.38) !important;
   transform: translateY(-2px);
+}
+.package-card .button-accent:active {
+  background: #063478 !important;
+  border-color: #063478 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(10, 88, 202, 0.25) !important;
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 0.05s;
+}
+.package-card .button-accent:focus-visible {
+  outline: 2px solid #0a58ca !important;
+  outline-offset: 3px !important;
+}
+.package-card .button-accent:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* 9. Bundle Banner (Pola ai-vouchers.com) */
@@ -3639,6 +3711,24 @@ footer {
   color: #ffffff;
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(10, 88, 202, 0.35);
+}
+.button-accent:active {
+  background: #063478;
+  border-color: #063478;
+  color: #ffffff;
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 2px 5px rgba(10, 88, 202, 0.2);
+  transition-duration: 0.05s;
+}
+.button-accent:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 3px;
+}
+.button-accent:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 .button-accent.full {
   width: 100%;
@@ -9192,7 +9282,15 @@ footer {
 }
 
 .cpe-btn-primary:active {
-  transform: translateY(0);
+  background: #084298;
+  border-color: #084298;
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 1px 4px rgba(10, 88, 202, 0.2);
+  transition-duration: 0.05s;
+}
+.cpe-btn-primary:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 3px;
 }
 
 .cpe-btn-ghost {
@@ -9210,6 +9308,7 @@ footer {
   letter-spacing: -0.01em;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
 }
 
 .cpe-btn-ghost:hover {
@@ -9221,7 +9320,14 @@ footer {
 }
 
 .cpe-btn-ghost:active {
-  transform: translateY(0);
+  background: #f1f5f9;
+  border-color: #64748b;
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 0.05s;
+}
+.cpe-btn-ghost:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 3px;
 }
 
 @media (max-width: 1240px) {
@@ -9242,4 +9348,713 @@ footer {
     padding-left: 16px;
     padding-right: 16px;
   }
+}
+
+/* ========================================================================= */
+/* TACTILE 5-STATE MICRO-INTERACTIONS (UI/UX PRO MAX, IMPECCABLE, IMPROVE-UI)*/
+/* ========================================================================= */
+
+/* 1. Mode Switcher Toggle (Terbitkan Baru vs Top-Up) */
+.cosc-mode-switcher {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border: 1px solid #e2e8f0;
+}
+.cosc-mode-btn {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 9px;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 650;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.cosc-mode-btn:hover:not(.active) {
+  color: #0a2540;
+  background: rgba(255, 255, 255, 0.7);
+  transform: translateY(-1px);
+}
+.cosc-mode-btn:active {
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 0.05s;
+}
+.cosc-mode-btn.active {
+  background: #ffffff !important;
+  color: #0a2540 !important;
+  font-weight: 750;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08) !important;
+}
+.cosc-mode-btn:focus-visible {
+  outline: 2px solid #0a58ca !important;
+  outline-offset: 2px !important;
+}
+
+/* 2. Top-Up Verify Button */
+.classai-verify-btn {
+  padding: 0 16px;
+  height: 40px;
+  border-radius: 9px;
+  border: none;
+  background: #0a58ca;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(10, 88, 202, 0.2);
+  user-select: none;
+}
+.classai-verify-btn:hover:not(:disabled) {
+  background: #084298;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.35);
+}
+.classai-verify-btn:active:not(:disabled) {
+  background: #063478;
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 1px 4px rgba(10, 88, 202, 0.25);
+  transition-duration: 0.05s;
+}
+.classai-verify-btn:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 2px;
+}
+.classai-verify-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 3. Method Accordion Cards (QRIS, E-Wallet, VA Bank) */
+.classai-method-card {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 13px 15px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.classai-method-card:hover:not(.selected) {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+.classai-method-card:active {
+  transform: translateY(1px) scale(0.995);
+  transition-duration: 0.05s;
+}
+.classai-method-card.selected {
+  border-color: #0a58ca !important;
+  background: #f8fbff !important;
+  box-shadow: 0 0 0 1px #0a58ca, 0 3px 10px rgba(10, 88, 202, 0.08) !important;
+}
+.classai-method-card:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 2px;
+}
+
+/* 4. Bank Option Rows in Accordion */
+.cmc-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.cmc-option-row:hover:not(.active) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+.cmc-option-row:active {
+  transform: translateY(1px) scale(0.99);
+  transition-duration: 0.05s;
+}
+.cmc-option-row.active {
+  background: #eff6ff !important;
+  border-color: #0a58ca !important;
+  box-shadow: 0 0 0 1px #0a58ca;
+}
+
+/* 5. Sticky Bottom Action Buttons: csb-btn-bayar & csb-btn-kembali */
+.csb-btn-bayar {
+  flex: 2;
+  height: 46px;
+  border-radius: 12px;
+  border: none;
+  background: #0a58ca !important;
+  color: #ffffff !important;
+  font-family: var(--font-h);
+  font-size: 14px;
+  font-weight: 750;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.28) !important;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none;
+}
+.csb-btn-bayar:hover:not(:disabled) {
+  background: #084298 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(10, 88, 202, 0.38) !important;
+}
+.csb-btn-bayar:active:not(:disabled) {
+  background: #063478 !important;
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 2px 6px rgba(10, 88, 202, 0.2) !important;
+  transition-duration: 0.05s;
+}
+.csb-btn-bayar:focus-visible {
+  outline: 2px solid #0a58ca !important;
+  outline-offset: 3px !important;
+}
+.csb-btn-bayar:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.csb-btn-kembali {
+  flex: 1;
+  height: 46px;
+  border-radius: 12px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-family: var(--font-h);
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.csb-btn-kembali:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+.csb-btn-kembali:active {
+  background: #f1f5f9;
+  border-color: #64748b;
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 0.05s;
+}
+.csb-btn-kembali:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 2px;
+}
+
+/* 6. Step 2 & 3 Interactive Buttons */
+.cpv-verify-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: 12px;
+  border: none;
+  background: #0a58ca !important;
+  color: #ffffff !important;
+  font-family: var(--font-h);
+  font-size: 14px;
+  font-weight: 750;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.28) !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none;
+}
+.cpv-verify-btn:hover:not(:disabled) {
+  background: #084298 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(10, 88, 202, 0.38) !important;
+}
+.cpv-verify-btn:active:not(:disabled) {
+  background: #063478 !important;
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 2px 6px rgba(10, 88, 202, 0.2) !important;
+  transition-duration: 0.05s;
+}
+.cpv-verify-btn:focus-visible {
+  outline: 2px solid #0a58ca !important;
+  outline-offset: 3px !important;
+}
+.cpv-verify-btn:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.cpv-copy-btn, .csv-copy-key-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.18s ease;
+  user-select: none;
+}
+.cpv-copy-btn:hover, .csv-copy-key-btn:hover {
+  transform: translateY(-1.5px);
+  filter: brightness(1.06);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12);
+}
+.cpv-copy-btn:active, .csv-copy-key-btn:active {
+  transform: translateY(1px) scale(0.96);
+  transition-duration: 0.05s;
+}
+.cpv-copy-btn:focus-visible, .csv-copy-key-btn:focus-visible {
+  outline: 2px solid #0a58ca;
+  outline-offset: 2px;
+}
+
+.cpv-tab-btn {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.cpv-tab-btn:hover:not(.active) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+.cpv-tab-btn:active {
+  transform: translateY(1px) scale(0.98);
+  transition-duration: 0.05s;
+}
+.cpv-tab-btn.active {
+  background: #eff6ff !important;
+  border-color: #0a58ca !important;
+  color: #0a58ca !important;
+  font-weight: 750 !important;
+}
+
+.cpv-wa-help-btn, .csv-wa-share-btn {
+  width: 100%;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #86efac;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 12.5px;
+  font-weight: 650;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.cpv-wa-help-btn:hover, .csv-wa-share-btn:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
+  transform: translateY(-1.5px);
+  box-shadow: 0 3px 10px rgba(22, 101, 52, 0.12);
+}
+.cpv-wa-help-btn:active, .csv-wa-share-btn:active {
+  background: #bbf7d0;
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 0.05s;
+}
+
+.csv-done-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: 12px;
+  border: none;
+  background: #0a58ca !important;
+  color: #ffffff !important;
+  font-family: var(--font-h);
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(10, 88, 202, 0.28) !important;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none;
+}
+.csv-done-btn:hover {
+  background: #084298 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(10, 88, 202, 0.38) !important;
+}
+.csv-done-btn:active {
+  background: #063478 !important;
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 0.05s;
+}
+
+/* ========================================================================= */
+/* 20. Fintech Payment Modal Step Transitions & Instructions Styling         */
+/* ========================================================================= */
+
+.cpv-transition-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px 64px;
+  text-align: center;
+  animation: cpvFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  min-height: 420px;
+}
+
+.cpv-loader-spinner-box {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cpv-spinner-ring {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 3.5px solid #e0edff;
+  border-top-color: #0a58ca;
+  border-right-color: #0284c7;
+  animation: cpvSpin 0.85s linear infinite;
+}
+
+.cpv-spinner-inner-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cpvPulse 1.6s ease-in-out infinite;
+}
+
+.cpv-loader-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0a58ca;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.cpv-loader-title {
+  font-family: var(--font-h);
+  font-size: 20px;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.cpv-loader-sub {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 auto 22px auto;
+  max-width: 400px;
+  line-height: 1.55;
+}
+
+.cpv-loader-progressbar {
+  width: 100%;
+  max-width: 290px;
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0 auto 22px auto;
+}
+
+.cpv-loader-progressfill {
+  height: 100%;
+  background: linear-gradient(90deg, #0a58ca, #38bdf8);
+  border-radius: 9999px;
+  animation: cpvProgressFill 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.cpv-loader-security-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 6px 14px;
+  border-radius: 8px;
+}
+
+@keyframes cpvSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes cpvPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+@keyframes cpvProgressFill {
+  0% { width: 0%; transform: translateX(-10%); }
+  50% { width: 75%; }
+  100% { width: 100%; transform: translateX(0); }
+}
+
+@keyframes cpvFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* QRIS Supported Banks / Apps Grid */
+.cpv-supported-apps {
+  padding: 16px 20px 20px;
+  background: #ffffff;
+}
+
+.cpv-supported-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cpv-bank-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .cpv-bank-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cpv-bank-badge {
+  height: 32px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cpv-bank-badge:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1.5px);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
+}
+
+.cpv-bank-badge-img {
+  height: 16px;
+  max-width: 48px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Instructions Block (Gambar 1) */
+.cpv-instruction-block {
+  padding: 16px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  margin: 14px 18px 18px;
+}
+
+.cpv-instruction-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cpv-instruction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0a58ca;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.cpv-instruction-tabs {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 12px;
+  background: #e2e8f0;
+  padding: 3px;
+  border-radius: 9px;
+}
+
+.cpv-instruction-tabs .cpv-tab-btn {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.cpv-instruction-tabs .cpv-tab-btn.active {
+  background: #ffffff !important;
+  color: #0a58ca !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+  border: none !important;
+}
+
+.cpv-instruction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cpv-instruction-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  transition: all 0.15s ease;
+}
+
+.cpv-instruction-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+}
+
+.cpv-step-badge {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #0a58ca;
+  border: 1.5px solid #bfdbfe;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.cpv-step-text {
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.cpv-step-text strong,
+.cpv-step-text b {
+  color: #0f172a;
+  font-weight: 750;
+}
+
+.cpv-step-text code {
+  background: #eff6ff;
+  color: #0a58ca;
+  font-weight: 750;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-family: monospace;
+  border: 1px solid #bfdbfe;
+}
+
+.cpv-instruction-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 9px;
+  padding: 9px 12px;
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: #0369a1;
+  line-height: 1.4;
 }

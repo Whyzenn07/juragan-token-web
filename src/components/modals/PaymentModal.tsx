@@ -91,6 +91,16 @@ export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps)
   const [_emailMessage, setEmailMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionConfig, setTransitionConfig] = useState<{
+    badge: string;
+    title: string;
+    subtitle: string;
+  }>({
+    badge: "MEMPROSES TRANSAKSI",
+    title: "Menyiapkan Lembar Pembayaran...",
+    subtitle: "Menerbitkan kode tagihan resmi & instruksi pembayaran...",
+  });
 
   // Mode Top-Up Kunci yang Ada
   const [checkoutMode, setCheckoutMode] = useState<"new" | "topup">("new");
@@ -165,6 +175,7 @@ export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps)
     setPaidAt("");
     setIsSubmitting(false);
     setIsConfirming(false);
+    setIsTransitioning(false);
     setCheckoutMode("new");
     setTargetApiKey("");
     setVerifiedKeyData(null);
@@ -213,7 +224,17 @@ export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps)
           if (data.order.paidAt) setPaidAt(data.order.paidAt);
           if (data.order.emailStatus) setEmailStatus(data.order.emailStatus);
           if (data.order.emailMessage) setEmailMessage(data.order.emailMessage);
-          setStep("success");
+          
+          setTransitionConfig({
+            badge: "PEMBAYARAN DITERIMA",
+            title: "Pembayaran Terkonfirmasi!",
+            subtitle: "Sinkronisasi mutasi rekening & mengaktifkan API Key universal Anda...",
+          });
+          setIsTransitioning(true);
+          setTimeout(() => {
+            setIsTransitioning(false);
+            setStep("success");
+          }, 1400);
         } else if (data.order.status === "expired") {
           alert("Waktu pemesanan telah kedaluwarsa. Silakan lakukan pemesanan ulang.");
           setStep("checkout");
@@ -386,6 +407,17 @@ export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps)
         setInvoiceId(data.invoiceId);
         setOrderToken(data.orderToken);
         setTotalPaid(data.totalIdr);
+
+        setTransitionConfig({
+          badge: "MEMPROSES TRANSAKSI",
+          title: "Menyiapkan Lembar Pembayaran...",
+          subtitle: selectedMethod === "qris" 
+            ? "Menerbitkan kode QRIS nasional resmi & mengamankan pesanan..." 
+            : `Menghubungkan ke Virtual Account ${currentMethod.name}...`,
+        });
+        setIsTransitioning(true);
+        await new Promise((resolve) => setTimeout(resolve, 1400));
+        setIsTransitioning(false);
         setStep("payment");
       } else {
         alert(data.error || "Gagal membuat pesanan.");
@@ -432,6 +464,15 @@ export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps)
         if (order.paidAt) setPaidAt(order.paidAt);
         if (order.emailStatus) setEmailStatus(order.emailStatus);
         if (order.emailMessage) setEmailMessage(order.emailMessage);
+
+        setTransitionConfig({
+          badge: "VERIFIKASI REAL-TIME",
+          title: "Memverifikasi Pembayaran...",
+          subtitle: "Sinkronisasi mutasi rekening & mengaktifkan API Key universal Anda...",
+        });
+        setIsTransitioning(true);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        setIsTransitioning(false);
         setStep("success");
       }
     } catch {
@@ -1325,10 +1366,37 @@ Mohon dibantu konfirmasi ya!`;
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* STEP 1: CHECKOUT SCREEN (100% IDENTICAL TO CLASSAI.ID SCREENSHOTS)        */}
-      {/* ========================================================================= */}
-      {step === "checkout" && (
+      {isTransitioning ? (
+        <div className="cpv-transition-loader">
+          <div className="cpv-loader-spinner-box">
+            <div className="cpv-spinner-ring" />
+            <div className="cpv-spinner-inner-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+            </div>
+          </div>
+          <span className="cpv-loader-badge">{transitionConfig.badge}</span>
+          <h3 className="cpv-loader-title">{transitionConfig.title}</h3>
+          <p className="cpv-loader-sub">{transitionConfig.subtitle}</p>
+          <div className="cpv-loader-progressbar">
+            <div className="cpv-loader-progressfill" />
+          </div>
+          <div className="cpv-loader-security-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span>Enkripsi Bank Grade 256-bit Terproteksi</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ========================================================================= */}
+          {/* STEP 1: CHECKOUT SCREEN (100% IDENTICAL TO CLASSAI.ID SCREENSHOTS)        */}
+          {/* ========================================================================= */}
+          {step === "checkout" && (
         <form onSubmit={handleProceedPayment} className="classai-checkout-form">
           {/* Top Notice Disclaimer Banner */}
           <div
@@ -1403,7 +1471,7 @@ Mohon dibantu konfirmasi ya!`;
           {/* OPSI MODE: TERBITKAN KUNCI BARU VS TOP-UP KUNCI LAMA                 */}
           {/* ===================================================================== */}
           <div
-            className="classai-mode-selector"
+            className="classai-mode-selector cosc-mode-switcher"
             style={{
               display: "flex",
               gap: "8px",
@@ -1415,26 +1483,10 @@ Mohon dibantu konfirmasi ya!`;
           >
             <button
               type="button"
+              className={`cosc-mode-btn ${checkoutMode === "new" ? "active" : ""}`}
               onClick={() => {
                 setCheckoutMode("new");
                 setKeyVerifyError("");
-              }}
-              style={{
-                flex: 1,
-                padding: "8px 12px",
-                borderRadius: "9px",
-                border: "none",
-                fontSize: "12.5px",
-                fontWeight: checkoutMode === "new" ? 750 : 600,
-                background: checkoutMode === "new" ? "#ffffff" : "transparent",
-                color: checkoutMode === "new" ? "#0a2540" : "#64748b",
-                boxShadow: checkoutMode === "new" ? "0 2px 6px rgba(15, 23, 42, 0.08)" : "none",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
               }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1447,29 +1499,13 @@ Mohon dibantu konfirmasi ya!`;
             </button>
             <button
               type="button"
+              className={`cosc-mode-btn ${checkoutMode === "topup" ? "active" : ""}`}
               onClick={() => {
                 setCheckoutMode("topup");
                 if (savedKeyHint && !targetApiKey) {
                   setTargetApiKey(savedKeyHint);
                   verifyTargetKey(savedKeyHint);
                 }
-              }}
-              style={{
-                flex: 1,
-                padding: "8px 12px",
-                borderRadius: "9px",
-                border: "none",
-                fontSize: "12.5px",
-                fontWeight: checkoutMode === "topup" ? 750 : 600,
-                background: checkoutMode === "topup" ? "#ffffff" : "transparent",
-                color: checkoutMode === "topup" ? "#0a58ca" : "#64748b",
-                boxShadow: checkoutMode === "topup" ? "0 2px 6px rgba(15, 23, 42, 0.08)" : "none",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
               }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1529,20 +1565,9 @@ Mohon dibantu konfirmasi ya!`;
                 />
                 <button
                   type="button"
+                  className="classai-verify-btn"
                   onClick={() => verifyTargetKey(targetApiKey)}
                   disabled={verifyingKey || !targetApiKey.trim()}
-                  style={{
-                    padding: "0 14px",
-                    height: "40px",
-                    borderRadius: "9px",
-                    border: "none",
-                    background: "#0a58ca",
-                    color: "#ffffff",
-                    fontSize: "12.5px",
-                    fontWeight: 700,
-                    cursor: verifyingKey || !targetApiKey.trim() ? "not-allowed" : "pointer",
-                    opacity: verifyingKey || !targetApiKey.trim() ? 0.6 : 1,
-                  }}
                 >
                   {verifyingKey ? "Mengecek..." : "Verifikasi"}
                 </button>
@@ -2008,17 +2033,6 @@ Mohon dibantu konfirmasi ya!`;
                 type="button"
                 className="csb-btn-kembali"
                 onClick={handleClose}
-                style={{
-                  flex: 1,
-                  height: "44px",
-                  borderRadius: "12px",
-                  border: "1px solid #cbd5e1",
-                  background: "#ffffff",
-                  color: "#334155",
-                  fontSize: "13.5px",
-                  fontWeight: 650,
-                  cursor: "pointer",
-                }}
               >
                 Kembali
               </button>
@@ -2026,23 +2040,6 @@ Mohon dibantu konfirmasi ya!`;
                 type="submit"
                 className="csb-btn-bayar"
                 disabled={isSubmitting}
-                style={{
-                  flex: 2,
-                  height: "44px",
-                  borderRadius: "12px",
-                  border: "none",
-                  background: "#0a58ca",
-                  color: "#ffffff",
-                  fontSize: "14px",
-                  fontWeight: 750,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  cursor: isSubmitting ? "not-allowed" : "pointer",
-                  opacity: isSubmitting ? 0.7 : 1,
-                  boxShadow: "0 4px 12px rgba(10, 88, 202, 0.25)",
-                }}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -2252,46 +2249,22 @@ Mohon dibantu konfirmasi ya!`;
                 </button>
               </div>
 
-              {/* Supported Payment Apps Strip (Xendit / Midtrans footer) */}
-              <div style={{ padding: "14px 20px 18px", background: "#ffffff" }}>
-                <span style={{ display: "block", fontSize: "11px", fontWeight: 600, color: "#64748b", marginBottom: "10px", textAlign: "center" }}>
-                  Buka aplikasi mobile banking atau e-wallet pilihan Anda lalu scan QR di atas:
+              {/* Supported Payment Apps Strip (Clean, symmetrical grid) */}
+              <div className="cpv-supported-apps">
+                <span className="cpv-supported-label">
+                  Dukungan Pembayaran Melalui Aplikasi Terdaftar:
                 </span>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                    flexWrap: "wrap",
-                  }}
-                >
+                <div className="cpv-bank-grid">
                   {["bca", "mandiri", "bri", "bni", "gopay", "ovo", "dana", "shopeepay", "linkaja"].map((m) => (
-                    <div
-                      key={m}
-                      style={{
-                        height: "26px",
-                        padding: "2px 7px",
-                        background: "#ffffff",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "6px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+                    <div key={m} className="cpv-bank-badge" title={m.toUpperCase()}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={`/assets/payment-logos/${m === "shopeepay" ? "shopeepay.svg" : `${m}.svg`}`}
                         alt={m.toUpperCase()}
-                        style={{ height: "15px", maxWidth: "44px", width: "auto", objectFit: "contain", display: "block" }}
+                        className="cpv-bank-badge-img"
                       />
                     </div>
                   ))}
-                </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "12px", fontSize: "11.5px", color: "#16a34a", fontWeight: 650 }}>
-                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#16a34a", display: "inline-block" }} />
-                  <span>Pembayaran terverifikasi otomatis dalam 10–30 detik</span>
                 </div>
               </div>
             </div>
@@ -2443,62 +2416,150 @@ Mohon dibantu konfirmasi ya!`;
                 </button>
               </div>
 
-              {/* Step-by-Step Payment Instructions Tabs */}
-              <div style={{ padding: "16px 20px", background: "#ffffff" }}>
-                <span style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#64748b", marginBottom: "8px" }}>
-                  PETUNJUK PEMBAYARAN:
-                </span>
-                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+              {/* Step-by-Step Payment Instructions - Structured Fintech Block */}
+              <div className="cpv-instruction-block">
+                <div className="cpv-instruction-head">
+                  <span className="cpv-instruction-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                    PANDUAN PEMBAYARAN RESMI
+                  </span>
+                  <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 600 }}>
+                    Pilih kanal transfer Anda:
+                  </span>
+                </div>
+
+                <div className="cpv-instruction-tabs">
                   {(["mbanking", "ibanking", "atm"] as const).map((tab) => (
                     <button
                       key={tab}
                       type="button"
+                      className={`cpv-tab-btn ${guideTab === tab ? "active" : ""}`}
                       onClick={() => setGuideTab(tab)}
-                      style={{
-                        flex: 1,
-                        padding: "6px 10px",
-                        borderRadius: "8px",
-                        fontSize: "11.5px",
-                        fontWeight: guideTab === tab ? 750 : 600,
-                        border: guideTab === tab ? "1.5px solid #0a58ca" : "1px solid #e2e8f0",
-                        background: guideTab === tab ? "#eff6ff" : "#ffffff",
-                        color: guideTab === tab ? "#0a58ca" : "#64748b",
-                        cursor: "pointer",
-                      }}
                     >
-                      {tab === "mbanking" ? "m-Banking" : tab === "ibanking" ? "Internet Banking" : "ATM"}
+                      {tab === "mbanking" ? "m-Banking" : tab === "ibanking" ? "Internet Banking" : "ATM Mesin"}
                     </button>
                   ))}
                 </div>
-                <ol style={{ margin: 0, paddingLeft: "18px", fontSize: "12px", color: "#475569", lineHeight: 1.6 }}>
+
+                <div className="cpv-instruction-list">
                   {guideTab === "mbanking" && (
                     <>
-                      <li>Buka aplikasi mobile banking bank Anda ({currentMethod.name}).</li>
-                      <li>Pilih menu <b>Transfer</b> &gt; <b>Virtual Account</b>.</li>
-                      <li>Masukkan Nomor Virtual Account: <b>{currentMethod.accountNumber || "8277 0812 3456 7890"}</b>.</li>
-                      <li>Pastikan nama penerima <b>PT JURAGAN TOKEN INDONESIA</b> dan nominal transfer <b>{formatIdr(totalPrice)}</b>.</li>
-                      <li>Masukkan PIN mobile banking Anda untuk menyelesaikan transaksi.</li>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">1</div>
+                        <div className="cpv-step-text">
+                          Buka aplikasi mobile banking bank Anda (<strong>{currentMethod.name}</strong>).
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">2</div>
+                        <div className="cpv-step-text">
+                          Pilih menu <strong>Transfer</strong> &gt; <strong>Virtual Account</strong> (atau Bayar Tagihan).
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">3</div>
+                        <div className="cpv-step-text">
+                          Masukkan Nomor Virtual Account: <code>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">4</div>
+                        <div className="cpv-step-text">
+                          Pastikan nama tujuan tertulis <strong>PT JURAGAN TOKEN INDONESIA</strong> dan nominal transfer tepat <strong>{formatIdr(totalPrice)}</strong>.
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">5</div>
+                        <div className="cpv-step-text">
+                          Masukkan PIN mobile banking Anda untuk menyelesaikan transaksi secara instan.
+                        </div>
+                      </div>
                     </>
                   )}
                   {guideTab === "ibanking" && (
                     <>
-                      <li>Login ke portal Internet Banking bank Anda.</li>
-                      <li>Pilih menu <b>Pembayaran</b> / <b>Transfer ke Virtual Account</b>.</li>
-                      <li>Pilih rekening sumber dan masukkan nomor VA: <b>{currentMethod.accountNumber || "8277 0812 3456 7890"}</b>.</li>
-                      <li>Verifikasi tagihan atas nama <b>PT JURAGAN TOKEN INDONESIA</b>.</li>
-                      <li>Otorisasi transaksi menggunakan token internet banking Anda.</li>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">1</div>
+                        <div className="cpv-step-text">
+                          Login ke akun perbankan melalui portal resmi Internet Banking Anda.
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">2</div>
+                        <div className="cpv-step-text">
+                          Pilih menu <strong>Pembayaran</strong> / <strong>Transfer ke Virtual Account</strong>.
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">3</div>
+                        <div className="cpv-step-text">
+                          Pilih rekening sumber dan masukkan nomor VA: <code>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">4</div>
+                        <div className="cpv-step-text">
+                          Verifikasi tagihan atas nama <strong>PT JURAGAN TOKEN INDONESIA</strong> sebesar <strong>{formatIdr(totalPrice)}</strong>.
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">5</div>
+                        <div className="cpv-step-text">
+                          Otorisasi transaksi menggunakan token otentikasi / respon key internet banking Anda.
+                        </div>
+                      </div>
                     </>
                   )}
                   {guideTab === "atm" && (
                     <>
-                      <li>Masukkan kartu ATM dan PIN Anda di mesin ATM.</li>
-                      <li>Pilih menu <b>Transaksi Lainnya</b> &gt; <b>Transfer</b> &gt; <b>Ke Rekening Virtual Account</b>.</li>
-                      <li>Masukkan nomor Virtual Account: <b>{currentMethod.accountNumber || "8277 0812 3456 7890"}</b>.</li>
-                      <li>Periksa detail pada layar konfirmasi, pastikan nama dan jumlah sesuai.</li>
-                      <li>Pilih <b>Ya</b> untuk memproses pembayaran dan simpan struk transaksi.</li>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">1</div>
+                        <div className="cpv-step-text">
+                          Masukkan kartu ATM dan 6 digit PIN rahasia Anda pada mesin ATM.
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">2</div>
+                        <div className="cpv-step-text">
+                          Pilih menu <strong>Transaksi Lainnya</strong> &gt; <strong>Transfer</strong> &gt; <strong>Ke Rekening Virtual Account</strong>.
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">3</div>
+                        <div className="cpv-step-text">
+                          Ketikkan nomor Virtual Account: <code>{currentMethod.accountNumber || "8277 0812 3456 7890"}</code>
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">4</div>
+                        <div className="cpv-step-text">
+                          Periksa detail konfirmasi di layar: nama <strong>PT JURAGAN TOKEN INDONESIA</strong> dan nominal <strong>{formatIdr(totalPrice)}</strong>.
+                        </div>
+                      </div>
+                      <div className="cpv-instruction-item">
+                        <div className="cpv-step-badge">5</div>
+                        <div className="cpv-step-text">
+                          Tekan <strong>Ya / Benar</strong> untuk memproses transaksi dan simpan struk fisik bukti pembayaran.
+                        </div>
+                      </div>
                     </>
                   )}
-                </ol>
+                </div>
+
+                <div className="cpv-instruction-tip">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
+                  <span>
+                    Tips: Pastikan nama penerima tertulis <strong>PT JURAGAN TOKEN INDONESIA</strong> sebelum mengonfirmasi PIN.
+                  </span>
+                </div>
               </div>
             </div>
           )}
@@ -2510,22 +2571,6 @@ Mohon dibantu konfirmasi ya!`;
               className="cpv-verify-btn"
               onClick={handleSimulateSuccess}
               disabled={isConfirming}
-              style={{
-                width: "100%",
-                height: "44px",
-                borderRadius: "12px",
-                border: "none",
-                background: "#0a58ca",
-                color: "#ffffff",
-                fontSize: "14px",
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                cursor: isConfirming ? "not-allowed" : "pointer",
-                opacity: isConfirming ? 0.7 : 1,
-              }}
             >
               <Icon name="check" size={16} />
               <span>{isConfirming ? "Memeriksa Status..." : "Cek Status Pembayaran (Selesai)"}</span>
@@ -2544,21 +2589,6 @@ Mohon dibantu konfirmasi ya!`;
               type="button"
               className="cpv-wa-help-btn"
               onClick={openWhatsAppOrder}
-              style={{
-                width: "100%",
-                height: "40px",
-                borderRadius: "10px",
-                border: "1px solid #86efac",
-                background: "#f0fdf4",
-                color: "#166534",
-                fontSize: "12.5px",
-                fontWeight: 650,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                cursor: "pointer",
-              }}
             >
               <Icon name="whatsapp" size={15} />
               <span>Bantuan Konfirmasi via WhatsApp Admin</span>
@@ -2631,17 +2661,6 @@ Mohon dibantu konfirmasi ya!`;
               type="button"
               className="csv-done-btn"
               onClick={handleClose}
-              style={{
-                width: "100%",
-                height: "44px",
-                borderRadius: "12px",
-                border: "none",
-                background: "#0a58ca",
-                color: "#ffffff",
-                fontSize: "14px",
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
             >
               Selesai &amp; Kembali ke Halaman Utama
             </button>
@@ -2649,27 +2668,14 @@ Mohon dibantu konfirmasi ya!`;
               type="button"
               className="csv-wa-share-btn"
               onClick={openWhatsAppOrder}
-              style={{
-                width: "100%",
-                height: "40px",
-                borderRadius: "10px",
-                border: "1px solid #86efac",
-                background: "#f0fdf4",
-                color: "#166534",
-                fontSize: "13px",
-                fontWeight: 650,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                cursor: "pointer",
-              }}
             >
               <Icon name="whatsapp" size={15} />
               <span>Kirim Bukti Pembayaran ke WhatsApp</span>
             </button>
           </div>
         </div>
+      )}
+        </>
       )}
     </Dialog>
   );
