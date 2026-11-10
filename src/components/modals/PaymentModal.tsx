@@ -574,6 +574,7 @@ Mohon dibantu konfirmasi ya!`;
         .classai-brand-text strong {
           color: #0a58ca !important;
           font-weight: 800 !important;
+        }
         .classai-header-right {
           display: flex !important;
           align-items: center !important;
@@ -1448,20 +1449,20 @@ Mohon dibantu konfirmasi ya!`;
               marginBottom: "16px",
             }}
           >
-            <div className="cosc-left">
+            <div className="cosc-left" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "12px", minWidth: 0, flex: 1 }}>
               {model && (
-                <div className="cosc-logo-wrap">
-                  <ProviderLogo provider={model.providerId} size={28} />
+                <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dbeafe", flexShrink: 0, boxShadow: "0 1px 3px rgba(10, 88, 202, 0.06)" }}>
+                  <ProviderLogo provider={model.providerId} size={26} />
                 </div>
               )}
-              <div className="cosc-info">
-                <span className="cosc-badge" style={{ fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              <div className="cosc-info" style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
+                <span className="cosc-badge" style={{ display: "block", fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.2 }}>
                   {pkg.badge || "Pilihan Siap Pakai"}
                 </span>
-                <strong className="cosc-pkg-name" style={{ fontSize: "15px", fontWeight: 800, color: "#0a2540" }}>
+                <strong className="cosc-pkg-name" style={{ display: "block", fontSize: "15px", fontWeight: 800, color: "#0a2540", lineHeight: 1.25 }}>
                   {pkg.name}
                 </strong>
-                <span className="cosc-pkg-token" style={{ fontSize: "12px", color: "#475569" }}>
+                <span className="cosc-pkg-token" style={{ display: "block", fontSize: "12px", color: "#475569", lineHeight: 1.35 }}>
                   {model
                     ? `±${new Intl.NumberFormat("id-ID").format(unitsForBudget(model, pkg.priceIdr))} Interaksi · ${model.name} · Saldo Universal`
                     : `${pkg.estToken} · Saldo Universal`}

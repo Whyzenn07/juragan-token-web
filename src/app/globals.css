@@ -2976,15 +2976,18 @@ main {
   gap: 8px;
   justify-content: space-between;
   margin-bottom: 12px;
-  height: 24px;
+  min-height: 24px;
 }
 .pkg-target {
   color: var(--blue);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 750;
   letter-spacing: .03em;
   text-transform: uppercase;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 .card-badge {
   background: #0a4ea3;
@@ -2996,6 +2999,7 @@ main {
   padding: 3px 8px;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 .package-card.featured .card-badge {
   background: #0a58ca;
