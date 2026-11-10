@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GATEWAY_BASE_URL, RetailPackage, ModelItem, paymentMethods, unitsForBudget } from "@/data/catalog";
+import { GATEWAY_BASE_URL, RetailPackage, ModelItem, paymentMethods, unitsForBudget, retailPackages } from "@/data/catalog";
 import { Dialog } from "./Dialog";
 import { Icon, BrandMark } from "@/components/ui/Icon";
 import { ProviderLogo } from "@/components/ui/ProviderLogo";
@@ -12,6 +12,8 @@ type SingaPayModalProps = {
   pkg: RetailPackage | null;
   model?: ModelItem | null;
   onClose: () => void;
+  initialMode?: "new" | "topup";
+  initialTargetKey?: string;
 };
 
 // Official authentic vector logos from idn-finlogos (Xendit / Midtrans standard)
@@ -69,7 +71,17 @@ function PaymentLogo({ type }: { type: string }) {
   );
 }
 
-export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps) {
+export function SingaPayModal({
+  open,
+  pkg: initialPkg,
+  model,
+  onClose,
+  initialMode = "new",
+  initialTargetKey = "",
+}: SingaPayModalProps) {
+  const [selectedPkg, setSelectedPkg] = useState<RetailPackage | null>(initialPkg);
+  const [showPkgSwitcher, setShowPkgSwitcher] = useState(false);
+  const pkg = selectedPkg || initialPkg;
   const [selectedMethod, setSelectedMethod] = useState("qris");
   const [openCategory, setOpenCategory] = useState<"qris" | "ewallet" | "va">("qris");
   const [step, setStep] = useState<"checkout" | "payment" | "success">("checkout");
@@ -103,8 +115,8 @@ export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps)
   });
 
   // Mode Top-Up Kunci yang Ada
-  const [checkoutMode, setCheckoutMode] = useState<"new" | "topup">("new");
-  const [targetApiKey, setTargetApiKey] = useState("");
+  const [checkoutMode, setCheckoutMode] = useState<"new" | "topup">(initialMode);
+  const [targetApiKey, setTargetApiKey] = useState(initialTargetKey);
   const [verifyingKey, setVerifyingKey] = useState(false);
   const [verifiedKeyData, setVerifiedKeyData] = useState<{
     maskedKey: string;
@@ -115,18 +127,32 @@ export function SingaPayModal({ open, pkg, model, onClose }: SingaPayModalProps)
   const [savedKeyHint, setSavedKeyHint] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open && typeof window !== "undefined") {
-      const timer = setTimeout(() => {
-        try {
-          const last = sessionStorage.getItem("jt_last_api_key");
-          if (last) setSavedKeyHint(last);
-        } catch {
-          // ignore
-        }
-      }, 0);
-      return () => clearTimeout(timer);
+    if (open) {
+      if (initialPkg) {
+        setSelectedPkg(initialPkg);
+      }
+      if (initialMode) {
+        setCheckoutMode(initialMode);
+      }
+      if (initialTargetKey) {
+        setTargetApiKey(initialTargetKey);
+        verifyTargetKey(initialTargetKey);
+      }
+      setShowPkgSwitcher(false);
+
+      if (typeof window !== "undefined") {
+        const timer = setTimeout(() => {
+          try {
+            const last = sessionStorage.getItem("jt_last_api_key");
+            if (last) setSavedKeyHint(last);
+          } catch {
+            // ignore
+          }
+        }, 0);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [open]);
+  }, [open, initialPkg, initialMode, initialTargetKey]);
 
   const verifyTargetKey = async (keyToVerify: string) => {
     const clean = keyToVerify.trim();
@@ -1450,31 +1476,111 @@ Mohon dibantu konfirmasi ya!`;
             }}
           >
             <div className="cosc-left" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "12px", minWidth: 0, flex: 1 }}>
-              {model && (
+              {model ? (
                 <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dbeafe", flexShrink: 0, boxShadow: "0 1px 3px rgba(10, 88, 202, 0.06)" }}>
                   <ProviderLogo provider={model.providerId} size={26} />
                 </div>
+              ) : (
+                <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "10px", background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)", border: "1px solid #bfdbfe", flexShrink: 0, boxShadow: "0 1px 3px rgba(10, 88, 202, 0.08)" }} title="Juragan Token Universal AI">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="rgba(10, 88, 202, 0.18)" />
+                  </svg>
+                </div>
               )}
               <div className="cosc-info" style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
-                <span className="cosc-badge" style={{ display: "block", fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.2 }}>
-                  {pkg.badge || "Pilihan Siap Pakai"}
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span className="cosc-badge" style={{ display: "inline-block", fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.2 }}>
+                    {pkg ? (pkg.badge || "Pilihan Siap Pakai") : "Paket AI"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPkgSwitcher(!showPkgSwitcher)}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: "#0a58ca",
+                      fontSize: "11px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      padding: "0 2px",
+                      textDecoration: "underline",
+                    }}
+                    title="Pilih paket nominal lain"
+                  >
+                    {showPkgSwitcher ? "Tutup ✕" : "Ganti Paket ▾"}
+                  </button>
+                </div>
                 <strong className="cosc-pkg-name" style={{ display: "block", fontSize: "15px", fontWeight: 800, color: "#0a2540", lineHeight: 1.25 }}>
-                  {pkg.name}
+                  {pkg ? pkg.name : "Paket Token"}
                 </strong>
                 <span className="cosc-pkg-token" style={{ display: "block", fontSize: "12px", color: "#475569", lineHeight: 1.35 }}>
-                  {model
+                  {model && pkg
                     ? `±${new Intl.NumberFormat("id-ID").format(unitsForBudget(model, pkg.priceIdr))} Interaksi · ${model.name} · Saldo Universal`
-                    : `${pkg.estToken} · Saldo Universal`}
+                    : pkg ? `${pkg.estToken} · Saldo Universal` : "Saldo Universal"}
                 </span>
               </div>
             </div>
             <div className="cosc-right">
               <strong className="cosc-price" style={{ fontSize: "18px", fontWeight: 800, color: "#0a58ca", letterSpacing: "-0.02em" }}>
-                {formatIdr(pkg.priceIdr)}
+                {pkg ? formatIdr(pkg.priceIdr) : "Rp 0"}
               </strong>
             </div>
           </div>
+
+          {/* Inline Package Switcher Menu */}
+          {showPkgSwitcher && (
+            <div
+              className="cosc-package-picker"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "8px",
+                background: "#f8fafc",
+                border: "1px solid #cbd5e1",
+                borderRadius: "12px",
+                padding: "10px",
+                marginBottom: "16px",
+              }}
+            >
+              {retailPackages.map((p) => {
+                const isCurrent = p.id === pkg?.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPkg(p);
+                      setShowPkgSwitcher(false);
+                    }}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      padding: "8px 10px",
+                      borderRadius: "8px",
+                      border: isCurrent ? "1.5px solid #0a58ca" : "1px solid #e2e8f0",
+                      background: isCurrent ? "#eff6ff" : "#ffffff",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
+                      <strong style={{ fontSize: "12px", color: isCurrent ? "#0a58ca" : "#0f172a", fontWeight: 750 }}>
+                        {p.name}
+                      </strong>
+                      <span style={{ fontSize: "11px", fontWeight: 800, color: isCurrent ? "#0a58ca" : "#334155" }}>
+                        {formatIdr(p.priceIdr)}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: "10.5px", color: "#64748b", marginTop: "2px" }}>
+                      {p.targetUser} · {p.badge}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* ===================================================================== */}
           {/* OPSI MODE: TERBITKAN KUNCI BARU VS TOP-UP KUNCI LAMA                 */}
@@ -2067,13 +2173,29 @@ Mohon dibantu konfirmasi ya!`;
       {step === "payment" && (
         <div className="classai-payment-view">
           {/* Timer Banner */}
-          <div className="cpv-timer-strip" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "10px", padding: "10px 14px", marginBottom: "14px" }}>
-            <span className="cpv-status-badge" style={{ fontSize: "12px", fontWeight: 700, color: "#1d4ed8" }}>Menunggu Pembayaran</span>
-            <div className="cpv-timer-count" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#475569" }}>
-              <span>Sisa Waktu:</span>
-              <strong style={{ fontSize: "14px", color: "#dc2626", fontFamily: "monospace" }}>{formatTime(timeLeft)}</strong>
+          {timeLeft > 0 ? (
+            <div className="cpv-timer-strip" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "10px", padding: "10px 14px", marginBottom: "14px" }}>
+              <span className="cpv-status-badge" style={{ fontSize: "12px", fontWeight: 700, color: "#1d4ed8" }}>Menunggu Pembayaran</span>
+              <div className="cpv-timer-count" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#475569" }}>
+                <span>Sisa Waktu:</span>
+                <strong style={{ fontSize: "14px", color: "#dc2626", fontFamily: "monospace" }}>{formatTime(timeLeft)}</strong>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="cpv-timer-strip expired" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: "10px", padding: "10px 14px", marginBottom: "14px" }}>
+              <span className="cpv-status-badge" style={{ fontSize: "12px", fontWeight: 700, color: "#be123c" }}>Batas Waktu Habis</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setTimeLeft(15 * 60);
+                  setInvoiceId(`INV-JT-${Date.now().toString(36).toUpperCase()}`);
+                }}
+                style={{ background: "#ffffff", border: "1px solid #fda4af", color: "#be123c", borderRadius: "6px", padding: "4px 10px", fontSize: "11.5px", fontWeight: 700, cursor: "pointer" }}
+              >
+                Perbarui Tagihan ↻
+              </button>
+            </div>
+          )}
 
           {/* Invoice ID Header */}
           <div className="cpv-invoice-info-card" style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "12px 14px", marginBottom: "14px", display: "flex", flexDirection: "column", gap: "8px" }}>

@@ -8,7 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 type TokenBalanceModalProps = {
   open: boolean;
   onClose: () => void;
-  onTopUp: () => void;
+  onTopUp: (key?: string) => void;
 };
 
 type KeyCheckResult = {
@@ -210,11 +210,12 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
                   type="button"
                   className="button-accent full"
                   onClick={() => {
+                    const keyToTopUp = inputKey.trim();
                     handleClose();
-                    onTopUp();
+                    onTopUp(keyToTopUp);
                   }}
                 >
-                  Beli Token / Top Up Baru ↗
+                  Top-Up Saldo Kunci Ini Sekarang ↗
                 </button>
               </div>
             </div>

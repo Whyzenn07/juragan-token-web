@@ -171,6 +171,8 @@ export default function Home() {
   const [selectedPackage, setSelectedPackage] = useState<RetailPackage | null>(null);
   const [checkoutModel, setCheckoutModel] = useState<ModelItem | null>(null);
   const [singaPayOpen, setSingaPayOpen] = useState(false);
+  const [checkoutInitialMode, setCheckoutInitialMode] = useState<"new" | "topup">("new");
+  const [checkoutInitialKey, setCheckoutInitialKey] = useState<string>("");
   const [balanceModalOpen, setBalanceModalOpen] = useState(false);
   const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -323,6 +325,8 @@ export default function Home() {
     }
     setSelectedPackage(matched);
     setCheckoutModel(model);
+    setCheckoutInitialMode("new");
+    setCheckoutInitialKey("");
     setSingaPayOpen(true);
   };
 
@@ -569,7 +573,7 @@ export default function Home() {
           {/* Breadcrumb & Live Status Strip */}
           <div className="breadcrumb">
             <span>Marketplace</span> / <span>Temukan</span>
-            <span className="demo-pill">Pratinjau · Akses Token Ritel Mahasiswa</span>
+            <span className="demo-pill">Pratinjau · Akses Token Universal Frontier AI</span>
           </div>
 
           <div className="gateway-status-strip" data-reveal="fade-up">
@@ -602,7 +606,7 @@ export default function Home() {
                 <span className="hero-accent">Dengan harga lebih ringan.</span>
               </h1>
               <p>
-                Temukan token dan kredit API untuk AI favorit Anda. Berkarya, ngoding tugas kuliah, dan riset skripsi di mana pun tanpa kartu kredit internasional.
+                Temukan token dan kredit API untuk AI favorit Anda. Operasional bisnis, koding aplikasi, riset pasar, dan asisten kerja di mana pun tanpa kartu kredit internasional.
               </p>
               <div className="hero-actions">
                 <button type="button" className="primary-button" onClick={scrollToCatalog}>
@@ -1323,7 +1327,7 @@ export default function Home() {
                       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                     </svg>
                   </span>
-                  <span className="dps-pill-title">Paket Ritel</span>
+                  <span className="dps-pill-title">Paket Ritel &amp; Bisnis</span>
                   <span className="dps-pill-badge blue">PRABAYAR</span>
                   <span className="dps-pill-sub">Mulai Rp 15.000</span>
                 </div>
@@ -1334,7 +1338,7 @@ export default function Home() {
                 </h2>
 
                 <p className="dps-banner-desc">
-                  Untuk siapa saja, bukan hanya tim teknis. Kami siapkan saldo prabayar fleksibel mulai Rp 15.000 tanpa kartu kredit — langsung siap pakai untuk riset skripsi, praktikum koding, dan chat harian.
+                  Untuk siapa saja, mulai dari pemilik usaha, profesional, hingga developer. Kami siapkan saldo prabayar fleksibel mulai Rp 15.000 tanpa kartu kredit — langsung siap pakai untuk operasional bisnis, analisis data, koding Cursor, dan asisten kerja harian.
                 </p>
 
                 <div className="dps-action-row">
@@ -1442,6 +1446,8 @@ export default function Home() {
                     onClick={() => {
                       setSelectedPackage(pkg);
                       setCheckoutModel(null);
+                      setCheckoutInitialMode("new");
+                      setCheckoutInitialKey("");
                       setSingaPayOpen(true);
                     }}
                   >
@@ -1558,7 +1564,7 @@ export default function Home() {
                     <b>Sama sekali tidak memerlukan kartu kredit.</b>
                   </p>
                   <p>
-                    Juragan Token didesain untuk kemudahan pengguna dan mahasiswa di Indonesia. Pembayaran dilakukan 100% dalam mata uang Rupiah (IDR) menggunakan <b>QRIS SingaPay Instan</b> (bisa di-scan dari BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA) maupun Virtual Account bank lokal dengan aktivasi otomatis detik itu juga.
+                    Juragan Token didesain untuk kemudahan seluruh pengguna, pelaku usaha, profesional, dan developer di Indonesia. Pembayaran dilakukan 100% dalam mata uang Rupiah (IDR) menggunakan <b>QRIS SingaPay Instan</b> (bisa di-scan dari BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA) maupun Virtual Account bank lokal dengan aktivasi otomatis detik itu juga.
                   </p>
                 </div>
               </details>
@@ -1741,17 +1747,25 @@ export default function Home() {
         open={singaPayOpen}
         pkg={selectedPackage}
         model={checkoutModel}
-        onClose={() => setSingaPayOpen(false)}
+        initialMode={checkoutInitialMode}
+        initialTargetKey={checkoutInitialKey}
+        onClose={() => {
+          setSingaPayOpen(false);
+          setCheckoutInitialMode("new");
+          setCheckoutInitialKey("");
+        }}
       />
 
       {/* Token Balance Modal */}
       <TokenBalanceModal
         open={balanceModalOpen}
         onClose={() => setBalanceModalOpen(false)}
-        onTopUp={() => {
+        onTopUp={(key) => {
           setBalanceModalOpen(false);
           setSelectedPackage(retailPackages[1]);
           setCheckoutModel(null);
+          setCheckoutInitialMode("topup");
+          setCheckoutInitialKey(key || "");
           setSingaPayOpen(true);
         }}
       />

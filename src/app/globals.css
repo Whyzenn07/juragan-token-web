@@ -10171,3 +10171,22 @@ footer {
   color: #0c4a6e;
   font-weight: 750;
 }
+
+/* Mobile Responsive Refinements for Checkout Modal */
+@media (max-width: 480px) {
+  .classai-input-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .classai-order-summary-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .cosc-right {
+    align-self: flex-end !important;
+  }
+  .cosc-package-picker {
+    grid-template-columns: 1fr !important;
+  }
+}
