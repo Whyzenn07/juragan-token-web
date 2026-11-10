@@ -23,11 +23,9 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     customerEmail,
     priceIdr,
     invoiceId,
-    isTopUp = false,
     gatewayUrl: rawGatewayUrl = process.env.GATEWAY_BASE_URL || "https://www.juragantoken.co.id/v1",
   } = payload;
 
-  const customerName = escapeHtml(payload.customerName);
   const packageName = escapeHtml(payload.packageName);
   const paymentMethod = escapeHtml(payload.paymentMethod);
   const apiKey = escapeHtml(payload.apiKey);
@@ -39,11 +37,23 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     maximumFractionDigits: 0,
   }).format(priceIdr);
 
-  const transactionDate = new Intl.DateTimeFormat("id-ID", {
-    dateStyle: "full",
-    timeStyle: "short",
+  const now = new Date();
+  const datePart = new Intl.DateTimeFormat("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
     timeZone: "Asia/Jakarta",
-  }).format(new Date());
+  }).format(now);
+
+  const timePart = new Intl.DateTimeFormat("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Jakarta",
+  }).format(now).replace(":", ".");
+
+  const transactionDate = `${datePart} pukul ${timePart} WIB`;
 
   const adminWaRaw = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "");
   const adminWaFormatted = adminWaRaw.startsWith("62")
@@ -53,7 +63,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
 
   const gmailUser = process.env.GMAIL_USER?.trim();
   const gmailPass = process.env.GMAIL_APP_PASSWORD?.trim();
-  const fromName = process.env.GMAIL_FROM_NAME?.trim() || "Juragan Token Indonesia";
+  const fromName = "Qris Payment Gateway";
 
   // Mode simulasi bila kredensial Gmail belum diisi di .env.local
   const isConfigured = Boolean(
@@ -79,7 +89,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     },
   });
 
-  // Template Email HTML (Desain Responsif Mobile-First, Antislop UI/Layout, Bebas SingaPay)
+  // Template Email HTML (Desain 1:1 Persis Contoh Gambar Qris Payment Gateway)
   const htmlContent = `
 <!DOCTYPE html>
 <html lang="id">
@@ -88,173 +98,251 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="supported-color-schemes" content="light dark">
-  <title>Bukti Pembayaran &amp; Kredensial API Token</title>
+  <title>Invoice Pembayaran Berhasil</title>
   <style>
-    @media only screen and (max-width: 480px) {
-      .email-container { padding: 12px 6px !important; }
-      .email-card-body { padding: 20px 16px !important; }
-      .email-banner { padding: 18px 16px !important; }
-      .email-summary-table td { font-size: 12px !important; }
-      .email-api-box { padding: 14px 12px !important; }
-      .email-btn { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
+    @media only screen and (max-width: 520px) {
+      .email-wrapper { padding: 10px 4px !important; }
+      .email-card { border-radius: 12px !important; }
+      .email-header-table { padding: 20px 16px !important; }
+      .email-body-content { padding: 24px 16px 18px !important; }
+      .email-detail-card { padding: 16px 14px !important; }
+      .email-api-container { padding: 16px 14px !important; }
+      .header-slogan { font-size: 12px !important; line-height: 1.3 !important; }
+      .price-highlight { font-size: 19px !important; }
     }
   </style>
 </head>
-<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#0f172a; line-height:1.6;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f1f5f9; padding:24px 10px;" class="email-container">
+<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#0f172a; line-height:1.5;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f1f5f9; padding:24px 10px;" class="email-wrapper">
     <tr>
       <td align="center">
-        <!-- Container Kartu Utama -->
-        <table role="presentation" width="100%" style="max-width:580px; width:100%; background-color:#ffffff; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 6px 20px rgba(10,37,64,0.06);">
+        <!-- Kartu Utama -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:580px; width:100%; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e1e8f2; box-shadow:0 8px 26px rgba(15,37,64,0.07);" class="email-card">
           
-          <!-- Header Banner -->
+          <!-- 1. Header Banner Gradient Biru (QRIS Payment Gateway + Slogan Italic) -->
           <tr>
-            <td style="background-color:#0a2442; padding:22px 24px; text-align:left;" class="email-banner">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            <td style="background: linear-gradient(135deg, #092c72 0%, #134fb8 50%, #1e6beb 100%); padding: 24px 28px;" class="email-header-table">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td>
-                    <div style="font-size:22px; font-weight:850; color:#ffffff; letter-spacing:-0.5px;">
-                      juragan<span style="color:#60a5fa;">token</span><span style="color:#38bdf8;">.</span>
-                    </div>
-                    <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#93c5fd; margin-top:4px; font-weight:700;">
-                      Kredit API Multi-AI Prabayar Indonesia
-                    </div>
+                  <td style="vertical-align: middle;">
+                    <!-- QRIS Logo Vector -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle;">
+                          <svg width="124" height="40" viewBox="0 0 124 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Q Outer Frame -->
+                            <path d="M3 15V3H26V11" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M11 29H3V19" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M29 21V29H19" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="9" y="9" width="7" height="7" fill="#ffffff" rx="1"/>
+                            <path d="M20 20L25 25" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+                            <!-- RIS Text -->
+                            <text x="36" y="25" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="21" letter-spacing="0.5">RIS</text>
+                            <!-- Payment Gateway -->
+                            <text x="37" y="35" fill="rgba(255,255,255,0.92)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="7.5" letter-spacing="0.6">Payment Gateway</text>
+                          </svg>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
-                  <td align="right" style="vertical-align:middle;">
-                    <span style="display:inline-block; background-color:#166534; color:#dcfce7; font-size:11px; padding:4px 12px; border-radius:20px; font-weight:700; border:1px solid #22c55e; white-space:nowrap;">
-                      Lunas ✓
-                    </span>
+                  <td align="right" style="vertical-align: middle;">
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-style: italic; font-size: 13.5px; color: #ffffff; line-height: 1.35; text-align: right; opacity: 0.95; font-weight: 500;" class="header-slogan">
+                      Transaksi Aman,<br>Mudah, dan Terpercaya
+                    </div>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Konten Body -->
+          <!-- 2. Konten Tengah -->
           <tr>
-            <td style="padding:26px 24px;" class="email-card-body">
-              <h1 style="font-size:19px; font-weight:800; color:#0f172a; margin:0 0 10px; letter-spacing:-0.3px; line-height:1.35;">
-                ${isTopUp ? "Bukti Pembayaran &amp; Pengisian Saldo Berhasil" : "Bukti Pembayaran &amp; Kredensial Token Anda"}
-              </h1>
+            <td style="padding: 30px 28px 24px;" class="email-body-content">
               
-              <p style="font-size:13.5px; color:#334155; margin:0 0 20px; line-height:1.65;">
-                ${isTopUp
-                  ? `Halo <strong>${customerName}</strong>, pembayaran Anda sebesar <strong>${formattedPrice}</strong> telah <strong>berhasil dikonfirmasi</strong>. Saldo kredit telah berhasil ditambahkan ke API Key Anda dengan nomor invoice <strong>${invoiceId}</strong>. Kunci Anda di Cursor atau terminal tetap sama dan siap langsung digunakan.`
-                  : `Halo <strong>${customerName}</strong>, pembayaran Anda sebesar <strong>${formattedPrice}</strong> untuk <strong>${packageName}</strong> telah <strong>berhasil dikonfirmasi</strong> dengan nomor invoice <strong>${invoiceId}</strong>. Kredensial Virtual API Key Anda kini telah aktif permanen (tanpa masa kedaluwarsa) dan siap langsung digunakan.`}
-              </p>
-
-              <!-- Box Ringkasan Transaksi -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px; margin-bottom:20px; font-size:12.5px;" class="email-summary-table">
+              <!-- Green Checkmark Icon Circle -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto 16px;">
                 <tr>
-                  <td style="color:#64748b; padding:5px 0; width:36%;">No. Invoice</td>
-                  <td align="right" style="font-weight:700; color:#0f172a; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12.5px; padding:5px 0; width:64%; word-break:break-all; letter-spacing:0.3px;">${invoiceId}</td>
-                </tr>
-                <tr>
-                  <td style="color:#64748b; padding:5px 0;">Waktu Pembayaran</td>
-                  <td align="right" style="color:#0f172a; padding:5px 0;">${transactionDate}</td>
-                </tr>
-                <tr>
-                  <td style="color:#64748b; padding:5px 0;">Paket Token</td>
-                  <td align="right" style="font-weight:700; color:#0a58ca; padding:5px 0;">${packageName}</td>
-                </tr>
-                <tr>
-                  <td style="color:#64748b; padding:5px 0;">Metode Pembayaran</td>
-                  <td align="right" style="color:#0f172a; padding:5px 0;">${paymentMethod}</td>
-                </tr>
-                <tr>
-                  <td colspan="2" style="border-top:1px dashed #cbd5e1; padding-top:8px; margin-top:8px;"></td>
-                </tr>
-                <tr>
-                  <td style="color:#0f172a; font-weight:800; font-size:13.5px; padding:6px 0 2px;">Total Pembayaran</td>
-                  <td align="right" style="font-size:16px; font-weight:900; color:#0a58ca; padding:6px 0 2px; white-space:nowrap;">${formattedPrice}</td>
+                  <td align="center" style="width: 68px; height: 68px; border-radius: 50%; background-color: #e6f9ee; text-align: center; vertical-align: middle;">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                      <tr>
+                        <td align="center" style="width: 48px; height: 48px; border-radius: 50%; background-color: #16a34a; text-align: center; vertical-align: middle; box-shadow: 0 4px 10px rgba(22, 163, 74, 0.28);">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: 0 auto;">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
                 </tr>
               </table>
 
-              <!-- Box Kredensial API Key (Sorotan Utama) -->
-              <div style="background-color:#0b192e; border:1px solid #1e3a5f; border-radius:10px; padding:18px 16px; margin-bottom:22px; color:#ffffff;" class="email-api-box">
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#93c5fd; font-weight:700; margin-bottom:8px;">
-                  ${isTopUp ? "🔑 API Key Anda yang Telah Diisi Saldo" : "🔑 Virtual API Key Anda (Rahasia)"}
-                </div>
-                <div style="background-color:#030d1a; border:1px solid #1e3a5f; border-radius:6px; padding:12px 14px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:14px; color:#38bdf8; font-weight:700; word-break:break-all; letter-spacing:0.5px; line-height:1.4;">
-                  ${apiKey}
-                </div>
-
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#93c5fd; font-weight:700; margin:14px 0 6px;">
-                  🌐 Base URL Gateway (OpenAI Compatible)
-                </div>
-                <div style="background-color:#030d1a; border:1px solid #1e3a5f; border-radius:6px; padding:10px 14px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:12.5px; color:#f1f5f9; word-break:break-all; line-height:1.4;">
-                  ${gatewayUrl}
-                </div>
-                <div style="font-size:11.5px; color:#94a3b8; margin-top:10px; line-height:1.45;">
-                  💡 Tips: Salin kredensial di atas dan simpan di pengelola kata sandi atau catatan aman Anda.
-                </div>
+              <!-- Headline Status -->
+              <div style="text-align: center; margin-bottom: 24px;">
+                <h1 style="font-size: 24px; font-weight: 850; color: #0f172a; margin: 0 0 6px; letter-spacing: -0.4px;">
+                  Pembayaran <span style="color: #16a34a;">Berhasil!</span>
+                </h1>
+                <p style="font-size: 14px; color: #475569; margin: 0; font-weight: 500;">
+                  Terima kasih, pembayaran Anda telah berhasil diproses.
+                </p>
               </div>
 
-              <!-- Panduan Pemasangan Kilat -->
-              <h2 style="font-size:14.5px; font-weight:750; color:#0f172a; margin:0 0 10px;">
-                🚀 Panduan Cepat Menghubungkan Token:
-              </h2>
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:12.5px; color:#334155; margin-bottom:22px; line-height:1.55;">
+              <!-- 3. Detail Invoice Box (Clean Card) -->
+              <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);" class="email-detail-card">
+                
+                <!-- Card Header -->
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 14px;">
+                  <tr>
+                    <td style="width: 22px; vertical-align: middle;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                      </svg>
+                    </td>
+                    <td style="font-size: 15px; font-weight: 750; color: #0f172a; vertical-align: middle;">
+                      Detail Invoice
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Table Rows -->
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13.5px; line-height: 1.5;">
+                  <tr>
+                    <td style="color: #64748b; padding: 6px 0; width: 40%;">No. Invoice</td>
+                    <td align="right" style="color: #0f172a; font-weight: 600; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 13px; padding: 6px 0; word-break: break-all;">
+                      ${invoiceId}
+                      <span style="display: inline-block; vertical-align: middle; margin-left: 6px; color: #64748b;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="color: #64748b; padding: 6px 0;">Waktu Pembayaran</td>
+                    <td align="right" style="color: #1e293b; font-size: 13px; padding: 6px 0;">${transactionDate}</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #64748b; padding: 6px 0;">Paket Token</td>
+                    <td align="right" style="padding: 6px 0;">
+                      <span style="background-color: #dbeafe; color: #1d4ed8; font-weight: 700; font-size: 12.5px; padding: 3px 10px; border-radius: 5px; display: inline-block;">
+                        ${packageName}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="color: #64748b; padding: 6px 0;">Metode Pembayaran</td>
+                    <td align="right" style="color: #1e293b; font-weight: 600; font-size: 13px; padding: 6px 0;">${paymentMethod}</td>
+                  </tr>
+
+                  <!-- Total Pembayaran Highlight Box (Sesuai Gambar) -->
+                  <tr>
+                    <td colspan="2" style="padding-top: 14px;">
+                      <div style="background-color: #f0f7ff; border-radius: 8px; padding: 12px 16px;">
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                          <tr>
+                            <td style="color: #0f172a; font-weight: 750; font-size: 15px; vertical-align: middle;">
+                              Total Pembayaran
+                            </td>
+                            <td align="right" style="color: #1d4ed8; font-weight: 900; font-size: 22px; vertical-align: middle;" class="price-highlight">
+                              ${formattedPrice}
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- 4. Virtual API Key & Base URL Box (Background Soft Blue-Grey) -->
+              <div style="background-color: #eef4fb; border: 1px solid #dce7f3; border-radius: 12px; padding: 18px 20px; margin-bottom: 20px;" class="email-api-container">
+                
+                <!-- Sub-Block 1: API Key -->
+                <div style="margin-bottom: 16px;">
+                  <div style="font-size: 13.5px; font-weight: 750; color: #0f172a; margin-bottom: 8px;">
+                    🔑 Virtual API Key Anda (Rahasia)
+                  </div>
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #0c1829; border: 1px solid #1a2c47; border-radius: 8px;">
+                    <tr>
+                      <td style="padding: 12px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13.5px; color: #38bdf8; font-weight: 600; word-break: break-all; letter-spacing: 0.3px;">
+                        ${apiKey}
+                      </td>
+                      <td align="right" style="padding: 12px 14px; width: 24px; vertical-align: middle;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- Sub-Block 2: Base URL Gateway -->
+                <div>
+                  <div style="font-size: 13.5px; font-weight: 750; color: #0f172a; margin-bottom: 8px;">
+                    🔗 Base URL Gateway (OpenAI Compatible)
+                  </div>
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #dbe7f4; border: 1px solid #cadbeb; border-radius: 8px;">
+                    <tr>
+                      <td style="padding: 10px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; color: #1e293b; font-weight: 600; word-break: break-all;">
+                        ${gatewayUrl}
+                      </td>
+                      <td align="right" style="padding: 10px 14px; width: 24px; vertical-align: middle;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+              </div>
+
+              <!-- 5. Tips Keamanan (Amber Callout Box Sesuai Gambar) -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 14px 16px; margin-bottom: 22px;">
                 <tr>
-                  <td style="padding:5px 0; vertical-align:top; width:22px;"><b>1.</b></td>
-                  <td style="padding:5px 0;">
-                    <strong>Web Client:</strong> Buka <a href="https://web.chatboxai.app/" target="_blank" style="color:#0a58ca; font-weight:600; text-decoration:none;">Chatbox Web</a> atau <a href="https://app.nextchat.dev/" target="_blank" style="color:#0a58ca; font-weight:600; text-decoration:none;">NextChat</a>, pilih provider <i>OpenAI</i>, lalu masukkan API Key &amp; Base URL di atas.
+                  <td style="width: 28px; vertical-align: top; font-size: 18px; line-height: 1.2;">
+                    💡
                   </td>
-                </tr>
-                <tr>
-                  <td style="padding:5px 0; vertical-align:top; width:22px;"><b>2.</b></td>
-                  <td style="padding:5px 0;">
-                    <strong>Cursor AI:</strong> Masuk ke <i>Settings &gt; Models &gt; OpenAI API Key</i> atau centang <i>Override OpenAI Base URL</i> lalu tempel Base URL di atas.
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:5px 0; vertical-align:top; width:22px;"><b>3.</b></td>
-                  <td style="padding:5px 0;">
-                    <strong>Claude Code CLI (Terminal):</strong><br>
-                    <div style="background-color:#0f172a; border:1px solid #1e293b; border-radius:6px; padding:10px 12px; margin-top:6px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11.5px; color:#e2e8f0; word-break:break-all; line-height:1.5;">
-                      <span style="color:#94a3b8;"># PowerShell (Windows):</span><br>
-                      <code style="color:#38bdf8;">$env:ANTHROPIC_API_KEY="${apiKey}"</code><br><br>
-                      <span style="color:#94a3b8;"># Bash / macOS / Linux:</span><br>
-                      <code style="color:#38bdf8;">export ANTHROPIC_API_KEY="${apiKey}"</code>
+                  <td style="vertical-align: top;">
+                    <div style="font-size: 13.5px; font-weight: 750; color: #78350f; margin-bottom: 2px;">
+                      Tips Keamanan
+                    </div>
+                    <div style="font-size: 12.5px; color: #92400e; line-height: 1.5;">
+                      Simpan API Key Anda dengan aman dan jangan bagikan kepada pihak lain.
                     </div>
                   </td>
                 </tr>
               </table>
 
-              <!-- Tombol Web Resmi -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td align="center">
-                    <a href="${officialWeb}" target="_blank" style="display:inline-block; background-color:#0a58ca; color:#ffffff; text-decoration:none; font-weight:700; font-size:13.5px; padding:12px 24px; border-radius:8px; box-shadow:0 4px 12px rgba(10,88,202,0.28);" class="email-btn">
-                      Buka Web Resmi Juragan Token ↗
-                    </a>
-                  </td>
-                </tr>
-              </table>
+              <!-- 6. Footer Bawah (Sesuai Gambar + WhatsApp & Web Resmi) -->
+              <div style="text-align: center; padding-top: 6px; font-size: 12px; color: #64748b; line-height: 1.6;">
+                <p style="margin: 0 0 4px; color: #475569;">
+                  Terima kasih telah menggunakan layanan kami.
+                </p>
+                <p style="margin: 0; color: #64748b;">
+                  Qris Payment Gateway &nbsp;•&nbsp; <a href="${officialWeb}" target="_blank" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">https://www.juragantoken.co.id</a>
+                </p>
+                <p style="margin: 8px 0 0; font-size: 11.5px; color: #64748b;">
+                  Bantuan WhatsApp: <a href="https://wa.me/${adminWaRaw}" target="_blank" style="color: #1d4ed8; font-weight: 600; text-decoration: none;">${adminWaFormatted}</a> &nbsp;•&nbsp; Web Resmi: <a href="${officialWeb}" target="_blank" style="color: #1d4ed8; font-weight: 600; text-decoration: none;">${officialWeb}</a>
+                </p>
+              </div>
 
             </td>
           </tr>
 
-          <!-- Footer Email Resmi -->
+          <!-- 7. Bottom Wave Art (Gelombang Biru Bawah) -->
           <tr>
-            <td style="background-color:#f8fafc; border-top:1px solid #e2e8f0; padding:22px 20px; font-size:12px; color:#64748b; text-align:center; line-height:1.6;">
-              <p style="margin:0 0 10px; color:#475569;">
-                Email ini diterbitkan otomatis oleh sistem transaksi <strong>Juragan Token Indonesia</strong> sebagai bukti pembayaran yang sah.
-              </p>
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:12px; font-size:12px;">
-                <tr>
-                  <td align="center">
-                    <p style="margin:0 0 6px; color:#334155;">
-                      💬 <strong>Bantuan &amp; Customer Care:</strong><br>
-                      WhatsApp Admin: <a href="https://wa.me/${adminWaRaw}" target="_blank" style="color:#0a58ca; font-weight:700; text-decoration:none;">${adminWaFormatted} ↗</a>
-                    </p>
-                    <p style="margin:6px 0 0; color:#334155;">
-                      🌐 <strong>Website Resmi:</strong><br>
-                      <a href="${officialWeb}" target="_blank" style="color:#0a58ca; font-weight:700; text-decoration:none;">${officialWeb} ↗</a>
-                    </p>
-                  </td>
-                </tr>
-              </table>
+            <td style="line-height: 0; font-size: 0;">
+              <svg viewBox="0 0 580 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; display: block;">
+                <path d="M0 16C160 34 380 4 580 18V36H0V16Z" fill="#1e6beb" fill-opacity="0.3"/>
+                <path d="M0 22C140 10 360 32 580 18V36H0V22Z" fill="#0f4fc7"/>
+              </svg>
             </td>
           </tr>
 
@@ -269,9 +357,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
   const info = await transporter.sendMail({
     from: `"${fromName}" <${gmailUser}>`,
     to: customerEmail,
-    subject: isTopUp
-      ? `[Juragan Token] Saldo API Key Berhasil Ditambahkan (+${formattedPrice}) (${invoiceId})`
-      : `[Juragan Token] Bukti Pembayaran & Kredensial API Key Token (${invoiceId})`,
+    subject: `Invoice Pembayaran Berhasil`,
     html: htmlContent,
   });
   console.log(`[EMAIL BERHASIL] ID: ${info.messageId} dikirim ke ${customerEmail}`);
