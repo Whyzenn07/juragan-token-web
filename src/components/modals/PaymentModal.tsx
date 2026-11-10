@@ -627,8 +627,28 @@ Mohon dibantu konfirmasi ya!`;
         }
         .cosc-left {
           display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          gap: 12px !important;
+          min-width: 0 !important;
+        }
+        .cosc-logo-wrap {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          width: 44px !important;
+          height: 44px !important;
+          border-radius: 10px !important;
+          background: #ffffff !important;
+          border: 1px solid #dbeafe !important;
+          flex-shrink: 0 !important;
+          box-shadow: 0 1px 3px rgba(10, 88, 202, 0.06) !important;
+        }
+        .cosc-info {
+          display: flex !important;
           flex-direction: column !important;
           gap: 2px !important;
+          min-width: 0 !important;
         }
         .cosc-badge {
           font-size: 10px !important;
@@ -1428,25 +1448,13 @@ Mohon dibantu konfirmasi ya!`;
               marginBottom: "16px",
             }}
           >
-            <div className="cosc-left" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div className="cosc-left">
               {model && (
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: "#ffffff",
-                    border: "1px solid #dbeafe",
-                    flexShrink: 0,
-                  }}
-                >
-                  <ProviderLogo provider={model.providerId} size={26} />
-                </span>
+                <div className="cosc-logo-wrap">
+                  <ProviderLogo provider={model.providerId} size={28} />
+                </div>
               )}
-              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <div className="cosc-info">
                 <span className="cosc-badge" style={{ fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                   {pkg.badge || "Pilihan Siap Pakai"}
                 </span>

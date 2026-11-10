@@ -907,54 +907,54 @@ const modelById = (id: string) => modelsCatalog.find((m) => m.id === id) as Mode
 const answersFor = (id: string, budget: number, shortModelName: string) =>
   `±${new Intl.NumberFormat("id-ID").format(unitsForBudget(modelById(id), budget))} Interaksi · ${shortModelName}`;
 
-// Paket Retail Khusus Mahasiswa & Retail (Top-up Nominal Ramah Uang Saku)
+// Pilihan Paket Token Fleksibel Sesuai Kebutuhan (Personal, Kerja, Coding, & Enterprise)
 export const retailPackages: RetailPackage[] = [
   {
     id: "pkt-mhs-uji",
-    name: "Paket Coba-Coba",
-    subtitle: "Uang saku ramah kantong",
-    targetUser: "Pemula",
+    name: "Paket Starter AI",
+    subtitle: "Kebutuhan chat, tugas & eksplorasi harian",
+    targetUser: "Personal & Harian",
     priceIdr: 15000,
     estToken: answersFor("deepseek-v4-flash", 15000, "DeepSeek"),
-    description: "Cukup untuk ratusan pertanyaan tugas, terjemahan jurnal bahasa Inggris, dan chat harian di HP.",
-    popularFor: ["Tugas Kuliah", "Chatbox di HP", "Terjemah Jurnal"],
+    description: "Cukup untuk ratusan pertanyaan AI harian, terjemahan dokumen instan, dan asisten chat cepat di smartphone & laptop.",
+    popularFor: ["Chat & Tanya Cepat", "Asisten HP & Web", "Terjemah Dokumen"],
     recommendedModel: "DeepSeek V4 Flash / Gemini 3.8 Flash",
-    badge: "Termurah"
+    badge: "Starter Hemat"
   },
   {
     id: "pkt-mhs-starter",
-    name: "Paket Starter Kuliah",
-    subtitle: "Pilihan paling hemat bulanan",
-    targetUser: "Mahasiswa",
+    name: "Paket Produktivitas",
+    subtitle: "Analisis dokumen, riset & asisten kerja",
+    targetUser: "Profesional & Mahasiswa",
     priceIdr: 29000,
     estToken: answersFor("gemini-3.8-flash", 29000, "Gemini"),
-    description: "Saldo fleksibel untuk tanya jawab intensif, bedah tugas presentasi, dan ringkas materi PDF perkuliahan.",
-    popularFor: ["Review Jurnal PDF", "Bantuan Resume", "Chatbot Harian"],
+    description: "Saldo fleksibel untuk analisis berkas PDF panjang, resume rapat, pembuatan draft email/laporan, dan riset harian.",
+    popularFor: ["Analisis PDF Panjang", "Draft Laporan Kerja", "Riset & Resume Data"],
     recommendedModel: "Gemini 3.8 Flash / Kimi K2.7 Code",
-    badge: "Favorit",
+    badge: "Paling Populer",
     featured: true
   },
   {
     id: "pkt-skripsi-koding",
-    name: "Paket Skripsi & Koding",
-    subtitle: "Kekuatan ganda riset & debug",
-    targetUser: "Skripsi",
+    name: "Paket Pro & Developer",
+    subtitle: "Pairing coding Cursor, debug & riset teknis",
+    targetUser: "Developer & Peneliti",
     priceIdr: 69000,
     estToken: answersFor("claude-sonnet-5-5", 69000, "Claude"),
-    description: "Rangkum puluhan jurnal dengan Gemini 3.1 Pro, lalu kerjakan kode praktikum dengan Claude Sonnet.",
-    popularFor: ["Skripsi Bab 1-5", "Debug Error Coding", "Cursor & VS Code"],
+    description: "Saldo optimal untuk pairing coding intensif di Cursor / VS Code, penanganan error kompleks, dan pengolahan data teknis.",
+    popularFor: ["Pairing di Cursor/VS Code", "Debug Error Coding", "Riset Data Kompleks"],
     recommendedModel: "Claude Sonnet 5.5 / Gemini 3.1 Pro / Kimi K2.7 Code",
     badge: "Best Value"
   },
   {
     id: "pkt-pro-builder",
-    name: "Paket Pro Builder",
-    subtitle: "Spesialis Claude Code & Cursor",
-    targetUser: "Developer",
+    name: "Paket Enterprise / Ultra",
+    subtitle: "Sprint Claude Code CLI, automasi API & performa",
+    targetUser: "Software Engineer & Tim",
     priceIdr: 149000,
     estToken: answersFor("claude-sonnet-5-5", 149000, "Claude"),
-    description: "Saldo besar untuk pairing coding di terminal Claude Code tanpa kartu kredit dan tanpa langganan bulanan.",
-    popularFor: ["Claude Code CLI", "Alternatif Cursor Pro", "Sprint Proyek Klien"],
+    description: "Kapasitas saldo besar untuk workflow terminal Claude Code CLI, proyek produksi skala penuh, dan automasi backend tanpa langganan kartu kredit.",
+    popularFor: ["Claude Code CLI Terminal", "Automasi Script & API", "Proyek Klien Skala Besar"],
     recommendedModel: "Claude Sonnet 5.5 / Claude Opus 5.5 / GPT-6 Sol",
     badge: "Power User"
   }

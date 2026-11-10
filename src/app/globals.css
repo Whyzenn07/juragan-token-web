@@ -8270,8 +8270,30 @@ footer {
 
 .cosc-left {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cosc-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(10, 88, 202, 0.06);
+}
+
+.cosc-info {
+  display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .cosc-badge {
