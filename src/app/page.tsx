@@ -1564,7 +1564,7 @@ export default function Home() {
                     <b>Sama sekali tidak memerlukan kartu kredit.</b>
                   </p>
                   <p>
-                    Juragan Token didesain untuk kemudahan seluruh pengguna, pelaku usaha, profesional, dan developer di Indonesia. Pembayaran dilakukan 100% dalam mata uang Rupiah (IDR) menggunakan <b>QRIS SingaPay Instan</b> (bisa di-scan dari BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA) maupun Virtual Account bank lokal dengan aktivasi otomatis detik itu juga.
+                    Juragan Token didesain untuk kemudahan seluruh pengguna, pelaku usaha, profesional, dan developer di Indonesia. Pembayaran dilakukan 100% dalam mata uang Rupiah (IDR) menggunakan <b>QRIS Instan Otomatis</b> (bisa di-scan dari BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA) maupun Virtual Account bank lokal dengan aktivasi otomatis detik itu juga.
                   </p>
                 </div>
               </details>

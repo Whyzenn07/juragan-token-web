@@ -28,7 +28,7 @@ export function SavingsCalculator({ onSelectRecommended }: { onSelectRecommended
         <span className="badge-pill">Kalkulator Hemat Kantong Mahasiswa</span>
         <h3>Berapa uang jajan yang bisa Anda hemat tiap bulan?</h3>
         <p className="calc-subtitle">
-          Bandingkan biaya jika Anda harus langganan kartu kredit resmi versus beli saldo token ritel via SingaPay.
+          Bandingkan biaya jika Anda harus langganan kartu kredit resmi versus beli saldo token ritel prabayar Juragan Token.
         </p>
       </div>
 
@@ -63,7 +63,7 @@ export function SavingsCalculator({ onSelectRecommended }: { onSelectRecommended
         </div>
 
         <div className="calc-col juragan">
-          <div className="singapay-tag">Bayar QRIS SingaPay</div>
+          <div className="singapay-tag">Bayar QRIS Instan</div>
           <p className="col-label">Pakai Token Prabayar Juragan Token</p>
           <strong className="cost-highlight">{formatIdr(estimatedTokenCostIdr)}</strong>
           <span className="col-note">Hanya bayar token yang Anda konsumsi. Saldo tidak pernah hangus!</span>
