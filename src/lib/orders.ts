@@ -14,6 +14,7 @@ export type CreateOrderInput = {
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
+  existingApiKey?: string;
 };
 
 export type OrderResult<T> = { ok: true; value: T } | { ok: false; status: number; error: string };
@@ -34,6 +35,42 @@ export async function createOrder(
   const method = paymentMethods.find((m) => m.id === input.methodId);
   if (!method) return { ok: false, status: 400, error: "Metode pembayaran tidak valid." };
 
+  let targetKeyHash: string | undefined;
+  let isTopUp = false;
+
+  if (input.existingApiKey?.trim()) {
+    const rawKey = input.existingApiKey.trim();
+    if (!rawKey.startsWith("jt-live-") || rawKey.length < 20 || rawKey.length > 80) {
+      return { ok: false, status: 400, error: "Format API Key untuk top-up tidak valid (harus diawali 'jt-live-')." };
+    }
+    targetKeyHash = sha256(rawKey);
+    isTopUp = true;
+
+    // Verifikasi keberadaan key di local store atau Supabase
+    const localKey = await query((db) => db.keys[targetKeyHash!]);
+    if (!localKey && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      try {
+        const sbRes = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/keys?hash=eq.${targetKeyHash}&select=hash`,
+          {
+            headers: {
+              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+          }
+        );
+        const rows = await sbRes.json();
+        if (!rows || rows.length === 0) {
+          return { ok: false, status: 404, error: "API Key untuk top-up tidak ditemukan di server Juragan Token." };
+        }
+      } catch {
+        // Fallback jika network error
+      }
+    } else if (!localKey) {
+      return { ok: false, status: 404, error: "API Key untuk top-up tidak ditemukan di server Juragan Token." };
+    }
+  }
+
   const invoiceId = generateInvoiceId();
   const orderToken = generateOrderToken();
   const order: Order = {
@@ -53,6 +90,8 @@ export async function createOrder(
     status: "pending",
     createdAt: new Date().toISOString(),
     emailStatus: "none",
+    targetKeyHash,
+    isTopUp,
   };
   await mutate((db) => {
     db.orders[invoiceId] = order;
@@ -77,8 +116,9 @@ export type PublicOrder = {
   paidAt?: string;
   emailStatus: Order["emailStatus"];
   emailMessage?: string;
-  /** Hanya terisi satu kali, pada pembacaan pertama setelah status paid. */
   apiKey?: string;
+  isTopUp?: boolean;
+  keyHash?: string;
 };
 
 function toPublic(order: Order, apiKey?: string): PublicOrder {
@@ -93,6 +133,8 @@ function toPublic(order: Order, apiKey?: string): PublicOrder {
     emailStatus: order.emailStatus,
     emailMessage: order.emailMessage,
     apiKey,
+    isTopUp: order.isTopUp,
+    keyHash: order.keyHash,
   };
 }
 
@@ -125,6 +167,32 @@ export async function confirmOrder(id: string): Promise<OrderResult<PublicOrder>
       return { ok: false, status: 410, error: "Order sudah kedaluwarsa." };
     }
 
+    if (order.isTopUp && order.targetKeyHash) {
+      const hash = order.targetKeyHash;
+      let existingKey = db.keys[hash];
+      if (existingKey) {
+        existingKey.balanceIdr += order.baseIdr;
+        existingKey.planName = order.packageName;
+        existingKey.estPackage = order.estPackage;
+      } else {
+        existingKey = {
+          hash,
+          last4: "xxxx",
+          orderId: order.id,
+          planName: order.packageName,
+          estPackage: order.estPackage,
+          balanceIdr: order.baseIdr,
+          createdAt: new Date().toISOString(),
+          status: "active",
+        };
+        db.keys[hash] = existingKey;
+      }
+      order.status = "paid";
+      order.paidAt = new Date().toISOString();
+      order.keyHash = hash;
+      return { ok: true, value: { order } };
+    }
+
     const apiKey = generateApiKey();
     const hash = sha256(apiKey);
     db.keys[hash] = {
@@ -147,8 +215,8 @@ export async function confirmOrder(id: string): Promise<OrderResult<PublicOrder>
   if (!issued.ok) return issued;
   const { order, apiKey } = issued.value;
 
-  // Email hanya dikirim pada konfirmasi pertama (saat kunci baru terbit).
-  if (apiKey) {
+  // Email dikirim saat konfirmasi sukses (baik kunci baru maupun top-up)
+  if (apiKey || order.isTopUp) {
     let emailStatus: Order["emailStatus"] = "error";
     let emailMessage: string | undefined;
     try {
@@ -158,8 +226,9 @@ export async function confirmOrder(id: string): Promise<OrderResult<PublicOrder>
         packageName: order.packageName,
         priceIdr: order.totalIdr,
         paymentMethod: order.methodName,
-        apiKey,
+        apiKey: apiKey || (order.targetKeyHash ? "jt-live-•••••••• (Kunci Tetap)" : ""),
         invoiceId: order.id,
+        isTopUp: order.isTopUp,
       });
       emailStatus = result.status;
       emailMessage = result.message;

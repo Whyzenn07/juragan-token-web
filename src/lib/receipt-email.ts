@@ -9,6 +9,7 @@ export interface SendReceiptPayload {
   apiKey: string;
   gatewayUrl?: string;
   invoiceId: string;
+  isTopUp?: boolean;
 }
 
 export type SendReceiptResult = { status: "sent" | "simulated"; messageId?: string; message?: string };
@@ -23,6 +24,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
       customerEmail,
       priceIdr,
       invoiceId,
+      isTopUp = false,
       gatewayUrl: rawGatewayUrl = process.env.GATEWAY_BASE_URL || "https://www.juragantoken.co.id/v1",
     } = payload;
     const customerName = escapeHtml(payload.customerName);
@@ -114,10 +116,12 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
           <tr>
             <td style="padding:32px;">
               <h1 style="font-size:20px; font-weight:800; color:#0f172a; margin:0 0 12px; letter-spacing:-0.4px;">
-                Bukti Pembayaran &amp; Kredensial Token Anda
+                ${isTopUp ? "Bukti Pembayaran &amp; Pengisian Saldo Berhasil" : "Bukti Pembayaran &amp; Kredensial Token Anda"}
               </h1>
               <p style="font-size:14px; color:#475569; margin:0 0 24px;">
-                Halo <strong>${customerName}</strong>, terima kasih atas pesanan Anda. Pembayaran Anda telah terverifikasi otomatis oleh SingaPay. Kredensial Virtual API Key Anda kini telah aktif permanen (tanpa masa kedaluwarsa).
+                ${isTopUp
+                  ? `Halo <strong>${customerName}</strong>, terima kasih! Pembayaran Anda telah terverifikasi otomatis. Saldo kredit sebesar <strong>${formattedPrice}</strong> telah berhasil ditambahkan ke API Key Anda. Kunci Anda di Cursor/VS Code tetap sama dan siap langsung digunakan.`
+                  : `Halo <strong>${customerName}</strong>, terima kasih atas pesanan Anda. Pembayaran Anda telah terverifikasi otomatis oleh SingaPay. Kredensial Virtual API Key Anda kini telah aktif permanen (tanpa masa kedaluwarsa).`}
               </p>
 
               <!-- Box Ringkasan Transaksi -->
@@ -150,7 +154,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
               <!-- Box Kredensial API Key (Sorotan Utama) -->
               <div style="background-color:#0f172a; border-radius:10px; padding:20px; margin-bottom:24px; color:#ffffff;">
                 <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; font-weight:700; margin-bottom:6px;">
-                  🔑 Virtual API Key Anda (Rahasia)
+                  ${isTopUp ? "🔑 API Key Anda yang Telah Diisi Saldo" : "🔑 Virtual API Key Anda (Rahasia)"}
                 </div>
                 <div style="background-color:#1e293b; border:1px solid #334155; border-radius:6px; padding:12px 14px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:15px; color:#38bdf8; font-weight:700; word-break:break-all;">
                   ${apiKey}
@@ -230,7 +234,9 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     const info = await transporter.sendMail({
       from: `"${fromName}" <${gmailUser}>`,
       to: customerEmail,
-      subject: `[Juragan Token] Bukti Pembayaran & Kredensial API Key Token (${invoiceId})`,
+      subject: isTopUp
+        ? `[Juragan Token] Saldo API Key Berhasil Ditambahkan (+${formattedPrice}) (${invoiceId})`
+        : `[Juragan Token] Bukti Pembayaran & Kredensial API Key Token (${invoiceId})`,
       html: htmlContent,
     });
     console.log(`[EMAIL BERHASIL] ID: ${info.messageId} dikirim ke ${customerEmail}`);

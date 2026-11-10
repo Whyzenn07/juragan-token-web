@@ -26,6 +26,8 @@ export type Order = {
   pendingReveal?: string;
   emailStatus: EmailStatus;
   emailMessage?: string;
+  targetKeyHash?: string;
+  isTopUp?: boolean;
 };
 
 export type KeyRecord = {

@@ -91,6 +91,60 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
+  // Mode Top-Up Kunci yang Ada
+  const [checkoutMode, setCheckoutMode] = useState<"new" | "topup">("new");
+  const [targetApiKey, setTargetApiKey] = useState("");
+  const [verifyingKey, setVerifyingKey] = useState(false);
+  const [verifiedKeyData, setVerifiedKeyData] = useState<{
+    maskedKey: string;
+    planName: string;
+    balanceIdr: number;
+  } | null>(null);
+  const [keyVerifyError, setKeyVerifyError] = useState("");
+  const [savedKeyHint, setSavedKeyHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open && typeof window !== "undefined") {
+      try {
+        const last = sessionStorage.getItem("jt_last_api_key");
+        if (last) setSavedKeyHint(last);
+      } catch {
+        // ignore
+      }
+    }
+  }, [open]);
+
+  const verifyTargetKey = async (keyToVerify: string) => {
+    const clean = keyToVerify.trim();
+    if (!clean) return;
+    setVerifyingKey(true);
+    setKeyVerifyError("");
+    try {
+      const res = await fetch("/api/keys/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: clean }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.key) {
+        setVerifiedKeyData({
+          maskedKey: data.key.maskedKey,
+          planName: data.key.planName,
+          balanceIdr: data.key.balanceIdr,
+        });
+        setKeyVerifyError("");
+      } else {
+        setVerifiedKeyData(null);
+        setKeyVerifyError(data.error || "Kunci API tidak ditemukan di server.");
+      }
+    } catch {
+      setVerifiedKeyData(null);
+      setKeyVerifyError("Gagal memverifikasi kunci. Cek koneksi internet.");
+    } finally {
+      setVerifyingKey(false);
+    }
+  };
+
   const adminWaNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990";
 
   const handleClose = () => {
@@ -107,6 +161,10 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
     setPaidAt("");
     setIsSubmitting(false);
     setIsConfirming(false);
+    setCheckoutMode("new");
+    setTargetApiKey("");
+    setVerifiedKeyData(null);
+    setKeyVerifyError("");
     onClose();
   };
 
@@ -291,8 +349,19 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
     if (e) e.preventDefault();
     if (!customerEmail.trim() || !customerName.trim() || !pkg) {
       if (!customerName.trim()) alert("Silakan masukkan Nama Lengkap terlebih dahulu.");
-      else if (!customerEmail.trim()) alert("Silakan masukkan Alamat Email untuk pengiriman API Key.");
+      else if (!customerEmail.trim()) alert("Silakan masukkan Alamat Email untuk pengiriman bukti transaksi.");
       return;
+    }
+
+    if (checkoutMode === "topup") {
+      if (!targetApiKey.trim()) {
+        alert("Silakan masukkan API Key yang ingin diisi ulang (top-up).");
+        return;
+      }
+      if (!verifiedKeyData) {
+        alert("Silakan verifikasi API Key terlebih dahulu sebelum melanjutkan.");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -306,6 +375,7 @@ export function SingaPayModal({ open, pkg, onClose }: SingaPayModalProps) {
           customerName: customerName.trim(),
           customerEmail: customerEmail.trim(),
           customerPhone: customerPhone.trim(),
+          existingApiKey: checkoutMode === "topup" ? targetApiKey.trim() : undefined,
         }),
       });
       const data = await res.json();
@@ -1305,6 +1375,204 @@ Mohon dibantu konfirmasi ya!`;
             </div>
           </div>
 
+          {/* ===================================================================== */}
+          {/* OPSI MODE: TERBITKAN KUNCI BARU VS TOP-UP KUNCI LAMA                 */}
+          {/* ===================================================================== */}
+          <div
+            className="classai-mode-selector"
+            style={{
+              display: "flex",
+              gap: "8px",
+              padding: "4px",
+              background: "#f1f5f9",
+              borderRadius: "12px",
+              marginBottom: "14px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setCheckoutMode("new");
+                setKeyVerifyError("");
+              }}
+              style={{
+                flex: 1,
+                padding: "8px 12px",
+                borderRadius: "9px",
+                border: "none",
+                fontSize: "12.5px",
+                fontWeight: checkoutMode === "new" ? 750 : 600,
+                background: checkoutMode === "new" ? "#ffffff" : "transparent",
+                color: checkoutMode === "new" ? "#0a2540" : "#64748b",
+                boxShadow: checkoutMode === "new" ? "0 2px 6px rgba(15, 23, 42, 0.08)" : "none",
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+              }}
+            >
+              <span>✨</span>
+              <span>Terbitkan Kunci Baru</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setCheckoutMode("topup");
+                if (savedKeyHint && !targetApiKey) {
+                  setTargetApiKey(savedKeyHint);
+                  verifyTargetKey(savedKeyHint);
+                }
+              }}
+              style={{
+                flex: 1,
+                padding: "8px 12px",
+                borderRadius: "9px",
+                border: "none",
+                fontSize: "12.5px",
+                fontWeight: checkoutMode === "topup" ? 750 : 600,
+                background: checkoutMode === "topup" ? "#ffffff" : "transparent",
+                color: checkoutMode === "topup" ? "#0a58ca" : "#64748b",
+                boxShadow: checkoutMode === "topup" ? "0 2px 6px rgba(15, 23, 42, 0.08)" : "none",
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+              }}
+            >
+              <span>⚡</span>
+              <span>Top-Up Kunci yang Ada</span>
+            </button>
+          </div>
+
+          {/* FORM INPUT TOP-UP */}
+          {checkoutMode === "topup" && (
+            <div
+              className="classai-topup-card"
+              style={{
+                background: "#f8fafc",
+                border: "1.5px solid #cbd5e1",
+                borderRadius: "12px",
+                padding: "14px",
+                marginBottom: "16px",
+              }}
+            >
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  color: "#1e293b",
+                  marginBottom: "6px",
+                }}
+              >
+                Kunci API yang Hendak Diisi Saldo:
+              </label>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input
+                  type="text"
+                  placeholder="jt-live-xxxxxxxxxxxxxxxxxxxx"
+                  value={targetApiKey}
+                  onChange={(e) => {
+                    setTargetApiKey(e.target.value);
+                    setVerifiedKeyData(null);
+                    setKeyVerifyError("");
+                  }}
+                  style={{
+                    flex: 1,
+                    height: "40px",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "9px",
+                    padding: "8px 12px",
+                    fontSize: "12.5px",
+                    fontFamily: "monospace",
+                    background: "#ffffff",
+                    color: "#0f172a",
+                    outline: "none",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => verifyTargetKey(targetApiKey)}
+                  disabled={verifyingKey || !targetApiKey.trim()}
+                  style={{
+                    padding: "0 14px",
+                    height: "40px",
+                    borderRadius: "9px",
+                    border: "none",
+                    background: "#0a58ca",
+                    color: "#ffffff",
+                    fontSize: "12.5px",
+                    fontWeight: 700,
+                    cursor: verifyingKey || !targetApiKey.trim() ? "not-allowed" : "pointer",
+                    opacity: verifyingKey || !targetApiKey.trim() ? 0.6 : 1,
+                  }}
+                >
+                  {verifyingKey ? "Mengecek..." : "Verifikasi"}
+                </button>
+              </div>
+
+              {savedKeyHint && !verifiedKeyData && (
+                <div style={{ marginTop: "6px", fontSize: "11px", color: "#64748b" }}>
+                  Kunci dari pesanan sebelumnya:{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetApiKey(savedKeyHint);
+                      verifyTargetKey(savedKeyHint);
+                    }}
+                    style={{
+                      border: "none",
+                      background: "none",
+                      color: "#0a58ca",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      padding: 0,
+                    }}
+                  >
+                    Gunakan {savedKeyHint.slice(0, 11)}...{savedKeyHint.slice(-4)}
+                  </button>
+                </div>
+              )}
+
+              {verifiedKeyData && (
+                <div
+                  style={{
+                    marginTop: "10px",
+                    background: "#ecfdf5",
+                    border: "1px solid #a7f3d0",
+                    borderRadius: "8px",
+                    padding: "10px 12px",
+                    fontSize: "12px",
+                    color: "#065f46",
+                  }}
+                >
+                  <div style={{ fontWeight: 750, display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>✓</span>
+                    <span>Kunci Terverifikasi ({verifiedKeyData.maskedKey})</span>
+                  </div>
+                  <div style={{ marginTop: "4px", fontSize: "11.5px", color: "#047857" }}>
+                    Saldo saat ini: <b>{formatIdr(verifiedKeyData.balanceIdr)}</b> ➔ Setelah top-up: <b>{formatIdr(verifiedKeyData.balanceIdr + pkg.priceIdr)}</b> (+{formatIdr(pkg.priceIdr)}).
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#059669", marginTop: "3px" }}>
+                    Setting di Cursor / VS Code / Claude Code Anda tidak perlu diubah!
+                  </div>
+                </div>
+              )}
+
+              {keyVerifyError && (
+                <div style={{ marginTop: "8px", fontSize: "11.5px", color: "#e11d48", fontWeight: 600 }}>
+                  ✕ {keyVerifyError}
+                </div>
+              )}
+            </div>
+          )}
+
           <div
             className="classai-input-grid"
             style={{
@@ -2274,33 +2542,39 @@ Mohon dibantu konfirmasi ya!`;
           <div className="csv-badge-center">
             <PaymentSuccessMark />
             <h3 className="csv-title" style={{ fontSize: "20px", fontWeight: 800, color: "#0a2540", margin: "12px 0 6px 0" }}>
-              Pembayaran Berhasil Diterima!
+              {checkoutMode === "topup" ? "Saldo Berhasil Ditambahkan!" : "Pembayaran Berhasil Diterima!"}
             </h3>
             <p className="csv-sub" style={{ fontSize: "13px", color: "#475569", lineHeight: 1.5, marginBottom: "18px" }}>
-              Saldo akun sebesar <b>{formatIdr(totalPaid || totalPrice)}</b> ({pkg.estToken}) telah aktif permanen di gateway juragantoken.co.id.
+              {checkoutMode === "topup" ? (
+                <>Saldo tambahan sebesar <b>{formatIdr(totalPaid || totalPrice)}</b> telah langsung aktif di API Key Anda tanpa perlu ganti setting di IDE.</>
+              ) : (
+                <>Saldo akun sebesar <b>{formatIdr(totalPaid || totalPrice)}</b> ({pkg.estToken}) telah aktif permanen di gateway juragantoken.co.id.</>
+              )}
             </p>
           </div>
 
           <div className="csv-key-card" style={{ background: "#0f172a", color: "#ffffff", borderRadius: "14px", padding: "16px", textAlign: "left", marginBottom: "14px" }}>
             <span className="csv-key-label" style={{ fontSize: "10.5px", color: "#94a3b8", fontWeight: 750, letterSpacing: "0.05em" }}>
-              API KEY UNIVERSAL ANDA:
+              {checkoutMode === "topup" ? "API KEY ANDA (TETAP SAMA):" : "API KEY UNIVERSAL ANDA:"}
             </span>
             <div className="csv-key-display" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#1e293b", border: "1px solid #334155", borderRadius: "8px", padding: "8px 12px", margin: "8px 0" }}>
               <code style={{ fontFamily: "monospace", fontSize: "13px", color: "#38bdf8", wordBreak: "break-all" }}>
-                {apiKeyGenerated || "jt-sec-live-89f41b2c7e0941ab82"}
+                {checkoutMode === "topup" ? (targetApiKey || "jt-live-•••••••• (Kunci Tetap)") : (apiKeyGenerated || "jt-sec-live-89f41b2c7e0941ab82")}
               </code>
               <button
                 type="button"
                 className="csv-copy-key-btn"
-                onClick={() => copyToClipboard(apiKeyGenerated || "jt-sec-live-89f41b2c7e0941ab82", "key")}
+                onClick={() => copyToClipboard(checkoutMode === "topup" ? targetApiKey : (apiKeyGenerated || "jt-sec-live-89f41b2c7e0941ab82"), "key")}
                 style={{ border: "none", background: "#0a58ca", color: "#ffffff", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px", cursor: "pointer", whiteSpace: "nowrap" }}
               >
                 <Icon name="copy" size={14} />
-                <span>{copiedKey ? "Tersalin! ✓" : "Salin API Key"}</span>
+                <span>{copiedKey ? "Tersalin! ✓" : "Salin Kunci"}</span>
               </button>
             </div>
             <span className="csv-key-note" style={{ display: "block", fontSize: "11px", color: "#94a3b8", lineHeight: 1.4 }}>
-              Simpan API key ini dengan aman. Key dapat langsung dipakai di Claude Code, Cursor, Chatbox, dan LibreChat.
+              {checkoutMode === "topup"
+                ? "Saldo telah aktif seketika. Konfigurasi di Cursor, VS Code, atau Claude Code Anda tidak perlu diubah sama sekali."
+                : "Simpan API key ini dengan aman. Key dapat langsung dipakai di Claude Code, Cursor, Chatbox, dan LibreChat."}
             </span>
           </div>
 
