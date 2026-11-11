@@ -75,7 +75,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
 
   const gmailUser = process.env.GMAIL_USER?.trim();
   const gmailPass = process.env.GMAIL_APP_PASSWORD?.trim();
-  const fromName  = "Qris Payment Gateway";
+  const fromName  = process.env.GMAIL_FROM_NAME?.trim() || "Juragan Token Indonesia";
 
   const isConfigured = Boolean(
     gmailUser &&
@@ -152,15 +152,15 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
           <tr>
             <td class="eb" style="padding:30px 26px 24px;">
 
-              <!-- Authentic Fintech Success Badge (Anti-Broken, Crisp, No Attachment Download) -->
+              <!-- Authentic Fintech Success Badge (Identik 100% PaymentSuccessMark Website) -->
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 18px;">
                 <tr>
-                  <td align="center" valign="middle" style="width:78px;height:78px;border-radius:50%;background:#00b37e;background:linear-gradient(135deg,#00b37e 0%,#009366 100%);text-align:center;box-shadow:0 10px 26px rgba(0,179,126,0.36);padding:0;">
+                  <td align="center" valign="middle" style="padding:0;text-align:center;">
                     <img src="${badgeUrl}"
-                         width="78"
-                         height="78"
-                         alt="✓"
-                         style="display:block;width:78px;height:78px;max-width:78px;border:0;outline:none;border-radius:50%;margin:0 auto;color:#ffffff;font-size:38px;font-weight:bold;line-height:78px;text-align:center;" />
+                         width="104"
+                         height="104"
+                         alt="✓ Pembayaran Berhasil"
+                         style="display:block;width:104px;height:104px;max-width:104px;border:0;outline:none;margin:0 auto;text-align:center;" />
                   </td>
                 </tr>
               </table>
@@ -237,6 +237,25 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
                 </tr>
               </table>
 
+              <!-- ─── Panduan Integrasi Cepat (/docs) ─── -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                     style="background-color:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;margin-bottom:16px;">
+                <tr>
+                  <td style="padding:15px 18px;">
+                    <div style="font-size:13px;font-weight:800;color:#0a2540;margin-bottom:4px;">
+                      &#128218; Panduan Cara Pakai Kunci API (/docs)
+                    </div>
+                    <div style="font-size:12px;color:#475569;line-height:1.5;margin-bottom:12px;">
+                      Lihat contoh kode Python, Node.js, cURL, serta petunjuk konfigurasi di Cursor IDE, Claude Code CLI, Windsurf &amp; Continue:
+                    </div>
+                    <a href="${webOrigin}/docs" target="_blank"
+                       style="display:inline-block;background:#0a58ca;color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;padding:9px 18px;border-radius:8px;box-shadow:0 2px 6px rgba(10,88,202,0.22);">
+                      Buka Dokumentasi Integrasi (/docs) &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
               <!-- ─── Tips Keamanan ─── -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
                      style="background-color:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-bottom:22px;">
@@ -257,11 +276,13 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
 
               <!-- ─── Footer ─── -->
               <div style="text-align:center;font-size:12px;color:#94a3b8;line-height:1.75;border-top:1px solid #f1f5f9;padding-top:18px;">
-                <div style="color:#64748b;font-weight:500;margin-bottom:4px;">Terima kasih telah menggunakan layanan kami.</div>
+                <div style="color:#64748b;font-weight:500;margin-bottom:6px;">Terima kasih telah menggunakan layanan Juragan Token Indonesia.</div>
                 <div>
-                  <a href="https://wa.me/${adminWaRaw}" target="_blank" style="color:#1d4ed8;font-weight:600;text-decoration:none;">WhatsApp Admin (${adminWaFormatted})</a>
+                  <a href="${webOrigin}/docs" target="_blank" style="color:#0a58ca;font-weight:700;text-decoration:none;">Panduan Integrasi (/docs)</a>
                   &nbsp;&bull;&nbsp;
-                  <a href="${officialWeb}" target="_blank" style="color:#1d4ed8;font-weight:600;text-decoration:none;">api.tokotokenai.com</a>
+                  <a href="https://wa.me/${adminWaRaw}" target="_blank" style="color:#16a34a;font-weight:700;text-decoration:none;">WhatsApp Admin (${adminWaFormatted})</a>
+                  &nbsp;&bull;&nbsp;
+                  <a href="${webOrigin}" target="_blank" style="color:#0a58ca;font-weight:700;text-decoration:none;">Website Toko</a>
                 </div>
               </div>
 

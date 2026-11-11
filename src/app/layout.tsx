@@ -71,10 +71,15 @@ export const metadata: Metadata = {
   },
 };
 
+import { FloatingWhatsApp } from "@/components/ui/FloatingWhatsApp";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
-      <body>{children}</body>
+      <body>
+        {children}
+        <FloatingWhatsApp />
+      </body>
     </html>
   );
 }

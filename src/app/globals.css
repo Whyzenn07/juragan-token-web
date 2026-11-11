@@ -10266,3 +10266,116 @@ footer {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ========================================================================= */
+/* Floating WhatsApp Help / Consultation Widget                              */
+/* ========================================================================= */
+.floating-wa-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.floating-wa-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #ffffff !important;
+  text-decoration: none !important;
+  padding: 11px 18px 11px 15px;
+  border-radius: 9999px;
+  box-shadow: 0 10px 26px rgba(37, 211, 102, 0.42), 0 4px 12px rgba(18, 140, 126, 0.28);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 750;
+  letter-spacing: -0.2px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.floating-wa-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 14px 34px rgba(37, 211, 102, 0.52), 0 6px 16px rgba(18, 140, 126, 0.35);
+  color: #ffffff !important;
+}
+
+.floating-wa-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.floating-wa-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: rgba(37, 211, 102, 0.35);
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1);
+  animation: wa-pulse 2.2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: -1;
+}
+
+@keyframes wa-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 0;
+  }
+}
+
+.floating-wa-icon {
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.floating-wa-label {
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* Responsif Mobile (<640px): Bulatan kompak 50px agar tidak menutupi konten checkout */
+@media (max-width: 640px) {
+  .floating-wa-container {
+    bottom: 18px;
+    right: 16px;
+  }
+  .floating-wa-btn {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 8px 22px rgba(37, 211, 102, 0.45);
+  }
+  .floating-wa-label {
+    display: none;
+  }
+  .floating-wa-icon {
+    width: 26px;
+    height: 26px;
+  }
+  .floating-wa-ripple {
+    border-radius: 50%;
+  }
+}
+
