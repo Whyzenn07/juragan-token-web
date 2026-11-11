@@ -1,8 +1,9 @@
 export * from "@/types";
 import type { Category, Provider, ModelItem, RetailPackage, PaymentMethod } from "@/types";
 
-/** Gateway produksi. Domain api.juragantoken.co.id belum punya DNS, jadi semua panduan memakai host ini. */
-export const GATEWAY_ORIGIN = "https://www.juragantoken.co.id";
+/** Gateway produksi. Menggunakan domain publik terkonfigurasi. */
+export const GATEWAY_ORIGIN =
+  (process.env.NEXT_PUBLIC_APP_URL || "https://api.tokotokenai.com").trim().replace(/\/+$/, "");
 export const GATEWAY_BASE_URL = `${GATEWAY_ORIGIN}/v1`;
 export const PRICING_SNAPSHOT_DATE = "4 Nov 2026";
 

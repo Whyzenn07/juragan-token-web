@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Syarat dan ketentuan resmi penggunaan layanan kredit Multi-AI prabayar dan Universal AI Gateway Juragan Token. Transparan, aman, dan tanpa masa kedaluwarsa.",
   alternates: {
-    canonical: "https://www.juragantoken.co.id/terms",
+    canonical: "/terms",
   },
 };
 

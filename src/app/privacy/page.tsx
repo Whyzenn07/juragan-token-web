@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Komitmen perlindungan data dan privasi Juragan Token. Jaminan 100% Zero-Training, enkripsi TLS 1.3, dan pengamanan kredensial berbasis SHA-256.",
   alternates: {
-    canonical: "https://www.juragantoken.co.id/privacy",
+    canonical: "/privacy",
   },
 };
 

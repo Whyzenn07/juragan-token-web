@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Panduan lengkap integrasi Universal AI Gateway Juragan Token untuk Cursor AI, Claude Code CLI, Windsurf, Chatbox, dan Python SDK. 1 API Key untuk semua model AI terkemuka.",
   alternates: {
-    canonical: "https://www.juragantoken.co.id/docs",
+    canonical: "/docs",
   },
 };
 

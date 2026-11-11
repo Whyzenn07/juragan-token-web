@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Pantau status operasional gateway AI, database cloud Supabase, dan sistem pembayaran QRIS Juragan Token secara real-time. Transparansi dan uptime 99.9%.",
   alternates: {
-    canonical: "https://www.juragantoken.co.id/status",
+    canonical: "/status",
   },
 };
 

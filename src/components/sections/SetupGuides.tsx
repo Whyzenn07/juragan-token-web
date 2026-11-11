@@ -201,7 +201,7 @@ print(response.choices[0].message.content)`;
               <ol className="cursor-steps">
                 <li>Buka <b>Settings</b> (<Icon name="settings" size={13} style={{ margin: "0 2px" }} /> di pojok kiri bawah).</li>
                 <li>Pilih menu <b>Model Provider</b> &gt; pilih <b>OpenAI</b> (karena Juragan Token memakai protokol standar OpenAI).</li>
-                <li>Pada kolom <b>API Host</b>, masukkan: <code>https://www.juragantoken.co.id</code></li>
+                <li>Pada kolom <b>API Host</b>, masukkan: <code>{origin}</code></li>
                 <li>Pada kolom <b>API Key</b>, tempelkan API Key token Anda.</li>
                 <li>Klik tombol <b>+ New</b> di bagian Model, lalu ketik model pilihan (misal: <code>claude-sonnet-5.5</code> atau <code>gemini-3.8-flash</code>). Selesai!</li>
               </ol>
@@ -216,12 +216,12 @@ print(response.choices[0].message.content)`;
               <div className="mock-field">
                 <label>2. API Host / Endpoint</label>
                 <div style={{ display: "flex", gap: "6px" }}>
-                  <input readOnly value="https://www.juragantoken.co.id" />
+                  <input readOnly value={origin} />
                   <button
                     type="button"
                     className="copy-btn"
                     style={{ background: "#0a4ea3", color: "#fff", borderRadius: "4px", padding: "0 10px", flexShrink: 0 }}
-                    onClick={() => copyCode("https://www.juragantoken.co.id", "host")}
+                    onClick={() => copyCode(origin, "host")}
                   >
                     {copied === "host" ? "Tersalin!" : "Salin"}
                   </button>

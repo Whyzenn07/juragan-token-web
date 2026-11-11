@@ -7,8 +7,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://api.tokotokenai.com").trim().replace(/\/+$/, "");
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://www.juragantoken.co.id"),
+  metadataBase: new URL(appUrl),
   title: "Juragan Token: Kredit API AI Prabayar untuk Claude, GPT, Gemini & DeepSeek",
   description:
     "Marketplace kredit API Multi-AI prabayar lokal di Indonesia. Akses resmi Claude Sonnet, Opus 5.5, GPT-4o, Gemini 3.8 Flash, dan DeepSeek tanpa kartu kredit melalui QRIS instan dan Virtual Account Bank lokal.",
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     "Cursor AI API key",
     "Claude Code CLI token",
   ],
-  authors: [{ name: "Juragan Token Indonesia", url: "https://www.juragantoken.co.id" }],
+  authors: [{ name: "Juragan Token Indonesia", url: appUrl }],
   creator: "Juragan Token Indonesia",
   publisher: "Juragan Token Indonesia",
   robots: {
@@ -43,7 +45,7 @@ export const metadata: Metadata = {
     title: "Juragan Token - 1 Kunci Token untuk Semua AI Kelas Dunia",
     description:
       "Akses resmi Claude 3.5 / Opus 5.5, GPT-4o, Gemini 3.8 Flash, dan DeepSeek dalam mata uang Rupiah. Bayar instan via QRIS, aktif selamanya tanpa kedaluwarsa.",
-    url: "https://www.juragantoken.co.id",
+    url: appUrl,
     siteName: "Juragan Token Indonesia",
     locale: "id_ID",
     type: "website",
