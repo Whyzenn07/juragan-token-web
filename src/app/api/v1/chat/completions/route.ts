@@ -178,10 +178,10 @@ export async function POST(req: NextRequest) {
     upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
     upstreamAuthHeader = `Bearer ${geminiKey}`;
   } else {
-    // Pass-Through Engine ke juragantoken.co.id
+    // Pass-Through Engine ke api.tokotokenai.com
     const engineUrl =
       process.env.UPSTREAM_ENGINE_URL?.trim() ||
-      "https://gateway.juragantoken.co.id/v1";
+      "https://api.tokotokenai.com/v1";
     const engineKey =
       process.env.UPSTREAM_ENGINE_KEY?.trim() ||
       process.env.ADMIN_SECRET?.trim() ||
@@ -369,7 +369,7 @@ export async function POST(req: NextRequest) {
             message:
               rawMessage ||
               (provider === "engine"
-                ? `Engine Utama (juragantoken.co.id) mengembalikan status ${upstreamRes.status}. Coba gunakan model Google Gemini ('gemini-3.5-flash-lite').`
+                ? `Engine Utama (api.tokotokenai.com) mengembalikan status ${upstreamRes.status}. Coba gunakan model Google Gemini ('gemini-3.5-flash-lite').`
                 : `Gagal mendapatkan respons dari provider ${provider} (Status: ${upstreamRes.status}).`),
             type: "upstream_error",
             code: rawCode || "upstream_failure",
@@ -448,7 +448,7 @@ export async function POST(req: NextRequest) {
     console.error("[GATEWAY FATAL ERROR]", err);
     const friendlyMessage =
       provider === "engine"
-        ? "Engine Utama Central (https://gateway.juragantoken.co.id) saat ini belum online atau DNS belum terhubung. Silakan gunakan model Google Gemini ('gemini-3.5-flash') untuk pengujian saat ini."
+        ? "Engine Utama Central (https://api.tokotokenai.com) saat ini belum online atau DNS belum terhubung. Silakan gunakan model Google Gemini ('gemini-3.5-flash') untuk pengujian saat ini."
         : `Koneksi ke provider Google Gemini terputus: ${err?.message || "Internal Network Error"}`;
 
     return NextResponse.json(

@@ -27,7 +27,7 @@ Namun, mereka menghadapi hambatan struktural yang signifikan:
 - **Siklus Ganda (Dual-Lifecycle): Kunci Baru & Top-Up Kunci Lama:** Pengguna baru menerima kunci API unik, sementara pengguna lama dapat melakukan isi ulang (*top-up*) saldo ke kunci yang sama secara idempoten tanpa perlu mengubah konfigurasi IDE mereka.
 - **Hybrid Upstream Routing Berkecepatan Tinggi:** 
   1. *Direct Engine:* Permintaan Google Gemini diproses langsung secara lokal ke Google AI Studio (`gemini-3.8-flash`) menggunakan Master Key berkecepatan tinggi.
-  2. *Pass-Through Engine:* Permintaan model frontier berdaya tinggi (Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, DeepSeek) diteruskan secara aman ke Central Engine di `https://gateway.juragantoken.co.id/v1` (bebas dependensi OpenRouter).
+  2. *Pass-Through Engine:* Permintaan model frontier berdaya tinggi (Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, DeepSeek) diteruskan secara aman ke Central Engine di `https://api.tokotokenai.com/v1` (bebas dependensi OpenRouter).
 - **Masa Aktif Token Permanen:** Saldo kredit dalam mata uang rupiah (IDR) berlaku permanen tanpa kedaluwarsa bulanan.
 - **Zero-Retention Prompt Privacy:** Server Juragan Token hanya bertindak sebagai *pass-through proxy*. Tidak ada pencatatan atau penyimpanan teks prompt, dokumen bisnis, maupun respon AI ke database. Hanya metrik token kuantitatif yang dicatat untuk kebutuhan pengurangan saldo.
 - **Dual Persistence & Audit Log:** Setiap transaksi dan pemakaian kredit tersinkronisasi secara *real-time* ke **Supabase Cloud Database** (menggunakan service role key) dengan failover penyimpanan lokal atomik.
@@ -125,7 +125,7 @@ sequenceDiagram
     alt Model = Gemini (e.g. gemini-3.8-flash)
         Gateway->>Engine: POST Google AI Studio (OpenAI-compatible endpoint)
     else Model = Frontier (Claude / GPT-4o / DeepSeek)
-        Gateway->>Engine: Pass-Through ke https://gateway.juragantoken.co.id/v1
+        Gateway->>Engine: Pass-Through ke https://api.tokotokenai.com/v1
     end
 
     alt Upstream Sukses
@@ -238,7 +238,7 @@ sequenceDiagram
 | **Universal Webhook Engine** | `/api/webhooks/payment/route.ts` | Endpoint terpadu yang memproses notifikasi pembayaran otomatis dari Tripay (HMAC-SHA256), Midtrans (SHA-512), dan Xendit. |
 | **Sinkronisasi Kurs Real-Time (BI Rate)** | `CurrencyRateModal.tsx`<br>`src/app/page.tsx` | Menampilkan modal kurs valas Bank Indonesia dengan visual grafik tren historis (1HR s/d Maks), perhitungan margin proteksi selisih kurs, dan pemicu pembaruan katalog tarif live. |
 | **Katalog Model Favorit** | `src/app/page.tsx` | Fitur simpan/bookmark model AI favorit dengan filter `Tersimpan (★)` yang tersimpan di memori browser pengguna. |
-| **Panduan Setup 4-in-1** | `SetupGuides.tsx` | Tab panduan interaktif siap salin dengan deteksi otomatis Base URL origin (`http://localhost:3000/v1` di dev, atau `https://www.juragantoken.co.id/v1` saat live) untuk: Cursor AI, Claude Code CLI, Chatbox, dan Python SDK. |
+| **Panduan Setup 4-in-1** | `SetupGuides.tsx` | Tab panduan interaktif siap salin dengan deteksi otomatis Base URL origin (`http://localhost:3000/v1` di dev, atau `https://api.tokotokenai.com/v1` saat live) untuk: Cursor AI, Claude Code CLI, Chatbox, dan Python SDK. |
 | **Sistem Checkout Multi-Channel & Accordion** | `SingaPayModal.tsx` | Modal checkout 3 langkah dengan navigasi accordion interaktif bersusun halus (QRIS, VA & e-Wallet, Transfer Bank), validasi form, breakdown transparan, dan integrasi WhatsApp. |
 | **Invoice Standar Traveloka / Tiket.com** | `SingaPayModal.tsx` (Step 2) | Layar invoice pembayaran resmi OTA benchmark: countdown timer 15 menit dengan recovery batas waktu habis, tombol 1-klik salin nomor invoice, salin nomor rekening/VA (tanpa terpotong), salin nominal persis, serta petunjuk pembayaran multi-tab. |
 | **Integrasi Notifikasi WhatsApp** | `SingaPayModal.tsx`, `page.tsx` | Pesan langsung via WhatsApp Admin di Step 1, konfirmasi bayar WhatsApp di Step 2, cadangkan kredensial ke WhatsApp pribadi/admin di Step 3, serta link bantuan WhatsApp di footer (`081226983990`). |
@@ -275,7 +275,7 @@ sequenceDiagram
 - [x] **[✓] Endpoint Daftar Model (`/v1/models`):** JSON response berstandar OpenAI models schema.
 - [x] **[✓] Rewrites Router (`next.config.ts`):** Mapping `/v1/*` ke `/api/v1/*` selesai.
 - [x] **[✓] Direct Master Key Routing Google Gemini:** Routing `gemini-3.8-flash` & `gemini-1.5-pro` langsung ke Google AI Studio dengan master key.
-- [x] **[✓] Pass-Through Engine Frontier Models:** Routing Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, dan DeepSeek diteruskan ke `UPSTREAM_ENGINE_URL` (`juragantoken.co.id`). Dependensi OpenRouter telah dihapus 100%.
+- [x] **[✓] Pass-Through Engine Frontier Models:** Routing Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, dan DeepSeek diteruskan ke `UPSTREAM_ENGINE_URL` (`api.tokotokenai.com`). Dependensi OpenRouter telah dihapus 100%.
 - [x] **[✓] Pemotongan Saldo Real-Time (`deductKeyBalance`):** Pemotongan IDR per request berbasis volume token.
 - [x] **[✓] Audit Log Pemakaian (`recordUsageLog`):** Pencatatan riwayat pemakaian ke `public.usage_logs` dan memori lokal.
 
@@ -324,7 +324,7 @@ $$\text{Biaya (IDR)} = \left\lceil \frac{\text{Prompt Tokens} + \text{Completion
 Sistem Juragan Token menjamin kompatibilitas 100% dengan 4 alat kerja utama pengembang:
 
 ### 6.1 Cursor AI & Windsurf IDE
-- **Base URL:** `https://www.juragantoken.co.id/v1` (atau `http://localhost:3000/v1` pada tahap lokal)
+- **Base URL:** `https://api.tokotokenai.com/v1` (atau `http://localhost:3000/v1` pada tahap lokal)
 - **API Key:** `jt-live-xxxxxxxxxxxxxxxxxxxx`
 - **Model Override:** `claude-sonnet-5-5`, `gpt-4o`, `gemini-3.8-flash`
 - **Konfigurasi:** Masuk ke `Cursor Settings` > `Models` > Aktifkan `OpenAI API Key` > Masukkan Base URL & API Key.
@@ -332,14 +332,14 @@ Sistem Juragan Token menjamin kompatibilitas 100% dengan 4 alat kerja utama peng
 ### 6.2 Claude Code CLI (Terminal Anthropic)
 - **Environment Variables:**
   ```bash
-  export ANTHROPIC_BASE_URL="https://www.juragantoken.co.id/v1"
+  export ANTHROPIC_BASE_URL="https://api.tokotokenai.com/v1"
   export ANTHROPIC_API_KEY="jt-live-xxxxxxxxxxxxxxxxxxxx"
   ```
 - **Eksekusi:** Jalankan perintah `claude` langsung di terminal kerja.
 
 ### 6.3 Chatbox (Desktop & Web App)
 - **AI Model Provider:** Pilih `OpenAI API`
-- **API Host:** `https://www.juragantoken.co.id` (otomatis menambahkan `/v1`)
+- **API Host:** `https://api.tokotokenai.com` (otomatis menambahkan `/v1`)
 - **API Key:** `jt-live-xxxxxxxxxxxxxxxxxxxx`
 - **Model:** `claude-opus-5-5` atau `gemini-3.8-flash`
 
@@ -348,7 +348,7 @@ Sistem Juragan Token menjamin kompatibilitas 100% dengan 4 alat kerja utama peng
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://www.juragantoken.co.id/v1",
+    base_url="https://api.tokotokenai.com/v1",
     api_key="jt-live-xxxxxxxxxxxxxxxxxxxx"
 )
 
@@ -365,13 +365,13 @@ print(response.choices[0].message.content)
 
 | Nama Variabel | Wajib/Opsional | Nilai Default / Format | Fungsi & Keterangan |
 | :--- | :---: | :--- | :--- |
-| `NEXT_PUBLIC_APP_URL` | Wajib | `https://www.juragantoken.co.id` | URL domain publik website untuk penentuan canonical SEO & OpenGraph. |
-| `GATEWAY_BASE_URL` | Wajib | `https://gateway.juragantoken.co.id/v1` | URL gateway acuan pada email bukti pembayaran. |
+| `NEXT_PUBLIC_APP_URL` | Wajib | `https://api.tokotokenai.com` | URL domain publik website untuk penentuan canonical SEO & OpenGraph. |
+| `GATEWAY_BASE_URL` | Wajib | `https://api.tokotokenai.com/v1` | URL gateway acuan pada email bukti pembayaran. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Wajib | `https://nzcblpzianzbgbwglhxc.supabase.co` | Endpoint REST API Cloud PostgreSQL Supabase. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Wajib | `sb_publishable_...` | Kunci anon/publishable untuk query frontend & backend ke Supabase. |
 | `SUPABASE_SECRET_KEY` | Opsional | `sb_secret_...` | Service Role Key untuk bypass RLS (keperluan migrasi database). |
 | `GEMINI_API_KEY` | Wajib | `AQ.Ab8RN6KZoZ...` | Master API Key Google AI Studio untuk pemrosesan direct model Gemini Flash/Pro. |
-| `UPSTREAM_ENGINE_URL` | Wajib | `https://gateway.juragantoken.co.id/v1` | Endpoint Central Engine untuk pass-through request Claude/GPT-4o/DeepSeek. |
+| `UPSTREAM_ENGINE_URL` | Wajib | `https://api.tokotokenai.com/v1` | Endpoint Central Engine untuk pass-through request Claude/GPT-4o/DeepSeek. |
 | `UPSTREAM_ENGINE_KEY` | Opsional | `sk-...` | Token otentikasi internal jika Central Engine mewajibkan master header khusus. |
 | `TRIPAY_PRIVATE_KEY` | Opsional | String Kunci Rahasia | Kunci rahasia untuk validasi HMAC-SHA256 callback Tripay. |
 | `MIDTRANS_SERVER_KEY` | Opsional | String Kunci Server | Kunci rahasia untuk validasi hash SHA-512 callback Midtrans. |

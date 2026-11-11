@@ -262,7 +262,7 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
             </div>
             <div className="spec-item">
               <span className="spec-key">Sumber tarif</span>
-              <span className="spec-val">Gateway juragantoken.co.id per {PRICING_SNAPSHOT_DATE}, kurs realtime Rp{formatNum(usdRate)}/US$</span>
+              <span className="spec-val">Gateway api.tokotokenai.com per {PRICING_SNAPSHOT_DATE}, kurs realtime Rp{formatNum(usdRate)}/US$</span>
             </div>
           </div>
         </div>

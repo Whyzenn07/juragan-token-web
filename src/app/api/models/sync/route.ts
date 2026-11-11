@@ -51,7 +51,7 @@ export async function GET() {
     rateSource = "snapshot_fallback";
   }
 
-  // 2. Fetch remote pricing models from live gateway (api.tokotokenai.com / juragantoken.co.id)
+  // 2. Fetch remote pricing models from live gateway (api.tokotokenai.com)
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 4000);
@@ -60,13 +60,6 @@ export async function GET() {
       signal: controller.signal,
       next: { revalidate: 300 }
     }).catch(() => null);
-
-    if (!res || !res.ok) {
-      res = await fetch("https://www.juragantoken.co.id/api/pricing", {
-        signal: controller.signal,
-        next: { revalidate: 300 }
-      }).catch(() => null);
-    }
     clearTimeout(timeoutId);
 
     if (res && res.ok) {
@@ -128,7 +121,7 @@ export async function GET() {
     rateSource,
     lastSynced: syncTimestamp,
     usdRate: activeUsdRate,
-    gatewayOrigin: "https://www.juragantoken.co.id",
+    gatewayOrigin: process.env.NEXT_PUBLIC_APP_URL || "https://api.tokotokenai.com",
     totalModels: finalModels.length,
     models: finalModels
   });

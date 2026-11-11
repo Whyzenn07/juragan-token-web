@@ -128,7 +128,7 @@ export function StatusClient() {
           <div className="stat-card">
             <span className="stat-label">STATUS GATEWAY</span>
             <strong className="stat-val" style={{ color: "#16a34a" }}>ONLINE</strong>
-            <span className="stat-sub">Base URL: www.juragantoken.co.id</span>
+            <span className="stat-sub">Base URL: api.tokotokenai.com</span>
           </div>
           <div className="stat-card">
             <span className="stat-label">PEMBARUAN TERAKHIR</span>

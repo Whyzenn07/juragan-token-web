@@ -25,7 +25,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     customerEmail,
     priceIdr,
     invoiceId,
-    gatewayUrl: rawGatewayUrl = process.env.GATEWAY_BASE_URL || "https://www.juragantoken.co.id/v1",
+    gatewayUrl: rawGatewayUrl = process.env.GATEWAY_BASE_URL || "https://api.tokotokenai.com/v1",
   } = payload;
 
   const customerName = escapeHtml(payload.customerName);

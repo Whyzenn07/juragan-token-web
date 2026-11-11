@@ -185,7 +185,7 @@ NEXT_PUBLIC_GATEWAY_URL="http://localhost:3000/api/v1"
 GEMINI_API_KEY="AIzaSy..."
 
 # 3. Upstream Central Engine (Pass-Through Model Frontier)
-UPSTREAM_ENGINE_URL="https://gateway.juragantoken.co.id/v1"
+UPSTREAM_ENGINE_URL="https://api.tokotokenai.com/v1"
 UPSTREAM_ENGINE_KEY=""
 
 # 4. Transaksional Email (Gmail SMTP / Google Workspace)

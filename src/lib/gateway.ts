@@ -107,7 +107,7 @@ export async function authenticateGatewayKey(authHeader: string | null): Promise
 /**
  * Normalisasi nama model ke provider upstream yang sesuai.
  * Model Gemini diproses via master key Gemini.
- * Model Claude, GPT-4o, DeepSeek, Qwen diarahkan ke Pass-Through Engine (juragantoken.co.id).
+ * Model Claude, GPT-4o, DeepSeek, Qwen diarahkan ke Pass-Through Engine (api.tokotokenai.com).
  */
 export function resolveUpstreamModel(inputModel: string): {
   provider: "gemini" | "engine";

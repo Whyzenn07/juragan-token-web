@@ -579,7 +579,7 @@ export default function Home() {
           <div className="gateway-status-strip" data-reveal="fade-up">
             <div className="gateway-status-left">
               <span className="live-pulse-dot" />
-              <strong>Gateway juragantoken.co.id</strong>
+              <strong>Gateway api.tokotokenai.com</strong>
               <span>· Claude Sonnet 5.5, Gemini 3.8 Flash, GPT-6, DeepSeek V4 &amp; Kimi K3 lewat satu API key</span>
             </div>
             <div className="gateway-status-right">
@@ -735,7 +735,7 @@ export default function Home() {
             </a>
           </div>
 
-          {/* 5. Catalog Section: model riil dari gateway juragantoken.co.id */}
+          {/* 5. Catalog Section: model riil dari gateway api.tokotokenai.com */}
           <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
             {/* 5. Catalog Section Header Card - DPSBuddy Style */}
             <div className="dps-banner-card" data-reveal="scale">

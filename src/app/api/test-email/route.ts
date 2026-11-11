@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       paymentMethod: "QRIS Standar Nasional",
       apiKey: testApiKey,
       invoiceId: testInvoiceId,
-      gatewayUrl: process.env.GATEWAY_BASE_URL || "https://www.juragantoken.co.id/v1",
+      gatewayUrl: process.env.GATEWAY_BASE_URL || "https://api.tokotokenai.com/v1",
     });
 
     if (result.status === "simulated") {
