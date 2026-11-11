@@ -1,6 +1,4 @@
 import nodemailer from "nodemailer";
-import path from "path";
-import fs from "fs";
 
 export interface SendReceiptPayload {
   customerName: string;
@@ -64,6 +62,17 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     : `+${adminWaRaw}`;
   const officialWeb = "https://api.tokotokenai.com/";
 
+  // Domain asal aset publik: pastikan mengarah ke hosting frontend Vercel yang valid
+  const webOrigin = (
+    process.env.NEXT_PUBLIC_APP_URL?.startsWith("http") && !process.env.NEXT_PUBLIC_APP_URL.includes("tokotokenai.com")
+      ? process.env.NEXT_PUBLIC_APP_URL
+      : process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app"
+  ).replace(/\/+$/, "");
+
+  const badgeUrl = `${webOrigin}/assets/email/success-check-badge.png`;
+
   const gmailUser = process.env.GMAIL_USER?.trim();
   const gmailPass = process.env.GMAIL_APP_PASSWORD?.trim();
   const fromName  = "Qris Payment Gateway";
@@ -90,18 +99,6 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
       pass: gmailPass?.replace(/\s+/g, ""),
     },
   });
-
-  // Lampirkan badge centang sukses resolusi tinggi (Retina) sebagai inline CID image
-  const badgePath = path.join(process.cwd(), "public", "assets", "email", "success-check-badge.png");
-  const attachments = fs.existsSync(badgePath)
-    ? [
-        {
-          filename: "success-check-badge.png",
-          path: badgePath,
-          cid: "success-check-badge@juragantoken",
-        },
-      ]
-    : [];
 
   // ─── Template Email HTML — Clean Fintech Receipt v4 ───────────────────────
   const htmlContent = `<!DOCTYPE html>
@@ -155,15 +152,15 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
           <tr>
             <td class="eb" style="padding:30px 26px 24px;">
 
-              <!-- ✅ Authentic Fintech Success Badge (Identik dengan PaymentSuccessMark Website) -->
+              <!-- Authentic Fintech Success Badge (Anti-Broken, Crisp, No Attachment Download) -->
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 18px;">
                 <tr>
-                  <td align="center" valign="middle" style="text-align:center;">
-                    <img src="cid:success-check-badge@juragantoken"
-                         width="84"
-                         height="84"
-                         alt="Pembayaran Berhasil"
-                         style="display:block;margin:0 auto;width:84px;height:84px;max-width:84px;border:0;outline:none;text-decoration:none;" />
+                  <td align="center" valign="middle" style="width:78px;height:78px;border-radius:50%;background:#00b37e;background:linear-gradient(135deg,#00b37e 0%,#009366 100%);text-align:center;box-shadow:0 10px 26px rgba(0,179,126,0.36);padding:0;">
+                    <img src="${badgeUrl}"
+                         width="78"
+                         height="78"
+                         alt="✓"
+                         style="display:block;width:78px;height:78px;max-width:78px;border:0;outline:none;border-radius:50%;margin:0 auto;color:#ffffff;font-size:38px;font-weight:bold;line-height:78px;text-align:center;" />
                   </td>
                 </tr>
               </table>
@@ -271,13 +268,10 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
             </td>
           </tr>
 
-          <!-- WAVE BOTTOM -->
+          <!-- ACCENT FOOTER LINE -->
           <tr>
-            <td style="line-height:0;font-size:0;padding:0;">
-              <svg viewBox="0 0 540 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
-                <path d="M0 13C140 28 350 2 540 15V30H0V13Z" fill="#1e6beb" fill-opacity="0.22"/>
-                <path d="M0 19C120 7 330 28 540 15V30H0V19Z" fill="#0f4fc7"/>
-              </svg>
+            <td style="line-height:0;font-size:0;padding:0;height:4px;background:linear-gradient(90deg, #0a2d75 0%, #1e6beb 100%);">
+              &nbsp;
             </td>
           </tr>
 
@@ -294,7 +288,6 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     to: customerEmail,
     subject: `Invoice Pembayaran Berhasil — ${invoiceId}`,
     html: htmlContent,
-    attachments,
   });
   console.log(`[EMAIL BERHASIL] ID: ${info.messageId} dikirim ke ${customerEmail}`);
 
