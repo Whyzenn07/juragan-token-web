@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { query } from "@/lib/store";
+import { query, mutate } from "@/lib/store";
 import { maskKey, rateLimited, sha256 } from "@/lib/keys";
+import { fetchKeyFromSupabase } from "@/lib/supabase-sync";
 
 async function handleCheck(keyRaw: string, ip: string) {
   if (rateLimited(`check:${ip}`, 15, 60_000)) {
@@ -15,37 +16,16 @@ async function handleCheck(keyRaw: string, ip: string) {
     return NextResponse.json({ success: false, error: "API Key tidak ditemukan." }, { status: 404 });
   }
 
-  let record = await query((db) => db.keys[sha256(key)]);
-  if (!record && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    try {
-      const sbRes = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/keys?hash=eq.${sha256(key)}&select=*`,
-        {
-          headers: {
-            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          },
-        }
-      );
-      if (sbRes.ok) {
-        const rows = await sbRes.json();
-        if (rows && rows.length > 0) {
-          const r = rows[0];
-          record = {
-            hash: r.hash,
-            last4: r.last4,
-            orderId: r.order_id,
-            planName: r.plan_name,
-            estPackage: r.est_package,
-            balanceIdr: r.balance_idr,
-            status: r.status,
-            createdAt: r.created_at,
-          };
-        }
-      }
-    } catch {
-      // Supabase query error fallback
-    }
+  const hash = sha256(key);
+  let record = await query((db) => db.keys[hash]);
+
+  // Di serverless atau jika record belum ada di memory, selalu ambil dari Supabase
+  const remote = await fetchKeyFromSupabase(hash);
+  if (remote) {
+    record = remote;
+    await mutate((db) => {
+      db.keys[hash] = remote;
+    });
   }
 
   if (!record) {

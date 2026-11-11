@@ -1,6 +1,6 @@
 import { sha256 } from "./keys";
 import { query, mutate, type KeyRecord } from "./store";
-import { syncKeyToSupabase, syncUsageLogToSupabase, getSupabaseConfig } from "./supabase-sync";
+import { syncKeyToSupabase, syncUsageLogToSupabase, getSupabaseConfig, fetchKeyFromSupabase } from "./supabase-sync";
 
 export type AuthResult = {
   ok: boolean;
@@ -38,38 +38,14 @@ export async function authenticateGatewayKey(authHeader: string | null): Promise
   // 1. Cek di local store
   let record = await query((db) => db.keys[hash]);
 
-  // 2. Jika tidak ada di lokal, cek di Supabase Cloud
-  const { url: sbUrl, key: sbKey, isConfigured: sbConfigured } = getSupabaseConfig();
-  if (!record && sbConfigured) {
-    try {
-      const res = await fetch(`${sbUrl}/rest/v1/keys?hash=eq.${hash}&select=*`, {
-        headers: {
-          apikey: sbKey,
-          Authorization: `Bearer ${sbKey}`,
-        },
+  // 2. Di serverless Vercel atau jika belum ada di lokal, hydrate dari Supabase Cloud
+  if (!record || process.env.VERCEL) {
+    const remote = await fetchKeyFromSupabase(hash);
+    if (remote) {
+      record = remote;
+      await mutate((db) => {
+        db.keys[hash] = remote;
       });
-      if (res.ok) {
-        const rows = await res.json();
-        if (rows && rows.length > 0) {
-          const r = rows[0];
-          record = {
-            hash: r.hash,
-            last4: r.last4,
-            orderId: r.order_id,
-            planName: r.plan_name,
-            estPackage: r.est_package,
-            balanceIdr: r.balance_idr,
-            status: r.status,
-            createdAt: r.created_at,
-          };
-          // Simpan ke local cache untuk request berikutnya
-          await mutate((db) => {
-            db.keys[hash] = record!;
-          });
-        }
-      }
-    } catch (err) {
-      console.warn("[GATEWAY AUTH] Gagal query Supabase fallback:", err);
     }
   }
 
@@ -178,7 +154,7 @@ export async function deductKeyBalance(keyHash: string, costIdr: number): Promis
 
   // 2. Sinkronkan saldo baru ke Supabase
   if (updatedRecord) {
-    syncKeyToSupabase(updatedRecord).catch((err) => {
+    await syncKeyToSupabase(updatedRecord).catch((err) => {
       console.warn("[GATEWAY DEDUCT] Gagal sync pengurangan saldo ke Supabase:", err);
     });
   } else if (sbConfigured) {
@@ -231,7 +207,7 @@ export async function recordUsageLog(params: RecordUsageParams): Promise<void> {
   const now = new Date().toISOString();
 
   // 1. Simpan di local store
-  mutate((db) => {
+  await mutate((db) => {
     if (!db.usageLogs) db.usageLogs = [];
     db.usageLogs.unshift({
       id: logId,
@@ -242,7 +218,7 @@ export async function recordUsageLog(params: RecordUsageParams): Promise<void> {
   }).catch(() => undefined);
 
   // 2. Kirim ke Supabase public.usage_logs
-  syncUsageLogToSupabase({
+  await syncUsageLogToSupabase({
     ...params,
     createdAt: now,
   }).catch(() => undefined);

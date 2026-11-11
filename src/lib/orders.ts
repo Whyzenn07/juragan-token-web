@@ -81,26 +81,17 @@ export async function createOrder(
     isTopUp = true;
 
     // Verifikasi keberadaan key di local store atau Supabase
-    const localKey = await query((db) => db.keys[targetKeyHash!]);
-    if (!localKey && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      try {
-        const sbRes = await fetch(
-          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/keys?hash=eq.${targetKeyHash}&select=hash`,
-          {
-            headers: {
-              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-            },
-          }
-        );
-        const rows = await sbRes.json();
-        if (!rows || rows.length === 0) {
-          return { ok: false, status: 404, error: "API Key untuk top-up tidak ditemukan di server Juragan Token." };
-        }
-      } catch {
-        // Fallback jika network error
+    let keyRecord = await query((db) => db.keys[targetKeyHash!]);
+    if (!keyRecord || process.env.VERCEL) {
+      const remote = await fetchKeyFromSupabase(targetKeyHash!);
+      if (remote) {
+        keyRecord = remote;
+        await mutate((db) => {
+          db.keys[targetKeyHash!] = remote;
+        });
       }
-    } else if (!localKey) {
+    }
+    if (!keyRecord) {
       return { ok: false, status: 404, error: "API Key untuk top-up tidak ditemukan di server Juragan Token." };
     }
   }
