@@ -41,11 +41,11 @@ export const modelsCatalog: ModelItem[] = [
     id: "gpt-6-luna",
     name: "GPT-6 Luna",
     providerId: "openai",
-    category: "Chat Hemat",
-    description: "Model OpenAI paling irit untuk tugas pendek: klasifikasi, ekstraksi data, dan pertanyaan singkat.",
+    category: "Tugas & Riset",
+    description: "Model penalaran cerdas generasi ke-6 OpenAI: arsitektur responsif, pemahaman kontekstual maju, dan analitika presisi tinggi.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
-    ratio: 0.05,
+    ratio: 0.75,
     completionRatio: 5,
     featured: true
   },
@@ -57,8 +57,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Generasi baru efisiensi OpenAI untuk respons kilat, chatbot interaktif, dan parsing payload data terstruktur.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
-    ratio: 0.125,
-    completionRatio: 8,
+    ratio: 0.15,
+    completionRatio: 5,
     featured: true
   },
   {
@@ -102,10 +102,10 @@ export const modelsCatalog: ModelItem[] = [
     name: "GPT-6 Sol",
     providerId: "openai",
     category: "Tugas & Riset",
-    description: "Model penalaran profesional OpenAI untuk analitika riset multi-langkah dan sintesis komputasi mendalam.",
+    description: "Model penalaran profesional generasi ke-6 OpenAI untuk analitika riset multi-langkah, arsitektur sistem, dan sintesis komputasi mendalam.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
-    ratio: 1.0,
+    ratio: 1.75,
     completionRatio: 5,
     featured: true
   },
@@ -157,10 +157,10 @@ export const modelsCatalog: ModelItem[] = [
     name: "Claude Haiku 5.5",
     providerId: "anthropic",
     category: "Chat Hemat",
-    description: "Claude generasi terbaru paling ringan dan ekonomis. Kecepatan streaming instan untuk chat harian dan klasifikasi teks.",
+    description: "Generasi 5.5 teringan Anthropic: penalaran cepat generasi terbaru dengan kecepatan streaming instan dan gaya bahasa cerdas.",
     inputs: ["teks", "gambar"],
     endpoints: ["anthropic", "openai"],
-    ratio: 0.05,
+    ratio: 0.45,
     completionRatio: 5,
     featured: true
   },
@@ -169,10 +169,10 @@ export const modelsCatalog: ModelItem[] = [
     name: "Claude Haiku 4.5",
     providerId: "anthropic",
     category: "Chat Hemat",
-    description: "Claude versi ringan dan gesit. Gaya bahasa sopan khas Claude dengan biaya seperenam Sonnet.",
+    description: "Claude versi ringan dan gesit. Gaya bahasa sopan khas Claude dengan biaya sangat ekonomis.",
     inputs: ["teks", "gambar"],
     endpoints: ["anthropic", "openai"],
-    ratio: 0.5,
+    ratio: 0.25,
     completionRatio: 5
   },
   {
@@ -180,11 +180,11 @@ export const modelsCatalog: ModelItem[] = [
     name: "Claude 3.5 Haiku",
     providerId: "anthropic",
     category: "Chat Hemat",
-    description: "Model ringan ultra-cepat untuk customer service, ekstraksi data, dan parsing dokumen singkat.",
+    description: "Model ringan legacy ultra-cepat untuk customer service, ekstraksi data, dan parsing dokumen singkat.",
     inputs: ["teks", "gambar"],
     endpoints: ["anthropic", "openai"],
     contextTokens: 200_000,
-    ratio: 0.5,
+    ratio: 0.15,
     completionRatio: 5
   },
   {
@@ -218,7 +218,7 @@ export const modelsCatalog: ModelItem[] = [
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
     contextTokens: 200_000,
-    ratio: 1.0,
+    ratio: 1.75,
     completionRatio: 5,
     featured: true
   },
@@ -253,7 +253,7 @@ export const modelsCatalog: ModelItem[] = [
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
     contextTokens: 200_000,
-    ratio: 2.0,
+    ratio: 3.5,
     completionRatio: 5,
     featured: true
   },
@@ -440,18 +440,18 @@ export const modelsCatalog: ModelItem[] = [
     description: "Model koding kilat Google untuk integrasi CI/CD, parsing log server, dan penulisan skrip automasi.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai"],
-    ratio: 0.75,
-    completionRatio: 4.67
+    ratio: 0.15,
+    completionRatio: 5
   },
   {
     id: "gemini-4-argon",
     name: "Gemini 4 Argon",
     providerId: "google",
     category: "Ngoding",
-    description: "Eksperimen frontier terbaru Google DeepMind untuk reasoning tingkat tinggi dan pemecahan algoritma rumit.",
+    description: "Frontier generasi ke-4 terbaru Google DeepMind untuk reasoning tingkat tinggi dan pemecahan algoritma rumit.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["openai"],
-    ratio: 1.0,
+    ratio: 1.75,
     completionRatio: 5,
     featured: true
   },
@@ -501,22 +501,22 @@ export const modelsCatalog: ModelItem[] = [
     name: "Grok 4 Fast",
     providerId: "xai",
     category: "Tugas & Riset",
-    description: "Penalaran analitis cepat xAI untuk verifikasi data, pencarian logika kritis, dan sintesis ringkasan instan.",
+    description: "Penalaran analitis cepat xAI generasi ke-4 untuk verifikasi data, pencarian logika kritis, dan sintesis ringkasan instan.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 0.1,
-    completionRatio: 2.5
+    ratio: 1.25,
+    completionRatio: 4
   },
   {
     id: "grok-3-fast-beta",
     name: "Grok 3 Fast Beta",
     providerId: "xai",
     category: "Ngoding",
-    description: "Versi beta bertenaga xAI untuk sprint coding cepat, generate boilerplate, dan eksekusi instruksi technical.",
+    description: "Versi bertenaga xAI untuk sprint coding cepat, generate boilerplate, dan eksekusi instruksi technical.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 2.75,
-    completionRatio: 5
+    ratio: 0.75,
+    completionRatio: 4
   },
   {
     id: "grok-4",
@@ -602,8 +602,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Versi pro generasi K3.1 dengan pemahaman struktur kode kompleks dan chain-of-thought koding tingkat lanjut.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 37.5,
-    completionRatio: 1
+    ratio: 0.85,
+    completionRatio: 4
   },
   {
     id: "kimi-k3",
@@ -625,8 +625,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Akselerasi inference tinggi untuk penelusuran jurnal ilmiah, sintesis data, dan pembuatan makalah riset kilat.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 37.5,
-    completionRatio: 1
+    ratio: 1.15,
+    completionRatio: 4
   },
 
   // ==========================================
@@ -716,8 +716,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Model ultra-cepat ByteDance untuk percakapan sosial, rekomendasi konten, dan interaksi interaktif harian.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 37.5,
-    completionRatio: 1
+    ratio: 0.05,
+    completionRatio: 4
   },
   {
     id: "seed-2.0-lite",
@@ -727,8 +727,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Generasi 2.0 yang sangat efisien dari ByteDance. Kecepatan streaming tinggi dengan konsumsi token irit.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 37.5,
-    completionRatio: 1,
+    ratio: 0.08,
+    completionRatio: 4,
     featured: true
   },
   {
@@ -739,8 +739,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Model engineering ByteDance dengan pengoptimalan logika koding, refactoring skrip, dan penulisan algoritma.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 37.5,
-    completionRatio: 1,
+    ratio: 0.40,
+    completionRatio: 4.5,
     featured: true
   },
   {
@@ -751,8 +751,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Model koding ringan ByteDance untuk autocompletion di IDE, penulisan fungsi kecil, dan unit testing cepat.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 37.5,
-    completionRatio: 1
+    ratio: 0.15,
+    completionRatio: 4
   },
   {
     id: "seed-1.8",
@@ -762,8 +762,8 @@ export const modelsCatalog: ModelItem[] = [
     description: "Spesialis analisis tren, ekstraksi data riset, dan pengolahan dokumen komprehensif dari ByteDance AI Lab.",
     inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 37.5,
-    completionRatio: 1
+    ratio: 0.50,
+    completionRatio: 4
   },
   {
     id: "seedream-4.5",

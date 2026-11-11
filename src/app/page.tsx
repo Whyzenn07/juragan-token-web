@@ -308,6 +308,7 @@ export default function Home() {
     } else if (
       mName.includes("sonnet") ||
       mName.includes("sol") ||
+      mName.includes("luna") ||
       mName.includes("m2.5") ||
       mName.includes("m2.7") ||
       mName.includes("k2.7") ||
@@ -315,7 +316,6 @@ export default function Home() {
     ) {
       matched = retailPackages.find((p) => p.id === "pkt-skripsi-koding") || retailPackages[2];
     } else if (
-      mName.includes("luna") ||
       mName.includes("flash") ||
       mName.includes("qwen") ||
       mName.includes("haiku") ||
