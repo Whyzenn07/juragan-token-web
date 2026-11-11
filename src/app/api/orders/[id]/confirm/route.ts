@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { confirmOrder, tokenMatches } from "@/lib/orders";
-import { query } from "@/lib/store";
+import { query, mutate } from "@/lib/store";
 import { rateLimited, safeEqualHash, sha256 } from "@/lib/keys";
+import { fetchOrderFromSupabase } from "@/lib/supabase-sync";
 
 /**
  * Konfirmasi pembayaran. Diizinkan untuk:
  *  - admin: header `x-admin-secret` sama dengan ADMIN_SECRET, atau
- *  - mode demo: DEMO_MODE=true dan pemegang order token yang sah (tombol simulasi di modal).
+ *  - mode demo: DEMO_MODE !== "false" dan pemegang order token yang sah (tombol simulasi di modal).
  * Webhook SingaPay nanti cukup memanggil confirmOrder() yang sama setelah memverifikasi tanda tangannya.
  */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
@@ -22,7 +23,16 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
   let allowed = isAdmin;
   if (!allowed && process.env.DEMO_MODE !== "false") {
-    const order = await query((db) => db.orders[id]);
+    let order = await query((db) => db.orders[id]);
+    if (!order) {
+      const remote = await fetchOrderFromSupabase(id);
+      if (remote) {
+        order = remote;
+        await mutate((db) => {
+          db.orders[id] = remote;
+        });
+      }
+    }
     allowed = Boolean(order && tokenMatches(order, req.headers.get("x-order-token")));
   }
   if (!allowed) {
