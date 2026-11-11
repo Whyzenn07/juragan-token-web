@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   GATEWAY_BASE_URL,
   GATEWAY_ORIGIN,
@@ -81,6 +81,54 @@ function PaymentLogo({ type }: { type: string }) {
   );
 }
 
+export function validateEmailAddress(email: string): { isValid: boolean; error?: string; suggestion?: string } {
+  const trimmed = (email || "").trim();
+  if (!trimmed) {
+    return {
+      isValid: false,
+      error: "Alamat email wajib diisi untuk pengiriman kredensial API dan bukti transaksi.",
+    };
+  }
+
+  // RFC 5322 regex approximation for strict email validation
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+  if (!emailRegex.test(trimmed)) {
+    return {
+      isValid: false,
+      error: "Format email tidak valid. Masukkan alamat email yang tepat (contoh: nama@gmail.com).",
+    };
+  }
+
+  const parts = trimmed.split("@");
+  if (parts.length === 2) {
+    const domain = parts[1].toLowerCase();
+    const typoMap: Record<string, string> = {
+      "gmai.com": "gmail.com",
+      "gamil.com": "gmail.com",
+      "gmial.com": "gmail.com",
+      "gmaill.com": "gmail.com",
+      "gmal.com": "gmail.com",
+      "gemail.com": "gmail.com",
+      "yaho.com": "yahoo.com",
+      "yahooo.com": "yahoo.com",
+      "yahu.com": "yahoo.com",
+      "hotmial.com": "hotmail.com",
+      "hotmaill.com": "hotmail.com",
+      "outlok.com": "outlook.com",
+    };
+
+    if (typoMap[domain]) {
+      return {
+        isValid: false,
+        error: `Domain "@${domain}" salah ketik atau tidak dapat dijangkau.`,
+        suggestion: `Maksud Anda "@${typoMap[domain]}"? Harap gunakan email aktif yang tepat.`,
+      };
+    }
+  }
+
+  return { isValid: true };
+}
+
 export function PaymentModal({
   open,
   pkg: initialPkg,
@@ -97,6 +145,8 @@ export function PaymentModal({
   const [step, setStep] = useState<"checkout" | "payment" | "success">("checkout");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
+  const emailValidation = useMemo(() => validateEmailAddress(customerEmail), [customerEmail]);
   const [invoiceId, setInvoiceId] = useState("");
   const [orderToken, setOrderToken] = useState("");
   const [totalPaid, setTotalPaid] = useState<number | null>(null);
@@ -215,6 +265,7 @@ export function PaymentModal({
     setTargetApiKey("");
     setVerifiedKeyData(null);
     setKeyVerifyError("");
+    setEmailTouched(false);
     onClose();
   };
 
@@ -433,9 +484,23 @@ export function PaymentModal({
 
   const handleProceedPayment = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!customerEmail.trim() || !customerName.trim() || !pkg) {
-      if (!customerName.trim()) alert("Silakan masukkan Nama Lengkap terlebih dahulu.");
-      else if (!customerEmail.trim()) alert("Silakan masukkan Alamat Email untuk pengiriman bukti transaksi.");
+    if (!customerName.trim()) {
+      alert("Silakan masukkan Nama Lengkap terlebih dahulu.");
+      return;
+    }
+
+    const emailCheck = validateEmailAddress(customerEmail);
+    if (!emailCheck.isValid) {
+      setEmailTouched(true);
+      const alertMsg = emailCheck.suggestion
+        ? `⚠️ ${emailCheck.error}\n\n💡 ${emailCheck.suggestion}`
+        : `⚠️ ${emailCheck.error}`;
+      alert(alertMsg);
+      return;
+    }
+
+    if (!pkg) {
+      alert("Paket token belum dipilih. Silakan pilih paket kembali.");
       return;
     }
 
@@ -1379,7 +1444,13 @@ Mohon dibantu konfirmasi ya!`;
           gap: 6px !important;
           cursor: pointer !important;
         }
-        @media (max-width: 540px) {
+        .classai-input-grid {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+        @media (max-width: 640px) {
           .classai-checkout-modal {
             width: 100% !important;
             max-width: 100% !important;
@@ -1388,7 +1459,7 @@ Mohon dibantu konfirmasi ya!`;
           }
           .classai-input-grid {
             grid-template-columns: 1fr !important;
-            gap: 10px !important;
+            gap: 12px !important;
           }
           .classai-sticky-bottom {
             margin: 0 -16px 0 -16px !important;
@@ -1701,15 +1772,7 @@ Mohon dibantu konfirmasi ya!`;
             </div>
           )}
 
-          <div
-            className="classai-input-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "12px",
-              marginBottom: "16px",
-            }}
-          >
+          <div className="classai-input-grid">
             <div className="cig-col" style={{ display: "flex", flexDirection: "column" }}>
               <label
                 className="cig-label"
@@ -1722,7 +1785,9 @@ Mohon dibantu konfirmasi ya!`;
                   color: "#334155",
                 }}
               >
-                Nama Lengkap
+                <span>
+                  Nama Lengkap <span style={{ color: "#ef4444" }}>*</span>
+                </span>
                 <input
                   type="text"
                   required
@@ -1732,7 +1797,7 @@ Mohon dibantu konfirmasi ya!`;
                   className="cig-input"
                   style={{
                     width: "100%",
-                    height: "40px",
+                    height: "42px",
                     border: "1px solid #cbd5e1",
                     borderRadius: "9px",
                     padding: "8px 12px",
@@ -1757,28 +1822,57 @@ Mohon dibantu konfirmasi ya!`;
                   color: "#334155",
                 }}
               >
-                Email (Kredensial API dikirim ke sini)
+                <span>
+                  Email <span style={{ color: "#0a58ca" }}>(Kredensial API dikirim ke sini)</span>
+                  <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
+                </span>
                 <input
                   type="email"
                   required
                   placeholder="nama@email.com"
                   value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  className="cig-input"
+                  onChange={(e) => {
+                    setCustomerEmail(e.target.value);
+                    if (!emailTouched) setEmailTouched(true);
+                  }}
+                  onBlur={() => setEmailTouched(true)}
+                  className={`cig-input ${emailTouched && !emailValidation.isValid ? "is-invalid" : ""} ${emailTouched && emailValidation.isValid ? "is-valid" : ""}`}
                   style={{
                     width: "100%",
-                    height: "40px",
-                    border: "1px solid #cbd5e1",
+                    height: "42px",
+                    border: emailTouched && !emailValidation.isValid
+                      ? "1.5px solid #ef4444"
+                      : (emailTouched && emailValidation.isValid ? "1.5px solid #10b981" : "1px solid #cbd5e1"),
                     borderRadius: "9px",
                     padding: "8px 12px",
                     fontSize: "13px",
-                    background: "#ffffff",
+                    background: emailTouched && !emailValidation.isValid ? "#fff5f5" : "#ffffff",
                     color: "#0f172a",
                     outline: "none",
                     boxSizing: "border-box",
+                    transition: "border-color 0.2s, background 0.2s",
                   }}
                 />
               </label>
+              {emailTouched && !emailValidation.isValid && (
+                <div style={{ marginTop: "5px", fontSize: "11px", color: "#dc2626", fontWeight: 600, lineHeight: 1.35, display: "flex", alignItems: "flex-start", gap: "4px" }}>
+                  <span aria-hidden="true">⚠️</span>
+                  <span>
+                    {emailValidation.error}
+                    {emailValidation.suggestion && (
+                      <span style={{ display: "block", color: "#b91c1c", marginTop: "2px", fontWeight: 700 }}>
+                        👉 {emailValidation.suggestion}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )}
+              {emailTouched && emailValidation.isValid && (
+                <div style={{ marginTop: "4px", fontSize: "11px", color: "#16a34a", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span aria-hidden="true">✓</span>
+                  <span>Kredensial API &amp; invoice akan dikirim ke email ini</span>
+                </div>
+              )}
             </div>
           </div>
 

@@ -30,7 +30,13 @@ export async function createOrder(
   const customerPhone = (input.customerPhone ?? "").trim().slice(0, 20);
 
   if (!customerName) return { ok: false, status: 400, error: "Nama lengkap wajib diisi." };
-  if (!EMAIL_RE.test(customerEmail)) return { ok: false, status: 400, error: "Format email tidak valid." };
+  if (!EMAIL_RE.test(customerEmail)) return { ok: false, status: 400, error: "Format email tidak valid. Harap gunakan alamat email aktif yang tepat." };
+
+  const emailDomain = customerEmail.split("@")[1]?.toLowerCase() || "";
+  const invalidDomainTypos = ["gmai.com", "gamil.com", "gmial.com", "gmaill.com", "gmal.com", "gemail.com", "yaho.com", "yahooo.com", "yahu.com", "hotmial.com", "hotmaill.com", "outlok.com"];
+  if (invalidDomainTypos.includes(emailDomain)) {
+    return { ok: false, status: 400, error: `Domain email @${emailDomain} tidak valid. Harap gunakan alamat email aktif yang tepat (misal: @gmail.com) agar kredensial API dapat terkirim.` };
+  }
 
   const pkg = retailPackages.find((p) => p.id === input.packageId);
   if (!pkg) return { ok: false, status: 400, error: "Paket tidak ditemukan." };

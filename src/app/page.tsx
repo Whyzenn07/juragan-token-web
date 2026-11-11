@@ -465,7 +465,7 @@ export default function Home() {
                 <rect width="18" height="12" stroke="#cbd5e1" strokeWidth="0.5" rx="1" />
               </svg>
             </span>
-            <span>Indonesia (IDR)</span>
+            <span className="region-name-text">Indonesia (IDR)</span>
             <span className="currency-pill-badge" aria-hidden="true">BI Live</span>
           </button>
           <span className="header-divider" />
@@ -522,6 +522,17 @@ export default function Home() {
             <a href="#katalog-retail" onClick={() => setMobileMenuOpen(false)}>
               Paket Prabayar Ritel
             </a>
+            <button
+              type="button"
+              className="mobile-link-btn"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setBalanceModalOpen(true);
+              }}
+            >
+              <span>🔑 Cek Saldo Virtual Key</span>
+              <span aria-hidden="true">↗</span>
+            </button>
             <Link href="/docs" onClick={() => setMobileMenuOpen(false)}>
               Dokumentasi API &amp; Panduan ↗
             </Link>
