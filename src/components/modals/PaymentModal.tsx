@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GATEWAY_BASE_URL, RetailPackage, ModelItem, paymentMethods, unitsForBudget, retailPackages } from "@/data/catalog";
+import {
+  GATEWAY_BASE_URL,
+  GATEWAY_ORIGIN,
+  RetailPackage,
+  ModelItem,
+  paymentMethods,
+  unitsForBudget,
+  retailPackages,
+  modelsCatalog,
+  isPerImage,
+} from "@/data/catalog";
 import { Dialog } from "./Dialog";
 import { Icon, BrandMark } from "@/components/ui/Icon";
 import { ProviderLogo } from "@/components/ui/ProviderLogo";
@@ -81,6 +91,8 @@ export function SingaPayModal({
 }: SingaPayModalProps) {
   const [selectedPkg, setSelectedPkg] = useState<RetailPackage | null>(initialPkg);
   const [showPkgSwitcher, setShowPkgSwitcher] = useState(false);
+  const [activeModel, setActiveModel] = useState<ModelItem | null>(model || null);
+  const [showModelSwitcher, setShowModelSwitcher] = useState(false);
   const pkg = selectedPkg || initialPkg;
   const [selectedMethod, setSelectedMethod] = useState("qris");
   const [openCategory, setOpenCategory] = useState<"qris" | "ewallet" | "va">("qris");
@@ -131,6 +143,7 @@ export function SingaPayModal({
       if (initialPkg) {
         setSelectedPkg(initialPkg);
       }
+      setActiveModel(model || null);
       if (initialMode) {
         setCheckoutMode(initialMode);
       }
@@ -139,6 +152,7 @@ export function SingaPayModal({
         verifyTargetKey(initialTargetKey);
       }
       setShowPkgSwitcher(false);
+      setShowModelSwitcher(false);
 
       if (typeof window !== "undefined") {
         const timer = setTimeout(() => {
@@ -309,6 +323,42 @@ export function SingaPayModal({
   const basePrice = pkg ? pkg.priceIdr : 0;
   const totalPrice = basePrice + adminFee;
 
+  const resolveFallbackModel = (p?: RetailPackage | null): ModelItem | null => {
+    if (!p) return null;
+    if (p.id === "pkt-mhs-uji") return modelsCatalog.find((m) => m.id === "deepseek-v4-flash") || null;
+    if (p.id === "pkt-mhs-starter") return modelsCatalog.find((m) => m.id === "gemini-3.8-flash") || null;
+    if (p.id === "pkt-skripsi-koding") return modelsCatalog.find((m) => m.id === "claude-sonnet-5-5") || null;
+    if (p.id === "pkt-pro-builder") return modelsCatalog.find((m) => m.id === "claude-sonnet-5-5") || null;
+    return (
+      modelsCatalog.find((m) => p.recommendedModel.toLowerCase().includes(m.name.toLowerCase())) ||
+      modelsCatalog[0] ||
+      null
+    );
+  };
+
+  const targetModel = activeModel || resolveFallbackModel(pkg);
+  const currentBudget = totalPaid || totalPrice || (pkg ? pkg.priceIdr : 0);
+  const estInteractions = targetModel ? unitsForBudget(targetModel, currentBudget) : 0;
+  const unitLabel = targetModel && isPerImage(targetModel) ? "Gambar" : "Interaksi";
+  const estText = targetModel
+    ? `±${new Intl.NumberFormat("id-ID").format(estInteractions)} ${unitLabel} · ${targetModel.name}`
+    : (pkg ? pkg.estToken : "Saldo Universal");
+
+  const gatewayHost = (GATEWAY_ORIGIN || process.env.NEXT_PUBLIC_APP_URL || "https://api.tokotokenai.com")
+    .replace(/^https?:\/\//, "")
+    .replace(/\/.*$/, "");
+
+  const popularQuickModels = [
+    modelsCatalog.find((m) => m.id === "gemini-3.8-flash"),
+    modelsCatalog.find((m) => m.id === "gemini-3.1-pro"),
+    modelsCatalog.find((m) => m.id === "gpt-6-sol"),
+    modelsCatalog.find((m) => m.id === "gpt-5.6-terra"),
+    modelsCatalog.find((m) => m.id === "claude-sonnet-5-5"),
+    modelsCatalog.find((m) => m.id === "claude-opus-5-5"),
+    modelsCatalog.find((m) => m.id === "deepseek-v4-flash"),
+    modelsCatalog.find((m) => m.id === "kimi-k2.7-code"),
+  ].filter(Boolean) as ModelItem[];
+
   const isEwalletSelected = selectedMethod.startsWith("va-gopay") || selectedMethod.startsWith("va-dana") || selectedMethod.startsWith("va-ovo") || selectedMethod.startsWith("va-shopeepay");
   const isVaSelected = selectedMethod.startsWith("va-bni") || selectedMethod.startsWith("va-bri") || selectedMethod.startsWith("va-bca") || selectedMethod.startsWith("va-mandiri") || selectedMethod.startsWith("transfer-");
 
@@ -426,6 +476,8 @@ export function SingaPayModal({
           customerName: customerName.trim(),
           customerEmail: customerEmail.trim(),
           existingApiKey: checkoutMode === "topup" ? targetApiKey.trim() : undefined,
+          modelName: targetModel ? targetModel.name : undefined,
+          estToken: estText,
         }),
       });
       const data = await res.json();
@@ -541,9 +593,10 @@ export function SingaPayModal({
     const msg = `Halo Admin Juragan Token! 👋
 Saya ingin memesan token API AI:
 • Invoice: *${inv}*
-• Paket: *${pkg?.name}* (${pkg?.estToken})
+• Paket: *${pkg?.name}* (${estText})
+• Model AI: *${targetModel ? targetModel.name : "Universal"}*
 • Metode: ${currentMethod.name}
-• Total: *${formatIdr(totalPrice)}*
+• Total: *${formatIdr(totalPaid || totalPrice)}*
 • Nama: *${customerName}*
 • Email: *${customerEmail || "-"}*
 Mohon dibantu konfirmasi ya!`;
@@ -1476,9 +1529,9 @@ Mohon dibantu konfirmasi ya!`;
             }}
           >
             <div className="cosc-left" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "12px", minWidth: 0, flex: 1 }}>
-              {model ? (
+              {targetModel ? (
                 <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dbeafe", flexShrink: 0, boxShadow: "0 1px 3px rgba(10, 88, 202, 0.06)" }}>
-                  <ProviderLogo provider={model.providerId} size={26} />
+                  <ProviderLogo provider={targetModel.providerId} size={26} />
                 </div>
               ) : (
                 <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "10px", background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)", border: "1px solid #bfdbfe", flexShrink: 0, boxShadow: "0 1px 3px rgba(10, 88, 202, 0.08)" }} title="Juragan Token Universal AI">
@@ -1494,7 +1547,10 @@ Mohon dibantu konfirmasi ya!`;
                   </span>
                   <button
                     type="button"
-                    onClick={() => setShowPkgSwitcher(!showPkgSwitcher)}
+                    onClick={() => {
+                      setShowPkgSwitcher(!showPkgSwitcher);
+                      setShowModelSwitcher(false);
+                    }}
                     style={{
                       border: "none",
                       background: "transparent",
@@ -1509,14 +1565,33 @@ Mohon dibantu konfirmasi ya!`;
                   >
                     {showPkgSwitcher ? "Tutup ✕" : "Ganti Paket ▾"}
                   </button>
+                  <span style={{ color: "#cbd5e1", fontSize: "11px" }}>•</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowModelSwitcher(!showModelSwitcher);
+                      setShowPkgSwitcher(false);
+                    }}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: "#0a58ca",
+                      fontSize: "11px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      padding: "0 2px",
+                      textDecoration: "underline",
+                    }}
+                    title="Pilih model AI yang ditargetkan"
+                  >
+                    {showModelSwitcher ? "Tutup ✕" : `Model: ${targetModel ? targetModel.name : "Universal"} ▾`}
+                  </button>
                 </div>
                 <strong className="cosc-pkg-name" style={{ display: "block", fontSize: "15px", fontWeight: 800, color: "#0a2540", lineHeight: 1.25 }}>
                   {pkg ? pkg.name : "Paket Token"}
                 </strong>
                 <span className="cosc-pkg-token" style={{ display: "block", fontSize: "12px", color: "#475569", lineHeight: 1.35 }}>
-                  {model && pkg
-                    ? `±${new Intl.NumberFormat("id-ID").format(unitsForBudget(model, pkg.priceIdr))} Interaksi · ${model.name} · Saldo Universal`
-                    : pkg ? `${pkg.estToken} · Saldo Universal` : "Saldo Universal"}
+                  {estText} · Saldo Universal
                 </span>
               </div>
             </div>
@@ -1575,6 +1650,60 @@ Mohon dibantu konfirmasi ya!`;
                     </div>
                     <span style={{ fontSize: "10.5px", color: "#64748b", marginTop: "2px" }}>
                       {p.targetUser} · {p.badge}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Inline Model Switcher Menu */}
+          {showModelSwitcher && (
+            <div
+              className="cosc-model-picker"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "8px",
+                background: "#f8fafc",
+                border: "1px solid #cbd5e1",
+                borderRadius: "12px",
+                padding: "10px",
+                marginBottom: "16px",
+              }}
+            >
+              {popularQuickModels.map((m) => {
+                const isCurrent = m.id === targetModel?.id;
+                const mUnits = unitsForBudget(m, pkg ? pkg.priceIdr : 0);
+                const mUnitLabel = isPerImage(m) ? "Gambar" : "Interaksi";
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveModel(m);
+                      setShowModelSwitcher(false);
+                    }}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      padding: "8px 10px",
+                      borderRadius: "8px",
+                      border: isCurrent ? "1.5px solid #0a58ca" : "1px solid #e2e8f0",
+                      background: isCurrent ? "#eff6ff" : "#ffffff",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
+                      <strong style={{ fontSize: "12px", color: isCurrent ? "#0a58ca" : "#0f172a", fontWeight: 750 }}>
+                        {m.name}
+                      </strong>
+                    </div>
+                    <span style={{ fontSize: "10.5px", color: "#64748b", marginTop: "2px" }}>
+                      ±{new Intl.NumberFormat("id-ID").format(mUnits)} {mUnitLabel}
                     </span>
                   </button>
                 );
@@ -2215,7 +2344,7 @@ Mohon dibantu konfirmasi ya!`;
             </div>
             <div className="cpv-info-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12.5px" }}>
               <span className="cpv-label" style={{ fontSize: "11px", color: "#64748b", fontWeight: 700, letterSpacing: "0.04em" }}>PAKET AI</span>
-              <strong style={{ color: "#0f172a" }}>{pkg.name} ({pkg.estToken})</strong>
+              <strong style={{ color: "#0f172a" }}>{pkg.name} ({estText})</strong>
             </div>
           </div>
 
@@ -2791,7 +2920,7 @@ Mohon dibantu konfirmasi ya!`;
               {checkoutMode === "topup" ? (
                 <>Saldo tambahan sebesar <b>{formatIdr(totalPaid || totalPrice)}</b> telah langsung aktif di API Key Anda tanpa perlu ganti setting di IDE.</>
               ) : (
-                <>Saldo akun sebesar <b>{formatIdr(totalPaid || totalPrice)}</b> ({pkg.estToken}) telah aktif permanen di gateway juragantoken.co.id.</>
+                <>Saldo akun sebesar <b>{formatIdr(totalPaid || totalPrice)}</b> ({estText}) telah aktif permanen di gateway {gatewayHost}.</>
               )}
             </p>
           </div>
@@ -2816,8 +2945,10 @@ Mohon dibantu konfirmasi ya!`;
             </div>
             <span className="csv-key-note" style={{ display: "block", fontSize: "11px", color: "#94a3b8", lineHeight: 1.4 }}>
               {checkoutMode === "topup"
-                ? "Saldo telah aktif seketika. Konfigurasi di Cursor, VS Code, atau Claude Code Anda tidak perlu diubah sama sekali."
-                : "Simpan API key ini dengan aman. Key dapat langsung dipakai di Claude Code, Cursor, Chatbox, dan LibreChat."}
+                ? `Saldo telah aktif seketika. Konfigurasi di Cursor, VS Code, atau ${targetModel ? targetModel.name : "Claude Code"} Anda tidak perlu diubah sama sekali.`
+                : targetModel
+                  ? `Simpan API key ini dengan aman. Key universal ini dapat langsung dipakai untuk model ${targetModel.name}, Cursor, Chatbox, dan LibreChat.`
+                  : "Simpan API key ini dengan aman. Key dapat langsung dipakai untuk semua model AI di Cursor, Chatbox, Claude Code, dan LibreChat."}
             </span>
           </div>
 

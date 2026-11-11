@@ -15,6 +15,8 @@ export type CreateOrderInput = {
   customerEmail?: string;
   customerPhone?: string;
   existingApiKey?: string;
+  modelName?: string;
+  estToken?: string;
 };
 
 export type OrderResult<T> = { ok: true; value: T } | { ok: false; status: number; error: string };
@@ -73,6 +75,11 @@ export async function createOrder(
 
   const invoiceId = generateInvoiceId();
   const orderToken = generateOrderToken();
+  const estPackage = (input.estToken ?? "").trim() || pkg.estToken;
+  const packageName = input.modelName?.trim()
+    ? `${pkg.name} (${input.modelName.trim()})`
+    : pkg.name;
+
   const order: Order = {
     id: invoiceId,
     tokenHash: sha256(orderToken),
@@ -80,8 +87,8 @@ export async function createOrder(
     customerEmail,
     customerPhone,
     packageId: pkg.id,
-    packageName: pkg.name,
-    estPackage: pkg.estToken,
+    packageName,
+    estPackage,
     baseIdr: pkg.priceIdr,
     feeIdr: method.feeAmount ?? 0,
     totalIdr: pkg.priceIdr + (method.feeAmount ?? 0),
