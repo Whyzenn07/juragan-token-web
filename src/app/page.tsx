@@ -10,7 +10,7 @@ import {
   ProviderLogo,
   RegionBadge,
   SetupGuides,
-  SingaPayModal,
+  PaymentModal,
   TokenBalanceModal
 } from "@/components";
 import {
@@ -170,7 +170,7 @@ export default function Home() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<RetailPackage | null>(null);
   const [checkoutModel, setCheckoutModel] = useState<ModelItem | null>(null);
-  const [singaPayOpen, setSingaPayOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [checkoutInitialMode, setCheckoutInitialMode] = useState<"new" | "topup">("new");
   const [checkoutInitialKey, setCheckoutInitialKey] = useState<string>("");
   const [balanceModalOpen, setBalanceModalOpen] = useState(false);
@@ -327,7 +327,7 @@ export default function Home() {
     setCheckoutModel(model);
     setCheckoutInitialMode("new");
     setCheckoutInitialKey("");
-    setSingaPayOpen(true);
+    setPaymentModalOpen(true);
   };
 
   // Filter & Sort Logic
@@ -1448,7 +1448,7 @@ export default function Home() {
                       setCheckoutModel(null);
                       setCheckoutInitialMode("new");
                       setCheckoutInitialKey("");
-                      setSingaPayOpen(true);
+                      setPaymentModalOpen(true);
                     }}
                   >
                     Beli Paket ↗
@@ -1742,15 +1742,15 @@ export default function Home() {
         }}
       />
 
-      {/* SingaPay Checkout Modal (QRIS & Virtual Account) */}
-      <SingaPayModal
-        open={singaPayOpen}
+      {/* Payment Checkout Modal (QRIS & Virtual Account) */}
+      <PaymentModal
+        open={paymentModalOpen}
         pkg={selectedPackage}
         model={checkoutModel}
         initialMode={checkoutInitialMode}
         initialTargetKey={checkoutInitialKey}
         onClose={() => {
-          setSingaPayOpen(false);
+          setPaymentModalOpen(false);
           setCheckoutInitialMode("new");
           setCheckoutInitialKey("");
         }}
@@ -1766,7 +1766,7 @@ export default function Home() {
           setCheckoutModel(null);
           setCheckoutInitialMode("topup");
           setCheckoutInitialKey(key || "");
-          setSingaPayOpen(true);
+          setPaymentModalOpen(true);
         }}
       />
 

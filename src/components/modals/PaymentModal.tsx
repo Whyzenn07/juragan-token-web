@@ -8,7 +8,6 @@ import {
   ModelItem,
   paymentMethods,
   unitsForBudget,
-  retailPackages,
   modelsCatalog,
   isPerImage,
 } from "@/data/catalog";
@@ -17,7 +16,7 @@ import { Icon, BrandMark } from "@/components/ui/Icon";
 import { ProviderLogo } from "@/components/ui/ProviderLogo";
 import { PaymentSuccessMark } from "@/components/ui/PaymentSuccessMark";
 
-type SingaPayModalProps = {
+export type PaymentModalProps = {
   open: boolean;
   pkg: RetailPackage | null;
   model?: ModelItem | null;
@@ -25,6 +24,7 @@ type SingaPayModalProps = {
   initialMode?: "new" | "topup";
   initialTargetKey?: string;
 };
+export type SingaPayModalProps = PaymentModalProps;
 
 // Official authentic vector logos from idn-finlogos (Xendit / Midtrans standard)
 function PaymentLogo({ type }: { type: string }) {
@@ -81,14 +81,14 @@ function PaymentLogo({ type }: { type: string }) {
   );
 }
 
-export function SingaPayModal({
+export function PaymentModal({
   open,
   pkg: initialPkg,
   model,
   onClose,
   initialMode = "new",
   initialTargetKey = "",
-}: SingaPayModalProps) {
+}: PaymentModalProps) {
   const [selectedPkg, setSelectedPkg] = useState<RetailPackage | null>(initialPkg);
   const [activeModel, setActiveModel] = useState<ModelItem | null>(model || null);
   const pkg = selectedPkg || initialPkg;
@@ -136,34 +136,6 @@ export function SingaPayModal({
   const [keyVerifyError, setKeyVerifyError] = useState("");
   const [savedKeyHint, setSavedKeyHint] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (open) {
-      if (initialPkg) {
-        setSelectedPkg(initialPkg);
-      }
-      setActiveModel(model || null);
-      if (initialMode) {
-        setCheckoutMode(initialMode);
-      }
-      if (initialTargetKey) {
-        setTargetApiKey(initialTargetKey);
-        verifyTargetKey(initialTargetKey);
-      }
-
-      if (typeof window !== "undefined") {
-        const timer = setTimeout(() => {
-          try {
-            const last = sessionStorage.getItem("jt_last_api_key");
-            if (last) setSavedKeyHint(last);
-          } catch {
-            // ignore
-          }
-        }, 0);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [open, initialPkg, initialMode, initialTargetKey, model]);
-
   const verifyTargetKey = async (keyToVerify: string) => {
     const clean = keyToVerify.trim();
     if (!clean) return;
@@ -194,6 +166,33 @@ export function SingaPayModal({
       setVerifyingKey(false);
     }
   };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const timer = setTimeout(() => {
+      if (initialPkg) {
+        setSelectedPkg(initialPkg);
+      }
+      setActiveModel(model || null);
+      if (initialMode) {
+        setCheckoutMode(initialMode);
+      }
+      if (initialTargetKey) {
+        setTargetApiKey(initialTargetKey);
+        verifyTargetKey(initialTargetKey);
+      }
+
+      try {
+        const last = sessionStorage.getItem("jt_last_api_key");
+        if (last) setSavedKeyHint(last);
+      } catch {
+        // ignore
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [open, initialPkg, initialMode, initialTargetKey, model]);
 
   const adminWaNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990";
 
@@ -2819,4 +2818,5 @@ Mohon dibantu konfirmasi ya!`;
   );
 }
 
-export { SingaPayModal as PaymentModal };
+export { PaymentModal as SingaPayModal };
+export default PaymentModal;

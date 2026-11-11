@@ -56,7 +56,7 @@ export async function GET() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-    let res = await fetch("https://api.tokotokenai.com/api/pricing", {
+    const res = await fetch("https://api.tokotokenai.com/api/pricing", {
       signal: controller.signal,
       next: { revalidate: 300 }
     }).catch(() => null);

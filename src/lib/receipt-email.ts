@@ -262,7 +262,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
               <div style="text-align:center;font-size:12px;color:#94a3b8;line-height:1.75;border-top:1px solid #f1f5f9;padding-top:18px;">
                 <div style="color:#64748b;font-weight:500;margin-bottom:4px;">Terima kasih telah menggunakan layanan kami.</div>
                 <div>
-                  <a href="https://wa.me/${adminWaRaw}" target="_blank" style="color:#1d4ed8;font-weight:600;text-decoration:none;">WhatsApp Admin</a>
+                  <a href="https://wa.me/${adminWaRaw}" target="_blank" style="color:#1d4ed8;font-weight:600;text-decoration:none;">WhatsApp Admin (${adminWaFormatted})</a>
                   &nbsp;&bull;&nbsp;
                   <a href="${officialWeb}" target="_blank" style="color:#1d4ed8;font-weight:600;text-decoration:none;">api.tokotokenai.com</a>
                 </div>
