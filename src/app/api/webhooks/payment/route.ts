@@ -106,10 +106,11 @@ export async function POST(req: NextRequest) {
     if (isPaid) {
       const confirmRes = await confirmOrder(orderId);
       if (!confirmRes.ok) {
-        // Jika order sudah dibayar sebelumnya (idempotent), tetap kembalikan HTTP 200 OK ke payment gateway
+        // Jika order sudah dibayar sebelumnya (idempotent), kembalikan HTTP 200 agar gateway tidak terus retry
         if (confirmRes.status === 410) {
-          return NextResponse.json({ success: false, error: confirmRes.error }, { status: 410 });
+          return NextResponse.json({ success: true, message: confirmRes.error }, { status: 200 });
         }
+        return NextResponse.json({ success: false, error: confirmRes.error }, { status: confirmRes.status || 400 });
       }
       return NextResponse.json({
         success: true,

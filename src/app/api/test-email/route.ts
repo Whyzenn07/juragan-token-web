@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendReceiptEmail } from "@/lib/receipt-email";
 
 export async function GET(req: NextRequest) {
+  // Pengamanan Server: Hanya izinkan test email jika DEMO_MODE aktif atau memiliki header x-admin-secret
+  const isDemo = process.env.DEMO_MODE === "true" || process.env.NODE_ENV !== "production";
+  const adminSecret = process.env.ADMIN_SECRET?.trim();
+  const providedSecret = req.headers.get("x-admin-secret") || new URL(req.url).searchParams.get("secret");
+
+  if (!isDemo && (!adminSecret || providedSecret !== adminSecret)) {
+    return NextResponse.json(
+      { success: false, error: "Akses ditolak: Endpoint ini diproteksi. Sertakan header x-admin-secret." },
+      { status: 403 }
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const targetEmail = searchParams.get("to")?.trim() || "wahyuargomu123@gmail.com";
   const customerName = searchParams.get("name")?.trim() || "Wahyu Argo";
