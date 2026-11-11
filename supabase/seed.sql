@@ -17,7 +17,7 @@ insert into public.orders (
     'Paket Pro Builder',
     '±833 Interaksi · Claude',
     149000, 0, 149000,
-    'qris', 'QRIS SingaPay (Instan)',
+    'qris', 'QRIS (Instan)',
     'paid', '2026-11-01T15:57:45.500Z', '2026-11-01T15:58:18.508Z',
     '3f6d62aaee5fc7153cf9174ccbc27a3543db3286bb20066eb0b06c7d668b708e',
     'simulated', 'Mode simulasi: kredensial Gmail belum diisi, email untuk budi@kampus.ac.id tidak dikirim.'

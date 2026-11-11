@@ -90,9 +90,7 @@ export function SingaPayModal({
   initialTargetKey = "",
 }: SingaPayModalProps) {
   const [selectedPkg, setSelectedPkg] = useState<RetailPackage | null>(initialPkg);
-  const [showPkgSwitcher, setShowPkgSwitcher] = useState(false);
   const [activeModel, setActiveModel] = useState<ModelItem | null>(model || null);
-  const [showModelSwitcher, setShowModelSwitcher] = useState(false);
   const pkg = selectedPkg || initialPkg;
   const [selectedMethod, setSelectedMethod] = useState("qris");
   const [openCategory, setOpenCategory] = useState<"qris" | "ewallet" | "va">("qris");
@@ -151,8 +149,6 @@ export function SingaPayModal({
         setTargetApiKey(initialTargetKey);
         verifyTargetKey(initialTargetKey);
       }
-      setShowPkgSwitcher(false);
-      setShowModelSwitcher(false);
 
       if (typeof window !== "undefined") {
         const timer = setTimeout(() => {
@@ -166,7 +162,7 @@ export function SingaPayModal({
         return () => clearTimeout(timer);
       }
     }
-  }, [open, initialPkg, initialMode, initialTargetKey]);
+  }, [open, initialPkg, initialMode, initialTargetKey, model]);
 
   const verifyTargetKey = async (keyToVerify: string) => {
     const clean = keyToVerify.trim();
@@ -348,16 +344,6 @@ export function SingaPayModal({
     .replace(/^https?:\/\//, "")
     .replace(/\/.*$/, "");
 
-  const popularQuickModels = [
-    modelsCatalog.find((m) => m.id === "gemini-3.8-flash"),
-    modelsCatalog.find((m) => m.id === "gemini-3.1-pro"),
-    modelsCatalog.find((m) => m.id === "gpt-6-sol"),
-    modelsCatalog.find((m) => m.id === "gpt-5.6-terra"),
-    modelsCatalog.find((m) => m.id === "claude-sonnet-5-5"),
-    modelsCatalog.find((m) => m.id === "claude-opus-5-5"),
-    modelsCatalog.find((m) => m.id === "deepseek-v4-flash"),
-    modelsCatalog.find((m) => m.id === "kimi-k2.7-code"),
-  ].filter(Boolean) as ModelItem[];
 
   const isEwalletSelected = selectedMethod.startsWith("va-gopay") || selectedMethod.startsWith("va-dana") || selectedMethod.startsWith("va-ovo") || selectedMethod.startsWith("va-shopeepay");
   const isVaSelected = selectedMethod.startsWith("va-bni") || selectedMethod.startsWith("va-bri") || selectedMethod.startsWith("va-bca") || selectedMethod.startsWith("va-mandiri") || selectedMethod.startsWith("transfer-");
@@ -730,24 +716,20 @@ Mohon dibantu konfirmasi ya!`;
           gap: 2px !important;
           min-width: 0 !important;
         }
-        .cosc-badge {
-          font-size: 10px !important;
-          font-weight: 750 !important;
-          color: #1d4ed8 !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.04em !important;
-        }
         .cosc-pkg-name {
           font-size: 15px !important;
           font-weight: 800 !important;
           color: #0a2540 !important;
+          line-height: 1.25 !important;
         }
-        .cosc-pkg-token {
-          font-size: 12px !important;
-          color: #475569 !important;
+        .cosc-pkg-model {
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          color: #0a58ca !important;
+          line-height: 1.3 !important;
         }
         .cosc-price {
-          font-size: 18px !important;
+          font-size: 19px !important;
           font-weight: 800 !important;
           color: #0a58ca !important;
           letter-spacing: -0.02em !important;
@@ -1514,7 +1496,7 @@ Mohon dibantu konfirmasi ya!`;
             </p>
           </div>
 
-          {/* Package Order Info & Customer Fields */}
+          {/* Package Order Info: Hanya Nama Paket, Model AI, dan Harga Saja */}
           <div
             className="classai-order-summary-card"
             style={{
@@ -1524,192 +1506,37 @@ Mohon dibantu konfirmasi ya!`;
               background: "#f0f7ff",
               border: "1px solid #bfdbfe",
               borderRadius: "14px",
-              padding: "12px 16px",
+              padding: "14px 18px",
               marginBottom: "16px",
             }}
           >
-            <div className="cosc-left" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "12px", minWidth: 0, flex: 1 }}>
+            <div className="cosc-left" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "14px", minWidth: 0, flex: 1 }}>
               {targetModel ? (
-                <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dbeafe", flexShrink: 0, boxShadow: "0 1px 3px rgba(10, 88, 202, 0.06)" }}>
-                  <ProviderLogo provider={targetModel.providerId} size={26} />
+                <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "44px", height: "44px", borderRadius: "12px", background: "#ffffff", border: "1px solid #dbeafe", flexShrink: 0, boxShadow: "0 2px 6px rgba(10, 88, 202, 0.08)" }}>
+                  <ProviderLogo provider={targetModel.providerId} size={28} />
                 </div>
               ) : (
-                <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "10px", background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)", border: "1px solid #bfdbfe", flexShrink: 0, boxShadow: "0 1px 3px rgba(10, 88, 202, 0.08)" }} title="Juragan Token Universal AI">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="cosc-logo-wrap" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)", border: "1px solid #bfdbfe", flexShrink: 0, boxShadow: "0 2px 6px rgba(10, 88, 202, 0.08)" }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a58ca" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="rgba(10, 88, 202, 0.18)" />
                   </svg>
                 </div>
               )}
-              <div className="cosc-info" style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span className="cosc-badge" style={{ display: "inline-block", fontSize: "10px", fontWeight: 750, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.2 }}>
-                    {pkg ? (pkg.badge || "Pilihan Siap Pakai") : "Paket AI"}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowPkgSwitcher(!showPkgSwitcher);
-                      setShowModelSwitcher(false);
-                    }}
-                    style={{
-                      border: "none",
-                      background: "transparent",
-                      color: "#0a58ca",
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      padding: "0 2px",
-                      textDecoration: "underline",
-                    }}
-                    title="Pilih paket nominal lain"
-                  >
-                    {showPkgSwitcher ? "Tutup ✕" : "Ganti Paket ▾"}
-                  </button>
-                  <span style={{ color: "#cbd5e1", fontSize: "11px" }}>•</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowModelSwitcher(!showModelSwitcher);
-                      setShowPkgSwitcher(false);
-                    }}
-                    style={{
-                      border: "none",
-                      background: "transparent",
-                      color: "#0a58ca",
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      padding: "0 2px",
-                      textDecoration: "underline",
-                    }}
-                    title="Pilih model AI yang ditargetkan"
-                  >
-                    {showModelSwitcher ? "Tutup ✕" : `Model: ${targetModel ? targetModel.name : "Universal"} ▾`}
-                  </button>
-                </div>
-                <strong className="cosc-pkg-name" style={{ display: "block", fontSize: "15px", fontWeight: 800, color: "#0a2540", lineHeight: 1.25 }}>
+              <div className="cosc-info" style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
+                <strong className="cosc-pkg-name" style={{ display: "block", fontSize: "16px", fontWeight: 800, color: "#0a2540", lineHeight: 1.25 }}>
                   {pkg ? pkg.name : "Paket Token"}
                 </strong>
-                <span className="cosc-pkg-token" style={{ display: "block", fontSize: "12px", color: "#475569", lineHeight: 1.35 }}>
-                  {estText} · Saldo Universal
+                <span className="cosc-pkg-model" style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#0a58ca", lineHeight: 1.3 }}>
+                  Model AI: {targetModel ? targetModel.name : "Universal"}
                 </span>
               </div>
             </div>
-            <div className="cosc-right">
-              <strong className="cosc-price" style={{ fontSize: "18px", fontWeight: 800, color: "#0a58ca", letterSpacing: "-0.02em" }}>
+            <div className="cosc-right" style={{ flexShrink: 0, paddingLeft: "16px", textAlign: "right" }}>
+              <strong className="cosc-price" style={{ fontSize: "20px", fontWeight: 800, color: "#0a58ca", letterSpacing: "-0.02em" }}>
                 {pkg ? formatIdr(pkg.priceIdr) : "Rp 0"}
               </strong>
             </div>
           </div>
-
-          {/* Inline Package Switcher Menu */}
-          {showPkgSwitcher && (
-            <div
-              className="cosc-package-picker"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "8px",
-                background: "#f8fafc",
-                border: "1px solid #cbd5e1",
-                borderRadius: "12px",
-                padding: "10px",
-                marginBottom: "16px",
-              }}
-            >
-              {retailPackages.map((p) => {
-                const isCurrent = p.id === pkg?.id;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedPkg(p);
-                      setShowPkgSwitcher(false);
-                    }}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      padding: "8px 10px",
-                      borderRadius: "8px",
-                      border: isCurrent ? "1.5px solid #0a58ca" : "1px solid #e2e8f0",
-                      background: isCurrent ? "#eff6ff" : "#ffffff",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
-                      <strong style={{ fontSize: "12px", color: isCurrent ? "#0a58ca" : "#0f172a", fontWeight: 750 }}>
-                        {p.name}
-                      </strong>
-                      <span style={{ fontSize: "11px", fontWeight: 800, color: isCurrent ? "#0a58ca" : "#334155" }}>
-                        {formatIdr(p.priceIdr)}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: "10.5px", color: "#64748b", marginTop: "2px" }}>
-                      {p.targetUser} · {p.badge}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Inline Model Switcher Menu */}
-          {showModelSwitcher && (
-            <div
-              className="cosc-model-picker"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "8px",
-                background: "#f8fafc",
-                border: "1px solid #cbd5e1",
-                borderRadius: "12px",
-                padding: "10px",
-                marginBottom: "16px",
-              }}
-            >
-              {popularQuickModels.map((m) => {
-                const isCurrent = m.id === targetModel?.id;
-                const mUnits = unitsForBudget(m, pkg ? pkg.priceIdr : 0);
-                const mUnitLabel = isPerImage(m) ? "Gambar" : "Interaksi";
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => {
-                      setActiveModel(m);
-                      setShowModelSwitcher(false);
-                    }}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      padding: "8px 10px",
-                      borderRadius: "8px",
-                      border: isCurrent ? "1.5px solid #0a58ca" : "1px solid #e2e8f0",
-                      background: isCurrent ? "#eff6ff" : "#ffffff",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
-                      <strong style={{ fontSize: "12px", color: isCurrent ? "#0a58ca" : "#0f172a", fontWeight: 750 }}>
-                        {m.name}
-                      </strong>
-                    </div>
-                    <span style={{ fontSize: "10.5px", color: "#64748b", marginTop: "2px" }}>
-                      ±{new Intl.NumberFormat("id-ID").format(mUnits)} {mUnitLabel}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {/* ===================================================================== */}
           {/* OPSI MODE: TERBITKAN KUNCI BARU VS TOP-UP KUNCI LAMA                 */}
