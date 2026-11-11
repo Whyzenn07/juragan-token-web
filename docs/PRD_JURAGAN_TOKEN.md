@@ -1,9 +1,10 @@
 # Product Requirement Document (PRD): Juragan Token
 
-**Versi Dokumen:** 2.2.0  
+**Versi Dokumen:** 2.3.0  
 **Status:** Living Document / Production-Ready Architecture  
-**Tanggal Pembaruan:** 10 November 2026  
+**Tanggal Pembaruan:** 11 November 2026  
 **Platform:** Web Application (Next.js 16.4.2 App Router, TypeScript, Vanilla CSS, Supabase Cloud)  
+**Domain Utama:** `https://api.tokotokenai.com`  
 **Repository:** `Whyzenn07/juragan-token-web`  
 
 ---
@@ -22,24 +23,24 @@ Namun, mereka menghadapi hambatan struktural yang signifikan:
 ### 1.2 Solusi: Juragan Token
 **Juragan Token** adalah platform marketplace & gateway kredit Multi-AI prabayar lokal pertama di Indonesia yang berfungsi sebagai:
 - **Toko Ritel & Kasir Pembayaran IDR Fleksibel:** Memungkinkan pembelian kredit API mulai dari **Rp 15.000** menggunakan metode pembayaran lokal Indonesia (**QRIS Instan**, Virtual Account & e-Wallet **DANA, ShopeePay, OVO, GoPay, BCA, Mandiri, BRI, BNI**, serta Transfer Bank **BCA, Mandiri, BRI, BNI, BSI**).
-- **Universal OpenAI-Compatible AI Gateway:** Menyediakan **1 Virtual API Key (`jt-live-...`)** dengan Base URL standar (`https://www.juragantoken.co.id/v1`) yang dapat langsung dicolokkan ke berbagai *coding tools* dan klien populer (Cursor AI, Windsurf, Claude Code CLI, Chatbox, dan Python SDK).
+- **Universal OpenAI-Compatible AI Gateway:** Menyediakan **1 Virtual API Key (`jt-live-...`)** dengan Base URL standar (`https://api.tokotokenai.com/v1`) yang dapat langsung dicolokkan ke berbagai *coding tools* dan klien populer (Cursor AI, Windsurf, Claude Code CLI, Chatbox, dan Python SDK).
 - **Siklus Ganda (Dual-Lifecycle): Kunci Baru & Top-Up Kunci Lama:** Pengguna baru menerima kunci API unik, sementara pengguna lama dapat melakukan isi ulang (*top-up*) saldo ke kunci yang sama secara idempoten tanpa perlu mengubah konfigurasi IDE mereka.
 - **Hybrid Upstream Routing Berkecepatan Tinggi:** 
   1. *Direct Engine:* Permintaan Google Gemini diproses langsung secara lokal ke Google AI Studio (`gemini-3.8-flash`) menggunakan Master Key berkecepatan tinggi.
   2. *Pass-Through Engine:* Permintaan model frontier berdaya tinggi (Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, DeepSeek) diteruskan secara aman ke Central Engine di `https://gateway.juragantoken.co.id/v1` (bebas dependensi OpenRouter).
 - **Masa Aktif Token Permanen:** Saldo kredit dalam mata uang rupiah (IDR) berlaku permanen tanpa kedaluwarsa bulanan.
 - **Zero-Retention Prompt Privacy:** Server Juragan Token hanya bertindak sebagai *pass-through proxy*. Tidak ada pencatatan atau penyimpanan teks prompt, dokumen bisnis, maupun respon AI ke database. Hanya metrik token kuantitatif yang dicatat untuk kebutuhan pengurangan saldo.
-- **Dual Persistence & Audit Log:** Setiap transaksi dan pemakaian kredit tersinkronisasi secara *real-time* ke **Supabase Cloud Database** dengan failover penyimpanan lokal atomik.
+- **Dual Persistence & Audit Log:** Setiap transaksi dan pemakaian kredit tersinkronisasi secara *real-time* ke **Supabase Cloud Database** (menggunakan service role key) dengan failover penyimpanan lokal atomik.
 
 ---
 
 ## 2. Arsitektur & Diagram Alur (Flowcharts)
 
-### 2.1 Alur Pengguna Utama (End-to-End User Journey)
+### 2.1 Alur Pengguna Utama (End-to-End Customer Journey)
 
 ```mermaid
 flowchart TD
-    Start([User Masuk ke Website]) --> Hero[Hero Section: Value Proposition & CTA]
+    Start([User Masuk ke Website https://api.tokotokenai.com]) --> Hero[Hero Section: Value Proposition & CTA]
     Hero --> Choice{Pilihan Interaksi}
     
     Choice -->|Eksplorasi Model| Catalog[Katalog Model AI & Kalkulator IDR]
@@ -55,8 +56,8 @@ flowchart TD
     Choice -->|Beli / Top-Up Paket| Retail[Katalog Paket Ritel: 4 Pilihan]
     Retail --> SelectPkg[Pilih Paket: Uji Coba, Produktivitas, Riset, Agensi]
     
-    DirectTopUp --> OpenCheckout[Buka SingaPay Modal: Mode Top-Up Kunci Lama]
-    SelectPkg --> OpenCheckoutNew[Buka SingaPay Modal: Mode Kunci Baru / Top-Up]
+    DirectTopUp --> OpenCheckout[Buka Payment Modal: Mode Top-Up Kunci Lama]
+    SelectPkg --> OpenCheckoutNew[Buka Payment Modal: Mode Kunci Baru / Top-Up]
     
     OpenCheckoutNew --> InModalSwitch{Ingin Ganti Paket?}
     InModalSwitch -->|Ya| SwitchPkg[Ganti Paket via In-Modal Package Switcher]
@@ -67,26 +68,28 @@ flowchart TD
     InputData --> SelectAccordion[Pilih Kategori: QRIS / VA & e-Wallet / Transfer Bank]
     SelectAccordion --> SelectChannel[Pilih Channel Pembayaran]
     
-    SelectChannel --> StepInvoice[Step 2: Layar Invoice Standar Traveloka / Tiket.com]
+    SelectChannel --> StepInvoice[Step 2: Layar Invoice Pembayaran QRIS / VA]
     StepInvoice --> CountdownTimer[Timer 15 Menit + Progress Bar Berjalan]
     StepInvoice --> CopyDetails[Fitur 1-Klik Salin: No. Invoice, No. Rek/VA, Nominal Persis]
     StepInvoice --> GuideTabs[Petunjuk Cara Bayar: m-Banking, i-Banking, ATM]
     
     StepInvoice --> UserPay[User Melakukan Transfer / Scan QRIS]
     UserPay --> VerifyPay{Verifikasi Pembayaran}
-    VerifyPay -->|Otomatis Webhook / Cek Status| CheckMode{Mode Pesanan?}
+    VerifyPay -->|Otomatis Webhook / Polling| CheckMode{Mode Pesanan?}
     
     CheckMode -->|Pesanan Baru| GenerateKey[Generate Kunci CSPRNG: jt-live-xxxx]
     CheckMode -->|Top-Up Kunci| AddBalance[Tambah Saldo ke Kunci Eksisting Secara Atomik]
     
-    GenerateKey --> StepSuccess[Step 3: Layar Sukses & Kredensial API Key]
+    GenerateKey --> StepSuccess[Step 3: Layar Sukses & Animasi Centang Hijau Retina]
     AddBalance --> StepSuccess
     
-    StepSuccess --> SendEmailTrigger[Trigger POST /api/send-receipt via Gmail SMTP]
-    StepSuccess --> BackupWA[Opsi Cadangkan Kredensial ke WhatsApp]
-    StepSuccess --> SetupGuide[Lihat Panduan Setup 1-Menit di Beranda]
+    StepSuccess --> SendEmailTrigger[Kirim Email Invoice & Kredensial via Gmail SMTP]
+    SendEmailTrigger --> EmailDelivered[Pelanggan Menerima Email Bersih + Checkmark Badge + API Key]
+    StepSuccess --> SetupGuide[Lihat Panduan Setup di Beranda / Docs]
     SetupGuide --> ColokTools[Colok Base URL & Key ke Cursor / Claude Code / Chatbox / Python]
-    ColokTools --> Done([Selesai: User Menikmati Akses Multi-AI])
+    ColokTools --> PromptUse[Kirim Prompt Coding / Bisnis]
+    PromptUse --> RealtimeDeduct[Saldo Terpotong Otomatis Per Request Sesuai Token]
+    RealtimeDeduct --> Done([Selesai: User Menikmati Akses Multi-AI Tanpa Kartu Kredit])
 ```
 
 ---
