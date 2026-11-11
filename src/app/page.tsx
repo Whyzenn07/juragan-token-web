@@ -301,9 +301,9 @@ export default function Home() {
   };
 
   const handleBuyTokenForModel = (model: ModelItem) => {
-    const mName = model.name.toLowerCase();
+    const mName = `${model.name} ${model.id}`.toLowerCase();
     let matched = retailPackages[1]; // default Paket Produktivitas
-    if (mName.includes("opus") || mName.includes("astra") || mName.includes("argon")) {
+    if (tierOf(model) === "Premium" || mName.includes("opus") || mName.includes("astra") || mName.includes("argon")) {
       matched = retailPackages.find((p) => p.id === "pkt-pro-builder") || retailPackages[3];
     } else if (
       mName.includes("sonnet") ||
