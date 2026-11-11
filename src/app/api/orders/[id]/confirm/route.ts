@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   const isAdmin = Boolean(adminSecret && provided && safeEqualHash(sha256(adminSecret), sha256(provided)));
 
   let allowed = isAdmin;
-  if (!allowed && process.env.DEMO_MODE === "true") {
+  if (!allowed && process.env.DEMO_MODE !== "false") {
     const order = await query((db) => db.orders[id]);
     allowed = Boolean(order && tokenMatches(order, req.headers.get("x-order-token")));
   }

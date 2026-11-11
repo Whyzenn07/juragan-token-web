@@ -2269,6 +2269,14 @@ main {
     align-items: stretch;
     gap: 10px;
   }
+  .toolbar-search-wrapper {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    box-sizing: border-box;
+    padding: 0 12px;
+  }
   .toolbar-selects-group {
     width: 100%;
     justify-content: space-between;
@@ -10223,12 +10231,36 @@ footer {
     gap: 10px !important;
   }
   .classai-order-summary-card {
-    flex-direction: column !important;
-    align-items: flex-start !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+  .cosc-left {
+    flex: 1 1 auto !important;
     gap: 10px !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+  .cosc-logo-wrap {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 8px !important;
+  }
+  .cosc-pkg-name {
+    font-size: 14px !important;
+  }
+  .cosc-pkg-model {
+    font-size: 12px !important;
   }
   .cosc-right {
-    align-self: flex-end !important;
+    flex-shrink: 0 !important;
+    padding-left: 4px !important;
+  }
+  .cosc-price {
+    font-size: 16px !important;
+    white-space: nowrap !important;
   }
   .cosc-package-picker {
     grid-template-columns: 1fr !important;

@@ -61,9 +61,14 @@ type Db = {
   usageLogs?: UsageLog[];
 };
 
-const FILE = path.join(process.cwd(), "data", "store.json");
+const FILE = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+  ? path.join("/tmp", "juragan-token-store.json")
+  : path.join(process.cwd(), "data", "store.json");
 
 let queue: Promise<unknown> = Promise.resolve();
+
+/** Cadangan di memori bila disk tidak bisa ditulis (mis. filesystem read-only). */
+let memDb: Db | null = null;
 
 async function readDb(): Promise<Db> {
   try {
@@ -75,15 +80,21 @@ async function readDb(): Promise<Db> {
       usageLogs: parsed.usageLogs ?? [],
     };
   } catch {
+    if (memDb) return JSON.parse(JSON.stringify(memDb)) as Db;
     return { orders: {}, keys: {}, usageLogs: [] };
   }
 }
 
 async function writeDb(db: Db): Promise<void> {
-  await fs.mkdir(path.dirname(FILE), { recursive: true });
-  const tmp = `${FILE}.tmp`;
-  await fs.writeFile(tmp, JSON.stringify(db, null, 2), "utf8");
-  await fs.rename(tmp, FILE);
+  memDb = JSON.parse(JSON.stringify(db)) as Db;
+  try {
+    await fs.mkdir(path.dirname(FILE), { recursive: true });
+    const tmp = `${FILE}.tmp`;
+    await fs.writeFile(tmp, JSON.stringify(db, null, 2), "utf8");
+    await fs.rename(tmp, FILE);
+  } catch (err) {
+    console.error("[STORE] Gagal menulis ke disk, memakai memori:", err instanceof Error ? err.message : err);
+  }
 }
 
 /** Baca-ubah-tulis berurutan agar dua request bersamaan tidak saling menimpa. */

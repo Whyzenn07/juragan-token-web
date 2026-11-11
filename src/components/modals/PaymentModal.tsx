@@ -530,7 +530,7 @@ export function PaymentModal({
           estToken: estText,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({} as { success: boolean; error: string; invoiceId: string; orderToken: string; totalIdr: number }));
       if (res.ok && data.success) {
         setInvoiceId(data.invoiceId);
         setOrderToken(data.orderToken);
@@ -1576,7 +1576,7 @@ Mohon dibantu konfirmasi ya!`;
               background: "#f0f7ff",
               border: "1px solid #bfdbfe",
               borderRadius: "14px",
-              padding: "14px 18px",
+              padding: "12px 14px",
               marginBottom: "16px",
             }}
           >
@@ -1823,7 +1823,7 @@ Mohon dibantu konfirmasi ya!`;
                 }}
               >
                 <span>
-                  Email <span style={{ color: "#0a58ca" }}>(Kredensial API dikirim ke sini)</span>
+                  Email <span style={{ color: "#0a58ca" }}>(Kredensial API akan dikirim via email)</span>
                   <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
                 </span>
                 <input
@@ -1865,12 +1865,6 @@ Mohon dibantu konfirmasi ya!`;
                       </span>
                     )}
                   </span>
-                </div>
-              )}
-              {emailTouched && emailValidation.isValid && (
-                <div style={{ marginTop: "4px", fontSize: "11px", color: "#16a34a", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
-                  <span aria-hidden="true">✓</span>
-                  <span>Kredensial API &amp; invoice akan dikirim ke email ini</span>
                 </div>
               )}
             </div>
