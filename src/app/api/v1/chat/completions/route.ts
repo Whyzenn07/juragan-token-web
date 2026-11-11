@@ -234,9 +234,8 @@ export async function POST(req: NextRequest) {
     // 2. gemini-flash-lite-latest (versi rolling production)
     // 3. gemini-3.5-flash (flash standar)
     const candidateModels = [
-      "gemini-3.5-flash-lite",
       "gemini-flash-lite-latest",
-      "gemini-3.5-flash",
+      "gemini-flash-latest",
     ];
 
     if (reqModel.toLowerCase().includes("pro")) {
