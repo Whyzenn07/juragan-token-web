@@ -195,7 +195,7 @@ export const modelsCatalog: ModelItem[] = [
     description: "Pilihan favorit developer untuk Claude Code CLI, Cursor, dan refactoring source code skala besar.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
-    ratio: 1.5,
+    ratio: 1.0,
     completionRatio: 5
   },
   {
@@ -206,7 +206,7 @@ export const modelsCatalog: ModelItem[] = [
     description: "Model reasoning koding generasi 5 Anthropic untuk penulisan arsitektur backend, refactoring, dan automated unit tests.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
-    ratio: 1.0,
+    ratio: 1.25,
     completionRatio: 5
   },
   {
@@ -230,7 +230,7 @@ export const modelsCatalog: ModelItem[] = [
     description: "Model flagship kelas berat Anthropic untuk analisis riset akademik mendalam dan penyusunan naskah komprehensif.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
-    ratio: 2.5,
+    ratio: 2.0,
     completionRatio: 5
   },
   {
