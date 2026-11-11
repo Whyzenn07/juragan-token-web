@@ -2,7 +2,33 @@ import { paymentMethods, retailPackages } from "@/data/catalog";
 import { generateApiKey, generateInvoiceId, generateOrderToken, safeEqualHash, sha256 } from "./keys";
 import { mutate, query, type Order } from "./store";
 import { sendReceiptEmail } from "./receipt-email";
-import { syncOrderToSupabase, syncKeyToSupabase } from "./supabase-sync";
+import { syncOrderToSupabase, syncKeyToSupabase, fetchOrderFromSupabase, fetchKeyFromSupabase, getSupabaseConfig } from "./supabase-sync";
+
+/**
+ * Di serverless (Vercel) tiap request bisa mendarat di instance berbeda, jadi Supabase dijadikan
+ * sumber kebenaran: order/kunci dimuat ulang dari cloud ke store lokal sebelum dipakai.
+ */
+async function hydrateOrder(id: string): Promise<void> {
+  if (!getSupabaseConfig().isConfigured) return;
+  const local = await query((db) => db.orders[id]);
+  if (local && !process.env.VERCEL) return;
+  const remote = await fetchOrderFromSupabase(id);
+  if (!remote) return;
+  await mutate((db) => {
+    db.orders[id] = remote;
+  });
+}
+
+async function hydrateKey(hash: string): Promise<void> {
+  if (!getSupabaseConfig().isConfigured) return;
+  const local = await query((db) => db.keys[hash]);
+  if (local && !process.env.VERCEL) return;
+  const remote = await fetchKeyFromSupabase(hash);
+  if (!remote) return;
+  await mutate((db) => {
+    db.keys[hash] = remote;
+  });
+}
 
 export const ORDER_TTL_MS = 15 * 60 * 1000;
 
@@ -109,8 +135,8 @@ export async function createOrder(
   await mutate((db) => {
     db.orders[invoiceId] = order;
   });
-  // Sinkronisasi otomatis ke Supabase di background
-  syncOrderToSupabase(order).catch(() => {});
+  // Harus selesai sebelum respons dikirim: di serverless proses dihentikan setelah respons.
+  await syncOrderToSupabase(order);
   return { ok: true, value: { invoiceId, orderToken, totalIdr: order.totalIdr } };
 }
 
@@ -152,25 +178,34 @@ function toPublic(order: Order, apiKey?: string): PublicOrder {
 }
 
 export async function readOrder(id: string, token: string | null): Promise<OrderResult<PublicOrder>> {
+  await hydrateOrder(id);
   const probe = await query((db) => db.orders[id]);
   if (!probe || !tokenMatches(probe, token)) return { ok: false, status: 404, error: "Order tidak ditemukan." };
 
-  return mutate((db) => {
+  const result = await mutate((db) => {
     const order = db.orders[id];
     if (order.status === "pending" && Date.now() - Date.parse(order.createdAt) > ORDER_TTL_MS) {
       order.status = "expired";
     }
     let apiKey: string | undefined;
+    let revealed = false;
     if (order.status === "paid" && order.pendingReveal) {
       apiKey = order.pendingReveal;
       delete order.pendingReveal;
+      revealed = true;
     }
-    return { ok: true as const, value: toPublic(order, apiKey) };
+    return { ok: true as const, value: toPublic(order, apiKey), revealed, snapshot: { ...order } };
   });
+  // Kunci hanya boleh diambil sekali: hapus juga di cloud.
+  if (result.revealed) await syncOrderToSupabase(result.snapshot);
+  return { ok: true, value: result.value };
 }
 
 /** Idempoten: memanggil dua kali tidak menerbitkan kunci kedua. */
 export async function confirmOrder(id: string): Promise<OrderResult<PublicOrder>> {
+  await hydrateOrder(id);
+  const pre = await query((db) => db.orders[id]);
+  if (pre?.isTopUp && pre.targetKeyHash) await hydrateKey(pre.targetKeyHash);
   const issued = await mutate((db): OrderResult<{ order: Order; apiKey?: string }> => {
     const order = db.orders[id];
     if (!order) return { ok: false, status: 404, error: "Order tidak ditemukan." };
@@ -260,8 +295,9 @@ export async function confirmOrder(id: string): Promise<OrderResult<PublicOrder>
 
   const fresh = await query((db) => db.orders[id]);
   const freshKey = order.keyHash ? await query((db) => db.keys[order.keyHash!]) : undefined;
-  if (fresh) syncOrderToSupabase(fresh).catch(() => {});
-  if (freshKey) syncKeyToSupabase(freshKey).catch(() => {});
+  // Order lebih dulu agar foreign key keys.order_id terpenuhi; wajib await agar tidak terputus di serverless.
+  if (fresh) await syncOrderToSupabase(fresh);
+  if (freshKey) await syncKeyToSupabase(freshKey);
 
   return { ok: true, value: toPublic(fresh ?? order) };
 }

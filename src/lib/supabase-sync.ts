@@ -93,33 +93,41 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
   const { url, key, isConfigured } = getSupabaseConfig();
   if (!isConfigured) return false;
 
-  try {
-    const res = await fetch(`${url}/rest/v1/orders`, {
+  const base = {
+    id: order.id,
+    token_hash: order.tokenHash,
+    customer_name: order.customerName,
+    customer_email: order.customerEmail,
+    customer_phone: order.customerPhone || null,
+    package_id: order.packageId,
+    package_name: order.packageName,
+    est_package: order.estPackage || null,
+    base_idr: order.baseIdr,
+    fee_idr: order.feeIdr,
+    total_idr: order.totalIdr,
+    method_id: order.methodId,
+    method_name: order.methodName,
+    status: order.status,
+    created_at: order.createdAt,
+    paid_at: order.paidAt || null,
+    key_hash: order.keyHash || null,
+    pending_reveal: order.pendingReveal || null,
+    email_status: order.emailStatus,
+    email_message: order.emailMessage || null,
+  };
+  const withTopUp = { ...base, is_top_up: Boolean(order.isTopUp), target_key_hash: order.targetKeyHash || null };
+
+  const post = (body: unknown) =>
+    fetch(`${url}/rest/v1/orders?on_conflict=id`, {
       method: "POST",
       headers: getHeaders(key, "resolution=merge-duplicates"),
-      body: JSON.stringify({
-        id: order.id,
-        token_hash: order.tokenHash,
-        customer_name: order.customerName,
-        customer_email: order.customerEmail,
-        customer_phone: order.customerPhone || null,
-        package_id: order.packageId,
-        package_name: order.packageName,
-        est_package: order.estPackage || null,
-        base_idr: order.baseIdr,
-        fee_idr: order.feeIdr,
-        total_idr: order.totalIdr,
-        method_id: order.methodId,
-        method_name: order.methodName,
-        status: order.status,
-        created_at: order.createdAt,
-        paid_at: order.paidAt || null,
-        key_hash: order.keyHash || null,
-        pending_reveal: order.pendingReveal || null,
-        email_status: order.emailStatus,
-        email_message: order.emailMessage || null,
-      }),
+      body: JSON.stringify(body),
     });
+
+  try {
+    let res = await post(withTopUp);
+    // Kolom top-up belum dimigrasi di database: ulangi tanpa kolom tersebut.
+    if (!res.ok && res.status === 400) res = await post(base);
 
     if (res.ok) {
       console.log(`[SUPABASE SYNC OK] Order ${order.id} berhasil disinkronkan ke cloud.`);
@@ -132,6 +140,74 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
   } catch (err) {
     console.warn(`[SUPABASE SYNC NETWORK] Terkendala koneksi ke Supabase:`, err);
     return false;
+  }
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export function rowToOrder(co: any): Order {
+  return {
+    id: co.id,
+    tokenHash: co.token_hash,
+    customerName: co.customer_name,
+    customerEmail: co.customer_email,
+    customerPhone: co.customer_phone || "",
+    packageId: co.package_id,
+    packageName: co.package_name,
+    estPackage: co.est_package || "",
+    baseIdr: co.base_idr,
+    feeIdr: co.fee_idr || 0,
+    totalIdr: co.total_idr,
+    methodId: co.method_id,
+    methodName: co.method_name,
+    status: co.status,
+    createdAt: co.created_at,
+    paidAt: co.paid_at || undefined,
+    keyHash: co.key_hash || undefined,
+    pendingReveal: co.pending_reveal || undefined,
+    emailStatus: co.email_status || "none",
+    emailMessage: co.email_message || undefined,
+    targetKeyHash: co.target_key_hash || undefined,
+    isTopUp: Boolean(co.is_top_up),
+  };
+}
+
+export function rowToKey(ck: any): KeyRecord {
+  return {
+    hash: ck.hash,
+    last4: ck.last4,
+    orderId: ck.order_id,
+    planName: ck.plan_name,
+    estPackage: ck.est_package,
+    balanceIdr: ck.balance_idr,
+    status: ck.status,
+    createdAt: ck.created_at,
+  };
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+export async function fetchOrderFromSupabase(id: string): Promise<Order | null> {
+  const { url, key, isConfigured } = getSupabaseConfig();
+  if (!isConfigured) return null;
+  try {
+    const res = await fetch(`${url}/rest/v1/orders?id=eq.${encodeURIComponent(id)}&select=*&limit=1`, { headers: getHeaders(key) });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return Array.isArray(rows) && rows[0] ? rowToOrder(rows[0]) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchKeyFromSupabase(hash: string): Promise<KeyRecord | null> {
+  const { url, key, isConfigured } = getSupabaseConfig();
+  if (!isConfigured) return null;
+  try {
+    const res = await fetch(`${url}/rest/v1/keys?hash=eq.${encodeURIComponent(hash)}&select=*&limit=1`, { headers: getHeaders(key) });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return Array.isArray(rows) && rows[0] ? rowToKey(rows[0]) : null;
+  } catch {
+    return null;
   }
 }
 
