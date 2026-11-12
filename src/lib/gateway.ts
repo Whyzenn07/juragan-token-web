@@ -1,6 +1,70 @@
-import { sha256 } from "./keys";
+import { rateLimited, sha256 } from "./keys";
 import { query, mutate, type KeyRecord } from "./store";
 import { syncKeyToSupabase, syncUsageLogToSupabase, getSupabaseConfig, fetchKeyFromSupabase } from "./supabase-sync";
+
+export const MAX_CONCURRENT_STREAMS = 5;
+const activeStreams = new Map<string, number>();
+
+/**
+ * Batas konkurensi: maksimal 5 stream/request simultan per API Key (PRD Bagian 8.2)
+ */
+export function acquireStreamSlot(keyHash: string): boolean {
+  const current = activeStreams.get(keyHash) ?? 0;
+  if (current >= MAX_CONCURRENT_STREAMS) {
+    return false;
+  }
+  activeStreams.set(keyHash, current + 1);
+  return true;
+}
+
+export function releaseStreamSlot(keyHash: string): void {
+  const current = activeStreams.get(keyHash) ?? 0;
+  if (current <= 1) {
+    activeStreams.delete(keyHash);
+  } else {
+    activeStreams.set(keyHash, current - 1);
+  }
+}
+
+/**
+ * Rate-Limiting per API Key (PRD Bagian 8.2):
+ * - 60 RPM untuk model umum (Gemini Flash/Pro)
+ * - 20 RPM untuk model frontier reasoning (Claude, GPT-4o, DeepSeek)
+ */
+export function checkGatewayRateLimit(keyHash: string, model: string): { limited: boolean; rpmLimit: number } {
+  const m = (model || "").toLowerCase();
+  const isFrontier = !m.includes("gemini") && m !== "default" && m !== "gpt-3.5-turbo";
+  const rpmLimit = isFrontier ? 20 : 60;
+  const bucketKey = `gw:${isFrontier ? "frontier" : "general"}:${keyHash}`;
+  return {
+    limited: rateLimited(bucketKey, rpmLimit, 60_000),
+    rpmLimit,
+  };
+}
+
+/**
+ * Estimasi jumlah token berdasarkan panjang teks (~4 karakter per token)
+ */
+export function estimateTokensFromText(text: string): number {
+  if (!text) return 0;
+  return Math.max(1, Math.ceil(text.length / 4));
+}
+
+export function estimatePromptTokens(messages: unknown[]): number {
+  if (!Array.isArray(messages)) return 32;
+  let totalChars = 0;
+  for (const msg of messages) {
+    if (msg && typeof msg === "object") {
+      const content = (msg as Record<string, unknown>).content;
+      if (typeof content === "string") {
+        totalChars += content.length + 12;
+      } else if (Array.isArray(content)) {
+        totalChars += JSON.stringify(content).length;
+      }
+    }
+  }
+  return Math.max(10, Math.ceil(totalChars / 4));
+}
 
 export type AuthResult = {
   ok: boolean;
@@ -135,52 +199,72 @@ export function calculateUsageCost(model: string, promptTokens: number, completi
 }
 
 /**
- * Potong saldo kredit key secara atomic di local store & sinkronkan ke Supabase
+ * Potong saldo kredit key secara atomic di Supabase (via RPC atau upsert) & local store
  */
 export async function deductKeyBalance(keyHash: string, costIdr: number): Promise<number> {
   let remaining = 0;
   const { url: sbUrl, key: sbKey, isConfigured: sbConfigured } = getSupabaseConfig();
 
-  // 1. Update di local store
+  // 1. Coba eksekusi RPC atomik di Supabase jika tersedia
+  let rpcHandled = false;
+  if (sbConfigured) {
+    try {
+      const rpcRes = await fetch(`${sbUrl}/rest/v1/rpc/deduct_token_balance`, {
+        method: "POST",
+        headers: {
+          apikey: sbKey,
+          Authorization: `Bearer ${sbKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          target_key_hash: keyHash,
+          deduct_amount: costIdr,
+        }),
+      });
+      if (rpcRes.ok) {
+        const rpcData = await rpcRes.json();
+        const row = Array.isArray(rpcData) ? rpcData[0] : rpcData;
+        if (row && typeof row.new_balance !== "undefined") {
+          remaining = Math.max(0, Number(row.new_balance));
+          rpcHandled = true;
+        }
+      }
+    } catch {
+      // Fallback ke metode standar jika fungsi RPC belum dibuat di database
+    }
+  }
+
+  // 2. Update di local store
   const updatedRecord = await mutate((db) => {
     const rec = db.keys[keyHash];
     if (rec) {
-      rec.balanceIdr = Math.max(0, rec.balanceIdr - costIdr);
+      rec.balanceIdr = rpcHandled ? remaining : Math.max(0, rec.balanceIdr - costIdr);
       remaining = rec.balanceIdr;
       return rec;
     }
     return null;
   });
 
-  // 2. Sinkronkan saldo baru ke Supabase
-  if (updatedRecord) {
-    await syncKeyToSupabase(updatedRecord).catch((err) => {
-      console.warn("[GATEWAY DEDUCT] Gagal sync pengurangan saldo ke Supabase:", err);
-    });
-  } else if (sbConfigured) {
-    // Jika tidak ada di local store, patch langsung ke Supabase
-    try {
-      const getRes = await fetch(`${sbUrl}/rest/v1/keys?hash=eq.${keyHash}&select=balance_idr`, {
-        headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` },
+  // 3. Jika RPC belum aktif di Supabase, sinkronkan saldo baru via REST upsert / PATCH
+  if (!rpcHandled) {
+    if (updatedRecord) {
+      await syncKeyToSupabase(updatedRecord).catch((err) => {
+        console.warn("[GATEWAY DEDUCT] Gagal sync pengurangan saldo ke Supabase:", err);
       });
-      if (getRes.ok) {
-        const rows = await getRes.json();
-        if (rows && rows.length > 0) {
-          const newBal = Math.max(0, (rows[0].balance_idr || 0) - costIdr);
-          remaining = newBal;
-          await fetch(`${sbUrl}/rest/v1/keys?hash=eq.${keyHash}`, {
-            method: "PATCH",
-            headers: {
-              apikey: sbKey,
-              Authorization: `Bearer ${sbKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ balance_idr: newBal }),
+    } else if (sbConfigured) {
+      try {
+        const remote = await fetchKeyFromSupabase(keyHash);
+        if (remote) {
+          remote.balanceIdr = Math.max(0, remote.balanceIdr - costIdr);
+          remaining = remote.balanceIdr;
+          await syncKeyToSupabase(remote);
+          await mutate((db) => {
+            db.keys[keyHash] = remote;
           });
         }
+      } catch (err) {
+        console.warn("[GATEWAY DEDUCT] Gagal patch balance di Supabase:", err);
       }
-    } catch (err) {
-      console.warn("[GATEWAY DEDUCT] Gagal patch balance di Supabase:", err);
     }
   }
 

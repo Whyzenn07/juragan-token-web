@@ -24,7 +24,9 @@ create table if not exists public.orders (
     key_hash text,
     pending_reveal text,
     email_status text default 'none',
-    email_message text
+    email_message text,
+    is_top_up boolean default false,
+    target_key_hash text
 );
 
 create index if not exists idx_orders_created_at on public.orders (created_at desc);
@@ -85,11 +87,36 @@ create policy "Allow keys lookup by hash" on public.keys for select using (true)
 drop policy if exists "Allow keys insert on payment" on public.keys;
 create policy "Allow keys insert on payment" on public.keys for insert with check (true);
 
+drop policy if exists "Allow keys update on balance deduction" on public.keys;
+create policy "Allow keys update on balance deduction" on public.keys for update using (true) with check (true);
+
 drop policy if exists "Allow insert usage_logs" on public.usage_logs;
 create policy "Allow insert usage_logs" on public.usage_logs for insert with check (true);
 
 drop policy if exists "Allow read usage_logs" on public.usage_logs;
 create policy "Allow read usage_logs" on public.usage_logs for select using (true);
+
+-- 4B. FUNGSI RPC ATOMIK PEMOTONGAN SALDO (ANTI-RACE CONDITION)
+create or replace function public.deduct_token_balance(
+    target_key_hash text,
+    deduct_amount integer
+) returns table(success boolean, new_balance integer) as $$
+declare
+    updated_bal integer;
+begin
+    update public.keys
+    set balance_idr = greatest(0, balance_idr - deduct_amount)
+    where hash = target_key_hash
+      and status = 'active'
+    returning balance_idr into updated_bal;
+
+    if found then
+        return query select true, updated_bal;
+    else
+        return query select false, 0;
+    end if;
+end;
+$$ language plpgsql security definer;
 
 -- 5. RESTORE BACKUP DATA YANG SUDAH ADA
 insert into public.orders (

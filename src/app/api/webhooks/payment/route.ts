@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { confirmOrder } from "@/lib/orders";
-import { mutate } from "@/lib/store";
+import { confirmOrder, expireOrder } from "@/lib/orders";
 
 
 /**
@@ -122,12 +121,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (isExpired) {
-      await mutate((db) => {
-        const o = db.orders[orderId];
-        if (o && o.status === "pending") {
-          o.status = "expired";
-        }
-      });
+      await expireOrder(orderId);
       return NextResponse.json({
         success: true,
         provider,

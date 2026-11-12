@@ -5,6 +5,12 @@ import {
   calculateUsageCost,
   deductKeyBalance,
   recordUsageLog,
+  acquireStreamSlot,
+  releaseStreamSlot,
+  checkGatewayRateLimit,
+  estimatePromptTokens,
+  estimateTokensFromText,
+  MAX_CONCURRENT_STREAMS,
 } from "@/lib/gateway";
 
 const CORS_HEADERS = {
@@ -51,14 +57,28 @@ function sanitizeOpenAIChunk(parsed: any) {
   return parsed;
 }
 
+type StreamUsageResult = {
+  usagePromptTokens?: number;
+  usageCompletionTokens?: number;
+  accumulatedText: string;
+};
+
 /**
- * TransformStream untuk memfilter baris SSE secara streaming tanpa merusak urutan teks
+ * TransformStream untuk memfilter baris SSE secara streaming tanpa merusak urutan teks,
+ * sekaligus mengakumulasi token output untuk pemotongan saldo akurat di akhir stream.
  */
-function createOpenAISanitizerStream(readableStream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+function createOpenAISanitizerStream(
+  readableStream: ReadableStream<Uint8Array>,
+  onComplete?: (result: StreamUsageResult) => void | Promise<void>,
+  onFinally?: () => void
+): ReadableStream<Uint8Array> {
   const reader = readableStream.getReader();
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   let buffer = "";
+  let accumulatedText = "";
+  let usagePromptTokens: number | undefined;
+  let usageCompletionTokens: number | undefined;
 
   return new ReadableStream({
     async start(controller) {
@@ -68,6 +88,13 @@ function createOpenAISanitizerStream(readableStream: ReadableStream<Uint8Array>)
           if (done) {
             if (buffer.trim()) {
               controller.enqueue(encoder.encode(buffer));
+            }
+            if (onComplete) {
+              try {
+                await onComplete({ usagePromptTokens, usageCompletionTokens, accumulatedText });
+              } catch (e) {
+                console.warn("[STREAM COMPLETE HOOK ERROR]", e);
+              }
             }
             controller.close();
             break;
@@ -86,6 +113,28 @@ function createOpenAISanitizerStream(readableStream: ReadableStream<Uint8Array>)
               }
               try {
                 const parsed = JSON.parse(dataStr);
+                if (parsed?.usage) {
+                  if (typeof parsed.usage.prompt_tokens === "number") {
+                    usagePromptTokens = parsed.usage.prompt_tokens;
+                  }
+                  if (typeof parsed.usage.completion_tokens === "number") {
+                    usageCompletionTokens = parsed.usage.completion_tokens;
+                  }
+                }
+                if (Array.isArray(parsed?.choices)) {
+                  for (const ch of parsed.choices) {
+                    if (typeof ch?.delta?.content === "string") {
+                      accumulatedText += ch.delta.content;
+                    }
+                    if (Array.isArray(ch?.delta?.tool_calls)) {
+                      for (const tc of ch.delta.tool_calls) {
+                        if (typeof tc?.function?.arguments === "string") {
+                          accumulatedText += tc.function.arguments;
+                        }
+                      }
+                    }
+                  }
+                }
                 const cleaned = sanitizeOpenAIChunk(parsed);
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify(cleaned)}\n\n`));
               } catch {
@@ -98,7 +147,13 @@ function createOpenAISanitizerStream(readableStream: ReadableStream<Uint8Array>)
         }
       } catch (err) {
         controller.error(err);
+      } finally {
+        if (onFinally) onFinally();
       }
+    },
+    cancel() {
+      if (onFinally) onFinally();
+      reader.cancel().catch(() => undefined);
     },
   });
 }
@@ -151,8 +206,43 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 3. Tentukan Target Upstream Provider & Model
+  // 3. Tentukan Target Upstream Provider & Model + Proteksi Rate-Limit & Konkurensi (PRD 8.2)
   const requestedModel = body.model || "gemini-3.5-flash";
+  const rateCheck = checkGatewayRateLimit(auth.keyHash, requestedModel);
+  if (rateCheck.limited) {
+    return NextResponse.json(
+      {
+        error: {
+          message: `Batas laju permintaan (Rate Limit ${rateCheck.rpmLimit} req/menit) terlampaui untuk kunci API ini. Tunggu beberapa detik lalu coba kembali.`,
+          type: "rate_limit_error",
+          code: "rate_limit_exceeded",
+        },
+      },
+      { status: 429, headers: CORS_HEADERS }
+    );
+  }
+
+  if (!acquireStreamSlot(auth.keyHash)) {
+    return NextResponse.json(
+      {
+        error: {
+          message: `Batas konkurensi maksimal (${MAX_CONCURRENT_STREAMS} stream simultan per API Key) tercapai. Tunggu respons aktif selesai terlebih dahulu.`,
+          type: "rate_limit_error",
+          code: "concurrency_limit_exceeded",
+        },
+      },
+      { status: 429, headers: CORS_HEADERS }
+    );
+  }
+
+  let slotReleased = false;
+  const freeSlot = () => {
+    if (!slotReleased && auth.keyHash) {
+      slotReleased = true;
+      releaseStreamSlot(auth.keyHash);
+    }
+  };
+
   let { provider, targetModel } = resolveUpstreamModel(requestedModel);
 
   // 4. Siapkan Upstream URL & Authorization
@@ -162,6 +252,7 @@ export async function POST(req: NextRequest) {
   if (provider === "gemini") {
     const geminiKey = process.env.GEMINI_API_KEY?.trim();
     if (!geminiKey) {
+      freeSlot();
       return NextResponse.json(
         {
           error: {
@@ -341,6 +432,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!upstreamRes) {
+      freeSlot();
       return NextResponse.json(
         {
           error: {
@@ -354,6 +446,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!upstreamRes.ok) {
+      freeSlot();
       const errBody = await upstreamRes.json().catch(() => ({}));
       const rawMessage = Array.isArray(errBody)
         ? errBody[0]?.error?.message
@@ -379,29 +472,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6A. Penanganan Streaming (Server-Sent Events)
+    const estimatedInputTokens = estimatePromptTokens(body.messages);
+
+    // 6A. Penanganan Streaming (Server-Sent Events) dengan Metering Token Dinamis
     if (isStream && upstreamRes.body) {
-      // Potong estimasi nominal ringan secara background untuk sesi streaming
-      const estCost = calculateUsageCost(targetModel, 150, 350);
-      deductKeyBalance(auth.keyHash, estCost)
-        .then((remainingBal) => {
-          recordUsageLog({
+      const sanitizedStream = createOpenAISanitizerStream(
+        upstreamRes.body,
+        async ({ usagePromptTokens, usageCompletionTokens, accumulatedText }) => {
+          const promptTokens = usagePromptTokens || estimatedInputTokens;
+          const completionTokens = usageCompletionTokens || Math.max(10, estimateTokensFromText(accumulatedText));
+          const totalTokens = promptTokens + completionTokens;
+          const costIdr = calculateUsageCost(targetModel, promptTokens, completionTokens);
+          const remainingBal = await deductKeyBalance(auth.keyHash!, costIdr);
+          await recordUsageLog({
             keyHash: auth.keyHash!,
             keyLast4: auth.keyRecord!.last4,
             model: targetModel,
             provider,
-            promptTokens: 150,
-            completionTokens: 350,
-            totalTokens: 500,
-            costIdr: estCost,
+            promptTokens,
+            completionTokens,
+            totalTokens,
+            costIdr,
             remainingBalanceIdr: remainingBal,
           });
-        })
-        .catch((err) => {
-          console.warn("[GATEWAY DEDUCT STREAM] Error:", err);
-        });
+        },
+        freeSlot
+      );
 
-      const sanitizedStream = createOpenAISanitizerStream(upstreamRes.body);
       return new Response(sanitizedStream, {
         headers: {
           ...CORS_HEADERS,
@@ -417,14 +514,16 @@ export async function POST(req: NextRequest) {
     const rawData = await upstreamRes.json();
     const data = sanitizeOpenAIChunk(rawData);
 
-    const promptTokens = data.usage?.prompt_tokens || 100;
-    const completionTokens = data.usage?.completion_tokens || 150;
+    const promptTokens = data.usage?.prompt_tokens || estimatedInputTokens;
+    const completionTokens =
+      data.usage?.completion_tokens ||
+      Math.max(10, estimateTokensFromText(data.choices?.[0]?.message?.content || ""));
     const totalTokens = data.usage?.total_tokens || promptTokens + completionTokens;
     const costIdr = calculateUsageCost(targetModel, promptTokens, completionTokens);
 
     const remainingBal = await deductKeyBalance(auth.keyHash, costIdr);
 
-    recordUsageLog({
+    await recordUsageLog({
       keyHash: auth.keyHash,
       keyLast4: auth.keyRecord.last4,
       model: targetModel,
@@ -436,6 +535,8 @@ export async function POST(req: NextRequest) {
       remainingBalanceIdr: remainingBal,
     }).catch(() => undefined);
 
+    freeSlot();
+
     return NextResponse.json(data, {
       headers: {
         ...CORS_HEADERS,
@@ -445,6 +546,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err: any) {
+    freeSlot();
     console.error("[GATEWAY FATAL ERROR]", err);
     const friendlyMessage =
       provider === "engine"

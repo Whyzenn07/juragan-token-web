@@ -1,4 +1,4 @@
-import type { Order, KeyRecord } from "./store";
+import type { Order, KeyRecord, UsageLog } from "./store";
 import { query, mutate } from "./store";
 
 export function getSupabaseConfig() {
@@ -211,6 +211,35 @@ export async function fetchKeyFromSupabase(hash: string): Promise<KeyRecord | nu
   }
 }
 
+export async function fetchUsageLogsFromSupabase(keyHash: string, limit = 10): Promise<UsageLog[]> {
+  const { url, key, isConfigured } = getSupabaseConfig();
+  if (!isConfigured) return [];
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/usage_logs?key_hash=eq.${encodeURIComponent(keyHash)}&select=*&order=created_at.desc&limit=${limit}`,
+      { headers: getHeaders(key) }
+    );
+    if (!res.ok) return [];
+    const rows = await res.json();
+    if (!Array.isArray(rows)) return [];
+    return rows.map((r: Record<string, unknown>) => ({
+      id: String(r.id ?? ""),
+      keyHash: String(r.key_hash ?? keyHash),
+      keyLast4: String(r.key_last4 ?? ""),
+      model: String(r.model ?? "gemini-3.5-flash"),
+      provider: String(r.provider ?? "gemini"),
+      promptTokens: Number(r.prompt_tokens ?? 0),
+      completionTokens: Number(r.completion_tokens ?? 0),
+      totalTokens: Number(r.total_tokens ?? 0),
+      costIdr: Number(r.cost_idr ?? 0),
+      remainingBalanceIdr: Number(r.remaining_balance_idr ?? 0),
+      createdAt: String(r.created_at ?? new Date().toISOString()),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Sinkronisasi data kunci API & saldo secara real-time ke Supabase PostgreSQL
  */
@@ -219,7 +248,7 @@ export async function syncKeyToSupabase(keyRecord: KeyRecord): Promise<boolean> 
   if (!isConfigured) return false;
 
   try {
-    const res = await fetch(`${url}/rest/v1/keys`, {
+    const res = await fetch(`${url}/rest/v1/keys?on_conflict=hash`, {
       method: "POST",
       headers: getHeaders(key, "resolution=merge-duplicates"),
       body: JSON.stringify({

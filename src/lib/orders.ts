@@ -175,8 +175,10 @@ export async function readOrder(id: string, token: string | null): Promise<Order
 
   const result = await mutate((db) => {
     const order = db.orders[id];
+    let newlyExpired = false;
     if (order.status === "pending" && Date.now() - Date.parse(order.createdAt) > ORDER_TTL_MS) {
       order.status = "expired";
+      newlyExpired = true;
     }
     let apiKey: string | undefined;
     let revealed = false;
@@ -185,11 +187,28 @@ export async function readOrder(id: string, token: string | null): Promise<Order
       delete order.pendingReveal;
       revealed = true;
     }
-    return { ok: true as const, value: toPublic(order, apiKey), revealed, snapshot: { ...order } };
+    return { ok: true as const, value: toPublic(order, apiKey), revealed, newlyExpired, snapshot: { ...order } };
   });
-  // Kunci hanya boleh diambil sekali: hapus juga di cloud.
-  if (result.revealed) await syncOrderToSupabase(result.snapshot);
+  // Kunci hanya boleh diambil sekali atau jika baru saja expired: sinkronkan juga ke cloud.
+  if (result.revealed || result.newlyExpired) await syncOrderToSupabase(result.snapshot);
   return { ok: true, value: result.value };
+}
+
+export async function expireOrder(id: string): Promise<boolean> {
+  await hydrateOrder(id);
+  const updated = await mutate((db) => {
+    const o = db.orders[id];
+    if (o && o.status === "pending") {
+      o.status = "expired";
+      return { ...o };
+    }
+    return null;
+  });
+  if (updated) {
+    await syncOrderToSupabase(updated);
+    return true;
+  }
+  return false;
 }
 
 /** Idempoten: memanggil dua kali tidak menerbitkan kunci kedua. */
@@ -251,7 +270,13 @@ export async function confirmOrder(id: string): Promise<OrderResult<PublicOrder>
     return { ok: true, value: { order, apiKey } };
   });
 
-  if (!issued.ok) return issued;
+  if (!issued.ok) {
+    if (issued.status === 410) {
+      const expiredSnap = await query((db) => db.orders[id]);
+      if (expiredSnap) await syncOrderToSupabase(expiredSnap);
+    }
+    return issued;
+  }
   const { order, apiKey } = issued.value;
 
   // Email dikirim saat konfirmasi sukses (baik kunci baru maupun top-up)

@@ -11,6 +11,15 @@ type TokenBalanceModalProps = {
   onTopUp: (key?: string) => void;
 };
 
+type UsageLogItem = {
+  id: string;
+  model: string;
+  provider: string;
+  totalTokens: number;
+  costIdr: number;
+  createdAt: string;
+};
+
 type KeyCheckResult = {
   maskedKey: string;
   planName: string;
@@ -18,6 +27,7 @@ type KeyCheckResult = {
   balanceIdr: number;
   status: "active" | "suspended" | "revoked";
   createdAt: string;
+  usageLogs?: UsageLogItem[];
 };
 
 export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalProps) {
@@ -192,17 +202,40 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
               </div>
 
               <div className="usage-breakdown-box">
-                <h5>Histori Pemakaian:</h5>
-                <div className="usage-list">
-                  <div className="usage-row">
-                    <span className="usage-model">Penggunaan Gateway</span>
-                    <span className="usage-tokens">Belum ada pemakaian token</span>
-                    <strong className="usage-cost">Rp 0</strong>
-                  </div>
-                </div>
-                <p style={{ fontSize: "11px", color: "var(--muted)", marginTop: "6px" }}>
-                  Saldo Anda masih 100% utuh dan siap digunakan di Claude Code, Cursor AI, atau Web Chatbox.
-                </p>
+                <h5>Histori Pemakaian Terbaru:</h5>
+                {checkedData.usageLogs && checkedData.usageLogs.length > 0 ? (
+                  <>
+                    <div className="usage-list">
+                      {checkedData.usageLogs.slice(0, 5).map((log) => (
+                        <div key={log.id} className="usage-row">
+                          <span className="usage-model" title={formatDate(log.createdAt)}>
+                            {log.model}
+                          </span>
+                          <span className="usage-tokens">
+                            {log.totalTokens.toLocaleString("id-ID")} token · {formatDate(log.createdAt)}
+                          </span>
+                          <strong className="usage-cost">-{formatIdr(log.costIdr)}</strong>
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: "11px", color: "var(--muted)", marginTop: "6px" }}>
+                      Menampilkan {Math.min(5, checkedData.usageLogs.length)} pemakaian terakhir dari gateway Juragan Token.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="usage-list">
+                      <div className="usage-row">
+                        <span className="usage-model">Penggunaan Gateway</span>
+                        <span className="usage-tokens">Belum ada pemakaian token</span>
+                        <strong className="usage-cost">Rp 0</strong>
+                      </div>
+                    </div>
+                    <p style={{ fontSize: "11px", color: "var(--muted)", marginTop: "6px" }}>
+                      Saldo Anda masih 100% utuh dan siap digunakan di Claude Code, Cursor AI, atau Web Chatbox.
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="balance-actions-row">

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query, mutate } from "@/lib/store";
 import { maskKey, rateLimited, sha256 } from "@/lib/keys";
-import { fetchKeyFromSupabase } from "@/lib/supabase-sync";
+import { fetchKeyFromSupabase, fetchUsageLogsFromSupabase } from "@/lib/supabase-sync";
 
 async function handleCheck(keyRaw: string, ip: string) {
   if (rateLimited(`check:${ip}`, 15, 60_000)) {
@@ -32,6 +32,13 @@ async function handleCheck(keyRaw: string, ip: string) {
     return NextResponse.json({ success: false, error: "API Key tidak ditemukan." }, { status: 404 });
   }
 
+  // Ambil 10 riwayat pemakaian terbaru dari Supabase (fallback ke local store jika kosong)
+  let usageLogs = await fetchUsageLogsFromSupabase(hash, 10);
+  if (usageLogs.length === 0) {
+    const localLogs = await query((db) => (db.usageLogs ?? []).filter((l) => l.keyHash === hash).slice(0, 10));
+    if (localLogs.length > 0) usageLogs = localLogs;
+  }
+
   return NextResponse.json(
     {
       success: true,
@@ -42,6 +49,14 @@ async function handleCheck(keyRaw: string, ip: string) {
         balanceIdr: record.balanceIdr,
         status: record.status,
         createdAt: record.createdAt,
+        usageLogs: usageLogs.map((l) => ({
+          id: l.id,
+          model: l.model,
+          provider: l.provider,
+          totalTokens: l.totalTokens,
+          costIdr: l.costIdr,
+          createdAt: l.createdAt,
+        })),
       },
     },
     { headers: { "Cache-Control": "no-store" } }
