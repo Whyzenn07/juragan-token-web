@@ -28,8 +28,6 @@ export function FloatingWhatsApp() {
         <span className="floating-wa-ripple" aria-hidden="true" />
         <svg
           viewBox="0 0 24 24"
-          width="24"
-          height="24"
           fill="#ffffff"
           className="floating-wa-icon"
           aria-hidden="true"

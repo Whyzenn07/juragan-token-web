@@ -6979,74 +6979,6 @@ footer {
   to { transform: rotate(360deg); }
 }
 
-/* Floating WhatsApp Customer Support Widget */
-.floating-wa-btn {
-  position: fixed;
-  bottom: 26px;
-  right: 26px;
-  z-index: 95;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.floating-wa-icon {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: #25d366;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.42);
-  transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.floating-wa-btn:hover .floating-wa-icon {
-  transform: scale(1.08) translateY(-2px);
-  background: #20ba5a;
-  box-shadow: 0 10px 28px rgba(37, 211, 102, 0.58);
-}
-
-.floating-wa-tooltip {
-  background: #0a2540;
-  color: #ffffff;
-  font-family: var(--font-h);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 8px 14px;
-  border-radius: 20px;
-  box-shadow: 0 6px 18px rgba(10, 37, 64, 0.22);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(10px);
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.floating-wa-btn:hover .floating-wa-tooltip {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-@media (max-width: 640px) {
-  .floating-wa-btn {
-    bottom: 20px;
-    right: 18px;
-  }
-  .floating-wa-icon {
-    width: 52px;
-    height: 52px;
-  }
-  .floating-wa-tooltip {
-    display: none;
-  }
-}
-
 /* ==========================================================================
    SUPPORTING PAGES STYLES (Docs, Terms, Privacy, Status)
    Clean, Professional, Fintech & SaaS Grade Design
@@ -10268,114 +10200,93 @@ footer {
 }
 
 /* ========================================================================= */
-/* Floating WhatsApp Help / Consultation Widget                              */
+/* Floating WhatsApp Widget - lingkaran kompak                               */
 /* ========================================================================= */
 .floating-wa-container {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 20px;
+  right: 20px;
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: auto;
 }
 
 .floating-wa-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: 50%;
+  background: #0f9d8a;
   color: #ffffff !important;
   text-decoration: none !important;
-  padding: 11px 18px 11px 15px;
-  border-radius: 9999px;
-  box-shadow: 0 10px 26px rgba(37, 211, 102, 0.42), 0 4px 12px rgba(18, 140, 126, 0.28);
-  font-family: inherit;
-  font-size: 13.5px;
-  font-weight: 750;
-  letter-spacing: -0.2px;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 .floating-wa-btn:hover {
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 14px 34px rgba(37, 211, 102, 0.52), 0 6px 16px rgba(18, 140, 126, 0.35);
-  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.34);
 }
 
 .floating-wa-btn:active {
-  transform: translateY(0) scale(0.97);
-}
-
-.floating-wa-ripple {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  border-radius: 9999px;
-  background: rgba(37, 211, 102, 0.35);
-  pointer-events: none;
-  transform: translate(-50%, -50%) scale(1);
-  animation: wa-pulse 2.2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  z-index: -1;
-}
-
-@keyframes wa-pulse {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.8;
-  }
-  70% {
-    transform: translate(-50%, -50%) scale(1.35);
-    opacity: 0;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.4);
-    opacity: 0;
-  }
+  transform: scale(0.96);
 }
 
 .floating-wa-icon {
   display: block;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.floating-wa-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(15, 157, 138, 0.35);
+  pointer-events: none;
+  animation: wa-pulse 2.6s infinite ease-out;
+  z-index: -1;
+}
+
+@keyframes wa-pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  70%, 100% { transform: scale(1.3); opacity: 0; }
 }
 
 .floating-wa-label {
-  display: inline-block;
-  white-space: nowrap;
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  background: #0a2540;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
   line-height: 1;
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-/* Responsif Mobile (<640px): Bulatan kompak 50px agar tidak menutupi konten checkout */
+.floating-wa-label.expanded {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
 @media (max-width: 640px) {
-  .floating-wa-container {
-    bottom: 18px;
-    right: 16px;
-  }
-  .floating-wa-btn {
-    width: 50px;
-    height: 50px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 50%;
-    box-shadow: 0 8px 22px rgba(37, 211, 102, 0.45);
-  }
-  .floating-wa-label {
-    display: none;
-  }
-  .floating-wa-icon {
-    width: 26px;
-    height: 26px;
-  }
-  .floating-wa-ripple {
-    border-radius: 50%;
-  }
+  .floating-wa-container { bottom: 16px; right: 14px; }
+  .floating-wa-btn { width: 48px; height: 48px; }
+  .floating-wa-icon { width: 26px; height: 26px; }
+  .floating-wa-label { display: none; }
 }
-
