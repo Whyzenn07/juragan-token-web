@@ -144,18 +144,65 @@ export async function authenticateGatewayKey(authHeader: string | null): Promise
   };
 }
 
+export type UpstreamEngineStatus = {
+  engineUrl: string;
+  hasEngineMasterKey: boolean;
+  hasGeminiDirectKey: boolean;
+  routeAllToCentralEngine: boolean;
+  mode: "live_central_engine" | "hybrid_gemini_fallback" | "awaiting_dev_key";
+};
+
+/**
+ * Status kesiapan koneksi ke Master LLM Engine (https://api.tokotokenai.com/v1).
+ * Begitu tim developer mengisi UPSTREAM_ENGINE_KEY di .env / Vercel, mode langsung berubah ke "live_central_engine".
+ */
+export function getUpstreamEngineStatus(): UpstreamEngineStatus {
+  const engineUrl = (process.env.UPSTREAM_ENGINE_URL || "https://api.tokotokenai.com/v1").trim().replace(/\/+$/, "");
+  const engineKey = (
+    process.env.UPSTREAM_ENGINE_KEY ||
+    process.env.TOKOTOKENAI_API_KEY ||
+    ""
+  ).trim();
+  const geminiKey = (process.env.GEMINI_API_KEY || "").trim();
+  const routeAll = (process.env.UPSTREAM_ROUTE_ALL || "false").toLowerCase() === "true";
+
+  let mode: UpstreamEngineStatus["mode"] = "awaiting_dev_key";
+  if (engineKey) {
+    mode = "live_central_engine";
+  } else if (geminiKey) {
+    mode = "hybrid_gemini_fallback";
+  }
+
+  return {
+    engineUrl,
+    hasEngineMasterKey: Boolean(engineKey),
+    hasGeminiDirectKey: Boolean(geminiKey),
+    routeAllToCentralEngine: routeAll || (Boolean(engineKey) && !geminiKey),
+    mode,
+  };
+}
+
 /**
  * Normalisasi nama model ke provider upstream yang sesuai.
- * Model Gemini diproses via master key Gemini.
- * Model Claude, GPT-4o, DeepSeek, Qwen diarahkan ke Pass-Through Engine (api.tokotokenai.com).
+ * - Jika UPSTREAM_ENGINE_KEY (https://api.tokotokenai.com/v1) sudah diisi dan UPSTREAM_ROUTE_ALL="true" (atau GEMINI_API_KEY kosong),
+ *   semua model termasuk Gemini diarahkan langsung ke Central Engine https://api.tokotokenai.com/v1.
+ * - Model Claude, GPT-4o, DeepSeek, Qwen, Grok, Kimi, MiniMax selalu diarahkan ke Pass-Through Engine (https://api.tokotokenai.com/v1).
  */
 export function resolveUpstreamModel(inputModel: string): {
   provider: "gemini" | "engine";
   targetModel: string;
 } {
   const m = (inputModel || "gemini-3.5-flash").toLowerCase().trim();
+  const engineStatus = getUpstreamEngineStatus();
 
-  // Mapping Google Gemini (bisa diproses lokal mandiri)
+  if (engineStatus.routeAllToCentralEngine) {
+    return {
+      provider: "engine",
+      targetModel: inputModel || "gemini-3.5-flash",
+    };
+  }
+
+  // Mapping Google Gemini (bisa diproses lokal mandiri via GEMINI_API_KEY)
   if (
     m.includes("gemini") ||
     m === "default" ||
@@ -165,7 +212,7 @@ export function resolveUpstreamModel(inputModel: string): {
     return { provider: "gemini", targetModel: "gemini-flash-lite-latest" };
   }
 
-  // Model lainnya (Claude Opus/Sonnet, GPT-4o/Astra, DeepSeek) diarahkan ke Pass-Through Engine
+  // Model lainnya (Claude Opus/Sonnet, GPT-4o/Astra, DeepSeek) diarahkan ke Pass-Through Engine (https://api.tokotokenai.com/v1)
   return {
     provider: "engine",
     targetModel: inputModel,

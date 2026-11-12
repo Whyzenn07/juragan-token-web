@@ -28,6 +28,12 @@ export type Order = {
   emailMessage?: string;
   targetKeyHash?: string;
   isTopUp?: boolean;
+  gatewayProvider?: "tripay" | "midtrans" | "xendit" | "manual";
+  gatewayReference?: string;
+  paymentUrl?: string;
+  qrUrl?: string;
+  qrString?: string;
+  payCode?: string;
 };
 
 export type KeyRecord = {

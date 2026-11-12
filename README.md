@@ -76,55 +76,64 @@ Juragan Token menghubungkan ekosistem pembayaran lokal Indonesia dengan API mode
 juragan-token-web/
 ├── docs/                                # Dokumentasi Spesifikasi & Arsitektur
 │   ├── ARCHITECTURE.md                  # System Design, Algoritma, & Database DDL
-│   ├── PRD_JURAGAN_TOKEN.md             # Product Requirement Document (PRD v2.1.0)
+│   ├── DEV_HANDOVER.md                  # Panduan Handover 2 Kredensial (Payment & LLM Key)
+│   ├── PRD_JURAGAN_TOKEN.md             # Product Requirement Document (PRD v2.4.0)
 │   └── audits/                          # Laporan Audit Kepatuhan & Keamanan
 ├── public/                              # Aset Statis Publik
 │   ├── assets/
 │   │   ├── AI-Logo/                     # Vektor Logo Provider AI (Anthropic, OpenAI, dll)
-│   │   └── payment-logos/               # 15 Logo Vektor Resmi Bank & E-Wallet (BCA, Mandiri, QRIS)
-│   └── images/                          # Aset Gambar & Template QRIS
+│   │   ├── email/                       # Aset Badge Centang Retina Struk Email
+│   │   └── payment-logos/               # 17 Logo Vektor Resmi Bank & E-Wallet (BCA, Mandiri, QRIS)
+│   └── images/                          # Aset Gambar & Template QRIS Resmi
+├── scripts/                             # Utilitas Build, Audit Keamanan, & Generator Badge
 ├── src/
 │   ├── app/                             # Next.js App Router (Halaman & Endpoint)
 │   │   ├── api/                         # REST API Route Handlers
-│   │   │   ├── keys/check/              # POST: Cek Saldo & Status API Key
+│   │   │   ├── keys/check/              # POST: Cek Saldo, Status, & 10 Usage Logs Terakhir
 │   │   │   ├── models/sync/             # GET: Sinkronisasi Kurs BI/Forex & Katalog Gateway
-│   │   │   ├── orders/                  # POST: Buat Invoice Order Baru
+│   │   │   ├── orders/                  # POST: Buat Invoice Order Baru (Outbound Gateway)
 │   │   │   │   └── [id]/                # GET: Polling Status Order
-│   │   │   │       └── confirm/         # POST: Konfirmasi Pembayaran (Webhook/Admin)
-│   │   │   ├── supabase/status/         # GET/POST: Health Check & Sinkronisasi DB
+│   │   │   │       └── confirm/         # POST: Konfirmasi Pembayaran (Simulasi/Admin)
+│   │   │   ├── supabase/status/         # GET/POST: Health Check 4 Pilar & Sinkronisasi DB
 │   │   │   ├── test-email/              # GET: Diagnostic Test SMTP Gmail
+│   │   │   ├── webhooks/payment/        # POST: Universal Webhook (Tripay, Midtrans, Xendit)
 │   │   │   └── v1/                      # AI Gateway (OpenAI Compatible)
-│   │   │       ├── chat/completions/    # POST: AI Inference Proxy, Stream Sanitizer & Billing
+│   │   │       ├── chat/completions/    # POST: AI Inference Proxy, Rate-Limit, & Billing
 │   │   │       └── models/              # GET: Daftar Model Tersedia (/v1/models)
-│   │   ├── docs/                        # Halaman Dokumentasi Integrasi & Panduan
-│   │   ├── status/                      # Halaman Status Uptime & Latensi Jaringan
+│   │   ├── docs/                        # Halaman Dokumentasi Integrasi & Interactive Tester
+│   │   ├── status/                      # Halaman Status Uptime & Kesiapan 4 Pilar Sistem
 │   │   ├── privacy/                     # Kebijakan Privasi
 │   │   ├── terms/                       # Syarat & Ketentuan Layanan
 │   │   ├── globals.css                  # Core Design System, Utility, & Responsive Layout
-│   │   ├── layout.tsx                   # Master Root Layout
+│   │   ├── layout.tsx                   # Master Root Layout + Floating WhatsApp Widget
 │   │   └── page.tsx                     # Landing Page (Katalog, Checkout, Setup Guide)
 │   ├── components/                      # UI Components Terstruktur
 │   │   ├── modals/                      # Modal Interaktif
-│   │   │   ├── SingaPayModal.tsx        # Checkout Modal, Tiket QRIS Enterprise & VA
-│   │   │   ├── TokenBalanceModal.tsx    # Modal Cek Saldo Kunci jt-live-...
+│   │   │   ├── PaymentModal.tsx         # Checkout Modal, Tiket QRIS Enterprise & VA
+│   │   │   ├── TokenBalanceModal.tsx    # Modal Cek Saldo & Riwayat Pemakaian (usage_logs)
 │   │   │   ├── CurrencyRateModal.tsx    # Modal Kurs Real-time Bank Indonesia
-│   │   │   └── ModelDetailModal.tsx     # Modal Detail Spesifikasi & Biaya per Model
-│   │   └── ui/                          # Atomik UI (Icon, BrandMark, Logo, Badge)
+│   │   │   ├── ModelDetailModal.tsx     # Modal Detail Spesifikasi & Biaya per Model
+│   │   │   └── Dialog.tsx               # Accessible Modal Wrapper
+│   │   ├── sections/                    # Komponen Seksi Landing Page
+│   │   │   ├── SavingsCalculator.tsx    # Kalkulator Penghematan Token Interaktif
+│   │   │   └── SetupGuides.tsx          # Panduan Integrasi Klien AI
+│   │   └── ui/                          # Atomik UI (Icon, FloatingWhatsApp, PaymentSuccessMark, dll)
 │   ├── data/                            # State Katalog & Definisi Produk
 │   │   └── catalog.ts                   # 66 Model AI Terkurasi, Paket Ritel, & Channel Bayar
 │   ├── lib/                             # Core Logic & Backend Services
-│   │   ├── gateway.ts                   # Autentikasi Gateway, Resolusi Upstream, & Metering
+│   │   ├── gateway.ts                   # Autentikasi Gateway, Rate-Limit, & Metering
 │   │   ├── keys.ts                      # Generator Kunci Kriptografis, Hashing, & Rate Limiter
 │   │   ├── orders.ts                    # Transaksi Order, Lifecycle Status, & Delivery Kunci
+│   │   ├── payment-gateway.ts           # Outbound Plug-and-Play Adapter (Tripay/Midtrans/Xendit)
 │   │   ├── receipt-email.ts             # Template & Transporter Email Nodemailer
 │   │   ├── store.ts                     # Penyimpanan Lokal Atomik (Failover Fallback)
 │   │   └── supabase-sync.ts             # REST Client Sinkronisasi Supabase Cloud
 │   └── types/                           # Definisi TypeScript Interfaces
 ├── supabase/                            # Skrip Database & Migrasi PostgreSQL
 │   ├── migrations/                      # Skrip Migrasi SQL Berurutan
-│   ├── setup_all.sql                    # Skrip Inisialisasi Skema Lengkap
+│   ├── setup_all.sql                    # Skrip Inisialisasi Skema Lengkap + RPC Atomic Deduct
 │   └── seed.sql                         # Data Awal / Seeder
-├── .env.example                         # Contoh Format Environment Variables
+├── .env.example                         # Contoh Format Environment Variables (Siap Handover)
 ├── package.json                         # Dependensi Node.js & Script NPM
 ├── tsconfig.json                        # Konfigurasi TypeScript Compiler
 └── README.md                            # Dokumentasi Pengembang Ini
@@ -291,6 +300,7 @@ for chunk in response:
 ## 9. Dokumen Arsitektur & PRD
 
 Untuk tim developer, lead architect, dan QA engineer yang ingin meninjau spesifikasi teknis lebih dalam:
+- 🚀 **[DEV_HANDOVER.md](docs/DEV_HANDOVER.md)**: Panduan Handover 2 Kredensial Terakhir (Payment Gateway & Master API Key `https://api.tokotokenai.com/v1`).
 - 📘 **[PRD_JURAGAN_TOKEN.md](docs/PRD_JURAGAN_TOKEN.md)**: Product Requirement Document lengkap, metrik produk, dan user flow.
 - 🏗️ **[ARCHITECTURE.md](docs/ARCHITECTURE.md)**: Arsitektur teknis, diagram alir, algoritma pemotongan saldo atomik, dan panduan keamanan.
 - 🎨 **[DESIGN.md](DESIGN.md)**: Standar desain visual, token warna fintech, dan pedoman tipografi.

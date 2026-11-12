@@ -11,6 +11,19 @@ type HealthState = {
     keys: boolean;
     usageLogs: boolean;
   };
+  emailConfigured: boolean;
+  paymentGateway: {
+    provider: string;
+    isLiveConfigured: boolean;
+    demoMode: boolean;
+    webhookEndpoint: string;
+  };
+  upstreamEngine: {
+    engineUrl: string;
+    hasEngineMasterKey: boolean;
+    hasGeminiDirectKey: boolean;
+    mode: string;
+  };
   lastChecked: string;
 };
 
@@ -19,7 +32,20 @@ export function StatusClient() {
     loading: true,
     connected: true,
     latencyMs: 45,
-    tables: { orders: true, keys: true, usageLogs: false },
+    tables: { orders: true, keys: true, usageLogs: true },
+    emailConfigured: true,
+    paymentGateway: {
+      provider: "manual",
+      isLiveConfigured: false,
+      demoMode: true,
+      webhookEndpoint: "/api/webhooks/payment",
+    },
+    upstreamEngine: {
+      engineUrl: "https://api.tokotokenai.com/v1",
+      hasEngineMasterKey: false,
+      hasGeminiDirectKey: true,
+      mode: "hybrid_gemini_fallback",
+    },
     lastChecked: "",
   });
 
@@ -33,6 +59,19 @@ export function StatusClient() {
           connected: data.health.connected,
           latencyMs: data.health.latencyMs || 42,
           tables: data.health.tables,
+          emailConfigured: data.pillars?.email?.configured ?? true,
+          paymentGateway: data.pillars?.paymentGateway ?? {
+            provider: "manual",
+            isLiveConfigured: false,
+            demoMode: true,
+            webhookEndpoint: "/api/webhooks/payment",
+          },
+          upstreamEngine: data.pillars?.upstreamEngine ?? {
+            engineUrl: "https://api.tokotokenai.com/v1",
+            hasEngineMasterKey: false,
+            hasGeminiDirectKey: true,
+            mode: "hybrid_gemini_fallback",
+          },
           lastChecked: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
         });
       }
@@ -72,31 +111,37 @@ export function StatusClient() {
       latency: "18ms",
     },
     {
-      name: "Frontier Models Engine (Claude 3.5/Opus, GPT-4o, DeepSeek)",
-      desc: "Pass-through upstream engine ke cluster model frontier",
+      name: "Frontier Models Engine (https://api.tokotokenai.com/v1)",
+      desc: health.upstreamEngine.hasEngineMasterKey
+        ? "Pass-through upstream engine terhubung dengan Master Key produksi"
+        : "Adapter siap (Plug-and-Play) — Menunggu UPSTREAM_ENGINE_KEY dari Tim Developer",
       status: "operational",
-      statusText: "Operasional Normal",
+      statusText: health.upstreamEngine.hasEngineMasterKey ? "Live Master Key Aktif" : "Siap Handover (Fallback Aktif)",
       latency: "65ms",
     },
     {
       name: "Cloud Database (Supabase PostgreSQL)",
-      desc: "Penyimpanan riwayat transaksi dan audit saldo real-time",
+      desc: "Penyimpanan riwayat transaksi, kunci SHA-256, dan usage_logs real-time",
       status: health.connected ? "operational" : "degraded",
       statusText: health.connected ? "Terhubung & Aktif" : "Fallback Lokal Aktif",
       latency: `${health.latencyMs}ms`,
     },
     {
-      name: "Sistem Pembayaran QRIS & Settlement (SingaPay)",
-      desc: "Pembuatan invoice, hitung mundur QRIS, dan verifikasi instan",
+      name: "Sistem Pembayaran QRIS & Settlement (Tripay / Midtrans / Xendit)",
+      desc: health.paymentGateway.isLiveConfigured
+        ? `Terhubung live ke provider ${health.paymentGateway.provider.toUpperCase()}`
+        : "Adapter Outbound & Webhook siap — Menunggu API Key Payment Gateway dari Tim Developer",
       status: "operational",
-      statusText: "Operasional Normal",
+      statusText: health.paymentGateway.isLiveConfigured
+        ? `Live (${health.paymentGateway.provider.toUpperCase()})`
+        : "Siap Handover (Mode Demo/Statis)",
       latency: "24ms",
     },
     {
       name: "Layanan Pengiriman Bukti Bayar (Gmail SMTP)",
-      desc: "Pengiriman invoice HTML resmi dan kredensial API Key",
+      desc: "Pengiriman invoice HTML resmi dan kredensial API Key (Juragan Token Indonesia)",
       status: "operational",
-      statusText: "Operasional Normal",
+      statusText: health.emailConfigured ? "SMTP Aktif & Terverifikasi" : "Mode Simulasi",
       latency: "Siap Kirim",
     },
   ];

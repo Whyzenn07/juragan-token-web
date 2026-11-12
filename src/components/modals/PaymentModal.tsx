@@ -150,6 +150,9 @@ export function PaymentModal({
   const [invoiceId, setInvoiceId] = useState("");
   const [orderToken, setOrderToken] = useState("");
   const [totalPaid, setTotalPaid] = useState<number | null>(null);
+  const [gatewayQrUrl, setGatewayQrUrl] = useState("");
+  const [gatewayPayCode, setGatewayPayCode] = useState("");
+  const [gatewayPaymentUrl, setGatewayPaymentUrl] = useState("");
   const [_paidAt, setPaidAt] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 menit
   const [apiKeyGenerated, setApiKeyGenerated] = useState("");
@@ -257,6 +260,9 @@ export function PaymentModal({
     setInvoiceId("");
     setOrderToken("");
     setTotalPaid(null);
+    setGatewayQrUrl("");
+    setGatewayPayCode("");
+    setGatewayPaymentUrl("");
     setPaidAt("");
     setIsSubmitting(false);
     setIsConfirming(false);
@@ -530,11 +536,21 @@ export function PaymentModal({
           estToken: estText,
         }),
       });
-      const data = await res.json().catch(() => ({} as { success: boolean; error: string; invoiceId: string; orderToken: string; totalIdr: number }));
+      const data = await res.json().catch(() => ({} as {
+        success: boolean;
+        error: string;
+        invoiceId: string;
+        orderToken: string;
+        totalIdr: number;
+        gateway?: { qrUrl?: string; payCode?: string; paymentUrl?: string };
+      }));
       if (res.ok && data.success) {
         setInvoiceId(data.invoiceId);
         setOrderToken(data.orderToken);
         setTotalPaid(data.totalIdr);
+        setGatewayQrUrl(data.gateway?.qrUrl || "");
+        setGatewayPayCode(data.gateway?.payCode || "");
+        setGatewayPaymentUrl(data.gateway?.paymentUrl || "");
 
         setTransitionConfig({
           badge: "MEMPROSES TRANSAKSI",
@@ -2345,19 +2361,23 @@ Mohon dibantu konfirmasi ya!`;
                   <span style={{ position: "absolute", bottom: "6px", left: "6px", width: "18px", height: "18px", borderBottom: "3px solid #dc2626", borderLeft: "3px solid #dc2626", borderBottomLeftRadius: "5px" }} />
                   <span style={{ position: "absolute", bottom: "6px", right: "6px", width: "18px", height: "18px", borderBottom: "3px solid #dc2626", borderRight: "3px solid #dc2626", borderBottomRightRadius: "5px" }} />
 
-                  {/* Real Scan-Ready QR Code */}
+                  {/* Real Scan-Ready QR Code (Dynamic Gateway QR or Static Fallback) */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/images/qris-code.png"
+                    src={gatewayQrUrl || "/images/qris-code.png"}
                     alt="QRIS Code PT Juragan Token Indonesia"
                     style={{ width: "210px", height: "210px", objectFit: "contain", display: "block" }}
-                    onError={(e) => { e.currentTarget.src = "/qris.png"; }}
+                    onError={(e) => {
+                      if (!e.currentTarget.src.endsWith("/images/qris-code.png")) {
+                        e.currentTarget.src = "/images/qris-code.png";
+                      }
+                    }}
                   />
                 </div>
 
                 {/* Download QR Button */}
                 <a
-                  href="/images/qris-code.png"
+                  href={gatewayQrUrl || "/images/qris-code.png"}
                   download={`QRIS-JuraganToken-${invoiceId || "INV"}.png`}
                   style={{
                     display: "inline-flex",
@@ -2383,6 +2403,28 @@ Mohon dibantu konfirmasi ya!`;
                   </svg>
                   <span>Unduh Kode QR (Simpan Gambar)</span>
                 </a>
+                {gatewayPaymentUrl && (
+                  <a
+                    href={gatewayPaymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "7px",
+                      marginTop: "8px",
+                      background: "#0a58ca",
+                      color: "#ffffff",
+                      padding: "8px 16px",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <span>Buka Halaman Pembayaran Gateway Resmi ↗</span>
+                  </a>
+                )}
               </div>
 
               {/* Total Amount Strip */}
@@ -2524,11 +2566,11 @@ Mohon dibantu konfirmasi ya!`;
                   }}
                 >
                   <code style={{ fontSize: "17px", fontWeight: 850, color: "#0a2540", letterSpacing: "0.06em", fontFamily: "monospace" }}>
-                    {currentMethod.accountNumber || "8277 0812 3456 7890"}
+                    {gatewayPayCode || currentMethod.accountNumber || "8277 0812 3456 7890"}
                   </code>
                   <button
                     type="button"
-                    onClick={() => copyToClipboard(currentMethod.accountNumber || "8277 0812 3456 7890", "va")}
+                    onClick={() => copyToClipboard(gatewayPayCode || currentMethod.accountNumber || "8277 0812 3456 7890", "va")}
                     style={{
                       border: "none",
                       background: "#0a58ca",

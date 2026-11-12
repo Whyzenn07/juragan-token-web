@@ -3,6 +3,7 @@ import { generateApiKey, generateInvoiceId, generateOrderToken, safeEqualHash, s
 import { mutate, query, type Order } from "./store";
 import { sendReceiptEmail } from "./receipt-email";
 import { syncOrderToSupabase, syncKeyToSupabase, fetchOrderFromSupabase, fetchKeyFromSupabase, getSupabaseConfig } from "./supabase-sync";
+import { createGatewayTransaction, type GatewayTransactionOutput } from "./payment-gateway";
 
 /**
  * Di serverless (Vercel) tiap request bisa mendarat di instance berbeda, jadi Supabase dijadikan
@@ -50,7 +51,7 @@ export type OrderResult<T> = { ok: true; value: T } | { ok: false; status: numbe
 /** Harga selalu dihitung ulang di server dari katalog; angka dari klien tidak dipercaya. */
 export async function createOrder(
   input: CreateOrderInput
-): Promise<OrderResult<{ invoiceId: string; orderToken: string; totalIdr: number }>> {
+): Promise<OrderResult<{ invoiceId: string; orderToken: string; totalIdr: number; gateway: GatewayTransactionOutput }>> {
   const customerName = (input.customerName ?? "").trim().slice(0, 80);
   const customerEmail = (input.customerEmail ?? "").trim().slice(0, 120);
   const customerPhone = (input.customerPhone ?? "").trim().slice(0, 20);
@@ -103,6 +104,19 @@ export async function createOrder(
     ? `${pkg.name} (${input.modelName.trim()})`
     : pkg.name;
 
+  const totalIdr = pkg.priceIdr + (method.feeAmount ?? 0);
+
+  // Outbound Plug-and-Play Payment Gateway Adapter (Otomatis aktif jika kredensial diisi di .env)
+  const gatewayTx = await createGatewayTransaction({
+    invoiceId,
+    amountIdr: totalIdr,
+    methodId: method.id,
+    packageName,
+    customerName,
+    customerEmail,
+    customerPhone,
+  });
+
   const order: Order = {
     id: invoiceId,
     tokenHash: sha256(orderToken),
@@ -114,7 +128,7 @@ export async function createOrder(
     estPackage,
     baseIdr: pkg.priceIdr,
     feeIdr: method.feeAmount ?? 0,
-    totalIdr: pkg.priceIdr + (method.feeAmount ?? 0),
+    totalIdr,
     methodId: method.id,
     methodName: method.name,
     status: "pending",
@@ -122,13 +136,19 @@ export async function createOrder(
     emailStatus: "none",
     targetKeyHash,
     isTopUp,
+    gatewayProvider: gatewayTx.provider,
+    gatewayReference: gatewayTx.reference,
+    paymentUrl: gatewayTx.paymentUrl,
+    qrUrl: gatewayTx.qrUrl,
+    qrString: gatewayTx.qrString,
+    payCode: gatewayTx.payCode,
   };
   await mutate((db) => {
     db.orders[invoiceId] = order;
   });
   // Harus selesai sebelum respons dikirim: di serverless proses dihentikan setelah respons.
   await syncOrderToSupabase(order);
-  return { ok: true, value: { invoiceId, orderToken, totalIdr: order.totalIdr } };
+  return { ok: true, value: { invoiceId, orderToken, totalIdr: order.totalIdr, gateway: gatewayTx } };
 }
 
 export function tokenMatches(order: Order, token: string | null): boolean {
@@ -149,6 +169,10 @@ export type PublicOrder = {
   apiKey?: string;
   isTopUp?: boolean;
   keyHash?: string;
+  gatewayProvider?: Order["gatewayProvider"];
+  paymentUrl?: string;
+  qrUrl?: string;
+  payCode?: string;
 };
 
 function toPublic(order: Order, apiKey?: string): PublicOrder {
@@ -165,6 +189,10 @@ function toPublic(order: Order, apiKey?: string): PublicOrder {
     apiKey,
     isTopUp: order.isTopUp,
     keyHash: order.keyHash,
+    gatewayProvider: order.gatewayProvider,
+    paymentUrl: order.paymentUrl,
+    qrUrl: order.qrUrl,
+    payCode: order.payCode,
   };
 }
 

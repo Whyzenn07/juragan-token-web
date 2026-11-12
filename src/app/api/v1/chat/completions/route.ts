@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   authenticateGatewayKey,
   resolveUpstreamModel,
+  getUpstreamEngineStatus,
   calculateUsageCost,
   deductKeyBalance,
   recordUsageLog,
@@ -269,16 +270,15 @@ export async function POST(req: NextRequest) {
     upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
     upstreamAuthHeader = `Bearer ${geminiKey}`;
   } else {
-    // Pass-Through Engine ke api.tokotokenai.com
-    const engineUrl =
-      process.env.UPSTREAM_ENGINE_URL?.trim() ||
-      "https://api.tokotokenai.com/v1";
+    // Pass-Through Engine ke https://api.tokotokenai.com/v1
+    const engineStatus = getUpstreamEngineStatus();
     const engineKey =
       process.env.UPSTREAM_ENGINE_KEY?.trim() ||
+      process.env.TOKOTOKENAI_API_KEY?.trim() ||
       process.env.ADMIN_SECRET?.trim() ||
       "";
 
-    upstreamUrl = `${engineUrl.replace(/\/+$/, "")}/chat/completions`;
+    upstreamUrl = `${engineStatus.engineUrl}/chat/completions`;
     upstreamAuthHeader = engineKey ? `Bearer ${engineKey}` : (authHeader || "");
   }
 
