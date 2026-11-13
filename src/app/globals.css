@@ -8315,30 +8315,37 @@ footer {
 .classai-input-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 6px;
   margin-bottom: 18px;
+  align-items: start;
 }
 
 .cig-col {
-  display: flex;
-  flex-direction: column;
+  display: contents;
 }
 
 .cig-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #475569;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  display: block;
+  align-self: end;
 }
+
+.cig-label-name { grid-column: 1; grid-row: 1; }
+.cig-input-name { grid-column: 1; grid-row: 2; }
+.cig-label-email { grid-column: 2; grid-row: 1; }
+.cig-input-email { grid-column: 2; grid-row: 2; }
+.cig-error-email { grid-column: 2; grid-row: 3; }
 
 .cig-input {
   width: 100%;
-  padding: 9px 12px;
+  height: 42px;
+  padding: 8px 12px;
   border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 12.5px;
+  border-radius: 9px;
+  font-size: 13px;
   color: #0f172a;
   background: #ffffff;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -9172,7 +9179,23 @@ footer {
   }
   .classai-input-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 12px;
+  }
+  .cig-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cig-label-name,
+  .cig-input-name,
+  .cig-label-email,
+  .cig-input-email,
+  .cig-error-email {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .cig-label {
+    align-self: stretch;
   }
   .classai-sticky-bottom {
     margin: 0 -16px 0 -16px;

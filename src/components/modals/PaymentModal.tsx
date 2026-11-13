@@ -1789,89 +1789,85 @@ Mohon dibantu konfirmasi ya!`;
           )}
 
           <div className="classai-input-grid">
-            <div className="cig-col" style={{ display: "flex", flexDirection: "column" }}>
+            <div className="cig-col cig-col-name">
               <label
-                className="cig-label"
+                htmlFor="checkout-customer-name"
+                className="cig-label cig-label-name"
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "6px",
                   fontSize: "12px",
                   fontWeight: 600,
                   color: "#334155",
+                  lineHeight: 1.4,
                 }}
               >
-                <span>
-                  Nama Lengkap <span style={{ color: "#ef4444" }}>*</span>
-                </span>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nama Anda / Panggilan"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="cig-input"
-                  style={{
-                    width: "100%",
-                    height: "42px",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "9px",
-                    padding: "8px 12px",
-                    fontSize: "13px",
-                    background: "#ffffff",
-                    color: "#0f172a",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
-                />
+                Nama Lengkap <span style={{ color: "#ef4444" }}>*</span>
               </label>
+              <input
+                id="checkout-customer-name"
+                type="text"
+                required
+                placeholder="Nama Anda / Panggilan"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="cig-input cig-input-name"
+                style={{
+                  width: "100%",
+                  height: "42px",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "9px",
+                  padding: "8px 12px",
+                  fontSize: "13px",
+                  background: "#ffffff",
+                  color: "#0f172a",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
             </div>
-            <div className="cig-col" style={{ display: "flex", flexDirection: "column" }}>
+            <div className="cig-col cig-col-email">
               <label
-                className="cig-label"
+                htmlFor="checkout-customer-email"
+                className="cig-label cig-label-email"
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "6px",
                   fontSize: "12px",
                   fontWeight: 600,
                   color: "#334155",
+                  lineHeight: 1.4,
                 }}
               >
-                <span>
-                  Email <span style={{ color: "#0a58ca" }}>(Kredensial API akan dikirim via email)</span>
-                  <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
-                </span>
-                <input
-                  type="email"
-                  required
-                  placeholder="nama@email.com"
-                  value={customerEmail}
-                  onChange={(e) => {
-                    setCustomerEmail(e.target.value);
-                    if (!emailTouched) setEmailTouched(true);
-                  }}
-                  onBlur={() => setEmailTouched(true)}
-                  className={`cig-input ${emailTouched && !emailValidation.isValid ? "is-invalid" : ""} ${emailTouched && emailValidation.isValid ? "is-valid" : ""}`}
-                  style={{
-                    width: "100%",
-                    height: "42px",
-                    border: emailTouched && !emailValidation.isValid
-                      ? "1.5px solid #ef4444"
-                      : (emailTouched && emailValidation.isValid ? "1.5px solid #10b981" : "1px solid #cbd5e1"),
-                    borderRadius: "9px",
-                    padding: "8px 12px",
-                    fontSize: "13px",
-                    background: emailTouched && !emailValidation.isValid ? "#fff5f5" : "#ffffff",
-                    color: "#0f172a",
-                    outline: "none",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.2s, background 0.2s",
-                  }}
-                />
+                Email <span style={{ color: "#0a58ca" }}>(Kredensial API dikirim via email)</span>
+                <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
               </label>
+              <input
+                id="checkout-customer-email"
+                type="email"
+                required
+                placeholder="nama@email.com"
+                value={customerEmail}
+                onChange={(e) => {
+                  setCustomerEmail(e.target.value);
+                  if (!emailTouched) setEmailTouched(true);
+                }}
+                onBlur={() => setEmailTouched(true)}
+                className={`cig-input cig-input-email ${emailTouched && !emailValidation.isValid ? "is-invalid" : ""} ${emailTouched && emailValidation.isValid ? "is-valid" : ""}`}
+                style={{
+                  width: "100%",
+                  height: "42px",
+                  border: emailTouched && !emailValidation.isValid
+                    ? "1.5px solid #ef4444"
+                    : (emailTouched && emailValidation.isValid ? "1.5px solid #10b981" : "1px solid #cbd5e1"),
+                  borderRadius: "9px",
+                  padding: "8px 12px",
+                  fontSize: "13px",
+                  background: emailTouched && !emailValidation.isValid ? "#fff5f5" : "#ffffff",
+                  color: "#0f172a",
+                  outline: "none",
+                  boxSizing: "border-box",
+                  transition: "border-color 0.2s, background 0.2s",
+                }}
+              />
               {emailTouched && !emailValidation.isValid && (
-                <div style={{ marginTop: "5px", fontSize: "11px", color: "#dc2626", fontWeight: 600, lineHeight: 1.35, display: "flex", alignItems: "flex-start", gap: "4px" }}>
+                <div className="cig-error-email" style={{ marginTop: "2px", fontSize: "11px", color: "#dc2626", fontWeight: 600, lineHeight: 1.35, display: "flex", alignItems: "flex-start", gap: "4px" }}>
                   <span aria-hidden="true">⚠️</span>
                   <span>
                     {emailValidation.error}
