@@ -10244,18 +10244,19 @@ footer {
   height: 52px;
   padding: 0;
   border-radius: 50%;
-  background: #0f9d8a;
+  background: #25d366;
   color: #ffffff !important;
   text-decoration: none !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(37, 211, 102, 0.32);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 .floating-wa-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.34);
+  background: #1ebe57;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(37, 211, 102, 0.4);
 }
 
 .floating-wa-btn:active {
@@ -10273,7 +10274,7 @@ footer {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: rgba(15, 157, 138, 0.35);
+  background: rgba(37, 211, 102, 0.35);
   pointer-events: none;
   animation: wa-pulse 2.6s infinite ease-out;
   z-index: -1;
