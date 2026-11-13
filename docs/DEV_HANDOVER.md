@@ -70,9 +70,12 @@ NEXT_PUBLIC_DEMO_MODE="false"
 
 ---
 
-## ✅ Verifikasi Pasca-Handover
+## ✅ Verifikasi & Keamanan Pasca-Handover
 
-Setelah kedua kredensial di atas dimasukkan ke Vercel:
-1. Buka halaman **`/status`** di website untuk memastikan indikator **Frontier Models Engine (`https://api.tokotokenai.com/v1`)** berubah menjadi **`Live Master Key Aktif`** dan **Sistem Pembayaran** berubah menjadi **`Live (TRIPAY / MIDTRANS / XENDIT)`**.
-2. Lakukan 1x transaksi percobaan dan 1x panggilan `POST /api/v1/chat/completions` dari halaman **`/docs`**.
+1. **Migrasi Database & RLS Hardening (Wajib di Supabase SQL Editor):**
+   - Jalankan [`supabase/migrations/20261113000000_security_rls_and_gateway_columns.sql`](../supabase/migrations/20261113000000_security_rls_and_gateway_columns.sql) di SQL Editor Supabase agar tabel `orders`, `keys`, dan `usage_logs` tertutup dari akses publik `anon` dan hanya dapat diakses backend melalui `SUPABASE_SECRET_KEY` (`service_role`).
+2. **Cek Status Infrastruktur:**
+   - Buka halaman **`/status`** di website untuk memastikan indikator **Frontier Models Engine (`https://api.tokotokenai.com/v1`)** berubah menjadi **`Live Master Key Aktif`** dan **Sistem Pembayaran** berubah menjadi **`Live (TRIPAY / MIDTRANS / XENDIT)`**.
+3. **Pengujian End-to-End:**
+   - Lakukan 1x transaksi percobaan dan 1x panggilan `POST /api/v1/chat/completions` dari halaman **`/docs`**.
 

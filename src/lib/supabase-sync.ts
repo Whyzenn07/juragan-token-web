@@ -116,6 +116,14 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
     email_message: order.emailMessage || null,
   };
   const withTopUp = { ...base, is_top_up: Boolean(order.isTopUp), target_key_hash: order.targetKeyHash || null };
+  const withGateway = {
+    ...withTopUp,
+    gateway_provider: order.gatewayProvider || null,
+    gateway_reference: order.gatewayReference || null,
+    payment_url: order.paymentUrl || null,
+    qr_url: order.qrUrl || null,
+    pay_code: order.payCode || null,
+  };
 
   const post = (body: unknown) =>
     fetch(`${url}/rest/v1/orders?on_conflict=id`, {
@@ -125,7 +133,8 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
     });
 
   try {
-    let res = await post(withTopUp);
+    let res = await post(withGateway);
+    if (!res.ok && res.status === 400) res = await post(withTopUp);
     // Kolom top-up belum dimigrasi di database: ulangi tanpa kolom tersebut.
     if (!res.ok && res.status === 400) res = await post(base);
 
@@ -168,6 +177,11 @@ export function rowToOrder(co: any): Order {
     emailMessage: co.email_message || undefined,
     targetKeyHash: co.target_key_hash || undefined,
     isTopUp: Boolean(co.is_top_up),
+    gatewayProvider: co.gateway_provider || undefined,
+    gatewayReference: co.gateway_reference || undefined,
+    paymentUrl: co.payment_url || undefined,
+    qrUrl: co.qr_url || undefined,
+    payCode: co.pay_code || undefined,
   };
 }
 

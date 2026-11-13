@@ -4,6 +4,8 @@ import {
   resolveUpstreamModel,
   getUpstreamEngineStatus,
   calculateUsageCost,
+  estimateMinimumRequestCost,
+  sanitizeUpstreamErrorMessage,
   deductKeyBalance,
   recordUsageLog,
   acquireStreamSlot,
@@ -207,8 +209,45 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (body.messages.length > 200) {
+    return NextResponse.json(
+      {
+        error: {
+          message: "Jumlah pesan maksimal per permintaan adalah 200 pesan.",
+          type: "invalid_request_error",
+          code: "messages_limit_exceeded",
+        },
+      },
+      { status: 400, headers: CORS_HEADERS }
+    );
+  }
+
+  const requestedModel = typeof body.model === "string" && body.model.trim() ? body.model.trim().slice(0, 100) : "gemini-3.5-flash";
+  const estimatedInputTokens = estimatePromptTokens(body.messages);
+  const minRequiredIdr = estimateMinimumRequestCost(requestedModel, estimatedInputTokens);
+
+  if (auth.keyRecord.balanceIdr < minRequiredIdr) {
+    return NextResponse.json(
+      {
+        error: {
+          message: `Saldo kredit Anda (Rp ${auth.keyRecord.balanceIdr}) tidak mencukupi estimasi biaya minimum request ini (Rp ${minRequiredIdr}). Silakan lakukan top-up di https://juragantoken.com`,
+          type: "insufficient_quota",
+          code: "insufficient_quota",
+        },
+      },
+      { status: 402, headers: CORS_HEADERS }
+    );
+  }
+
+  // Batasi max_tokens secara wajar agar satu request tidak memicu overdraft berlebih
+  if (typeof body.max_tokens === "number" && body.max_tokens > 32768) {
+    body.max_tokens = 32768;
+  }
+  if (typeof body.max_completion_tokens === "number" && body.max_completion_tokens > 32768) {
+    body.max_completion_tokens = 32768;
+  }
+
   // 3. Tentukan Target Upstream Provider & Model + Proteksi Rate-Limit & Konkurensi (PRD 8.2)
-  const requestedModel = body.model || "gemini-3.5-flash";
   const rateCheck = checkGatewayRateLimit(auth.keyHash, requestedModel);
   if (rateCheck.limited) {
     return NextResponse.json(
@@ -271,15 +310,37 @@ export async function POST(req: NextRequest) {
     upstreamAuthHeader = `Bearer ${geminiKey}`;
   } else {
     // Pass-Through Engine ke https://api.tokotokenai.com/v1
+    // KEAMANAN KETAT: Jangan pernah fallback ke ADMIN_SECRET atau header Authorization klien!
     const engineStatus = getUpstreamEngineStatus();
     const engineKey =
       process.env.UPSTREAM_ENGINE_KEY?.trim() ||
       process.env.TOKOTOKENAI_API_KEY?.trim() ||
-      process.env.ADMIN_SECRET?.trim() ||
       "";
 
-    upstreamUrl = `${engineStatus.engineUrl}/chat/completions`;
-    upstreamAuthHeader = engineKey ? `Bearer ${engineKey}` : (authHeader || "");
+    if (!engineKey) {
+      const geminiKey = process.env.GEMINI_API_KEY?.trim();
+      if (geminiKey) {
+        // Fallback aman ke Gemini Resilience tanpa mengirim rahasia/token ke endpoint upstream
+        provider = "gemini";
+        upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+        upstreamAuthHeader = `Bearer ${geminiKey}`;
+      } else {
+        freeSlot();
+        return NextResponse.json(
+          {
+            error: {
+              message: "Master API Key LLM (UPSTREAM_ENGINE_KEY) belum dikonfigurasi oleh tim developer.",
+              type: "server_configuration_error",
+              code: "missing_upstream_engine_key",
+            },
+          },
+          { status: 503, headers: CORS_HEADERS }
+        );
+      }
+    } else {
+      upstreamUrl = `${engineStatus.engineUrl}/chat/completions`;
+      upstreamAuthHeader = `Bearer ${engineKey}`;
+    }
   }
 
   // 5. Buat Payload yang Diteruskan & Multi-Tier Resilience Engine
@@ -448,14 +509,14 @@ export async function POST(req: NextRequest) {
     if (!upstreamRes.ok) {
       freeSlot();
       const errBody = await upstreamRes.json().catch(() => ({}));
-      const rawMessage = Array.isArray(errBody)
-        ? errBody[0]?.error?.message
-        : errBody?.error?.message;
+      const rawMessage = sanitizeUpstreamErrorMessage(
+        String((Array.isArray(errBody) ? errBody[0]?.error?.message : errBody?.error?.message) || "")
+      );
       const rawCode = Array.isArray(errBody)
         ? errBody[0]?.error?.code
         : errBody?.error?.code;
 
-      console.warn(`[GATEWAY UPSTREAM ERROR] ${provider} status ${upstreamRes.status}:`, errBody);
+      console.warn(`[GATEWAY UPSTREAM ERROR] ${provider} status ${upstreamRes.status}`);
       return NextResponse.json(
         {
           error: {
@@ -471,8 +532,6 @@ export async function POST(req: NextRequest) {
         { status: upstreamRes.status, headers: CORS_HEADERS }
       );
     }
-
-    const estimatedInputTokens = estimatePromptTokens(body.messages);
 
     // 6A. Penanganan Streaming (Server-Sent Events) dengan Metering Token Dinamis
     if (isStream && upstreamRes.body) {

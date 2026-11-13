@@ -26,7 +26,12 @@ create table if not exists public.orders (
     email_status text default 'none',
     email_message text,
     is_top_up boolean default false,
-    target_key_hash text
+    target_key_hash text,
+    gateway_provider text,
+    gateway_reference text,
+    payment_url text,
+    qr_url text,
+    pay_code text
 );
 
 create index if not exists idx_orders_created_at on public.orders (created_at desc);
@@ -73,28 +78,29 @@ alter table public.keys enable row level security;
 alter table public.usage_logs enable row level security;
 
 drop policy if exists "Allow public order insertion" on public.orders;
-create policy "Allow public order insertion" on public.orders for insert with check (true);
-
 drop policy if exists "Allow order read" on public.orders;
-create policy "Allow order read" on public.orders for select using (true);
-
 drop policy if exists "Allow order update" on public.orders;
-create policy "Allow order update" on public.orders for update using (true) with check (true);
-
 drop policy if exists "Allow keys lookup by hash" on public.keys;
-create policy "Allow keys lookup by hash" on public.keys for select using (true);
-
 drop policy if exists "Allow keys insert on payment" on public.keys;
-create policy "Allow keys insert on payment" on public.keys for insert with check (true);
-
 drop policy if exists "Allow keys update on balance deduction" on public.keys;
-create policy "Allow keys update on balance deduction" on public.keys for update using (true) with check (true);
-
 drop policy if exists "Allow insert usage_logs" on public.usage_logs;
-create policy "Allow insert usage_logs" on public.usage_logs for insert with check (true);
-
 drop policy if exists "Allow read usage_logs" on public.usage_logs;
-create policy "Allow read usage_logs" on public.usage_logs for select using (true);
+
+drop policy if exists "Service role full access orders" on public.orders;
+create policy "Service role full access orders" on public.orders for all
+  using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
+
+drop policy if exists "Service role full access keys" on public.keys;
+create policy "Service role full access keys" on public.keys for all
+  using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
+
+drop policy if exists "Service role full access usage_logs" on public.usage_logs;
+create policy "Service role full access usage_logs" on public.usage_logs for all
+  using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
+
+revoke all on public.orders from anon, authenticated;
+revoke all on public.keys from anon, authenticated;
+revoke all on public.usage_logs from anon, authenticated;
 
 -- 4B. FUNGSI RPC ATOMIK PEMOTONGAN SALDO (ANTI-RACE CONDITION)
 create or replace function public.deduct_token_balance(

@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendReceiptEmail } from "@/lib/receipt-email";
+import { rateLimited, safeEqualSecret } from "@/lib/keys";
 
 export async function GET(req: NextRequest) {
-  // Pengamanan Server: Hanya izinkan test email jika DEMO_MODE aktif atau memiliki header x-admin-secret
-  const isDemo = process.env.DEMO_MODE === "true" || process.env.NODE_ENV !== "production";
-  const adminSecret = process.env.ADMIN_SECRET?.trim();
-  const providedSecret = req.headers.get("x-admin-secret") || new URL(req.url).searchParams.get("secret");
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  if (rateLimited(`test-email:${ip}`, 10, 60_000)) {
+    return NextResponse.json({ success: false, error: "Terlalu banyak permintaan." }, { status: 429 });
+  }
 
-  if (!isDemo && (!adminSecret || providedSecret !== adminSecret)) {
+  // Pengamanan Ketat: Selalu wajib header x-admin-secret (tanpa query param & tanpa bypass DEMO_MODE)
+  const adminSecret = process.env.ADMIN_SECRET?.trim();
+  const providedSecret = req.headers.get("x-admin-secret")?.trim();
+
+  if (!adminSecret || !safeEqualSecret(adminSecret, providedSecret)) {
     return NextResponse.json(
-      { success: false, error: "Akses ditolak: Endpoint ini diproteksi. Sertakan header x-admin-secret." },
+      { success: false, error: "Akses ditolak: Endpoint ini diproteksi. Sertakan header x-admin-secret yang valid." },
       { status: 403 }
     );
   }

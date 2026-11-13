@@ -137,7 +137,7 @@ export async function createGatewayTransaction(
             quantity: 1,
           },
         ],
-        Callback_url: status.webhookEndpoint,
+        callback_url: status.webhookEndpoint,
         expired_time: Math.floor(Date.now() / 1000) + 15 * 60,
         signature,
       };

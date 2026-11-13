@@ -17,9 +17,17 @@ export function generateInvoiceId(): string {
 }
 
 export function safeEqualHash(a: string, b: string): boolean {
+  if (!a || !b || a.length !== b.length || a.length % 2 !== 0) return false;
+  if (!/^[0-9a-f]+$/i.test(a) || !/^[0-9a-f]+$/i.test(b)) return false;
   const ba = Buffer.from(a, "hex");
   const bb = Buffer.from(b, "hex");
-  return ba.length === bb.length && timingSafeEqual(ba, bb);
+  return ba.length > 0 && ba.length === bb.length && timingSafeEqual(ba, bb);
+}
+
+/** Bandingkan dua secret string dengan panjang seragam (via SHA-256) secara constant-time. */
+export function safeEqualSecret(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (!a || !b) return false;
+  return safeEqualHash(sha256(a), sha256(b));
 }
 
 export function maskKey(key: string): string {

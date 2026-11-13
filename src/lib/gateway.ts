@@ -1,6 +1,7 @@
 import { rateLimited, sha256 } from "./keys";
 import { query, mutate, type KeyRecord } from "./store";
 import { syncKeyToSupabase, syncUsageLogToSupabase, getSupabaseConfig, fetchKeyFromSupabase } from "./supabase-sync";
+import { modelsCatalog, inputIdrPer1M, outputIdrPer1M, isPerImage, tierOf } from "@/data/catalog";
 
 export const MAX_CONCURRENT_STREAMS = 5;
 const activeStreams = new Map<string, number>();
@@ -220,29 +221,60 @@ export function resolveUpstreamModel(inputModel: string): {
 }
 
 /**
- * Perhitungan tarif Rupiah per token berdasarkan jenis model
+ * Perhitungan tarif Rupiah per token berdasarkan katalog model riil (fallback ke 3 tier aman).
  */
 export function calculateUsageCost(model: string, promptTokens: number, completionTokens: number): number {
-  const m = model.toLowerCase();
+  const m = (model || "").toLowerCase().trim();
+  const catalogMatch = modelsCatalog.find(
+    (item) => item.id.toLowerCase() === m || item.name.toLowerCase() === m
+  );
+
+  if (catalogMatch && !isPerImage(catalogMatch)) {
+    const inCost = (promptTokens / 1_000_000) * inputIdrPer1M(catalogMatch);
+    const outCost = (completionTokens / 1_000_000) * outputIdrPer1M(catalogMatch);
+    const total = Math.ceil(inCost + outCost);
+    const tier = tierOf(catalogMatch);
+    const floor = tier === "Hemat" ? 5 : tier === "Seimbang" ? 15 : 25;
+    return Math.max(floor, total);
+  }
 
   // Gemini Flash: sangat hemat (Rp 20 per 1.000 tokens)
   if (m.includes("flash")) {
     const totalTokens = promptTokens + completionTokens;
     const cost = Math.ceil((totalTokens / 1000) * 20);
-    return Math.max(5, cost); // Minimal potong Rp 5
+    return Math.max(5, cost);
   }
 
   // Gemini Pro: (Rp 60 per 1.000 tokens)
   if (m.includes("pro")) {
     const totalTokens = promptTokens + completionTokens;
     const cost = Math.ceil((totalTokens / 1000) * 60);
-    return Math.max(10, cost);
+    return Math.max(15, cost);
   }
 
-  // Claude / GPT-4 / DeepSeek: (Rp 200 per 1.000 tokens)
+  // Model frontier lainnya (Claude / GPT / DeepSeek): (Rp 200 per 1.000 tokens)
   const totalTokens = promptTokens + completionTokens;
   const cost = Math.ceil((totalTokens / 1000) * 200);
   return Math.max(25, cost);
+}
+
+/**
+ * Estimasi biaya minimum sebelum memanggil upstream untuk mencegah overdraft (saldo Rp 1 menguras Master Key).
+ */
+export function estimateMinimumRequestCost(model: string, promptTokens: number): number {
+  return calculateUsageCost(model, promptTokens, 64);
+}
+
+/**
+ * Sanitasi pesan error upstream agar tidak membocorkan API key/token ke klien.
+ */
+export function sanitizeUpstreamErrorMessage(message: string): string {
+  if (!message) return "";
+  return message
+    .replace(/Bearer\s+[A-Za-z0-9._\-]+/gi, "Bearer [REDACTED]")
+    .replace(/AIza[0-9A-Za-z\-_]{20,}/g, "[REDACTED_KEY]")
+    .replace(/sk-[A-Za-z0-9\-_]{16,}/g, "[REDACTED_KEY]")
+    .replace(/jt-live-[A-Za-z0-9\-_]{10,}/g, "[REDACTED_KEY]");
 }
 
 /**

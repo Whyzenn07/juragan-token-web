@@ -117,14 +117,18 @@ async function runErrorTests() {
     }
   });
 
-  // 5. Cek Saldo dengan Key tidak terdaftar
-  await test("Cek Saldo API Key fiktif -> Harus return 404 Not Found", async () => {
-    const res = await request({
-      hostname: "localhost",
-      port: 3000,
-      path: "/api/keys/check?key=jt-live-tidakterdaftar0000000000",
-      method: "GET",
-    });
+  // 5. Cek Saldo dengan Key tidak terdaftar (POST) & Tolak GET (405)
+  await test("Cek Saldo API Key fiktif (POST) -> Harus return 404 Not Found", async () => {
+    const res = await request(
+      {
+        hostname: "localhost",
+        port: 3000,
+        path: "/api/keys/check",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      },
+      { key: "jt-live-tidakterdaftar0000000000" }
+    );
     if (res.status !== 404 && res.status !== 400) {
       throw new Error(`Expected status 404 or 400, got ${res.status}`);
     }
@@ -213,6 +217,62 @@ async function runErrorTests() {
     // Jika tidak ada order valid atau signature mismatch, harus ditolak dengan status 4xx
     if (res.status !== 403 && res.status !== 400 && res.status !== 404) {
       throw new Error(`Expected rejection status 403, 400, or 404, got ${res.status}`);
+    }
+  });
+
+  // 10. Cek Saldo via GET Query String -> Harus ditolak (405 Method Not Allowed)
+  await test("GET /api/keys/check dengan API key di URL -> Harus ditolak (405)", async () => {
+    const res = await request({
+      hostname: "localhost",
+      port: 3000,
+      path: "/api/keys/check?key=jt-live-rahasia123456789012",
+      method: "GET",
+    });
+    if (res.status !== 405) {
+      throw new Error(`Expected 405 Method Not Allowed, got ${res.status}`);
+    }
+  });
+
+  // 11. Webhook Generic Tanpa Admin Secret -> Harus ditolak (403 Forbidden)
+  await test("Webhook Generic Tanpa Autentikasi -> Harus ditolak (403)", async () => {
+    const res = await request(
+      {
+        hostname: "localhost",
+        port: 3000,
+        path: "/api/webhooks/payment",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      },
+      { invoiceId: "INV-JT-TEST123456", status: "PAID" }
+    );
+    if (res.status !== 403) {
+      throw new Error(`Expected 403 Forbidden, got ${res.status}`);
+    }
+  });
+
+  // 12. POST /api/supabase/status Tanpa Admin Secret -> Harus ditolak (403 Forbidden)
+  await test("POST /api/supabase/status Tanpa Admin Secret -> Harus ditolak (403)", async () => {
+    const res = await request({
+      hostname: "localhost",
+      port: 3000,
+      path: "/api/supabase/status",
+      method: "POST",
+    });
+    if (res.status !== 403) {
+      throw new Error(`Expected 403 Forbidden, got ${res.status}`);
+    }
+  });
+
+  // 13. GET /api/test-email Tanpa Admin Secret -> Harus ditolak (403 Forbidden)
+  await test("GET /api/test-email Tanpa Admin Secret -> Harus ditolak (403)", async () => {
+    const res = await request({
+      hostname: "localhost",
+      port: 3000,
+      path: "/api/test-email?to=attacker@example.com",
+      method: "GET",
+    });
+    if (res.status !== 403) {
+      throw new Error(`Expected 403 Forbidden, got ${res.status}`);
     }
   });
 

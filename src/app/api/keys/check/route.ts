@@ -68,9 +68,3 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as { key?: string };
   return handleCheck(body.key ?? "", ip);
 }
-
-export async function GET(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-  const { searchParams } = new URL(req.url);
-  return handleCheck(searchParams.get("key") ?? "", ip);
-}
