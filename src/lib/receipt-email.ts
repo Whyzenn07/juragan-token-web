@@ -1,4 +1,6 @@
-import nodemailer from "nodemailer";
+import fs from "node:fs";
+import path from "node:path";
+import nodemailer, { type SendMailOptions } from "nodemailer";
 
 export interface SendReceiptPayload {
   customerName: string;
@@ -62,16 +64,56 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     : `+${adminWaRaw}`;
   const officialWeb = "https://api.tokotokenai.com/";
 
-  // Domain asal aset publik: pastikan mengarah ke hosting frontend Vercel yang valid
+  // Domain asal aset publik: pastikan mengarah ke hosting frontend publik yang valid (hindari localhost & alias 404)
+  const fallbackOrigin = "https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app";
+  const isValidPublicOrigin = (val?: string) =>
+    Boolean(
+      val &&
+        val.startsWith("http") &&
+        !val.includes("localhost") &&
+        !val.includes("127.0.0.1") &&
+        !val.includes("tokotokenai.com") &&
+        !val.includes("juragan-token-web-retail.vercel.app")
+    );
+
   const webOrigin = (
-    process.env.NEXT_PUBLIC_APP_URL?.startsWith("http") && !process.env.NEXT_PUBLIC_APP_URL.includes("tokotokenai.com")
-      ? process.env.NEXT_PUBLIC_APP_URL
-      : process.env.VERCEL_PROJECT_PRODUCTION_URL
+    isValidPublicOrigin(process.env.NEXT_PUBLIC_APP_URL)
+      ? process.env.NEXT_PUBLIC_APP_URL!
+      : isValidPublicOrigin(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined)
+      ? `https://${process.env.VERCEL_URL}`
+      : isValidPublicOrigin(
+          process.env.VERCEL_PROJECT_PRODUCTION_URL
+            ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+            : undefined
+        )
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app"
+      : fallbackOrigin
   ).replace(/\/+$/, "");
 
   const badgeUrl = `${webOrigin}/assets/email/success-check-badge.png`;
+
+  // Embed ikon centang PNG langsung via inline CID agar 100% tampil di Gmail Desktop/Mobile tanpa bergantung fetch eksternal
+  const BADGE_CID = "success-check-badge@juragantoken";
+  let badgeSrc = badgeUrl;
+  let badgeAttachments: SendMailOptions["attachments"] | undefined;
+
+  try {
+    const badgePath = path.join(process.cwd(), "public", "assets", "email", "success-check-badge.png");
+    if (fs.existsSync(badgePath)) {
+      badgeAttachments = [
+        {
+          filename: "success-check-badge.png",
+          content: fs.readFileSync(badgePath),
+          cid: BADGE_CID,
+          contentDisposition: "inline",
+          contentType: "image/png",
+        },
+      ];
+      badgeSrc = `cid:${BADGE_CID}`;
+    }
+  } catch {
+    // Fallback ke badgeUrl HTTPS apabila pembacaan file lokal gagal
+  }
 
   const gmailUser = process.env.GMAIL_USER?.trim();
   const gmailPass = process.env.GMAIL_APP_PASSWORD?.trim();
@@ -156,11 +198,11 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 18px;">
                 <tr>
                   <td align="center" valign="middle" style="padding:0;text-align:center;">
-                    <img src="${badgeUrl}"
-                         width="104"
-                         height="104"
-                         alt="✓ Pembayaran Berhasil"
-                         style="display:block;width:104px;height:104px;max-width:104px;border:0;outline:none;margin:0 auto;text-align:center;" />
+                    <img src="${badgeSrc}"
+                         width="96"
+                         height="96"
+                         alt="Pembayaran Berhasil"
+                         style="display:block;width:96px;height:96px;max-width:96px;border:0;outline:none;margin:0 auto;text-align:center;border-radius:50%;" />
                   </td>
                 </tr>
               </table>
@@ -309,6 +351,7 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
     to: customerEmail,
     subject: `Invoice Pembayaran Berhasil — ${invoiceId}`,
     html: htmlContent,
+    attachments: badgeAttachments,
   });
   console.log(`[EMAIL BERHASIL] ID: ${info.messageId} dikirim ke ${customerEmail}`);
 
