@@ -817,24 +817,33 @@ Mohon dibantu konfirmasi ya!`;
         .classai-input-grid {
           display: grid !important;
           grid-template-columns: 1fr 1fr !important;
-          gap: 12px !important;
+          column-gap: 12px !important;
+          row-gap: 6px !important;
           margin-bottom: 16px !important;
+          align-items: start !important;
+          text-align: left !important;
         }
         .cig-col {
-          display: flex !important;
-          flex-direction: column !important;
+          display: contents !important;
         }
         .cig-label {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 6px !important;
+          display: block !important;
+          text-align: left !important;
+          align-self: end !important;
           font-size: 12px !important;
           font-weight: 600 !important;
           color: #334155 !important;
+          line-height: 1.4 !important;
+          margin: 0 !important;
         }
+        .cig-label-name { grid-column: 1 !important; grid-row: 1 !important; }
+        .cig-input-name { grid-column: 1 !important; grid-row: 2 !important; }
+        .cig-label-email { grid-column: 2 !important; grid-row: 1 !important; }
+        .cig-input-email { grid-column: 2 !important; grid-row: 2 !important; }
+        .cig-error-email { grid-column: 2 !important; grid-row: 3 !important; }
         .cig-input {
           width: 100% !important;
-          height: 40px !important;
+          height: 42px !important;
           border: 1px solid #cbd5e1 !important;
           border-radius: 9px !important;
           padding: 8px 12px !important;
@@ -1460,12 +1469,6 @@ Mohon dibantu konfirmasi ya!`;
           gap: 6px !important;
           cursor: pointer !important;
         }
-        .classai-input-grid {
-          display: grid !important;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-          margin-bottom: 16px;
-        }
         @media (max-width: 640px) {
           .classai-checkout-modal {
             width: 100% !important;
@@ -1476,6 +1479,19 @@ Mohon dibantu konfirmasi ya!`;
           .classai-input-grid {
             grid-template-columns: 1fr !important;
             gap: 12px !important;
+          }
+          .cig-col {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+          }
+          .cig-label-name,
+          .cig-input-name,
+          .cig-label-email,
+          .cig-input-email,
+          .cig-error-email {
+            grid-column: auto !important;
+            grid-row: auto !important;
           }
           .classai-sticky-bottom {
             margin: 0 -16px 0 -16px !important;
@@ -1835,7 +1851,7 @@ Mohon dibantu konfirmasi ya!`;
                   lineHeight: 1.4,
                 }}
               >
-                Email <span style={{ color: "#0a58ca" }}>(Kredensial API dikirim via email)</span>
+                Email <span style={{ color: "#0a58ca" }}>(Kirim API Key)</span>
                 <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
               </label>
               <input
