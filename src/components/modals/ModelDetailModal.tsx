@@ -21,6 +21,7 @@ import {
 import { Dialog } from "./Dialog";
 import { Icon } from "@/components/ui/Icon";
 import { ProviderLogo } from "@/components/ui/ProviderLogo";
+import { buildWhatsappUrl, SHOW_CATALOG_PRICING } from "@/lib/site-config";
 
 type ModelDetailModalProps = {
   open: boolean;
@@ -89,31 +90,48 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
       </div>
 
       {/* Key Stats Bar */}
-      <div className="model-stats-bar">
-        {perImage ? (
+      {SHOW_CATALOG_PRICING ? (
+        <div className="model-stats-bar">
+          {perImage ? (
+            <div className="stat-cell">
+              <span className="stat-label">Harga per gambar</span>
+              <strong className="stat-price">{formatIdr(perImageIdr(model, usdRate))}</strong>
+            </div>
+          ) : (
+            <>
+              <div className="stat-cell">
+                <span className="stat-label">Input / 1 juta token</span>
+                <strong>{formatIdr(inputIdrPer1M(model, usdRate))}</strong>
+              </div>
+              <div className="stat-cell">
+                <span className="stat-label">Output / 1 juta token</span>
+                <strong>{formatIdr(outputIdrPer1M(model, usdRate))}</strong>
+              </div>
+            </>
+          )}
           <div className="stat-cell">
-            <span className="stat-label">Harga per gambar</span>
-            <strong className="stat-price">{formatIdr(perImageIdr(model, usdRate))}</strong>
+            <span className="stat-label">Rp10.000 cukup untuk</span>
+            <strong className="stat-price">
+              ±{formatNum(unitsForBudget(model, 10_000, usdRate))} {unit}
+            </strong>
           </div>
-        ) : (
-          <>
-            <div className="stat-cell">
-              <span className="stat-label">Input / 1 juta token</span>
-              <strong>{formatIdr(inputIdrPer1M(model, usdRate))}</strong>
-            </div>
-            <div className="stat-cell">
-              <span className="stat-label">Output / 1 juta token</span>
-              <strong>{formatIdr(outputIdrPer1M(model, usdRate))}</strong>
-            </div>
-          </>
-        )}
-        <div className="stat-cell">
-          <span className="stat-label">Rp10.000 cukup untuk</span>
-          <strong className="stat-price">
-            ±{formatNum(unitsForBudget(model, 10_000, usdRate))} {unit}
-          </strong>
         </div>
-      </div>
+      ) : (
+        <div className="model-stats-bar">
+          <div className="stat-cell">
+            <span className="stat-label">Fokus Keahlian</span>
+            <strong>{model.category}</strong>
+          </div>
+          <div className="stat-cell">
+            <span className="stat-label">Input Didukung</span>
+            <strong>{model.inputs.join(", ")}</strong>
+          </div>
+          <div className="stat-cell">
+            <span className="stat-label">Protokol Endpoint</span>
+            <strong>{model.endpoints.map((e) => e.toUpperCase()).join(", ")}</strong>
+          </div>
+        </div>
+      )}
 
       {/* Modal Tabs */}
       <div className="modal-tabs-nav" role="tablist">
@@ -135,15 +153,17 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
         >
           Spesifikasi
         </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "pricing"}
-          className={`modal-tab-btn ${activeTab === "pricing" ? "active" : ""}`}
-          onClick={() => setActiveTab("pricing")}
-        >
-          Hitungan biaya
-        </button>
+        {SHOW_CATALOG_PRICING && (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "pricing"}
+            className={`modal-tab-btn ${activeTab === "pricing" ? "active" : ""}`}
+            onClick={() => setActiveTab("pricing")}
+          >
+            Hitungan biaya
+          </button>
+        )}
       </div>
 
       {/* Tab 1: Quickstart */}
@@ -234,7 +254,7 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
       )}
 
       {/* Tab 3: Pricing */}
-      {activeTab === "pricing" && (
+      {SHOW_CATALOG_PRICING && activeTab === "pricing" && (
         <div className="modal-tab-panel">
           <div className="spec-list">
             {perImage ? (
@@ -277,7 +297,7 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
         >
           {copiedAll ? "Base URL & model tersalin" : "Salin Base URL & model"}
         </button>
-        {onSelectTopUp && (
+        {SHOW_CATALOG_PRICING && onSelectTopUp ? (
           <button
             type="button"
             className="button-accent"
@@ -288,6 +308,16 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
           >
             Beli saldo untuk model ini
           </button>
+        ) : (
+          <a
+            href={buildWhatsappUrl(`Halo Tim Juragantoken, saya ingin konsultasi penggunaan model ${model.name} (${model.id}).`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="button-primary-sm"
+            style={{ padding: "10px 16px", textDecoration: "none" }}
+          >
+            Tanya Tim via WhatsApp ↗
+          </a>
         )}
       </div>
     </Dialog>

@@ -8,7 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 type TokenBalanceModalProps = {
   open: boolean;
   onClose: () => void;
-  onTopUp: (key?: string) => void;
+  onTopUp?: (key?: string) => void;
 };
 
 type UsageLogItem = {
@@ -239,17 +239,29 @@ export function TokenBalanceModal({ open, onClose, onTopUp }: TokenBalanceModalP
               </div>
 
               <div className="balance-actions-row">
-                <button
-                  type="button"
-                  className="button-accent full"
-                  onClick={() => {
-                    const keyToTopUp = inputKey.trim();
-                    handleClose();
-                    onTopUp(keyToTopUp);
-                  }}
-                >
-                  Top-Up Saldo Kunci Ini Sekarang ↗
-                </button>
+                {onTopUp ? (
+                  <button
+                    type="button"
+                    className="button-accent full"
+                    onClick={() => {
+                      const keyToTopUp = inputKey.trim();
+                      handleClose();
+                      onTopUp(keyToTopUp);
+                    }}
+                  >
+                    Top-Up Saldo Kunci Ini Sekarang ↗
+                  </button>
+                ) : (
+                  <a
+                    href={`https://wa.me/6281226983990?text=${encodeURIComponent("Halo Tim Juragantoken, saya ingin menanyakan penambahan kuota untuk API Key saya.")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="button-primary-sm full"
+                    style={{ padding: "11px 16px", textAlign: "center", justifyContent: "center", textDecoration: "none" }}
+                  >
+                    Hubungi Tim via WhatsApp ↗
+                  </a>
+                )}
               </div>
             </div>
           ) : (

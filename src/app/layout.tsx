@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./landing.css";
 
 export const viewport: Viewport = {
   themeColor: "#0a2442",
@@ -11,25 +12,24 @@ const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://api.tokotokenai.com"
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
-  title: "Juragan Token: Kredit API AI Prabayar untuk Claude, GPT, Gemini & DeepSeek",
+  title: "Juragantoken — One Gateway. Every Intelligence.",
   description:
-    "Marketplace kredit API Multi-AI prabayar lokal di Indonesia. Akses resmi Claude Sonnet, Opus 5.5, GPT-4o, Gemini 3.8 Flash, dan DeepSeek tanpa kartu kredit melalui QRIS instan dan Virtual Account Bank lokal.",
+    "Gerbang API AI terpadu di Indonesia untuk mengakses Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, Qwen, dan puluhan model LLM terkemuka melalui satu integrasi OpenAI-compatible.",
   keywords: [
+    "Juragantoken",
     "Juragan Token",
-    "kredit API AI",
-    "API Claude Sonnet",
-    "API Claude Opus",
-    "API ChatGPT Indonesia",
-    "API Gemini Flash",
-    "token AI prabayar",
-    "beli API AI QRIS",
-    "API AI tanpa kartu kredit",
-    "Cursor AI API key",
-    "Claude Code CLI token",
+    "AI Gateway Indonesia",
+    "API Claude Opus 5.5",
+    "API ChatGPT Astra",
+    "API Gemini 4 Argon",
+    "API DeepSeek V4",
+    "API Qwen",
+    "Cursor AI API gateway",
+    "Claude Code CLI gateway",
   ],
-  authors: [{ name: "Juragan Token Indonesia", url: appUrl }],
-  creator: "Juragan Token Indonesia",
-  publisher: "Juragan Token Indonesia",
+  authors: [{ name: "Juragantoken Indonesia", url: appUrl }],
+  creator: "Juragantoken Indonesia",
+  publisher: "Juragantoken Indonesia",
   robots: {
     index: true,
     follow: true,
@@ -42,28 +42,28 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Juragan Token - 1 Kunci Token untuk Semua AI Kelas Dunia",
+    title: "Juragantoken — One Gateway. Every Intelligence.",
     description:
-      "Akses resmi Claude 3.5 / Opus 5.5, GPT-4o, Gemini 3.8 Flash, dan DeepSeek dalam mata uang Rupiah. Bayar instan via QRIS, aktif selamanya tanpa kedaluwarsa.",
+      "Satu API Gateway terpadu untuk mengakses Claude, GPT, Gemini, DeepSeek, dan Qwen bagi developer dan tim di Indonesia.",
     url: appUrl,
-    siteName: "Juragan Token Indonesia",
+    siteName: "Juragantoken Indonesia",
     locale: "id_ID",
     type: "website",
     images: [
       {
-        url: "/icon.svg",
+        url: "/images/logo-juragantoken.jpg",
         width: 1200,
-        height: 630,
-        alt: "Juragan Token - Marketplace Kredit API AI Prabayar Indonesia",
+        height: 416,
+        alt: "Juragantoken — One Gateway. Every Intelligence.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Juragan Token - Kredit API AI Prabayar Indonesia",
+    title: "Juragantoken — One Gateway. Every Intelligence.",
     description:
-      "Akses Claude Opus, GPT, Gemini, dan DeepSeek via QRIS instan tanpa kartu kredit. Kompatibel dengan Cursor, Claude Code, dan Chatbox.",
-    images: ["/icon.svg"],
+      "Gerbang terpadu untuk model AI ngoding, riset mendalam, dan efisiensi biaya operasional melalui satu endpoint OpenAI-compatible.",
+    images: ["/images/logo-juragantoken.jpg"],
   },
   icons: {
     icon: "/icon.svg",

@@ -1,0 +1,84 @@
+"use client";
+
+import { ProviderLogo } from "@/components/ui/ProviderLogo";
+
+const ENDPOINT_PROVIDERS = [
+  { provider: "anthropic", title: "Anthropic Claude", sub: "Opus 5.5 · Sonnet 5.5" },
+  { provider: "openai", title: "OpenAI GPT", sub: "Chat GPT 6 Astra · Sol · Terra · Luna" },
+  { provider: "google", title: "Google Gemini", sub: "Gemini 4 Argon · 3.8 Flash" },
+  { provider: "deepseek", title: "DeepSeek & Qwen", sub: "V4 Pro · V4 Flash · Qwen 3.7" },
+];
+
+export function GatewayFlow() {
+  return (
+    <section className="jt-section" id="cara-kerja" aria-labelledby="workflow-heading" data-reveal="fade-up">
+      <div className="jt-section-head">
+        <span className="jt-kicker">CARA KERJA PLATFORM</span>
+        <h2 id="workflow-heading">Satu Gerbang Terpadu untuk Seluruh Provider AI</h2>
+        <p>
+          Tim IT maupun developer cukup memelihara satu basis kode dengan standar OpenAI API, lalu mengganti model
+          antar-provider kapan saja tanpa menulis ulang integrasi.
+        </p>
+      </div>
+
+      {/* Unified Routing Diagram (PDF Slide 3 & 4, original animated SVG lines) */}
+      <div className="jt-flow-card">
+        <div className="jt-flow-left">
+          <div className="jt-flow-step-pill">1 Integrasi Tunggal</div>
+          <div className="jt-flow-hub">
+            <span className="jt-flow-hub-badge">ENDPOINT TUNGGAL</span>
+            <strong>Juragantoken API Gateway</strong>
+            <code>https://api.tokotokenai.com/v1</code>
+            <p>Autentikasi terpadu SHA-256 &amp; pencatatan pemakaian per request secara real-time.</p>
+          </div>
+        </div>
+
+        {/* Animated signal lines (desktop/tablet) */}
+        <div className="jt-flow-wires" aria-hidden="true">
+          <svg viewBox="0 0 180 260" fill="none" className="jt-wires-svg">
+            <path className="jt-wire-base" d="M0 130 C60 130, 80 35, 180 35" />
+            <path className="jt-wire-base" d="M0 130 C70 130, 90 98, 180 98" />
+            <path className="jt-wire-base" d="M0 130 C70 130, 90 162, 180 162" />
+            <path className="jt-wire-base" d="M0 130 C60 130, 80 225, 180 225" />
+
+            <path className="jt-wire-pulse" d="M0 130 C60 130, 80 35, 180 35" />
+            <path className="jt-wire-pulse jt-delay-1" d="M0 130 C70 130, 90 98, 180 98" />
+            <path className="jt-wire-pulse jt-delay-2" d="M0 130 C70 130, 90 162, 180 162" />
+            <path className="jt-wire-pulse jt-delay-3" d="M0 130 C60 130, 80 225, 180 225" />
+          </svg>
+        </div>
+
+        <div className="jt-flow-right">
+          {ENDPOINT_PROVIDERS.map((p) => (
+            <div key={p.title} className="jt-flow-target">
+              <ProviderLogo provider={p.provider} size={26} />
+              <div>
+                <strong>{p.title}</strong>
+                <span>{p.sub}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3 Pillars of Operational Simplicity */}
+      <div className="jt-steps-grid">
+        <article className="jt-step-card">
+          <span className="jt-step-num">01</span>
+          <h3>Titik Integrasi Tunggal</h3>
+          <p>Pengembang hanya memelihara satu konvensi SDK OpenAI tanpa perlu mengurus autentikasi masing-masing vendor.</p>
+        </article>
+        <article className="jt-step-card">
+          <span className="jt-step-num">02</span>
+          <h3>Eksplorasi &amp; Pindah Model Cepat</h3>
+          <p>Beralih dari Claude Opus untuk ngoding ke GPT-6 Sol untuk riset atau DeepSeek untuk efisiensi dalam hitungan detik.</p>
+        </article>
+        <article className="jt-step-card">
+          <span className="jt-step-num">03</span>
+          <h3>Monitoring Terbuka &amp; Terkendali</h3>
+          <p>Setiap Virtual API Key dapat dicek riwayat pemakaian serta status aktifnya kapan saja melalui fitur Cek Saldo Key.</p>
+        </article>
+      </div>
+    </section>
+  );
+}

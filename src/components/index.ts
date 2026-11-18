@@ -13,3 +13,4 @@ export * from "./modals/CurrencyRateModal";
 
 // Sections
 export * from "./sections/SetupGuides";
+export * from "./landing";

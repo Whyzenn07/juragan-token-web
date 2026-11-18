@@ -3,16 +3,25 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  BrandMark,
   CurrencyRateModal,
+  GatewayFlow,
+  HeroOrbit,
   Icon,
+  LogoMarquee,
   ModelDetailModal,
+  ModelExpertiseShowcase,
   ProviderLogo,
-  RegionBadge,
   SetupGuides,
   PaymentModal,
-  TokenBalanceModal
+  TokenBalanceModal,
+  WhyChooseUs
 } from "@/components";
+import {
+  buildWhatsappUrl,
+  ENABLE_CHECKOUT,
+  SHOW_CATALOG_PRICING,
+  WHATSAPP_RAW
+} from "@/lib/site-config";
 import {
   ANSWER_INPUT_TOKENS,
   ANSWER_OUTPUT_TOKENS,
@@ -38,7 +47,7 @@ import {
   USD_RATE
 } from "@/data/catalog";
 
-type SortOption = "featured" | "provider" | "cheapest" | "priciest";
+type SortOption = "featured" | "provider" | "name" | "cheapest" | "priciest";
 
 const formatIdr = (val: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
@@ -195,13 +204,14 @@ export default function Home() {
   const catalogRef = useRef<HTMLElement>(null);
 
   const NAV_ITEMS = [
-    { id: "catalog", label: "Jelajahi Token", href: "#catalog" },
-    { id: "retail", label: "Paket Ritel", href: "#katalog-retail" },
-    { id: "setup", label: "Panduan Setup", href: "#panduan-setup" },
+    { id: "expertise", label: "Keahlian AI", href: "#keahlian-model" },
+    { id: "workflow", label: "Cara Kerja", href: "#cara-kerja" },
+    { id: "catalog", label: "Katalog Model", href: "#catalog" },
+    { id: "why", label: "Kenapa Kami", href: "#kenapa-kami" },
     { id: "faq", label: "FAQ", href: "#faq" },
   ] as const;
 
-  const [activeSection, setActiveSection] = useState<string>("catalog");
+  const [activeSection, setActiveSection] = useState<string>("expertise");
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
   const navRef = useRef<HTMLElement>(null);
@@ -245,11 +255,12 @@ export default function Home() {
 
   // Scroll spy to sync activeSection with visible viewport section
   useEffect(() => {
-    const sectionIds = ["catalog", "katalog-retail", "panduan-setup", "faq"];
+    const sectionIds = ["keahlian-model", "cara-kerja", "catalog", "kenapa-kami", "faq"];
     const sectionMap: Record<string, string> = {
+      "keahlian-model": "expertise",
+      "cara-kerja": "workflow",
       catalog: "catalog",
-      "katalog-retail": "retail",
-      "panduan-setup": "setup",
+      "kenapa-kami": "why",
       faq: "faq",
     };
 
@@ -356,8 +367,9 @@ export default function Home() {
         return 0; // Mempertahankan urutan tier kurasi di catalog.ts (Luna -> Terra -> Sol -> Astra)
       });
     }
-    if (sortOption === "cheapest") return [...list].sort((a, b) => unitCostIdr(a) - unitCostIdr(b));
-    if (sortOption === "priciest") return [...list].sort((a, b) => unitCostIdr(b) - unitCostIdr(a));
+    if (sortOption === "name") return [...list].sort((a, b) => a.name.localeCompare(b.name));
+    if (SHOW_CATALOG_PRICING && sortOption === "cheapest") return [...list].sort((a, b) => unitCostIdr(a) - unitCostIdr(b));
+    if (SHOW_CATALOG_PRICING && sortOption === "priciest") return [...list].sort((a, b) => unitCostIdr(b) - unitCostIdr(a));
     return list;
   }, [models, activeCategory, selectedProvider, searchQuery, sortOption, savedIds, viewSavedOnly]);
 
@@ -379,30 +391,32 @@ export default function Home() {
       />
 
       <a href="#catalog" className="skip-link">
-        Langsung ke katalog voucher
+        Langsung ke katalog model AI
       </a>
 
       {/* 1. Top Announcement */}
       <div className="announcement">
         <div className="announcement-container">
           <span>✧</span>
-        <span>Ide besar layak mendapatkan akses AI terbaik. Mulai Rp 15.000 tanpa kartu kredit.</span>
+        <span>Juragantoken — One Gateway. Every Intelligence. Satu gerbang terpadu untuk puluhan model AI terkemuka.</span>
         <button type="button" className="announcement-link" onClick={scrollToCatalog}>
-          Kenali Juragan Token ↗
+          Jelajahi Model AI ↗
         </button>
         </div>
       </div>
 
-      {/* 2. Site Header (Sesuai ai-vouchers tapi Biru + Putih) */}
+      {/* 2. Site Header */}
       <header className={`header ${isScrolled ? "scrolled" : ""}`}>
         <div className="header-container">
-          <a className="brand" href="#top" aria-label="Juragan Token Beranda">
-          <span className="brand-mark" aria-hidden="true">
-            <BrandMark />
-          </span>
-          <span>
-            juragan<span className="brand-light">token</span><span className="brand-dot">.</span>
-          </span>
+          <a className="brand" href="#top" aria-label="Juragantoken Beranda">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo-juragantoken.jpg"
+            alt="Juragantoken — One Gateway. Every Intelligence."
+            className="brand-logo-img"
+            width={160}
+            height={38}
+          />
         </a>
 
         <nav
@@ -480,20 +494,32 @@ export default function Home() {
             <span>Cek Saldo Key</span>
             <span className="btn-arrow" aria-hidden="true">↗</span>
           </button>
-          <a
-            href="#katalog-retail"
-            className="company-button"
-            onClick={(e) => {
-              const el = document.getElementById("katalog-retail");
-              if (el) {
-                e.preventDefault();
-                el.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-          >
-            <span>Beli Token</span>
-            <span className="btn-arrow" aria-hidden="true">↗</span>
-          </a>
+          {ENABLE_CHECKOUT ? (
+            <a
+              href="#katalog-retail"
+              className="company-button"
+              onClick={(e) => {
+                const el = document.getElementById("katalog-retail");
+                if (el) {
+                  e.preventDefault();
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+            >
+              <span>Beli Token</span>
+              <span className="btn-arrow" aria-hidden="true">↗</span>
+            </a>
+          ) : (
+            <a
+              href={buildWhatsappUrl("Halo Tim Juragantoken, saya ingin berdiskusi mengenai akses API AI & uji coba.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="company-button"
+            >
+              <span>Hubungi Tim</span>
+              <span className="btn-arrow" aria-hidden="true">↗</span>
+            </a>
+          )}
           <button
             type="button"
             className="mobile-menu icon-button"
@@ -510,6 +536,12 @@ export default function Home() {
       {mobileMenuOpen && (
         <div className="mobile-nav-drawer" role="dialog" aria-label="Menu navigasi mobile">
           <nav className="mobile-nav-links">
+            <a href="#keahlian-model" onClick={() => setMobileMenuOpen(false)}>
+              Keahlian Model AI
+            </a>
+            <a href="#cara-kerja" onClick={() => setMobileMenuOpen(false)}>
+              Cara Kerja Gateway
+            </a>
             <a
               href="#catalog"
               onClick={() => {
@@ -517,10 +549,15 @@ export default function Home() {
                 setMobileMenuOpen(false);
               }}
             >
-              Semua Token AI
+              Katalog Semua Model ({models.length})
             </a>
-            <a href="#katalog-retail" onClick={() => setMobileMenuOpen(false)}>
-              Paket Prabayar Ritel
+            {ENABLE_CHECKOUT && (
+              <a href="#katalog-retail" onClick={() => setMobileMenuOpen(false)}>
+                Paket Prabayar Ritel
+              </a>
+            )}
+            <a href="#kenapa-kami" onClick={() => setMobileMenuOpen(false)}>
+              Kenapa Memilih Kami
             </a>
             <button
               type="button"
@@ -539,29 +576,9 @@ export default function Home() {
             <Link href="/status" onClick={() => setMobileMenuOpen(false)}>
               Status Sistem (Live) ↗
             </Link>
-            <a href="#panduan-setup" onClick={() => setMobileMenuOpen(false)}>
-              Panduan Setup Claude Code &amp; Cursor
-            </a>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)}>
               Bantuan &amp; FAQ
             </a>
-            <button
-              type="button"
-              className="mobile-currency-btn"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setCurrencyModalOpen(true);
-              }}
-            >
-              <span className="flag-badge-svg" aria-hidden="true">
-                <svg width="16" height="11" viewBox="0 0 18 12" fill="none">
-                  <rect width="18" height="6" fill="#e11d48" />
-                  <rect y="6" width="18" height="6" fill="#ffffff" />
-                  <rect width="18" height="12" stroke="#cbd5e1" strokeWidth="0.5" rx="1" />
-                </svg>
-              </span>
-              <span>Kurs Real-Time BI (Rp {formatNum(usdRate)}) ↗</span>
-            </button>
           </nav>
           <div className="mobile-drawer-footer">
             <button
@@ -572,7 +589,7 @@ export default function Home() {
                 scrollToCatalog();
               }}
             >
-              Temukan Token Anda ↗
+              Jelajahi Katalog Model ↗
             </button>
           </div>
         </div>
@@ -583,18 +600,18 @@ export default function Home() {
         <main className="company-main">
           {/* Breadcrumb & Live Status Strip */}
           <div className="breadcrumb">
-            <span>Marketplace</span> / <span>Temukan</span>
-            <span className="demo-pill">Pratinjau · Akses Token Universal Frontier AI</span>
+            <span>Juragantoken</span> / <span>AI Gateway Profile</span>
+            <span className="demo-pill">One Gateway · Every Intelligence</span>
           </div>
 
           <div className="gateway-status-strip" data-reveal="fade-up">
             <div className="gateway-status-left">
               <span className="live-pulse-dot" />
               <strong>Gateway api.tokotokenai.com</strong>
-              <span>· Claude Sonnet 5.5, Gemini 3.8 Flash, GPT-6, DeepSeek V4 &amp; Kimi K3 lewat satu API key</span>
+              <span>· Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4 &amp; Qwen 3.7 dalam 1 endpoint</span>
             </div>
             <div className="gateway-status-right">
-              <span>Masa Aktif: <b>Permanen (Lifetime)</b></span>
+              <span>Protokol: <b>OpenAI-Compatible (/v1)</b></span>
               <button
                 type="button"
                 className="link-button"
@@ -605,150 +622,76 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero Section (Pola Asli Juragan Token dengan Tiket Pass & Animasi Kreatif) */}
-          <section className="hero" id="top">
-            <div className="hero-content">
-              <div className="eyebrow">
-                ✦ <span>Lebih hemat. Lebih banyak berkarya.</span>
+          {/* Hero Section (Company Profile + Animated Orbit Visual) */}
+          <section className="jt-hero" id="top">
+            <div className="jt-hero-copy">
+              <div className="jt-hero-eyebrow">
+                <span>✦</span>
+                <span>ONE GATEWAY · EVERY INTELLIGENCE</span>
               </div>
               <h1>
-                <span>Ide besar Anda berikutnya.</span>
-                <br />
-                <span className="hero-accent">Dengan harga lebih ringan.</span>
+                Satu Gerbang API AI Terpadu untuk{" "}
+                <span className="jt-hero-accent">Seluruh Model Terkemuka.</span>
               </h1>
-              <p>
-                Temukan token dan kredit API untuk AI favorit Anda. Operasional bisnis, koding aplikasi, riset pasar, dan asisten kerja di mana pun tanpa kartu kredit internasional.
+              <p className="jt-hero-desc">
+                Juragantoken menjembatani kebutuhan developer, tim riset, dan operasional bisnis di Indonesia untuk
+                mengakses Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, hingga Qwen melalui satu endpoint
+                dan satu API Key tanpa repot mengelola banyak akun vendor terpisah.
               </p>
-              <div className="hero-actions">
-                <button type="button" className="primary-button" onClick={scrollToCatalog}>
-                  <span>Temukan Token Anda</span> ↗
+              <div className="jt-hero-actions">
+                <button type="button" className="jt-btn-primary" onClick={scrollToCatalog}>
+                  <span>Jelajahi Katalog Model</span>
+                  <span aria-hidden="true">↗</span>
                 </button>
-                <span className="hero-note">
-                  <Icon name="check" size={16} /> Bebas kartu kredit internasional
+                <a
+                  href={buildWhatsappUrl("Halo Tim Juragantoken, saya ingin konsultasi penggunaan AI Gateway untuk proyek kami.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="jt-btn-secondary"
+                >
+                  <span>Konsultasi via WhatsApp</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <div className="jt-hero-facts">
+                <span className="jt-hero-fact">
+                  <Icon name="check" size={16} />
+                  <span>{models.length} Model AI Terkurasi</span>
+                </span>
+                <span className="jt-hero-fact">
+                  <Icon name="check" size={16} />
+                  <span>Kompatibel Cursor, Claude Code &amp; Python SDK</span>
+                </span>
+                <span className="jt-hero-fact">
+                  <Icon name="check" size={16} />
+                  <span>Dukungan Lokal Indonesia</span>
                 </span>
               </div>
-              <RegionBadge />
             </div>
 
-            {/* The Iconic Celestial Ticket Art dengan Animasi Bergerak Kreatif */}
-            <div className="hero-art" aria-hidden="true">
-              <div className="hero-aurora-glow" />
-              <div className="orbit orbit-one" />
-              <div className="orbit orbit-two" />
-              <span className="art-star star-one">✦</span>
-              <span className="art-star star-two">✧</span>
-              <div className="floating-tag">
-                <span className="online-dot" /> Mulai Rp 15.000
-              </div>
-
-              {/* Ticket Back (Pass Multi-AI) */}
-              <div className="art-ticket ticket-back">
-                <div className="art-ticket-head">
-                  ✳ MULTI-AI PASS <span>↗</span>
-                </div>
-                <div className="ticket-brands">
-                  <span>✳</span>
-                  <span>◈</span>
-                  <span>ıı</span>
-                </div>
-                <div className="ticket-rule" />
-                <div className="ticket-bottom">
-                  MORE AI · MORE YOU <span>✦ ✦ ✦</span>
-                </div>
-              </div>
-
-              {/* Ticket Front (Juragan Token Voucher) */}
-              <div className="art-ticket ticket-front">
-                <div className="art-ticket-head">
-                  ✳ juragan token <span>↗</span>
-                </div>
-                <div className="ticket-value">
-                  −90<span>%</span>
-                </div>
-                <div className="ticket-rule" />
-                <div className="ticket-bottom">
-                  <span>UNTUK IDE BESAR ANDA</span>
-                  <div className="barcode" />
-                </div>
-              </div>
-
-              <div className="art-caption">
-                ✧ <span>Biaya ringan. Peluang tanpa batas.</span>
-              </div>
-            </div>
+            <HeroOrbit />
           </section>
 
-          {/* 4. Trust Strip dengan Logo Resmi Perusahaan AI (Anthropic, OpenAI, Google, DeepSeek, dll) */}
-          <div className="trust-strip" data-reveal="fade-up">
-            <span className="trust-lead">Model AI terdepan yang didukung:</span>
-            <div className="provider-wordmark" title="Anthropic - Claude Sonnet 5.5">
-              <ProviderLogo provider="anthropic" size={18} />
-              <span className="company-brand">Anthropic</span>
-              <span className="brand-dot-sep">·</span>
-              <b>Claude Sonnet 5.5</b>
-            </div>
-            <div className="provider-wordmark" title="OpenAI - GPT-6 Sol & Luna">
-              <ProviderLogo provider="openai" size={18} />
-              <span className="company-brand">OpenAI</span>
-              <span className="brand-dot-sep">·</span>
-              <b>GPT-6 Sol &amp; Luna</b>
-            </div>
-            <div className="provider-wordmark" title="Google - Gemini 4 Argon">
-              <ProviderLogo provider="gemini" size={18} />
-              <span className="company-brand">Google</span>
-              <span className="brand-dot-sep">·</span>
-              <b>Gemini 4 Argon</b>
-            </div>
-            <div className="provider-wordmark" title="DeepSeek - DeepSeek V4">
-              <ProviderLogo provider="deepseek" size={18} />
-              <span className="company-brand">DeepSeek</span>
-              <span className="brand-dot-sep">·</span>
-              <b>DeepSeek V4</b>
-            </div>
-            <div className="provider-wordmark" title="Alibaba Cloud - Qwen3.7 Max">
-              <ProviderLogo provider="qwen" size={18} />
-              <span className="company-brand">Alibaba</span>
-              <span className="brand-dot-sep">·</span>
-              <b>Qwen3.7 Max</b>
-            </div>
-            <div className="provider-wordmark" title="MiniMax - MiniMax M2.5">
-              <ProviderLogo provider="minimax" size={18} />
-              <span className="company-brand">MiniMax</span>
-              <span className="brand-dot-sep">·</span>
-              <b>MiniMax M2.5</b>
-            </div>
-            <div className="provider-wordmark" title="xAI - Grok 4.3">
-              <ProviderLogo provider="grok" size={18} />
-              <span className="company-brand">xAI</span>
-              <span className="brand-dot-sep">·</span>
-              <b>Grok 4.3</b>
-            </div>
-            <div className="provider-wordmark" title="Moonshot AI - Kimi K3">
-              <ProviderLogo provider="kimi" size={18} />
-              <span className="company-brand">Moonshot</span>
-              <span className="brand-dot-sep">·</span>
-              <b>Kimi K3</b>
-            </div>
-            <div className="provider-wordmark" title="Anthropic - Claude Fable 5.1">
-              <ProviderLogo provider="anthropic" size={20} />
-              <span className="company-brand">Anthropic</span>
-              <span className="brand-dot-sep">·</span>
-              <b>Claude Fable 5.1</b>
-            </div>
-            <div className="provider-wordmark" title="Z.ai - GLM-5.3 Flash">
-              <ProviderLogo provider="zhipu" size={20} />
-              <span className="company-brand">Z.ai</span>
-              <span className="brand-dot-sep">·</span>
-              <b>GLM-5.3 Flash</b>
-            </div>
-            <a className="more-tools" href={`${GATEWAY_ORIGIN}/pricing`} target="_blank" rel="noreferrer">
-              Semua 124 model di gateway ↗
-            </a>
-          </div>
+          {/* Animated Moving LLM Showcase (Original Marquee Inspired by Industry Patterns) */}
+          <LogoMarquee onSelectModel={handleOpenDetail} />
+
+          {/* Model Expertise by Use Case (Coding, Research, Cost Efficiency) */}
+          <ModelExpertiseShowcase
+            onSelectModel={handleOpenDetail}
+            onBrowseCategory={(cat) => {
+              setViewSavedOnly(false);
+              setSelectedProvider("all");
+              setActiveCategory(cat);
+              scrollToCatalog();
+            }}
+          />
+
+          {/* Gateway Architecture & How It Works */}
+          <GatewayFlow />
 
           {/* 5. Catalog Section: model riil dari gateway api.tokotokenai.com */}
           <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
-            {/* 5. Catalog Section Header Card - DPSBuddy Style */}
+            {/* 5. Catalog Section Header Card */}
             <div className="dps-banner-card" data-reveal="scale">
               {/* Left Column: Heading & Primary Action */}
               <div className="dps-banner-left">
@@ -761,18 +704,29 @@ export default function Home() {
                       <rect x="3" y="14" width="7" height="7" rx="1.5" />
                     </svg>
                   </span>
-                  <span className="dps-pill-title">Katalog Frontier AI</span>
-                  <span className="dps-pill-badge green">LIVE BI RATE</span>
+                  <span className="dps-pill-title">Katalog Lengkap Model AI</span>
+                  <span className="dps-pill-badge green">{models.length} MODEL</span>
                   <span className="dps-pill-sub">1 API Key Universal</span>
                 </div>
 
                 <h2 className="dps-banner-title">
-                  Pilih model, lihat seberapa jauh{" "}
-                  <span className="hero-gradient-text">Rp10.000</span> Anda.
+                  {SHOW_CATALOG_PRICING ? (
+                    <>
+                      Pilih model, lihat seberapa jauh{" "}
+                      <span className="hero-gradient-text">Rp10.000</span> Anda.
+                    </>
+                  ) : (
+                    <>
+                      Temukan model AI tepat untuk{" "}
+                      <span className="hero-gradient-text">setiap tugas.</span>
+                    </>
+                  )}
                 </h2>
 
                 <p className="dps-banner-desc">
-                  Satu API key untuk seluruh model terbaik dunia (Claude 3.7, GPT-4o, Gemini 2.0, DeepSeek R1). Harga dihitung langsung dari kurs resmi Bank Indonesia tanpa markup — hanya bayar token riil yang Anda gunakan.
+                  {SHOW_CATALOG_PRICING
+                    ? "Satu API key untuk seluruh model terbaik dunia (Claude 3.7, GPT-4o, Gemini 2.0, DeepSeek R1). Harga dihitung langsung dari kurs resmi Bank Indonesia tanpa markup — hanya bayar token riil yang Anda gunakan."
+                    : "Bandingkan kapabilitas, fokus keahlian (Ngoding, Riset, Chat Hemat, hingga Gambar), dan protokol endpoint dari OpenAI, Anthropic, Google, DeepSeek, Qwen, dan puluhan model lainnya dalam satu gerbang terpadu."}
                 </p>
 
                 <div className="dps-action-row">
@@ -803,27 +757,53 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right Column: DPSBuddy Comparison Stack */}
+              {/* Right Column: Comparison Stack */}
               <div className="dps-banner-right">
-                <div className="dps-compare-card">
-                  <div className="dps-card-kicker">
-                    <span className="dps-card-dot gray" aria-hidden="true" />
-                    <span>API GATEWAY BIASA</span>
-                  </div>
-                  <p className="dps-card-body">
-                    Tarif USD fluktuatif, kena biaya konversi bank 3–5%, dan harus deposit minimal $5–$20 terpisah di tiap provider.
-                  </p>
-                </div>
+                {SHOW_CATALOG_PRICING ? (
+                  <>
+                    <div className="dps-compare-card">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot gray" aria-hidden="true" />
+                        <span>API GATEWAY BIASA</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Tarif USD fluktuatif, kena biaya konversi bank 3–5%, dan harus deposit minimal $5–$20 terpisah di tiap provider.
+                      </p>
+                    </div>
 
-                <div className="dps-compare-card highlight">
-                  <div className="dps-card-kicker">
-                    <span className="dps-card-dot blue" aria-hidden="true" />
-                    <span>JURAGAN TOKEN GATEWAY</span>
-                  </div>
-                  <p className="dps-card-body">
-                    Tarif Rupiah transparan. Rp 10.000 cukup untuk puluhan hingga ratusan jawaban cerdas, terpotong presisi per token tanpa deposit besar.
-                  </p>
-                </div>
+                    <div className="dps-compare-card highlight">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot blue" aria-hidden="true" />
+                        <span>JURAGAN TOKEN GATEWAY</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Tarif Rupiah transparan. Rp 10.000 cukup untuk puluhan hingga ratusan jawaban cerdas, terpotong presisi per token tanpa deposit besar.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="dps-compare-card">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot gray" aria-hidden="true" />
+                        <span>INTEGRASI TERPISAH</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Mengelola banyak SDK, endpoint, dan kunci akses berbeda untuk OpenAI, Anthropic, Google, dan model terbuka lainnya.
+                      </p>
+                    </div>
+
+                    <div className="dps-compare-card highlight">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot blue" aria-hidden="true" />
+                        <span>JURAGANTOKEN GATEWAY</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Satu endpoint OpenAI-compatible untuk memanggil Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, hingga Qwen secara fleksibel.
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -918,8 +898,13 @@ export default function Home() {
                     >
                       <option value="provider">Per Provider (OpenAI, Claude, Qwen...)</option>
                       <option value="featured">Pilihan Unggulan</option>
-                      <option value="cheapest">Paling hemat</option>
-                      <option value="priciest">Harga tertinggi</option>
+                      <option value="name">Nama Model (A–Z)</option>
+                      {SHOW_CATALOG_PRICING && (
+                        <>
+                          <option value="cheapest">Paling hemat</option>
+                          <option value="priciest">Harga tertinggi</option>
+                        </>
+                      )}
                     </select>
                   </div>
                 </div>
@@ -998,7 +983,9 @@ export default function Home() {
                 )}
               </span>
               <span>
-                1 jawaban ≈ {formatNum(ANSWER_INPUT_TOKENS)} token masuk + {formatNum(ANSWER_OUTPUT_TOKENS)} token keluar · kurs realtime Rp{formatNum(usdRate)}/US$ · tarif gateway per {PRICING_SNAPSHOT_DATE}
+                {SHOW_CATALOG_PRICING
+                  ? `1 jawaban ≈ ${formatNum(ANSWER_INPUT_TOKENS)} token masuk + ${formatNum(ANSWER_OUTPUT_TOKENS)} token keluar · kurs realtime Rp${formatNum(usdRate)}/US$ · tarif gateway per ${PRICING_SNAPSHOT_DATE}`
+                  : "Klik kartu model untuk melihat keahlian, protokol endpoint, dan contoh konfigurasi aplikasi"}
               </span>
             </div>
 
@@ -1164,43 +1151,59 @@ export default function Home() {
                       <code className="mc-id">{m.id}</code>
                       <p className="mc-desc">{m.description}</p>
 
-                      <div className="mc-reach">
-                        <span className="mc-reach-label">Rp10.000 cukup untuk</span>
-                        <div className="mc-reach-row">
-                          <strong className="mc-reach-num">±{formatNum(unitsForBudget(m, 10_000, usdRate))}</strong>
-                          <span className="mc-reach-unit">{perImage ? "gambar" : "jawaban"}</span>
-                          <span className="mc-tier">{perImage ? (m.id.includes("pro") ? "Pro Studio" : "Per gambar") : tier}</span>
-                        </div>
-                        <div className="mc-meter" aria-hidden="true">
-                          <span className="mc-meter-fill" />
-                        </div>
-                      </div>
+                      {SHOW_CATALOG_PRICING ? (
+                        <>
+                          <div className="mc-reach">
+                            <span className="mc-reach-label">Rp10.000 cukup untuk</span>
+                            <div className="mc-reach-row">
+                              <strong className="mc-reach-num">±{formatNum(unitsForBudget(m, 10_000, usdRate))}</strong>
+                              <span className="mc-reach-unit">{perImage ? "gambar" : "jawaban"}</span>
+                              <span className="mc-tier">{perImage ? (m.id.includes("pro") ? "Pro Studio" : "Per gambar") : tier}</span>
+                            </div>
+                            <div className="mc-meter" aria-hidden="true">
+                              <span className="mc-meter-fill" />
+                            </div>
+                          </div>
 
-                      <dl className="mc-prices">
-                        {perImage ? (
-                          <>
-                            <div>
-                              <dt>Biaya per gambar</dt>
-                              <dd>{formatIdr(perImageIdr(m, usdRate))}</dd>
-                            </div>
-                            <div>
-                              <dt>Resolusi &amp; Format</dt>
-                              <dd>{m.id.includes("pro") ? "2K HD Studio · PNG" : "1024px · WebP / PNG"}</dd>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div>
-                              <dt>Input / 1 jt token</dt>
-                              <dd>{formatIdr(inputIdrPer1M(m, usdRate))}</dd>
-                            </div>
-                            <div>
-                              <dt>Output / 1 jt token</dt>
-                              <dd>{formatIdr(outputIdrPer1M(m, usdRate))}</dd>
-                            </div>
-                          </>
-                        )}
-                      </dl>
+                          <dl className="mc-prices">
+                            {perImage ? (
+                              <>
+                                <div>
+                                  <dt>Biaya per gambar</dt>
+                                  <dd>{formatIdr(perImageIdr(m, usdRate))}</dd>
+                                </div>
+                                <div>
+                                  <dt>Resolusi &amp; Format</dt>
+                                  <dd>{m.id.includes("pro") ? "2K HD Studio · PNG" : "1024px · WebP / PNG"}</dd>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div>
+                                  <dt>Input / 1 jt token</dt>
+                                  <dd>{formatIdr(inputIdrPer1M(m, usdRate))}</dd>
+                                </div>
+                                <div>
+                                  <dt>Output / 1 jt token</dt>
+                                  <dd>{formatIdr(outputIdrPer1M(m, usdRate))}</dd>
+                                </div>
+                              </>
+                            )}
+                          </dl>
+                        </>
+                      ) : (
+                        <div className="mc-capabilities">
+                          <span className="mc-cap-pill is-tier">
+                            {m.category}
+                          </span>
+                          <span className="mc-cap-pill">
+                            {perImage ? "Generasi Gambar" : tier === "Hemat" ? "Efisiensi Biaya" : tier === "Premium" ? "Flagship Frontier" : "Seimbang"}
+                          </span>
+                          <span className="mc-cap-pill">
+                            Input: {m.inputs.join(" + ")}
+                          </span>
+                        </div>
+                      )}
 
                       <footer className="mc-apps">
                         {compatibleApps(m).map((app) => (
@@ -1209,23 +1212,43 @@ export default function Home() {
                       </footer>
 
                       <div className="mc-action-row">
-                        <button
-                          type="button"
-                          className="mc-buy-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBuyTokenForModel(m);
-                          }}
-                          aria-label={`Beli token untuk ${m.name}`}
-                        >
-                          <span>Beli Token</span>
-                          <span className="mc-buy-arrow" aria-hidden="true">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <line x1="5" y1="12" x2="19" y2="12" />
-                              <polyline points="12 5 19 12 12 19" />
-                            </svg>
-                          </span>
-                        </button>
+                        {ENABLE_CHECKOUT ? (
+                          <button
+                            type="button"
+                            className="mc-buy-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBuyTokenForModel(m);
+                            }}
+                            aria-label={`Beli token untuk ${m.name}`}
+                          >
+                            <span>Beli Token</span>
+                            <span className="mc-buy-arrow" aria-hidden="true">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                              </svg>
+                            </span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="mc-buy-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDetail(m);
+                            }}
+                            aria-label={`Lihat detail dan cara pakai ${m.name}`}
+                          >
+                            <span>Lihat Keahlian &amp; Cara Pakai</span>
+                            <span className="mc-buy-arrow" aria-hidden="true">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                              </svg>
+                            </span>
+                          </button>
+                        )}
                       </div>
                     </article>
                   );
@@ -1325,7 +1348,9 @@ export default function Home() {
             )}
           </section>
 
-          {/* 6. Paket Prabayar Ritel Mahasiswa Section (Pola Paket ai-vouchers) */}
+          {/* 6. Paket Prabayar Ritel (Hanya tampil bila flag ENABLE_CHECKOUT aktif) */}
+          {ENABLE_CHECKOUT && (
+          <>
           <section className="catalog" id="katalog-retail">
             {/* 6. Paket Prabayar Ritel Mahasiswa - DPSBuddy Style */}
             <div className="dps-banner-card" data-reveal="scale">
@@ -1487,24 +1512,29 @@ export default function Home() {
               <span>Jelajahi Cara Pakai</span> ↗
             </a>
           </section>
+          </>
+          )}
+
+          {/* 7. Why Choose Juragantoken & Neutral Integration Comparison */}
+          <WhyChooseUs />
 
           {/* 8. Setup Guides Section */}
           <SetupGuides />
 
           {/* 9. FAQ Section */}
           <section className="faq-section" id="faq" aria-labelledby="faq-heading" data-reveal="fade-up">
-            <div className="section-kicker">JURAGAN TOKEN</div>
+            <div className="section-kicker">JURAGANTOKEN</div>
             <h2 id="faq-heading">Pertanyaan Umum (FAQ)</h2>
             <p className="faq-section-lead">
-              Semua yang perlu Anda ketahui tentang fleksibilitas saldo token, kompatibilitas aplikasi, dan keamanan data.
+              Informasi lengkap mengenai arsitektur gateway, pemilihan model AI sesuai keahlian, kompatibilitas aplikasi, dan keamanan data.
             </p>
 
             <div className="faq-grid">
               <details className="faq-card" open>
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
-                    <span className="faq-badge">Multi-AI Pool</span>
-                    <h3 className="faq-question">Apakah 1 saldo token bisa dipakai bergantian untuk Claude, ChatGPT, Gemini, dan DeepSeek?</h3>
+                    <span className="faq-badge">Multi-AI Gateway</span>
+                    <h3 className="faq-question">Apakah 1 Virtual API Key bisa dipakai bergantian untuk Claude, ChatGPT, Gemini, DeepSeek, dan Qwen?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1512,10 +1542,32 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Bisa! Sistem kami menggunakan Multi-AI Pool (1 Saldo untuk Semua).</b>
+                    <b>Bisa! Juragantoken menggunakan arsitektur Unified Multi-AI Gateway.</b>
                   </p>
                   <p>
-                    Konsepnya persis seperti pulsa ponsel prabayar. Jika Anda mengisi saldo nominal berapa pun (mulai Rp 15.000), Anda <b>tidak perlu</b> membeli saldo terpisah untuk masing-masing AI. Saldo tersebut otomatis memotong biaya sesuai tarif model yang Anda panggil secara real-time—misalnya Claude Sonnet untuk coding intensif, lalu beralih ke Gemini 3.8 Flash untuk riset tugas tanpa perlu ganti akun.
+                    Anda cukup memasang satu Base URL (<code>https://api.tokotokenai.com/v1</code>) dan satu Virtual API Key (<code>jt-live-...</code>). Untuk berpindah dari Claude Opus 5.5 ke Chat GPT 6 Astra, Gemini 4 Argon, atau DeepSeek V4, Anda hanya perlu mengubah nilai parameter <code>model</code> pada request tanpa mengganti SDK maupun konfigurasi autentikasi.
+                  </p>
+                </div>
+              </details>
+
+              <details className="faq-card">
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Pemilihan Model</span>
+                    <h3 className="faq-question">Model AI mana yang paling cocok untuk Ngoding, Riset, dan Efisiensi Biaya?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Berikut rekomendasi kurasi berdasarkan beban kerja:</b>
+                  </p>
+                  <p>
+                    • <b>Ngoding &amp; Arsitektur Sistem:</b> Gunakan <b>Claude Opus 5.5</b>, <b>Chat GPT 6 Astra</b>, atau <b>Gemini 4 Argon</b> (serta <b>Claude Sonnet 5.5</b> untuk coding harian).<br />
+                    • <b>Riset &amp; Penalaran Mendalam:</b> Gunakan <b>GPT-6 Sol</b>, <b>GPT-5.6 Terra</b>, <b>GPT-6 Luna</b>, atau <b>DeepSeek V4 Pro</b>.<br />
+                    • <b>Operasional Cepat &amp; Hemat Biaya:</b> Gunakan <b>DeepSeek V4 Flash</b>, <b>DeepSeek V3 Chat</b>, <b>Qwen 3.7 Max</b>, <b>Qwen 3.6 Flash</b>, atau model ekosistem Asia lainnya seperti <b>GLM 5.3 Flash</b> dan <b>Kimi</b>.
                   </p>
                 </div>
               </details>
@@ -1524,7 +1576,7 @@ export default function Home() {
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Kompatibilitas</span>
-                    <h3 className="faq-question">Apakah bisa disambungkan langsung di website resmi chatgpt.com atau claude.ai?</h3>
+                    <h3 className="faq-question">Aplikasi dan bahasa pemrograman apa saja yang didukung?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1532,10 +1584,10 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Tidak bisa di web portal konsumen resmi mereka.</b> Website <code>chatgpt.com</code> dan <code>claude.ai</code> adalah produk SaaS tertutup yang sengaja tidak menyediakan input API Key pribadi karena bisnis mereka berbasis sistem langganan kartu kredit bulanan.
+                    <b>100% kompatibel dengan ekosistem standar OpenAI API &amp; Anthropic CLI.</b>
                   </p>
                   <p>
-                    Namun, token Juragan Token <b>100% kompatibel</b> dan bekerja mulus di semua aplikasi web client gratis (NextChat, Chatbox), code editor (Cursor, Windsurf, VS Code), dan terminal Anthropic resmi (Claude Code CLI) dengan kecerdasan model dan parameter yang identik.
+                    Endpoint Juragantoken bekerja langsung di code editor modern (<b>Cursor IDE, Windsurf, VS Code Cline/Continue</b>), terminal <b>Claude Code CLI</b>, aplikasi desktop/mobile (<b>Chatbox, NextChat</b>), serta SDK resmi <code>openai</code> di Python, Node.js/TypeScript, Go, dan cURL.
                   </p>
                 </div>
               </details>
@@ -1544,7 +1596,7 @@ export default function Home() {
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Masa Aktif</span>
-                    <h3 className="faq-question">Apakah saldo token memiliki masa kedaluwarsa atau batas waktu hangus bulanan?</h3>
+                    <h3 className="faq-question">Apakah kuota pada Virtual API Key memiliki batas kedaluwarsa bulanan?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1552,10 +1604,10 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Tidak ada masa kedaluwarsa (Aktif Permanen / Lifetime).</b>
+                    <b>Tidak ada sistem hangus bulanan.</b>
                   </p>
                   <p>
-                    Berbeda dengan langganan bulanan SaaS yang hangus tiap tanggal jatuh tempo meskipun tidak Anda pakai, saldo Juragan Token tetap utuh di akun Anda selamanya. Saldo hanya akan berkurang saat Anda mengirimkan prompt atau menjalankan kalkulasi token.
+                    Kuota pada Virtual API Key tetap tersimpan aman dan hanya terpakai ketika aplikasi atau tim Anda mengirimkan request inferensi ke model AI yang dipilih.
                   </p>
                 </div>
               </details>
@@ -1563,8 +1615,8 @@ export default function Home() {
               <details className="faq-card">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
-                    <span className="faq-badge">Pembayaran</span>
-                    <h3 className="faq-question">Apakah butuh kartu kredit internasional? Bagaimana cara pembayarannya?</h3>
+                    <span className="faq-badge">Monitoring</span>
+                    <h3 className="faq-question">Bagaimana cara memantau status kunci dan riwayat pemakaian model?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1572,30 +1624,10 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Sama sekali tidak memerlukan kartu kredit.</b>
+                    <b>Transparan secara real-time.</b>
                   </p>
                   <p>
-                    Juragan Token didesain untuk kemudahan seluruh pengguna, pelaku usaha, profesional, dan developer di Indonesia. Pembayaran dilakukan 100% dalam mata uang Rupiah (IDR) menggunakan <b>QRIS Instan Otomatis</b> (bisa di-scan dari BCA, Mandiri, BRI, BNI, GoPay, OVO, ShopeePay, DANA) maupun Virtual Account bank lokal dengan aktivasi otomatis detik itu juga.
-                  </p>
-                </div>
-              </details>
-
-              <details className="faq-card">
-                <summary className="faq-summary">
-                  <div className="faq-summary-content">
-                    <span className="faq-badge">Transparansi</span>
-                    <h3 className="faq-question">Bagaimana cara mengecek sisa saldo token dan riwayat konsumsi saya?</h3>
-                  </div>
-                  <span className="faq-chevron" aria-hidden="true">
-                    <Icon name="chevron" size={16} />
-                  </span>
-                </summary>
-                <div className="faq-answer">
-                  <p>
-                    <b>Sangat mudah dan transparan.</b>
-                  </p>
-                  <p>
-                    Cukup klik tombol <b>Cek Saldo Key ↗</b> di header atas website ini, lalu tempelkan API Key Anda (misal <code>jt-live-xxxxxx</code>). Sistem kami langsung menampilkan sisa saldo rupiah, estimasi kuota token yang tersisa, serta rincian pemakaian model terakhir secara transparan tanpa perlu login password yang rumit.
+                    Klik tombol <b>Cek Saldo Key ↗</b> di bagian atas halaman ini dan masukkan kode Virtual API Key Anda (<code>jt-live-...</code>) untuk melihat status aktif serta rincian 10 pemakaian model terakhir secara instan.
                   </p>
                 </div>
               </details>
@@ -1604,7 +1636,7 @@ export default function Home() {
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Privasi &amp; Keamanan</span>
-                    <h3 className="faq-question">Bagaimana dengan privasi percakapan dan kerahasiaan data koding saya?</h3>
+                    <h3 className="faq-question">Bagaimana perlindungan privasi kode sumber dan dokumen riset kami?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1612,10 +1644,10 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Privasi dan keamanan kode Anda terlindungi 100%.</b>
+                    <b>Arsitektur Zero-Knowledge &amp; Zero-Training.</b>
                   </p>
                   <p>
-                    Gateway Juragan Token menerapkan enkripsi TLS/SSL berstandar industri dan sistem direct-streaming (penerusan langsung) ke server resmi penyedia model AI (Anthropic, OpenAI, Google). Kami <b>tidak pernah</b> merekam, menyimpan, membagikan, atau menggunakan prompt maupun cuplikan kode tugas Anda untuk melatih model AI apa pun.
+                    Kunci akses disimpan menggunakan hashing satu arah SHA-256 dan seluruh trafik dienkripsi melalui TLS. Gateway hanya meneruskan request inferensi secara langsung tanpa menyimpan isi percakapan atau menggunakan kode Anda untuk melatih model AI.
                   </p>
                 </div>
               </details>
@@ -1638,28 +1670,33 @@ export default function Home() {
           <div className="spf-main-grid">
             {/* Kolom 1: Brand & Profil Platform */}
             <div className="spf-col spf-col-brand">
-              <a className="footer-brand" href="#top" aria-label="Juragan Token Beranda">
-                <span className="brand-mark" aria-hidden="true">
-                  <BrandMark />
-                </span>
-                <span>
-                  juragan<span className="brand-light">token</span><span className="brand-dot">.</span>
-                </span>
+              <a className="footer-brand" href="#top" aria-label="Juragantoken Beranda">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/logo-juragantoken.jpg"
+                  alt="Juragantoken — One Gateway. Every Intelligence."
+                  className="footer-logo-img"
+                  width={150}
+                  height={34}
+                />
               </a>
               <p className="spf-desc">
-                Platform marketplace dan Universal AI Gateway prabayar resmi di Indonesia. Akses model frontier Claude, GPT, Gemini, dan DeepSeek via satu API key terpadu tanpa kartu kredit internasional.
+                Gerbang API AI terpadu di Indonesia. Akses model frontier Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, dan Qwen melalui satu integrasi OpenAI-compatible.
               </p>
               <div className="spf-meta-info">
-                Masa aktif saldo permanen • SLA Uptime 99.98%
+                One Gateway. Every Intelligence. • SLA Uptime 99.98%
               </div>
             </div>
 
             {/* Kolom 2: Produk & Layanan */}
             <div className="spf-col">
-              <div className="spf-col-heading">Produk &amp; Layanan</div>
+              <div className="spf-col-heading">Platform &amp; Model</div>
               <ul className="spf-links">
                 <li>
-                  <a href="#katalog-retail">Paket Token Ritel</a>
+                  <a href="#keahlian-model">Rekomendasi Keahlian AI</a>
+                </li>
+                <li>
+                  <a href="#cara-kerja">Cara Kerja Gateway</a>
                 </li>
                 <li>
                   <a href="#catalog">Katalog Model AI</a>
@@ -1729,14 +1766,14 @@ export default function Home() {
           {/* Bottom Bar */}
           <div className="spf-bottom-bar">
             <div className="spf-copy">
-              &copy; 2026 Juragan Token Indonesia. Hak Cipta Dilindungi Undang-Undang.
+              &copy; 2026 Juragantoken Indonesia. Hak Cipta Dilindungi Undang-Undang.
             </div>
             <div className="spf-bottom-meta">
               <span>Zero-Training Guarantee</span>
               <span className="spf-sep">•</span>
               <span>Enkripsi Transit TLS 1.3</span>
               <span className="spf-sep">•</span>
-              <span>QRIS Standar Nasional</span>
+              <span>OpenAI-Compatible (/v1)</span>
             </div>
           </div>
         </div>
@@ -1748,37 +1785,47 @@ export default function Home() {
         model={selectedModel}
         onClose={() => setDetailModalOpen(false)}
         usdRate={usdRate}
-        onSelectTopUp={(model) => {
-          handleBuyTokenForModel(model);
-        }}
+        onSelectTopUp={
+          ENABLE_CHECKOUT
+            ? (model) => {
+                handleBuyTokenForModel(model);
+              }
+            : undefined
+        }
       />
 
-      {/* Payment Checkout Modal (QRIS & Virtual Account) */}
-      <PaymentModal
-        open={paymentModalOpen}
-        pkg={selectedPackage}
-        model={checkoutModel}
-        initialMode={checkoutInitialMode}
-        initialTargetKey={checkoutInitialKey}
-        onClose={() => {
-          setPaymentModalOpen(false);
-          setCheckoutInitialMode("new");
-          setCheckoutInitialKey("");
-        }}
-      />
+      {/* Payment Checkout Modal (Disembunyikan saat ENABLE_CHECKOUT = false, kode tetap utuh) */}
+      {ENABLE_CHECKOUT && (
+        <PaymentModal
+          open={paymentModalOpen}
+          pkg={selectedPackage}
+          model={checkoutModel}
+          initialMode={checkoutInitialMode}
+          initialTargetKey={checkoutInitialKey}
+          onClose={() => {
+            setPaymentModalOpen(false);
+            setCheckoutInitialMode("new");
+            setCheckoutInitialKey("");
+          }}
+        />
+      )}
 
       {/* Token Balance Modal */}
       <TokenBalanceModal
         open={balanceModalOpen}
         onClose={() => setBalanceModalOpen(false)}
-        onTopUp={(key) => {
-          setBalanceModalOpen(false);
-          setSelectedPackage(retailPackages[1]);
-          setCheckoutModel(null);
-          setCheckoutInitialMode("topup");
-          setCheckoutInitialKey(key || "");
-          setPaymentModalOpen(true);
-        }}
+        onTopUp={
+          ENABLE_CHECKOUT
+            ? (key) => {
+                setBalanceModalOpen(false);
+                setSelectedPackage(retailPackages[1]);
+                setCheckoutModel(null);
+                setCheckoutInitialMode("topup");
+                setCheckoutInitialKey(key || "");
+                setPaymentModalOpen(true);
+              }
+            : undefined
+        }
       />
 
       {/* Bank Indonesia Real-Time Currency Rate Modal */}

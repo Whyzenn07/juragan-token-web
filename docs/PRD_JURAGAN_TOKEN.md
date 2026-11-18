@@ -1,8 +1,8 @@
-# Product Requirement Document (PRD): Juragan Token
+# Product Requirement Document (PRD): Juragantoken
 
-**Versi Dokumen:** 2.4.0  
-**Status:** Living Document / Production-Ready Architecture  
-**Tanggal Pembaruan:** 13 November 2026  
+**Versi Dokumen:** 3.0.0  
+**Status:** Living Document / Company Profile & Enterprise Gateway Architecture  
+**Tanggal Pembaruan:** 18 November 2026  
 **Platform:** Web Application (Next.js 16.4.2 App Router, TypeScript, Vanilla CSS, Supabase Cloud)  
 **Domain Utama:** `https://api.tokotokenai.com`  
 **Repository:** `Whyzenn07/juragan-token-web`  
@@ -427,3 +427,48 @@ Juragan Token didesain dengan prinsip keamanan data (*privacy-by-design*):
    - Masukkan Sandi Aplikasi Gmail ke `GMAIL_APP_PASSWORD`.
    - Unggah gambar QRIS merchant resmi.
    - Ubah `NEXT_PUBLIC_DEMO_MODE="false"`.
+
+
+---
+
+## 10. Pembaruan v3.0.0 — Company Profile, Showcase Keahlian Model AI, & Roadmap Enterprise B2B
+
+### 10.1 Perubahan Positioning & Mode Tampilan (`NEXT_PUBLIC_ENABLE_CHECKOUT`)
+Pada rilis **v3.0.0**, tampilan depan website **Juragantoken** (`One Gateway. Every Intelligence.`) difokuskan sebagai **Company Profile & Katalog Keahlian Model LLM** tanpa menghapus kode backend pembayaran yang sudah dibangun:
+- **Feature Flag (`src/lib/site-config.ts`):**
+  - `ENABLE_CHECKOUT = process.env.NEXT_PUBLIC_ENABLE_CHECKOUT === "true"` (default: `false`).
+  - `SHOW_CATALOG_PRICING = ENABLE_CHECKOUT` (default: `false`).
+- **Saat Mode Company Profile (`ENABLE_CHECKOUT = false`):**
+  - Seluruh tombol *"Beli Token"*, seksi *Paket Prabayar Ritel* (`#katalog-retail`), *Bundle Banner*, serta nominal harga Rupiah per token/gambar disembunyikan dari UI kartu katalog maupun `ModelDetailModal`.
+  - Seluruh route backend (`/api/orders`, `/api/webhooks/payment`, `/api/v1/chat/completions`, `/api/keys/check`) dan komponen `PaymentModal.tsx` tetap tersimpan utuh di codebase dan dapat diaktifkan kembali kapan saja dengan menyetel `NEXT_PUBLIC_ENABLE_CHECKOUT="true"`.
+  - Nomor WhatsApp untuk pengujian dan konsultasi tetap menggunakan `0812-2698-3990` (`NEXT_PUBLIC_WHATSAPP_NUMBER`).
+
+### 10.2 Kurasi Keahlian & Efektivitas Model AI
+Untuk membantu calon pengguna dan tim teknis memilih model yang tepat tanpa kebingungan ratusan nama model, halaman utama menyediakan **Showcase Keahlian Model (`ModelExpertiseShowcase.tsx`)** dan **Animasi Marquee Model (`LogoMarquee.tsx`)** yang terbagi ke dalam tiga fokus beban kerja:
+1. **Ngoding & Arsitektur Sistem:**
+   - **Model Unggulan:** `Claude Opus 5.5` (`claude-opus-5-5`), `Chat GPT 6 Astra` (`chatgpt-6-astra`), `Gemini 4 Argon` (`gemini-4-argon`), serta `Claude Sonnet 5.5` (`claude-sonnet-5-5`).
+   - **Efektivitas:** Refactoring multi-file, debugging algoritma kompleks, perancangan API/database, dan integrasi langsung di Cursor IDE maupun Claude Code CLI.
+2. **Riset, Analisa & Penalaran Mendalam:**
+   - **Model Unggulan:** `GPT-6 Sol` (`gpt-6-sol`), `GPT-5.6 Terra` (`gpt-5.6-terra`), `GPT-6 Luna` (`gpt-6-luna`), dan `DeepSeek V4 Pro` (`deepseek-v4-pro`).
+   - **Efektivitas:** Kajian dokumen panjang, sintesis laporan riset, evaluasi hipotesis, dan penalaran logika bertahap.
+3. **Operasional Cepat & Efisiensi Biaya:**
+   - **Model Unggulan:** `DeepSeek V4 Flash` (`deepseek-v4-flash`), `DeepSeek V3 Chat` (`deepseek-chat-v3`), `Qwen 3.7 Max` (`qwen3.7-max`), `Qwen 3.6 Flash` (`qwen3.6-flash`), serta model ekosistem Asia lainnya (`GLM 5.3 Flash`, `Kimi K2.6 Flash`, `MiniMax M2.7`).
+   - **Efektivitas:** Chatbot layanan pelanggan, ekstraksi JSON terstruktur, translasi, dan automasi harian berbiaya rendah dengan throughput tinggi.
+
+### 10.3 Komponen Visual & Animasi Baru (`src/components/landing/`)
+- **`HeroOrbit.tsx`:** Visualisasi cincin orbit berputar (`@keyframes jt-orbit-spin` + counter-rotation agar logo provider tetap tegak) yang mengelilingi hub `juragantoken.` (`/v1/chat/completions`), dilengkapi pratinjau konsol request OpenAI-compatible.
+- **`LogoMarquee.tsx`:** Dua baris chip model + logo provider bergerak berlawanan arah secara halus, berhenti saat di-hover, dan membuka modal spesifikasi model saat diklik.
+- **`ModelExpertiseShowcase.tsx`:** Panel tab interaktif untuk membandingkan model unggulan Ngoding, Riset, dan Hemat Biaya beserta tombol pintas ke filter katalog.
+- **`GatewayFlow.tsx`:** Diagram alir SVG beranimasi (`stroke-dashoffset`) yang memperlihatkan satu titik integrasi menuju berbagai provider AI global.
+- **`WhyChooseUs.tsx`:** Empat pilar keunggulan aktual Juragantoken dan tabel perbandingan pendekatan integrasi menggunakan **kategori netral** (*Daftar Langsung per Vendor* vs *Platform Agregator Umum* vs *Juragantoken Gateway*) guna menghindari risiko *comparative advertising* terhadap merek pihak ketiga.
+- **Kepatuhan Aksesibilitas & Performa:** Seluruh animasi hanya menggunakan properti GPU (`transform`, `opacity`, `stroke-dashoffset`) tanpa library eksternal, serta mematuhi `@media (prefers-reduced-motion: reduce)`.
+
+### 10.4 Roadmap Fitur Enterprise B2B (Berdasarkan Materi Pitch Deck 12 Slide)
+Fitur-fitur korporat berikut berasal dari dokumen presentasi B2B (*PT Rejeki Digital Cemerlang*) dan dicatat di dalam PRD ini sebagai **Roadmap Pengembangan Tahap Berikutnya** (tidak ditampilkan sebagai klaim fitur aktif di halaman publik sebelum implementasi backend selesai):
+
+| Modul Roadmap B2B | Deskripsi Kebutuhan (Sesuai Pitch Deck PDF) | Status Implementasi Saat Ini | Target Arsitektur Berikutnya |
+| :--- | :--- | :--- | :--- |
+| **1. Kontrol Whitelist IP (Tim IT)** | Membatasi penggunaan Virtual API Key hanya dari alamat IP server kantor atau VPN korporat yang diotorisasi untuk mencegah kebocoran finansial jika key dicuri. | Belum ada di `gateway.ts` (saat ini baru autentikasi SHA-256 + rate-limit per IP/key). | Tambah kolom `allowed_ips text[]` pada tabel `public.keys` di Supabase + pengecekan CIDR/IP di `authenticateApiKey()`. |
+| **2. Alokasi Kuota Multi-Departemen (Tim Purchasing)** | Pembuatan sub-key per divisi (IT, Finance, Legal, Marketing) di bawah satu deposit korporat terpusat untuk memantau konsumsi real-time per departemen dan menghilangkan *reimbursement* kartu kredit pribadi. | Saat ini 1 key = 1 saldo independen (`public.keys`). | Tambah tabel `public.organizations` & `public.departments` dengan relasi parent-child quota cap. |
+| **3. Penagihan Invoice B2B & Faktur Pajak Lokal** | Pengadaan saldo secara terpusat melalui entitas resmi **PT Rejeki Digital Cemerlang** dengan penerbitan Invoice B2B, PO, dan Faktur Pajak (PPN/PPh) resmi dalam mata uang IDR tanpa biaya valas. | Belum ada alur PO/Faktur Pajak di aplikasi web. | Modul permohonan Invoice Korporat + unggah NPWP perusahaan & generasi PDF proforma invoice B2B. |
+| **4. SLA Korporat & Jalur Principal** | Jaminan ketersediaan tinggi (*High Availability*) dan dukungan teknis terdedikasi untuk beban transaksi skala enterprise. | Fallback hybrid Gemini + Central Engine sudah berjalan; dokumen SLA formal B2B disiapkan terpisah. | Kontrak SLA tertulis & multi-region upstream failover otomatis. |

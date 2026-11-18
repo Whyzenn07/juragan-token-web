@@ -229,7 +229,7 @@ print(response.choices[0].message.content)`;
               </div>
               <div className="mock-field">
                 <label>3. API Key</label>
-                <input readOnly value="jt-live-token-anda (Didapat setelah checkout)" />
+                <input readOnly value="jt-live-token-anda (Aktif setelah terhubung dengan tim kami)" />
               </div>
               <div className="mock-field">
                 <label>4. Model yang Didukung (Tinggal Ketik)</label>
