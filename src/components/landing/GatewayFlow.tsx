@@ -21,7 +21,7 @@ export function GatewayFlow() {
         </p>
       </div>
 
-      {/* Unified Routing Diagram (PDF Slide 3 & 4, original animated SVG lines) */}
+      {/* Unified Routing Diagram (PDF Slide 3 & 4, animated SVG lines) */}
       <div className="jt-flow-card">
         <div className="jt-flow-left">
           <div className="jt-flow-step-pill">1 Integrasi Tunggal</div>
@@ -61,20 +61,68 @@ export function GatewayFlow() {
         </div>
       </div>
 
-      {/* 3 Pillars of Operational Simplicity */}
+      {/* 3 Animated Step Cards (Adopted from tokenku.ai .tks-card visual micro-animations, keeping our exact text) */}
       <div className="jt-steps-grid">
-        <article className="jt-step-card">
+        <article className="jt-step-card jt-tks-card">
           <span className="jt-step-num">01</span>
+          <div className="tks-visual" aria-hidden="true">
+            <div className="tks-key">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#F5A623" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+              </svg>
+            </div>
+            <div className="tks-line" />
+            <div className="tks-dot" />
+          </div>
           <h3>Titik Integrasi Tunggal</h3>
           <p>Pengembang hanya memelihara satu konvensi SDK OpenAI tanpa perlu mengurus autentikasi masing-masing vendor.</p>
         </article>
-        <article className="jt-step-card">
+
+        <article className="jt-step-card jt-tks-card">
           <span className="jt-step-num">02</span>
+          <div className="tks-visual-fan" aria-hidden="true">
+            <div className="tks-fan">
+              <svg className="tks-fan-lines" viewBox="0 0 220 90" preserveAspectRatio="none">
+                <path d="M36 45 C90 45, 110 14, 155 14" />
+                <path d="M36 45 C95 45, 115 35, 155 35" />
+                <path d="M36 45 C95 45, 115 56, 155 56" />
+                <path d="M36 45 C90 45, 110 77, 155 77" />
+              </svg>
+              <div className="tks-core">API</div>
+              <div className="tks-branch" style={{ top: "4px" }}>
+                <ProviderLogo provider="anthropic" size={16} />
+                <span>Claude</span>
+              </div>
+              <div className="tks-branch" style={{ top: "25px" }}>
+                <ProviderLogo provider="openai" size={16} />
+                <span>ChatGPT</span>
+              </div>
+              <div className="tks-branch" style={{ top: "46px" }}>
+                <ProviderLogo provider="google" size={16} />
+                <span>Gemini</span>
+              </div>
+              <div className="tks-branch" style={{ top: "67px" }}>
+                <ProviderLogo provider="deepseek" size={16} />
+                <span>DeepSeek</span>
+              </div>
+            </div>
+          </div>
           <h3>Eksplorasi &amp; Pindah Model Cepat</h3>
           <p>Beralih dari Claude Opus untuk ngoding ke GPT-6 Sol untuk riset atau DeepSeek untuk efisiensi dalam hitungan detik.</p>
         </article>
-        <article className="jt-step-card">
+
+        <article className="jt-step-card jt-tks-card">
           <span className="jt-step-num">03</span>
+          <div className="tks-meter" aria-hidden="true">
+            <div className="tks-meter-lbl">TOKENS METERED · REAL-TIME</div>
+            <div className="tks-bar-track">
+              <div className="tks-bar-fill" />
+            </div>
+            <div className="tks-meter-sub">
+              <span className="tks-live-dot" />
+              <span>Audit log &amp; sisa kuota transparan</span>
+            </div>
+          </div>
           <h3>Monitoring Terbuka &amp; Terkendali</h3>
           <p>Setiap Virtual API Key dapat dicek riwayat pemakaian serta status aktifnya kapan saja melalui fitur Cek Saldo Key.</p>
         </article>

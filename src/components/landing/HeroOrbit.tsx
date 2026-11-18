@@ -12,7 +12,9 @@ type HeroModelShowcase = {
   orbitLabel: string;
   modelId: string;
   roleTag: string;
-  angle: number;
+  /** Normalized (cos, sin) position on unit circle so pill center sits dead-on the ring */
+  xFactor: number;
+  yFactor: number;
 };
 
 export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
@@ -22,7 +24,8 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Claude",
     modelId: "claude-opus-5-5",
     roleTag: "Ngoding & Arsitektur",
-    angle: 0,
+    xFactor: 0,
+    yFactor: -1,
   },
   {
     providerId: "openai",
@@ -30,7 +33,8 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "ChatGPT",
     modelId: "chatgpt-6-astra",
     roleTag: "Arsitektur & Debug",
-    angle: 60,
+    xFactor: 0.866025,
+    yFactor: -0.5,
   },
   {
     providerId: "google",
@@ -38,7 +42,8 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Gemini",
     modelId: "gemini-4-argon",
     roleTag: "Full-Stack & Konteks",
-    angle: 120,
+    xFactor: 0.866025,
+    yFactor: 0.5,
   },
   {
     providerId: "deepseek",
@@ -46,7 +51,8 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "DeepSeek",
     modelId: "deepseek-v4-pro",
     roleTag: "Riset & Efisiensi",
-    angle: 180,
+    xFactor: 0,
+    yFactor: 1,
   },
   {
     providerId: "alibaba",
@@ -54,7 +60,8 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Qwen",
     modelId: "qwen3.7-max",
     roleTag: "Multi-Bahasa Hemat",
-    angle: 240,
+    xFactor: -0.866025,
+    yFactor: 0.5,
   },
   {
     providerId: "xai",
@@ -62,7 +69,8 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Grok",
     modelId: "grok-4",
     roleTag: "Penalaran Cepat",
-    angle: 300,
+    xFactor: -0.866025,
+    yFactor: -0.5,
   },
 ];
 
@@ -105,7 +113,7 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Left Column: Clean 2-Line Headline + Description + Interactive Model Features */}
-      <div className="jt-hero-left">
+      <div className="jt-hero-left landing-animate-fade-up">
         <div className="jt-hero-pill-badge">
           <span className="jt-badge-spark" aria-hidden="true">✦</span>
           <span>Gerbang utama API AI terpadu untuk developer &amp; enterprise di Indonesia</span>
@@ -185,48 +193,50 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
       </div>
 
       {/* Right Column: Pure Centered Orbit Ring with Juragantoken Logo in Center */}
-      <div className="jt-hero-visual" aria-label="Animasi orbit model AI mengelilingi Juragantoken">
+      <div className="jt-hero-visual landing-animate-scale-in" aria-label="Animasi orbit model AI mengelilingi Juragantoken">
         <div className="jt-orbit-stage">
           <div className="jt-orbit-glow" aria-hidden="true" />
-          <div className="jt-orbit-ring jt-orbit-ring--outer" aria-hidden="true" />
-          <div className="jt-orbit-ring jt-orbit-ring--inner" aria-hidden="true" />
 
-          {/* Zero-wobble mathematical orbit track */}
+          {/* SVG Orbital Rings with Animated Signal Arc */}
+          <svg className="jt-orbit-svg" viewBox="0 0 420 420" fill="none" aria-hidden="true">
+            <circle cx="210" cy="210" r="154" className="jt-orbit-svg-outer" />
+            <circle cx="210" cy="210" r="154" className="jt-orbit-svg-pulse" />
+            <circle cx="210" cy="210" r="108" className="jt-orbit-svg-inner" />
+          </svg>
+
+          {/* Direct (x,y) polar placement on the r=154px circle — zero wobble */}
           <div className="jt-orbit-track" aria-hidden="true">
             {HERO_SHOWCASE_ITEMS.map((node, idx) => {
               const isSelected = idx === activeIndex;
               return (
-                <div
+                <button
                   key={node.orbitLabel}
-                  className="jt-orbit-slot"
-                  style={{
-                    transform: `rotate(${node.angle}deg) translateY(calc(var(--orbit-radius) * -1)) rotate(-${node.angle}deg)`,
-                  }}
+                  type="button"
+                  className={`jt-orbit-pill ${isSelected ? "is-selected" : ""}`}
+                  style={
+                    {
+                      left: `calc(50% + var(--orbit-radius) * ${node.xFactor})`,
+                      top: `calc(50% + var(--orbit-radius) * ${node.yFactor})`,
+                    } as React.CSSProperties
+                  }
+                  onClick={() => setActiveIndex(idx)}
+                  tabIndex={-1}
                 >
-                  <div className="jt-orbit-counter">
-                    <button
-                      type="button"
-                      className={`jt-orbit-pill ${isSelected ? "is-selected" : ""}`}
-                      onClick={() => setActiveIndex(idx)}
-                      tabIndex={-1}
-                    >
-                      <ProviderLogo provider={node.providerId} size={22} />
-                      <span>{node.orbitLabel}</span>
-                    </button>
-                  </div>
-                </div>
+                  <ProviderLogo provider={node.providerId} size={22} />
+                  <span>{node.orbitLabel}</span>
+                </button>
               );
             })}
           </div>
 
-          {/* Center Circle: Juragantoken Logo Only (No /v1/chat/completions) */}
+          {/* Center Circle: Juragantoken Logo Only */}
           <div className="jt-orbit-core">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/logo-mark.png"
               alt="Juragantoken"
-              width={54}
-              height={45}
+              width={56}
+              height={46}
               className="jt-core-logo-mark"
             />
             <strong className="jt-core-brand">
