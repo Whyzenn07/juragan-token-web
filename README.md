@@ -1,312 +1,303 @@
-# 🪐 Juragan Token — Universal AI Gateway & Multi-AI Prepaid Token Marketplace
+# 🪐 Juragan Token — Universal AI Gateway & Prepaid LLM Token Marketplace
 
+[![Live Demo Vercel](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4.2-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.3.0-blue?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
-[![PostgreSQL](https://img.shields.io/badge/Database-Supabase_PostgreSQL-green?style=flat&logo=supabase)](https://supabase.com/)
+[![Database](https://img.shields.io/badge/Database-Supabase_PostgreSQL-green?style=flat&logo=supabase)](https://supabase.com/)
+[![Version](https://img.shields.io/badge/Release-v2.3.0--stable-emerald)](#)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](#)
-[![Version](https://img.shields.io/badge/Release-v1.0.0--stable-emerald)](#)
 
-> **Platform marketplace kredit API AI prabayar pertama di Indonesia.** Akses model frontier kelas dunia (**Claude 3.5 Sonnet, Claude Opus, OpenAI GPT-4o, DeepSeek V3, Google Gemini, Alibaba Qwen**) menggunakan **1 Virtual API Key (`jt-live-...`)** terpadu berbasis mata uang Rupiah (IDR) tanpa kartu kredit internasional.
+> **Platform marketplace kredit API AI prabayar berbasis Rupiah (IDR).** Akses beragam model AI frontier (**Claude Sonnet/Opus, OpenAI GPT, DeepSeek, Google Gemini, Qwen, dll.**) melalui **1 Virtual API Key (`jt-live-...`)** yang kompatibel dengan standar OpenAI API, tanpa kartu kredit internasional.
+
+---
+
+## 🌐 Live Demo & Uji Coba (Vercel)
+
+| Halaman / Layanan | URL Live Demo | Kegunaan Uji Coba |
+| :--- | :--- | :--- |
+| **🏠 Aplikasi Utama & Checkout** | https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/ | Jelajahi katalog 66 model AI, kalkulator hemat, alur checkout QRIS/VA/e-Wallet, serta cek saldo API Key. |
+| **📚 Dokumentasi & API Tester** | https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/docs | Uji request OpenAI-compatible (`/v1/chat/completions`) dan lihat contoh konfigurasi IDE/SDK. |
+| **🩺 Status 4 Pilar Sistem** | https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/status | Monitoring real-time koneksi Supabase, SMTP Gmail, adapter Payment Gateway, dan Upstream LLM Engine. |
+
+> **Catatan Uji Coba:** Pada lingkungan demo (`DEMO_MODE=true`), tombol simulasi konfirmasi pembayaran dapat digunakan untuk mengetes penerbitan Virtual API Key `jt-live-...` dan pengiriman invoice email secara end-to-end.
 
 ---
 
 ## 📑 Daftar Isi
 
-- [1. Arsitektur & Gambaran Umum Sistem](#1-arsitektur--gambaran-umum-sistem)
+- [🌐 Live Demo & Uji Coba (Vercel)](#-live-demo--uji-coba-vercel)
+- [1. Arsitektur & Nilai Tambah Sistem](#1-arsitektur--nilai-tambah-sistem)
 - [2. Tech Stack](#2-tech-stack)
 - [3. Struktur Direktori Proyek](#3-struktur-direktori-proyek)
-- [4. Panduan Memulai Cepat (Quick Start)](#4-panduan-memulai-cepat-quick-start)
+- [4. Panduan Menjalankan Lokal (Quick Start)](#4-panduan-menjalankan-lokal-quick-start)
 - [5. Konfigurasi Environment (.env.local)](#5-konfigurasi-environment-envlocal)
 - [6. Spesifikasi API Gateway & Endpoint](#6-spesifikasi-api-gateway--endpoint)
-- [7. Skema Database & Persistensi](#7-skema-database--persistensi)
-- [8. Panduan Integrasi Klien (Cursor, Claude Code, Python)](#8-panduan-integrasi-klien-cursor-claude-code-python)
-- [9. Dokumen Arsitektur & PRD](#9-dokumen-arsitektur--prd)
+- [7. Skema Database & Keamanan](#7-skema-database--keamanan)
+- [8. Panduan Integrasi Klien (Cursor, Python, cURL)](#8-panduan-integrasi-klien-cursor-python-curl)
+- [9. Dokumentasi Teknis & Handover](#9-dokumentasi-teknis--handover)
 
 ---
 
-## 1. Arsitektur & Gambaran Umum Sistem
+## 1. Arsitektur & Nilai Tambah Sistem
 
-Juragan Token menghubungkan ekosistem pembayaran lokal Indonesia dengan API model AI global:
-
-```
-[ Klien AI: Cursor / Windsurf / Claude Code / Chatbox / Python ]
-                               │
-            (HTTPS: Authorization: Bearer jt-live-xxxx)
-                               ▼
+```text
+[ Klien AI: Cursor / Claude Code / Windsurf / Python SDK / cURL ]
+                                │
+             HTTPS (Authorization: Bearer jt-live-xxxx)
+                                ▼
 ┌────────────────────────────────────────────────────────────────────────┐
 │                   Juragan Token Gateway Engine                         │
-│  • Endpoint OpenAI-Compatible (/api/v1/chat/completions)               │
-│  • Autentikasi SHA-256 Zero-Knowledge & Cek Status Saldo IDR           │
-│  • Rate Limiting & Stream Sanitizer (SSE Real-Time)                    │
-│  • Atomic Token Metering & Saldo IDR Deduction                         │
+│  • Endpoint OpenAI-Compatible (/v1/chat/completions & /v1/models)      │
+│  • Autentikasi SHA-256 Zero-Knowledge & Validasi Saldo IDR             │
+│  • Rate Limiting (RPM & Stream Concurrency Guard)                      │
+│  • Atomic Token Metering & Pemotongan Saldo IDR                        │
 └───────────────────┬────────────────────────────────┬───────────────────┘
                     │                                │
-            (Direct Master Key)              (Pass-Through / Proxy)
+         (Hybrid Gemini Fallback)          (Central Engine Pass-Through)
                     ▼                                ▼
        ┌────────────────────────┐      ┌───────────────────────────────┐
-       │ Google Gemini Studio   │      │ Central Engine / Upstream LLM │
-       │ (gemini-3.5-flash-lite)│      │ Claude Sonnet, GPT-4o,        │
-       │                        │      │ DeepSeek V3, Alibaba Qwen     │
+       │ Google Gemini Direct   │      │ https://api.tokotokenai.com/v1│
+       │ (GEMINI_API_KEY)       │      │ Claude, GPT, DeepSeek, Qwen   │
        └────────────────────────┘      └───────────────────────────────┘
 ```
 
-### Nilai Tambah Utama:
-1. **Bebas Kartu Kredit Internasional**: Pembelian kredit instan mulai **Rp 15.000** via **QRIS**, Virtual Account (BCA, Mandiri, BRI, BNI, SeaBank, Permata, CIMB, BSI), dan e-Wallet (GoPay, OVO, DANA, ShopeePay, LinkAja).
-2. **Universal OpenAI-Compatible**: URL `https://juragantoken.com/v1` langsung cocok dengan SDK resmi `openai` di Node.js/Python, Cursor IDE, Claude Code CLI, LibreChat, Chatbox, dan Aider.
-3. **Masa Aktif Selamanya**: Saldo prabayar berlaku permanen tanpa sistem kedaluwarsa bulanan (*no use-it-or-lose-it*).
-4. **Keamanan Kriptografis Zero-Knowledge**: Server hanya menyimpan hash SHA-256 dari API Key. Kunci mentah `jt-live-...` hanya ditampilkan satu kali ke pembeli saat checkout berhasil dan dikirimkan via email tanda terima.
+### Keunggulan Utama
+1. **Pembayaran Lokal IDR:** Pembelian kredit mulai **Rp 15.000** mendukung QRIS, Virtual Account (BCA, Mandiri, BRI, BNI, SeaBank, Permata, CIMB, BSI), serta e-Wallet (GoPay, OVO, DANA, ShopeePay, LinkAja).
+2. **Standar OpenAI-Compatible:** Endpoint `/api/v1` dan rewrite `/v1` langsung kompatibel dengan SDK `openai`, Cursor IDE, Claude Code CLI, Windsurf, Continue, Chatbox, dan Aider.
+3. **Saldo Berlaku Permanen:** Tidak ada hangus saldo bulanan; mendukung mode **Beli Baru** maupun **Top-Up Key Lama**.
+4. **Kriptografi Zero-Knowledge:** Server hanya menyimpan hash **SHA-256** dari API Key di Supabase PostgreSQL. Kunci mentah `jt-live-...` hanya ditampilkan satu kali saat transaksi lunas dan dikirim melalui email invoice HTML (dengan ikon badge inline CID).
 
 ---
 
 ## 2. Tech Stack
 
-- **Framework**: [Next.js 16.4.2](https://nextjs.org/) (App Router, Turbopack, React Server Components)
-- **UI Engine**: [React 19.3.0](https://react.dev/) + Vanilla CSS Modular (Design System 1200px Centered Container)
-- **Bahasa**: [TypeScript 5.x](https://www.typescriptlang.org/) (Strict Mode)
-- **Database & Auth**: [Supabase](https://supabase.com/) (Managed PostgreSQL, RPC Stored Procedures, Dual-Sync Fallback)
-- **Email Transaksional**: [Nodemailer](https://nodemailer.com/) (Gmail SMTP / Google Workspace App Password)
-- **Kriptografi**: Node.js `crypto` (SHA-256 Hashing, CSPRNG Token Generation, Safe Timing Equality)
+- **Framework:** [Next.js 16.4.2](https://nextjs.org/) (App Router, Turbopack, Cache Components)
+- **UI Engine:** [React 19.3.0](https://react.dev/) + Modular CSS Design System (`globals.css`)
+- **Bahasa:** [TypeScript 5.x](https://www.typescriptlang.org/) (Strict Mode)
+- **Database:** [Supabase PostgreSQL](https://supabase.com/) (RLS + Stored Procedure Atomic Deduct + Local Failover Store)
+- **Email Transaksional:** [Nodemailer](https://nodemailer.com/) (Gmail SMTP / App Password dengan inline PNG CID badge)
+- **Keamanan:** Node.js `crypto` (SHA-256 Key Hashing, HMAC Webhook Verification, `timingSafeEqual`, Fail-Closed Auth)
 
 ---
 
 ## 3. Struktur Direktori Proyek
 
-```
+```text
 juragan-token-web/
-├── docs/                                # Dokumentasi Spesifikasi & Arsitektur
-│   ├── ARCHITECTURE.md                  # System Design, Algoritma, & Database DDL
-│   ├── DEV_HANDOVER.md                  # Panduan Handover 2 Kredensial (Payment & LLM Key)
-│   ├── PRD_JURAGAN_TOKEN.md             # Product Requirement Document (PRD v2.4.0)
-│   └── audits/                          # Laporan Audit Kepatuhan & Keamanan
+├── docs/                                # Spesifikasi Teknis, Handover, & Audit Keamanan
+│   ├── ARCHITECTURE.md                  # System design, algoritma metering, & DDL database
+│   ├── DEV_HANDOVER.md                  # Panduan handover 2 kredensial (Payment & LLM Key)
+│   ├── PRD_JURAGAN_TOKEN.md             # Product Requirement Document (v2.4.0)
+│   └── audits/                          # Laporan audit keamanan & QA
 ├── public/                              # Aset Statis Publik
 │   ├── assets/
-│   │   ├── AI-Logo/                     # Vektor Logo Provider AI (Anthropic, OpenAI, dll)
-│   │   ├── email/                       # Aset Badge Centang Retina Struk Email
-│   │   └── payment-logos/               # 17 Logo Vektor Resmi Bank & E-Wallet (BCA, Mandiri, QRIS)
-│   └── images/                          # Aset Gambar & Template QRIS Resmi
-├── scripts/                             # Utilitas Build, Audit Keamanan, & Generator Badge
+│   │   ├── AI-Logo/                     # Logo vektor provider AI
+│   │   ├── email/                       # Badge centang email struk (success-check-badge.png)
+│   │   └── payment-logos/               # 17 logo vektor Bank, QRIS, & e-Wallet
+│   └── images/                          # Aset gambar & template QRIS
+├── scripts/                             # Utilitas Developer & Pengujian
+│   ├── make-badge.cjs                   # Generator PNG badge email identik PaymentSuccessMark
+│   ├── security-audit.cjs               # Uji deteksi kebocoran secret di HTML & JS chunks
+│   └── test-errors.cjs                  # Suite 13 pengujian validasi & keamanan endpoint
 ├── src/
-│   ├── app/                             # Next.js App Router (Halaman & Endpoint)
-│   │   ├── api/                         # REST API Route Handlers
-│   │   │   ├── keys/check/              # POST: Cek Saldo, Status, & 10 Usage Logs Terakhir
-│   │   │   ├── models/sync/             # GET: Sinkronisasi Kurs BI/Forex & Katalog Gateway
-│   │   │   ├── orders/                  # POST: Buat Invoice Order Baru (Outbound Gateway)
-│   │   │   │   └── [id]/                # GET: Polling Status Order
-│   │   │   │       └── confirm/         # POST: Konfirmasi Pembayaran (Simulasi/Admin)
-│   │   │   ├── supabase/status/         # GET/POST: Health Check 4 Pilar & Sinkronisasi DB
-│   │   │   ├── test-email/              # GET: Diagnostic Test SMTP Gmail
-│   │   │   ├── webhooks/payment/        # POST: Universal Webhook (Tripay, Midtrans, Xendit)
-│   │   │   └── v1/                      # AI Gateway (OpenAI Compatible)
-│   │   │       ├── chat/completions/    # POST: AI Inference Proxy, Rate-Limit, & Billing
-│   │   │       └── models/              # GET: Daftar Model Tersedia (/v1/models)
-│   │   ├── docs/                        # Halaman Dokumentasi Integrasi & Interactive Tester
-│   │   ├── status/                      # Halaman Status Uptime & Kesiapan 4 Pilar Sistem
-│   │   ├── privacy/                     # Kebijakan Privasi
-│   │   ├── terms/                       # Syarat & Ketentuan Layanan
-│   │   ├── globals.css                  # Core Design System, Utility, & Responsive Layout
-│   │   ├── layout.tsx                   # Master Root Layout + Floating WhatsApp Widget
-│   │   └── page.tsx                     # Landing Page (Katalog, Checkout, Setup Guide)
-│   ├── components/                      # UI Components Terstruktur
-│   │   ├── modals/                      # Modal Interaktif
-│   │   │   ├── PaymentModal.tsx         # Checkout Modal, Tiket QRIS Enterprise & VA
-│   │   │   ├── TokenBalanceModal.tsx    # Modal Cek Saldo & Riwayat Pemakaian (usage_logs)
-│   │   │   ├── CurrencyRateModal.tsx    # Modal Kurs Real-time Bank Indonesia
-│   │   │   ├── ModelDetailModal.tsx     # Modal Detail Spesifikasi & Biaya per Model
-│   │   │   └── Dialog.tsx               # Accessible Modal Wrapper
-│   │   ├── sections/                    # Komponen Seksi Landing Page
-│   │   │   ├── SavingsCalculator.tsx    # Kalkulator Penghematan Token Interaktif
-│   │   │   └── SetupGuides.tsx          # Panduan Integrasi Klien AI
-│   │   └── ui/                          # Atomik UI (Icon, FloatingWhatsApp, PaymentSuccessMark, dll)
-│   ├── data/                            # State Katalog & Definisi Produk
-│   │   └── catalog.ts                   # 66 Model AI Terkurasi, Paket Ritel, & Channel Bayar
-│   ├── lib/                             # Core Logic & Backend Services
-│   │   ├── gateway.ts                   # Autentikasi Gateway, Rate-Limit, & Metering
-│   │   ├── keys.ts                      # Generator Kunci Kriptografis, Hashing, & Rate Limiter
-│   │   ├── orders.ts                    # Transaksi Order, Lifecycle Status, & Delivery Kunci
-│   │   ├── payment-gateway.ts           # Outbound Plug-and-Play Adapter (Tripay/Midtrans/Xendit)
-│   │   ├── receipt-email.ts             # Template & Transporter Email Nodemailer
-│   │   ├── store.ts                     # Penyimpanan Lokal Atomik (Failover Fallback)
-│   │   └── supabase-sync.ts             # REST Client Sinkronisasi Supabase Cloud
-│   └── types/                           # Definisi TypeScript Interfaces
-├── supabase/                            # Skrip Database & Migrasi PostgreSQL
-│   ├── migrations/                      # Skrip Migrasi SQL Berurutan
-│   ├── setup_all.sql                    # Skrip Inisialisasi Skema Lengkap + RPC Atomic Deduct
-│   └── seed.sql                         # Data Awal / Seeder
-├── .env.example                         # Contoh Format Environment Variables (Siap Handover)
-├── package.json                         # Dependensi Node.js & Script NPM
-├── tsconfig.json                        # Konfigurasi TypeScript Compiler
-└── README.md                            # Dokumentasi Pengembang Ini
+│   ├── app/                             # Next.js App Router (Pages & API Routes)
+│   │   ├── api/
+│   │   │   ├── keys/check/              # POST: Cek saldo IDR, status, & 10 usage_logs terakhir
+│   │   │   ├── models/sync/             # GET: Sinkronisasi kurs USD/IDR & katalog model
+│   │   │   ├── orders/                  # POST: Buat order checkout & adapter gateway
+│   │   │   │   └── [id]/                # GET: Polling status order (+ /confirm untuk admin/demo)
+│   │   │   ├── supabase/status/         # GET/POST: Health check 4 pilar & sync DB
+│   │   │   ├── test-email/              # GET: Diagnostic SMTP email (terproteksi ADMIN_SECRET)
+│   │   │   ├── webhooks/payment/        # POST: Webhook Tripay, Midtrans, Xendit (fail-closed)
+│   │   │   └── v1/                      # OpenAI-Compatible AI Gateway (/chat/completions, /models)
+│   │   ├── docs/                        # Dokumentasi integrasi & interactive tester
+│   │   ├── status/                      # Halaman status kesiapan 4 pilar sistem
+│   │   ├── privacy/ & terms/            # Kebijakan Privasi & Syarat Ketentuan
+│   │   ├── globals.css                  # Design system & responsive styles
+│   │   ├── layout.tsx                   # Root layout + widget FloatingWhatsApp
+│   │   └── page.tsx                     # Landing page katalog & checkout utama
+│   ├── components/                      # Komponen UI terstruktur (modals, sections, ui)
+│   ├── data/                            # Katalog 66 model AI, paket ritel, & channel bayar
+│   ├── lib/                             # Gateway, keys, orders, payment-gateway, receipt-email, supabase-sync
+│   └── types/                           # Definisi TypeScript interfaces
+├── supabase/                            # Migrasi SQL, setup_all.sql, & seed data
+├── .env.example                         # Template variabel environment siap handover
+├── DESIGN.md                            # Pedoman desain visual & token warna
+├── package.json                         # Dependensi & npm scripts (v2.3.0)
+└── README.md                            # Dokumentasi utama repositori
 ```
 
 ---
 
-## 4. Panduan Memulai Cepat (Quick Start)
+## 4. Panduan Menjalankan Lokal (Quick Start)
 
 ### Prasyarat
 - [Node.js](https://nodejs.org/) v18.18+ atau v20+
-- NPM atau PNPM
+- `npm`
 
-### 1. Clone Repositori & Install Dependensi
+### Langkah Instalasi
 ```bash
 git clone https://github.com/Whyzenn07/juragan-token-web.git
 cd juragan-token-web
 npm install
 ```
 
-### 2. Konfigurasi Environment
-Salin template environment:
+Salin template environment dan sesuaikan kredensial lokal Anda:
 ```bash
 cp .env.example .env.local
 ```
-Sesuaikan variabel di file `.env.local` (lihat panduan pada [Bagian 5](#5-konfigurasi-environment-envlocal)).
 
-### 3. Jalankan Development Server
+Jalankan server development:
 ```bash
 npm run dev
 ```
-Buka browser di **[http://localhost:3000](http://localhost:3000)**.
+Buka **[http://localhost:3000](http://localhost:3000)** di browser.
 
-### 4. Validasi Type Check & Build
+### Verifikasi Build, Keamanan, & Pengujian Error
 ```bash
-# Validasi tipe TypeScript bebas error
+# 1. Validasi TypeScript
 npx tsc --noEmit
 
-# Validasi build bundle Next.js
+# 2. Build produksi Next.js
 npm run build
+
+# 3. Jalankan server produksi lokal lalu uji audit & suite error (13/13 test)
+npm run start
+node scripts/security-audit.cjs
+node scripts/test-errors.cjs
 ```
 
 ---
 
-## 5. Konfigurasi Environment (.env.local)
+## 5. Konfigurasi Environment (`.env.local`)
+
+Referensi lengkap tersedia pada [`.env.example`](.env.example). Ringkasan variabel utama:
 
 ```ini
-# ==============================================================================
-# JURAGAN TOKEN - ENVIRONMENT VARIABLES
-# ==============================================================================
-
-# 1. Base URL Gateway
-GATEWAY_BASE_URL="http://localhost:3000/api/v1"
-NEXT_PUBLIC_GATEWAY_URL="http://localhost:3000/api/v1"
-
-# 2. Master Key Upstream AI (Direct Engine)
-# Dapatkan di: https://aistudio.google.com/app/apikey
-GEMINI_API_KEY="AIzaSy..."
-
-# 3. Upstream Central Engine (Pass-Through Model Frontier)
+# 1. Upstream LLM Engine (Handover Item #1)
+GATEWAY_BASE_URL="https://api.tokotokenai.com/v1"
 UPSTREAM_ENGINE_URL="https://api.tokotokenai.com/v1"
-UPSTREAM_ENGINE_KEY=""
+UPSTREAM_ENGINE_KEY=""                  # Isi dengan Master API Key https://api.tokotokenai.com/v1
+UPSTREAM_ROUTE_ALL="false"              # "true" untuk merutekan semua model ke Central Engine
+GEMINI_API_KEY="AIzaSy..."              # Direct Gemini fallback engine
 
-# 4. Transaksional Email (Gmail SMTP / Google Workspace)
-# Sandi Aplikasi 16 Karakter dari https://myaccount.google.com/apppasswords
-GMAIL_USER="halo@juragantoken.com"
+# 2. Payment Gateway Adapter (Handover Item #2)
+PAYMENT_GATEWAY_PROVIDER="manual"       # "manual" | "tripay" | "midtrans" | "xendit"
+PAYMENT_GATEWAY_SANDBOX="false"
+DEMO_MODE="true"                        # Ubah ke "false" saat Payment Gateway live
+NEXT_PUBLIC_DEMO_MODE="true"
+# Kredensial spesifik provider: TRIPAY_*, MIDTRANS_*, XENDIT_* (lihat .env.example)
+
+# 3. Domain, WhatsApp CS, & Email Struk
+NEXT_PUBLIC_APP_URL="https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app"
+NEXT_PUBLIC_WHATSAPP_NUMBER="6281226983990"
+GMAIL_USER="your-email@gmail.com"
 GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"
 GMAIL_FROM_NAME="Juragan Token Indonesia"
 
-# 5. Nomor Layanan Pelanggan WhatsApp (Format: 628xxxxxxxxxx)
-NEXT_PUBLIC_WHATSAPP_NUMBER="6281226983990"
-
-# 6. Mode Pembayaran & Keamanan
-# Set "true" untuk menampilkan tombol Simulasi Bayar di modal checkout (staging)
-DEMO_MODE="true"
-NEXT_PUBLIC_DEMO_MODE="true"
-ADMIN_SECRET="ganti_dengan_string_acak_panjang_untuk_konfirmasi_manual"
-
-# 7. Supabase PostgreSQL Cloud (Opsional tapi Direkomendasikan)
+# 4. Supabase Cloud & Secret Admin
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-or-publishable-key"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-publishable-or-anon-key"
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_PUBLISHABLE_KEY="your-publishable-or-anon-key"
+SUPABASE_SECRET_KEY="your-supabase-service-role-secret-key"
+ADMIN_SECRET="your-random-32-chars-secret"
 ```
 
 ---
 
 ## 6. Spesifikasi API Gateway & Endpoint
 
-### 1. AI Chat Completions (OpenAI Compatible)
-- **Endpoint**: `POST /api/v1/chat/completions` *(atau via rewrite: `POST /v1/chat/completions`)*
-- **Header**:
+### 1. AI Chat Completions (OpenAI-Compatible)
+- **Endpoint:** `POST /api/v1/chat/completions` *(rewrite aktif: `POST /v1/chat/completions`)*
+- **Header:**
   ```http
   Authorization: Bearer jt-live-xxxxxxxxxxxxxxxxxxxx
   Content-Type: application/json
   ```
-- **Payload**:
-  ```json
-  {
-    "model": "gemini-3.5-flash-lite",
-    "messages": [
-      { "role": "user", "content": "Halo, buatkan fungsi kalkulasi diskon di TypeScript!" }
-    ],
-    "stream": true
-  }
-  ```
-- **Response Headers**:
-  - `x-juragan-model`: Model yang dieksekusi di upstream.
-  - `x-juragan-cost-idr`: Nominal rupiah yang dipotong dari saldo.
-  - `x-juragan-balance-remaining-idr`: Sisa saldo kredit API Key.
+- **Response Headers Tambahan:**
+  - `x-juragan-model` — Model yang dieksekusi di upstream
+  - `x-juragan-cost-idr` — Biaya rupiah yang dipotong pada request ini
+  - `x-juragan-balance-remaining-idr` — Sisa saldo IDR API Key
 
-### 2. Cek Saldo Kunci
-- **Endpoint**: `POST /api/keys/check`
-- **Body**: `{ "key": "jt-live-xxxx" }`
-- **Response**: Mengembalikan nama paket, sisa saldo IDR, tanggal aktif, dan status.
+### 2. Cek Saldo & Riwayat Pemakaian
+- **Endpoint:** `POST /api/keys/check`
+- **Body:** `{ "key": "jt-live-xxxx" }`
+- **Response:** Nama paket, sisa saldo IDR, status aktif, dan hingga 10 entri `usage_logs` terakhir.
 
-### 3. Sinkronisasi Kurs & Model
-- **Endpoint**: `GET /api/models/sync`
-- **Deskripsi**: Mengambil kurs real-time USD/IDR dari API Forex dan menyinkronkan rasio pricing token terkini.
+### 3. Endpoint Pendukung & Operasional
+- `GET /api/v1/models` — Daftar seluruh model katalog dalam format OpenAI `/v1/models`.
+- `GET /api/models/sync` — Sinkronisasi kurs USD/IDR real-time & estimasi biaya token.
+- `POST /api/orders` & `GET /api/orders/[id]` — Pembuatan invoice checkout & polling status pembayaran.
+- `POST /api/webhooks/payment` — Penerima webhook Tripay / Midtrans / Xendit (fail-closed signature verification).
+- `GET /api/supabase/status` — Status 4 pilar sistem (Supabase, Email, Payment Gateway, Upstream Engine).
 
 ---
 
-## 7. Skema Database & Persistensi
+## 7. Skema Database & Keamanan
 
-Proyek ini menggunakan arsitektur **Dual-Persistence**:
-1. **Primary Cloud**: Managed PostgreSQL di Supabase Cloud (tabel `orders`, `keys`, `usage_logs`).
-2. **Local Fallback**: File penyimpanan terenkripsi di `.data/store.json` untuk failover otomatis jika koneksi internet server ke Supabase terputus sesaat.
-
-Skrip SQL lengkap untuk menginisialisasi tabel, indeks, dan stored procedure atomik tersedia di:
-- [`supabase/setup_all.sql`](supabase/setup_all.sql)
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#3-skema-database-postgresql)
+- **Dual-Persistence:** Menggunakan **Supabase PostgreSQL** (`orders`, `keys`, `usage_logs`) dengan stored procedure atomik (`deduct_key_balance`) serta fallback penyimpanan lokal yang diabaikan oleh Git (`/data/`, `/backups/`).
+- **Kebersihan Secret & Keamanan:**
+  - File `.env*` (kecuali template `.env.example`) tidak pernah di-commit ke Git dan dilindungi di [`.gitignore`](.gitignore).
+  - Seluruh webhook pembayaran & endpoint admin (`/api/orders/[id]/confirm`, `/api/test-email`, `POST /api/supabase/status`) menerapkan verifikasi HMAC/secret secara *fail-closed* (`timingSafeEqual`).
+  - Skrip migrasi lengkap tersedia di [`supabase/setup_all.sql`](supabase/setup_all.sql) dan [`supabase/migrations/`](supabase/migrations/).
 
 ---
 
-## 8. Panduan Integrasi Klien (Cursor, Claude Code, Python)
+## 8. Panduan Integrasi Klien (Cursor, Python, cURL)
 
-### A. Konfigurasi Cursor AI
-1. Buka **Cursor Settings** $\rightarrow$ **Models**.
-2. Centang **Override OpenAI Base URL**.
-3. Masukkan Base URL: `https://juragantoken.com/api/v1`
-4. Masukkan API Key: `jt-live-xxxx` Anda.
-5. Tambahkan model yang diinginkan (misal: `claude-3-5-sonnet`, `gpt-4o`, `gemini-3.5-flash-lite`).
+> Untuk menguji langsung ke deployment Vercel saat ini, gunakan Base URL:
+> **`https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/api/v1`**
 
-### B. Python SDK Resmi OpenAI
+### A. Cursor IDE / Windsurf / Cline
+1. Buka **Settings → Models** (atau OpenAI Compatible Provider).
+2. Aktifkan **Override OpenAI Base URL** dan isi:
+   `https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/api/v1`
+3. Masukkan API Key `jt-live-...` hasil checkout/simulasi.
+
+### B. Python (`openai` SDK)
 ```python
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://juragantoken.com/api/v1",
-    api_key="jt-live-xxxx"
+    base_url="https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/api/v1",
+    api_key="jt-live-xxxx",
 )
 
-response = client.chat.completions.create(
-    model="gemini-3.5-flash-lite",
-    messages=[{"role": "user", "content": "Jelaskan konsep arsitektur microservices!"}],
-    stream=True
+stream = client.chat.completions.create(
+    model="gemini-2.5-flash",
+    messages=[{"role": "user", "content": "Halo! Jelaskan cara kerja API gateway."}],
+    stream=True,
 )
 
-for chunk in response:
-    content = chunk.choices[0].delta.content or ""
-    print(content, end="", flush=True)
+for chunk in stream:
+    print(chunk.choices[0].delta.content or "", end="", flush=True)
+```
+
+### C. cURL Quick Test
+```bash
+curl -X POST "https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app/api/v1/chat/completions" \
+  -H "Authorization: Bearer jt-live-xxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-2.5-flash",
+    "messages": [{"role": "user", "content": "Tes koneksi Juragan Token"}]
+  }'
 ```
 
 ---
 
-## 9. Dokumen Arsitektur & PRD
+## 9. Dokumentasi Teknis & Handover
 
-Untuk tim developer, lead architect, dan QA engineer yang ingin meninjau spesifikasi teknis lebih dalam:
-- 🚀 **[DEV_HANDOVER.md](docs/DEV_HANDOVER.md)**: Panduan Handover 2 Kredensial Terakhir (Payment Gateway & Master API Key `https://api.tokotokenai.com/v1`).
-- 📘 **[PRD_JURAGAN_TOKEN.md](docs/PRD_JURAGAN_TOKEN.md)**: Product Requirement Document lengkap, metrik produk, dan user flow.
-- 🏗️ **[ARCHITECTURE.md](docs/ARCHITECTURE.md)**: Arsitektur teknis, diagram alir, algoritma pemotongan saldo atomik, dan panduan keamanan.
-- 🎨 **[DESIGN.md](DESIGN.md)**: Standar desain visual, token warna fintech, dan pedoman tipografi.
+- 🚀 **[DEV_HANDOVER.md](docs/DEV_HANDOVER.md)** — Panduan serah terima 2 kredensial akhir (Payment Gateway & Upstream Master API Key `api.tokotokenai.com/v1`)
+- 📘 **[PRD_JURAGAN_TOKEN.md](docs/PRD_JURAGAN_TOKEN.md)** — Product Requirement Document (v2.4.0)
+- 🏗️ **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** — Arsitektur teknis, diagram alir, & DDL PostgreSQL
+- 🛡️ **[audit-002-2026-11-13.md](docs/audits/audit-002-2026-11-13.md)** — Laporan audit keamanan & QA terbaru
+- 🎨 **[DESIGN.md](DESIGN.md)** — Pedoman visual & sistem desain UI
 
 ---
 
 ## 🛡️ Lisensi & Kontribusi
 
-Seluruh hak cipta dimiliki oleh **Juragan Token Indonesia**. Proyek ini dikembangkan untuk kebutuhan operasional komersial. Untuk kontribusi tim internal, buat pull request ke branch `main` dengan menyertakan pengujian type check `npx tsc --noEmit`.
+Seluruh hak cipta dimiliki oleh **Juragan Token Indonesia**. Untuk kontribusi tim internal, pastikan lulus pemeriksaan `npx tsc --noEmit`, `npm run build`, `node scripts/security-audit.cjs`, dan `node scripts/test-errors.cjs` sebelum melakukan merge ke branch `main`.
