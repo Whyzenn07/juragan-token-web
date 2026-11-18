@@ -1680,6 +1680,50 @@
   }
 }
 
+/* White Catalog CTA Button (Tampilkan 100+ Model Lainnya) */
+.cpe-btn-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #0a2540;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 9999px;
+  padding: 11px 28px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  transition:
+    background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cpe-btn-white:hover {
+  background: #f8fbff;
+  color: #1d63dc;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(29, 99, 220, 0.12);
+}
+
+.cpe-btn-white:active {
+  background: #eff6ff;
+  border-color: #1d63dc;
+  transform: translateY(1px) scale(0.985);
+}
+
+.cpe-btn-white:focus-visible {
+  outline: 2px solid #1d63dc;
+  outline-offset: 3px;
+}
+
 /* Strict Reduced Motion support */
 @media (prefers-reduced-motion: reduce) {
   .landing-animate-fade-up,

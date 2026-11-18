@@ -95,6 +95,17 @@ export const modelsCatalog: ModelItem[] = [
     featured: true
   },
   {
+    id: "gpt-5.4",
+    name: "GPT 5.4",
+    providerId: "openai",
+    category: "Ngoding",
+    description: "Model engineering OpenAI generasi 5.4 untuk arsitektur backend, refactoring bersih, dan debugging multi-file.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["openai", "anthropic"],
+    ratio: 1.25,
+    completionRatio: 6
+  },
+  {
     id: "claude-opus-5-5",
     name: "Claude Opus 5.5",
     providerId: "anthropic",
@@ -152,6 +163,18 @@ export const modelsCatalog: ModelItem[] = [
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
     ratio: 2.5,
+    completionRatio: 5
+  },
+  {
+    id: "claude-sonnet-4-6",
+    name: "Claude Sonnet 4.6",
+    providerId: "anthropic",
+    category: "Ngoding",
+    description: "Pilihan favorit tim developer untuk Claude Code CLI, Cursor, dan refactoring source code lintas repositori.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["anthropic", "openai"],
+    contextTokens: 200_000,
+    ratio: 1.5,
     completionRatio: 5
   },
   {
@@ -215,6 +238,17 @@ export const modelsCatalog: ModelItem[] = [
     completionRatio: 0,
     perImageUsd: 0.03,
     featured: true
+  },
+  {
+    id: "gemini-3.5-flash-lite",
+    name: "Gemini 3.5 Flash Lite",
+    providerId: "google",
+    category: "Chat Hemat",
+    description: "Model Google latensi sub-detik berbiaya hemat untuk chatbot volume tinggi, klasifikasi data, dan automasi cepat.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["openai"],
+    ratio: 0.15,
+    completionRatio: 4
   },
   {
     id: "deepseek-v4-pro",
@@ -623,6 +657,17 @@ export const modelsCatalog: ModelItem[] = [
     endpoints: ["openai", "anthropic"],
     ratio: 0.4225,
     completionRatio: 4
+  },
+  {
+    id: "glm-5",
+    name: "GLM 5",
+    providerId: "zhipu",
+    category: "Chat Hemat",
+    description: "Model efisien Zhipu AI seri GLM 5 untuk percakapan responsif, ringkasan cepat, dan olah teks operasional.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    ratio: 0.44,
+    completionRatio: 3.2
   }
 ];
 

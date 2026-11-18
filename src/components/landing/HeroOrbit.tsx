@@ -135,7 +135,7 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
         </h1>
 
         <p className="jt-hero-subtitle">
-          Satu gateway, satu API Key, 50 model AI terkurasi (100+ model di gateway). Jembatani kebutuhan teknis tim IT,
+          Satu gateway, satu API Key, 54 model AI terkurasi (100+ model di gateway). Jembatani kebutuhan teknis tim IT,
           ngoding, riset mendalam, dan efisiensi operasional dalam satu ekosistem terintegrasi.
         </p>
 
