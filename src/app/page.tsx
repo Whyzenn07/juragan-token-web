@@ -377,9 +377,12 @@ export default function Home() {
   const gridKey = `${activeCategory}-${selectedProvider}-${sortOption}-${viewSavedOnly ? "saved" : "all"}`;
   const { isScrolled } = useScrollEffects(gridKey);
 
-  // Slicing model yang ditampilkan sesuai batas aktif (Load More)
-  const displayedModels = filteredModels.slice(0, visibleCount);
-  const isExpanded = visibleCount > INITIAL_CATALOG_LIMIT;
+  // Slicing model yang ditampilkan: 6 kartu di tampilan utama, seluruh hasil saat filter provider/pencarian aktif
+  const effectiveLimit =
+    selectedProvider !== "all" || activeCategory !== "Semua" || searchQuery.trim() !== "" || viewSavedOnly
+      ? filteredModels.length
+      : visibleCount;
+  const displayedModels = filteredModels.slice(0, effectiveLimit);
 
   return (
     <div className="site-canvas">
@@ -1150,48 +1153,27 @@ export default function Home() {
               )}
             </div>
 
-            {/* Fitur Tampilkan Semua / Tampilkan Lebih Sedikit (Clean Single Toggle) */}
-            {filteredModels.length > INITIAL_CATALOG_LIMIT && (
+            {/* Arahkan eksplorasi 100+ model lengkap ke Gateway Model Picker */}
+            {filteredModels.length > 0 && (
               <div className="catalog-pagination-wrap" data-reveal="fade-up">
-                {/* Single Toggle Action Button */}
                 <div className="cpe-actions-row">
-                  {!isExpanded ? (
-                    <button
-                      type="button"
-                      className="cpe-btn-primary"
-                      onClick={() => setVisibleCount(filteredModels.length)}
-                      aria-label={`Tampilkan semua ${filteredModels.length} model AI`}
-                    >
-                      <span>Tampilkan Semua ({filteredModels.length})</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="cpe-btn-ghost"
-                      onClick={() => {
-                        setVisibleCount(INITIAL_CATALOG_LIMIT);
-                        const gridEl = document.getElementById("model-grid");
-                        if (gridEl) {
-                          gridEl.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }
-                      }}
-                      aria-label="Tampilkan lebih sedikit model (kembali ke tampilan ringkas)"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <polyline points="18 15 12 9 6 15" />
-                      </svg>
-                      <span>Tampilkan Lebih Sedikit</span>
-                    </button>
-                  )}
+                  <a
+                    href="https://api.tokotokenai.com/model-picker"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="cpe-btn-primary"
+                    aria-label="Tampilkan 100+ model AI lainnya di api.tokotokenai.com/model-picker"
+                  >
+                    <span>Tampilkan 100+ Model Lainnya</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
                 </div>
 
                 {/* Status Counter */}
                 <div className="cpe-status-bar">
                   <span className="cpe-counter">
-                    Menampilkan <strong className="cpe-strong">{displayedModels.length}</strong> dari <strong className="cpe-strong">{filteredModels.length}</strong> model AI
+                    Menampilkan <strong className="cpe-strong">{displayedModels.length}</strong> dari{" "}
+                    <strong className="cpe-strong">{filteredModels.length}</strong> model AI di katalog
                   </span>
                 </div>
               </div>
