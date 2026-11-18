@@ -344,63 +344,32 @@
 .jt-console-code .c-cyan { color: #7dd3fc; font-weight: 600; }
 .jt-console-code .c-cmt { color: #94a3b8; }
 
-/* Animated Moving Model Marquee */
+/* Animated Moving AI Logo + Name Marquee */
 .jt-marquee-section {
-  margin: 10px 0 42px;
-  padding: 20px 0;
+  margin: 12px 0 42px;
+  padding: 22px 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(234, 242, 251, 0.38) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(234, 242, 251, 0.45) 100%);
   border-radius: 16px;
-}
-
-.jt-marquee-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 0 20px 14px;
-}
-
-.jt-marquee-lead {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--blue-deep);
-}
-
-.jt-marquee-sub {
-  font-size: 12.5px;
-  color: #475569;
-}
-
-.jt-marquee-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .jt-marquee-viewport {
   position: relative;
   overflow: hidden;
   width: 100%;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
 }
 
 .jt-marquee-track {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 44px;
   width: max-content;
-  animation: jt-marquee-scroll 34s linear infinite;
+  padding: 4px 22px;
+  animation: jt-marquee-scroll 28s linear infinite;
   will-change: transform;
-}
-
-.jt-marquee-track.is-reverse {
-  animation-direction: reverse;
-  animation-duration: 38s;
 }
 
 .jt-marquee-viewport:hover .jt-marquee-track {
@@ -412,46 +381,31 @@
   to { transform: translate3d(-50%, 0, 0); }
 }
 
-.jt-marquee-chip {
+.jt-marquee-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 14px;
-  border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid #d8e3ef;
-  box-shadow: 0 2px 8px rgba(10, 37, 64, 0.04);
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-  text-align: left;
+  gap: 11px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: transparent;
+  border: 0;
+  transition: transform 0.18s ease, opacity 0.18s ease;
   flex-shrink: 0;
 }
 
-.jt-marquee-chip:hover {
+.jt-marquee-brand:hover {
   transform: translateY(-2px);
-  border-color: var(--blue);
-  box-shadow: 0 8px 18px rgba(10, 88, 202, 0.12);
+  opacity: 0.85;
 }
 
-.jt-chip-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.25;
-}
-
-.jt-chip-text strong {
-  font-size: 13px;
-  color: var(--ink);
+.jt-brand-name {
+  font-family: var(--font-h);
+  font-size: 21px;
   font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  white-space: nowrap;
 }
-
-.jt-chip-tag {
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.jt-chip-tag--coding { color: #0a58ca; }
-.jt-chip-tag--research { color: #6d28d9; }
-.jt-chip-tag--efficient { color: #0f766e; }
 
 /* Shared Section Framing */
 .jt-section {
@@ -1058,7 +1012,7 @@
     width: 100%;
   }
 
-  .jt-marquee-chip[aria-hidden="true"] {
+  .jt-marquee-brand[aria-hidden="true"] {
     display: none;
   }
 }
