@@ -3,15 +3,6 @@
    Original styles reusing core tokens from globals.css
    ========================================================================== */
 
-/* Brand image lockup in header & footer */
-.brand-logo-img {
-  height: 36px;
-  width: auto;
-  display: block;
-  object-fit: contain;
-  mix-blend-mode: multiply;
-}
-
 .footer-logo-img {
   height: 34px;
   width: auto;
@@ -22,61 +13,293 @@
   border-radius: 8px;
 }
 
-/* Hero Enterprise / Company Profile Grid */
-.jt-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 40px;
-  align-items: center;
-  padding: 36px 0 28px;
+/* 1. Floating Pill Navbar (Clean executive style) */
+.jt-pill-header-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  padding: 14px 20px 6px;
+  pointer-events: none;
 }
 
-.jt-hero-eyebrow {
+.jt-pill-navbar {
+  pointer-events: auto;
+  max-width: 1180px;
+  margin: 0 auto;
+  height: 58px;
+  padding: 0 10px 0 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid #dce6f2;
+  box-shadow: 0 8px 28px rgba(10, 37, 64, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.jt-pill-header-wrap.is-scrolled .jt-pill-navbar {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: #cbd8ea;
+  box-shadow: 0 12px 34px rgba(10, 37, 64, 0.1);
+}
+
+.jt-pill-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.jt-pill-brand-icon {
+  width: 30px;
+  height: 25px;
+  object-fit: contain;
+  display: block;
+  mix-blend-mode: multiply;
+}
+
+.jt-pill-brand-text {
+  font-family: var(--font-h);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0a2540;
+  line-height: 1;
+}
+
+.jt-pill-brand-blue {
+  color: #0a58ca;
+}
+
+.jt-pill-brand-dot {
+  color: #0ea5e9;
+}
+
+.jt-pill-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.jt-pill-nav-link {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #475569;
+  text-decoration: none;
+  padding: 6px 2px;
+  transition: color 0.18s ease;
+  white-space: nowrap;
+}
+
+.jt-pill-nav-link:hover,
+.jt-pill-nav-link.is-active {
+  color: #0a2540;
+  font-weight: 600;
+}
+
+.jt-pill-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+.jt-pill-util-link {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #475569;
+  background: none;
+  border: 0;
+  padding: 6px 2px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.18s ease;
+  white-space: nowrap;
+}
+
+.jt-pill-util-link:hover {
+  color: #0a2540;
+}
+
+.jt-pill-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: #1d63dc;
+  color: #ffffff !important;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px rgba(29, 99, 220, 0.28);
+  transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  white-space: nowrap;
+}
+
+.jt-pill-cta-btn:hover {
+  background: #1550b8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(29, 99, 220, 0.36);
+}
+
+/* 2. Hero Section (2-Column Light Grid + Frosted Console Card) */
+.jt-hero-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 44px;
+  align-items: center;
+  padding: 36px 0 38px;
+}
+
+.jt-hero-stage::before {
+  content: "";
+  position: absolute;
+  inset: -24px -32px 0;
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse at 50% 40%, #000 45%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 45%, transparent 85%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.jt-hero-left,
+.jt-console-window {
+  position: relative;
+  z-index: 1;
+}
+
+.jt-hero-pill-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 7px 15px;
   border-radius: 999px;
-  background: var(--wash);
-  border: 1px solid #c7dbf4;
-  color: var(--blue-deep);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 16px;
+  background: #eaf3ff;
+  border: 1px solid #d4e4ff;
+  color: #1d58c8;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 22px;
 }
 
-.jt-hero-copy h1 {
-  margin: 0 0 16px;
-  font-size: clamp(30px, 3.6vw, 46px);
-  line-height: 1.12;
-  letter-spacing: -0.025em;
-  color: var(--ink);
+.jt-badge-spark {
+  font-size: 12px;
+  color: #2563eb;
+}
+
+.jt-hero-headline {
+  margin: 0 0 18px;
+  font-family: var(--font-h);
+  font-size: clamp(38px, 4.4vw, 54px);
   font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: #0b192c;
 }
 
-.jt-hero-accent {
-  background: linear-gradient(135deg, #0a58ca 0%, #0284c7 65%, #0ea5e9 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.jt-hero-subtitle {
+  margin: 0 0 26px;
+  font-size: 16.5px;
+  line-height: 1.62;
+  color: #52657a;
+  max-width: 48ch;
 }
 
-.jt-hero-desc {
-  margin: 0 0 24px;
-  font-size: 16px;
-  line-height: 1.65;
-  color: #425466;
-  max-width: 58ch;
+.jt-provider-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-.jt-hero-actions {
+.jt-provider-tile {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #dce6f2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.jt-provider-tile:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+}
+
+.jt-provider-tile.is-selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16), 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.jt-active-model-pill {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #dce6f2;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  color: #334155;
+  margin-bottom: 24px;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.jt-active-model-pill:hover {
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.jt-amp-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+
+.jt-amp-name {
+  color: #1d58c8;
+  font-weight: 600;
+}
+
+.jt-amp-name strong {
+  font-weight: 700;
+}
+
+.jt-amp-role {
+  font-family: var(--font);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #0f766e;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.jt-hero-cta-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  margin-bottom: 22px;
 }
 
 .jt-btn-primary {
@@ -84,19 +307,19 @@
   align-items: center;
   gap: 8px;
   padding: 12px 22px;
-  border-radius: 10px;
-  background: var(--blue);
+  border-radius: 999px;
+  background: #1d63dc;
   color: #ffffff;
   font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 8px 20px rgba(10, 88, 202, 0.24);
+  box-shadow: 0 8px 20px rgba(29, 99, 220, 0.24);
   transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .jt-btn-primary:hover {
-  background: #084298;
+  background: #1550b8;
   transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(10, 88, 202, 0.3);
+  box-shadow: 0 12px 26px rgba(29, 99, 220, 0.32);
 }
 
 .jt-btn-secondary {
@@ -104,7 +327,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  border-radius: 10px;
+  border-radius: 999px;
   background: #ffffff;
   color: var(--ink);
   border: 1px solid #cbd5e1;
@@ -119,230 +342,241 @@
   transform: translateY(-2px);
 }
 
-.jt-hero-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  font-size: 13px;
-  color: #425466;
-  font-weight: 500;
-}
-
-.jt-hero-fact {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.jt-hero-fact svg {
-  color: #0d9488;
-}
-
-/* Hero Visual: Animated Orbit + Gateway Console */
-.jt-hero-visual {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
-}
-
-.jt-orbit-stage {
-  position: relative;
-  width: 340px;
-  height: 310px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 100%;
-}
-
-.jt-orbit-glow {
-  position: absolute;
-  inset: 16px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.16) 0%, rgba(10, 88, 202, 0.05) 55%, transparent 75%);
-  pointer-events: none;
-}
-
-.jt-orbit-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px dashed rgba(10, 88, 202, 0.22);
-  pointer-events: none;
-}
-
-.jt-orbit-ring--outer {
-  width: 280px;
-  height: 280px;
-}
-
-.jt-orbit-ring--inner {
-  width: 196px;
-  height: 196px;
-  border-style: solid;
-  border-color: rgba(10, 88, 202, 0.1);
-}
-
-.jt-orbit-track {
-  position: absolute;
-  inset: 0;
-  animation: jt-orbit-spin 36s linear infinite;
-  will-change: transform;
-}
-
-.jt-orbit-stage:hover .jt-orbit-track {
-  animation-play-state: paused;
-}
-
-.jt-orbit-arm {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  transform: rotate(var(--orbit-angle)) translateY(-136px);
-}
-
-.jt-orbit-node {
-  transform: translate(-50%, -50%) rotate(calc(var(--orbit-angle) * -1));
-}
-
-.jt-orbit-node-inner {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: #ffffff;
-  border: 1px solid #d8e3ef;
-  box-shadow: 0 6px 16px rgba(10, 37, 64, 0.08);
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--ink);
-  white-space: nowrap;
-  animation: jt-orbit-counter 36s linear infinite;
-  will-change: transform;
-}
-
-.jt-orbit-stage:hover .jt-orbit-node-inner {
-  animation-play-state: paused;
-}
-
-@keyframes jt-orbit-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes jt-orbit-counter {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(-360deg); }
-}
-
-.jt-orbit-core {
-  position: relative;
-  z-index: 2;
-  width: 148px;
-  height: 148px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #0a2540 0%, #0a4ea3 100%);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 12px;
-  box-shadow: 0 14px 34px rgba(10, 37, 64, 0.24), 0 0 0 8px rgba(10, 88, 202, 0.08);
-}
-
-.jt-core-kicker {
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #93c5fd;
-  margin-bottom: 2px;
-}
-
-.jt-core-brand {
-  font-family: var(--font-h);
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-
-.jt-core-accent {
-  color: #38bdf8;
-}
-
-.jt-core-endpoint {
-  margin-top: 4px;
-  font-size: 9.5px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  color: #cbd5e1;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.jt-console-card {
-  width: 100%;
-  max-width: 440px;
-  background: #0a192f;
-  color: #e2e8f0;
-  border-radius: 12px;
-  border: 1px solid #1e3a5f;
-  box-shadow: 0 14px 32px rgba(10, 25, 47, 0.16);
+/* Frosted Light Console Window (Right Column) */
+.jt-console-window {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.95) 0%, rgba(235, 245, 255, 0.9) 100%);
+  border: 1px solid #dce8f8;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(15, 35, 75, 0.08);
   overflow: hidden;
 }
 
-.jt-console-head {
+.jt-cw-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 14px;
-  background: #0f2442;
-  border-bottom: 1px solid #1e3a5f;
-  font-size: 11.5px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid #e2ecf9;
 }
 
-.jt-console-dots {
+.jt-cw-left {
   display: inline-flex;
-  gap: 5px;
+  align-items: center;
+  gap: 10px;
 }
 
-.jt-console-dots span {
+.jt-cw-dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.jt-cw-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.jt-cw-dots .dot-soft-1 { background: #bfdbfe; }
+.jt-cw-dots .dot-soft-2 { background: #60a5fa; }
+.jt-cw-dots .dot-blue { background: #1d63dc; }
+
+.jt-cw-title {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.jt-cw-tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.jt-cw-canvas {
+  padding: 26px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: radial-gradient(circle at 60% 45%, rgba(191, 219, 254, 0.42) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.jt-cw-request-card {
+  max-width: 310px;
+  background: #ffffff;
+  border: 1px solid #e2ecf9;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 12px 28px rgba(15, 35, 75, 0.06);
+}
+
+.jt-cw-req-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.jt-cw-dots-sm {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.jt-cw-dots-sm i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #93c5fd;
+  display: inline-block;
+}
+
+.jt-cw-dots-sm i:last-child {
+  background: #1d63dc;
+}
+
+.jt-cw-req-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #1e293b;
+}
+
+.jt-cw-req-code .req-method {
+  color: #1d58c8;
+  font-weight: 700;
+}
+
+.jt-cw-req-code .req-key {
+  color: #0284c7;
+}
+
+.jt-cw-req-code .req-val {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.jt-cw-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e2ecf9;
+  box-shadow: 0 6px 18px rgba(15, 35, 75, 0.05);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  color: #475569;
+  margin-bottom: 18px;
+}
+
+.jt-cw-status-pill strong {
+  color: #0f172a;
+}
+
+.jt-cw-status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #334155;
+  background: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18);
 }
 
-.jt-console-title {
+.jt-cw-routing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.jt-cw-hub-box {
+  background: #ffffff;
+  border: 1px solid #dce8f8;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 24px rgba(15, 35, 75, 0.06);
+  min-width: 175px;
+}
+
+.jt-cw-hub-logo {
+  width: 28px;
+  height: 24px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.jt-cw-hub-box code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #1d58c8;
   font-weight: 600;
-  color: #cbd5e1;
 }
 
-.jt-console-status {
+.jt-cw-connector {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #93c5fd 0%, #38bdf8 100%);
+  position: relative;
+  min-width: 28px;
+}
+
+.jt-cw-pulse-dot {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  box-shadow: 0 0 10px #0ea5e9;
+  transform: translateY(-50%);
+  animation: jt-connector-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes jt-connector-pulse {
+  0% { left: 0%; opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { left: calc(100% - 10px); opacity: 0.4; }
+}
+
+.jt-cw-provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  gap: 10px;
+}
+
+.jt-cw-grid-tile {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e2ecf9;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: #7dd3fc;
-  font-weight: 600;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(15, 35, 75, 0.05);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.jt-console-code {
-  margin: 0;
-  padding: 12px 14px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12px;
-  line-height: 1.55;
-  overflow-x: auto;
+.jt-cw-grid-tile.is-selected {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.22), 0 8px 20px rgba(29, 99, 220, 0.12);
+  transform: scale(1.06);
 }
-
-.jt-console-code .c-dim { color: #38bdf8; font-weight: 700; }
-.jt-console-code .c-cyan { color: #7dd3fc; font-weight: 600; }
-.jt-console-code .c-cmt { color: #94a3b8; }
 
 /* Animated Moving AI Logo + Name Marquee */
 .jt-marquee-section {
@@ -932,7 +1166,12 @@
 
 /* Responsive adjustments */
 @media (max-width: 960px) {
-  .jt-hero {
+  .jt-pill-nav-links,
+  .jt-pill-util-link {
+    display: none;
+  }
+
+  .jt-hero-stage {
     grid-template-columns: 1fr;
     gap: 28px;
     padding-top: 20px;
@@ -953,36 +1192,35 @@
 }
 
 @media (max-width: 640px) {
-  .brand-logo-img {
-    height: 30px;
+  .jt-pill-header-wrap {
+    padding: 10px 12px 4px;
   }
 
-  .jt-orbit-stage {
-    width: 280px;
-    height: 260px;
+  .jt-pill-navbar {
+    height: 52px;
+    padding: 0 8px 0 14px;
   }
 
-  .jt-orbit-ring--outer {
-    width: 230px;
-    height: 230px;
+  .jt-pill-brand-text {
+    font-size: 17.5px;
   }
 
-  .jt-orbit-ring--inner {
-    width: 162px;
-    height: 162px;
+  .jt-pill-cta-btn {
+    padding: 8px 14px;
+    font-size: 12.5px;
   }
 
-  .jt-orbit-arm {
-    transform: rotate(var(--orbit-angle)) translateY(-108px);
+  .jt-cw-routing-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .jt-orbit-core {
-    width: 124px;
-    height: 124px;
-  }
-
-  .jt-marquee-rows .jt-marquee-viewport:nth-child(2) {
+  .jt-cw-connector {
     display: none;
+  }
+
+  .jt-cw-provider-grid {
+    justify-content: center;
   }
 
   .jt-expertise-panel,
@@ -995,8 +1233,7 @@
 
 /* Strict Reduced Motion support */
 @media (prefers-reduced-motion: reduce) {
-  .jt-orbit-track,
-  .jt-orbit-node-inner,
+  .jt-cw-pulse-dot,
   .jt-marquee-track,
   .jt-wire-pulse {
     animation: none !important;

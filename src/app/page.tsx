@@ -204,10 +204,10 @@ export default function Home() {
   const catalogRef = useRef<HTMLElement>(null);
 
   const NAV_ITEMS = [
-    { id: "expertise", label: "Keahlian AI", href: "#keahlian-model" },
-    { id: "workflow", label: "Cara Kerja", href: "#cara-kerja" },
-    { id: "catalog", label: "Katalog Model", href: "#catalog" },
-    { id: "why", label: "Kenapa Kami", href: "#kenapa-kami" },
+    { id: "expertise", label: "Solusi", href: "#keahlian-model" },
+    { id: "workflow", label: "Integrasi", href: "#cara-kerja" },
+    { id: "why", label: "Keunggulan", href: "#kenapa-kami" },
+    { id: "setup", label: "Panduan", href: "#panduan-setup" },
     { id: "faq", label: "FAQ", href: "#faq" },
   ] as const;
 
@@ -255,12 +255,12 @@ export default function Home() {
 
   // Scroll spy to sync activeSection with visible viewport section
   useEffect(() => {
-    const sectionIds = ["keahlian-model", "cara-kerja", "catalog", "kenapa-kami", "faq"];
+    const sectionIds = ["keahlian-model", "cara-kerja", "kenapa-kami", "panduan-setup", "faq"];
     const sectionMap: Record<string, string> = {
       "keahlian-model": "expertise",
       "cara-kerja": "workflow",
-      catalog: "catalog",
       "kenapa-kami": "why",
+      "panduan-setup": "setup",
       faq: "faq",
     };
 
@@ -394,141 +394,103 @@ export default function Home() {
         Langsung ke katalog model AI
       </a>
 
-      {/* 1. Top Announcement */}
-      <div className="announcement">
-        <div className="announcement-container">
-          <span>✧</span>
-        <span>Juragantoken — One Gateway. Every Intelligence. Satu gerbang terpadu untuk puluhan model AI terkemuka.</span>
-        <button type="button" className="announcement-link" onClick={scrollToCatalog}>
-          Jelajahi Model AI ↗
-        </button>
-        </div>
-      </div>
-
-      {/* 2. Site Header */}
-      <header className={`header ${isScrolled ? "scrolled" : ""}`}>
-        <div className="header-container">
-          <a className="brand" href="#top" aria-label="Juragantoken Beranda">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/logo-juragantoken.jpg"
-            alt="Juragantoken — One Gateway. Every Intelligence."
-            className="brand-logo-img"
-            width={160}
-            height={38}
-          />
-        </a>
-
-        <nav
-          ref={navRef}
-          className="header-links"
-          aria-label="Navigasi Utama"
-          onMouseLeave={() => setHoveredNav(null)}
-        >
-          {NAV_ITEMS.map((item) => {
-            const isCurrent = activeSection === item.id;
-            return (
-              <a
-                key={item.id}
-                ref={(el) => {
-                  linkRefs.current[item.id] = el;
-                }}
-                href={item.href}
-                className={`header-nav-link ${isCurrent ? "active" : ""}`}
-                onMouseEnter={() => setHoveredNav(item.id)}
-                onClick={(e) => {
-                  if (item.href.startsWith("/")) {
-                    return; // Normal route change
-                  }
-                  if (item.id === "catalog") {
-                    e.preventDefault();
-                    setViewSavedOnly(false);
-                    scrollToCatalog();
-                  }
-                  setActiveSection(item.id);
-                }}
-              >
-                {item.label}
-              </a>
-            );
-          })}
-          <span
-            className="nav-sliding-indicator"
-            style={{
-              transform: `translateX(${indicatorStyle.left}px)`,
-              width: `${indicatorStyle.width}px`,
-              opacity: indicatorStyle.opacity,
-            }}
-            aria-hidden="true"
-          />
-        </nav>
-
-        <div className="header-right">
-          {/* Interactive Indonesia (IDR) Trigger -> Opens Bank Indonesia Live Rate Modal */}
-          <button
-            type="button"
-            className="region-indicator interactive"
-            onClick={() => setCurrencyModalOpen(true)}
-            title="Klik untuk melihat kurs real-time Bank Indonesia (BI) & segarkan harga"
-            aria-label="Lihat Kurs Real-Time Bank Indonesia"
-          >
-            <span className="flag-badge-svg" aria-hidden="true">
-              <svg width="18" height="12" viewBox="0 0 18 12" fill="none" style={{ borderRadius: "2px", overflow: "hidden", display: "block" }}>
-                <rect width="18" height="6" fill="#e11d48" />
-                <rect y="6" width="18" height="6" fill="#ffffff" />
-                <rect width="18" height="12" stroke="#cbd5e1" strokeWidth="0.5" rx="1" />
-              </svg>
+      {/* Floating Pill Navbar (Desain bersih ala gambar referensi tokotokenai) */}
+      <header className={`jt-pill-header-wrap ${isScrolled ? "is-scrolled" : ""}`}>
+        <div className="jt-pill-navbar">
+          <a className="jt-pill-brand" href="#top" aria-label="Juragantoken Beranda">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo-mark.png"
+              alt=""
+              width={30}
+              height={25}
+              className="jt-pill-brand-icon"
+            />
+            <span className="jt-pill-brand-text">
+              juragan<span className="jt-pill-brand-blue">token</span><span className="jt-pill-brand-dot">.</span>
             </span>
-            <span className="region-name-text">Indonesia (IDR)</span>
-            <span className="currency-pill-badge" aria-hidden="true">BI Live</span>
-          </button>
-          <span className="header-divider" />
-          <Link href="/docs" className="header-docs-link">
-            <span>Dokumentasi API</span>
-          </Link>
-          <button
-            type="button"
-            className="check-balance-btn"
-            onClick={() => setBalanceModalOpen(true)}
+          </a>
+
+          <nav
+            ref={navRef}
+            className="jt-pill-nav-links"
+            aria-label="Navigasi Utama"
+            onMouseLeave={() => setHoveredNav(null)}
           >
-            <span>Cek Saldo Key</span>
-            <span className="btn-arrow" aria-hidden="true">↗</span>
-          </button>
-          {ENABLE_CHECKOUT ? (
+            {NAV_ITEMS.map((item) => {
+              const isCurrent = activeSection === item.id;
+              return (
+                <a
+                  key={item.id}
+                  ref={(el) => {
+                    linkRefs.current[item.id] = el;
+                  }}
+                  href={item.href}
+                  className={`jt-pill-nav-link ${isCurrent ? "is-active" : ""}`}
+                  onMouseEnter={() => setHoveredNav(item.id)}
+                  onClick={() => setActiveSection(item.id)}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+          </nav>
+
+          <div className="jt-pill-actions">
             <a
-              href="#katalog-retail"
-              className="company-button"
+              href="#catalog"
+              className="jt-pill-util-link"
               onClick={(e) => {
-                const el = document.getElementById("katalog-retail");
-                if (el) {
-                  e.preventDefault();
-                  el.scrollIntoView({ behavior: "smooth" });
-                }
+                e.preventDefault();
+                setViewSavedOnly(false);
+                scrollToCatalog();
               }}
             >
-              <span>Beli Token</span>
-              <span className="btn-arrow" aria-hidden="true">↗</span>
+              Katalog Model
             </a>
-          ) : (
-            <a
-              href={buildWhatsappUrl("Halo Tim Juragantoken, saya ingin berdiskusi mengenai akses API AI & uji coba.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="company-button"
+            <button
+              type="button"
+              className="jt-pill-util-link"
+              onClick={() => setBalanceModalOpen(true)}
             >
-              <span>Hubungi Tim</span>
-              <span className="btn-arrow" aria-hidden="true">↗</span>
-            </a>
-          )}
-          <button
-            type="button"
-            className="mobile-menu icon-button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Menu navigasi"
-          >
-            <Icon name={mobileMenuOpen ? "close" : "menu"} />
-          </button>
-        </div>
+              Cek Saldo
+            </button>
+            <Link href="/docs" className="jt-pill-util-link">
+              Docs
+            </Link>
+            {ENABLE_CHECKOUT ? (
+              <a
+                href="#katalog-retail"
+                className="jt-pill-cta-btn"
+                onClick={(e) => {
+                  const el = document.getElementById("katalog-retail");
+                  if (el) {
+                    e.preventDefault();
+                    el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                Beli Token
+              </a>
+            ) : (
+              <a
+                href={buildWhatsappUrl("Halo Tim Juragantoken, saya ingin berdiskusi mengenai akses API AI & uji coba.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="jt-pill-cta-btn"
+              >
+                Hubungi Tim
+              </a>
+            )}
+            <button
+              type="button"
+              className="mobile-menu icon-button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Menu navigasi"
+            >
+              <Icon name={mobileMenuOpen ? "close" : "menu"} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -537,10 +499,10 @@ export default function Home() {
         <div className="mobile-nav-drawer" role="dialog" aria-label="Menu navigasi mobile">
           <nav className="mobile-nav-links">
             <a href="#keahlian-model" onClick={() => setMobileMenuOpen(false)}>
-              Keahlian Model AI
+              Solusi &amp; Keahlian AI
             </a>
             <a href="#cara-kerja" onClick={() => setMobileMenuOpen(false)}>
-              Cara Kerja Gateway
+              Integrasi Gateway
             </a>
             <a
               href="#catalog"
@@ -557,7 +519,7 @@ export default function Home() {
               </a>
             )}
             <a href="#kenapa-kami" onClick={() => setMobileMenuOpen(false)}>
-              Kenapa Memilih Kami
+              Keunggulan Kami
             </a>
             <button
               type="button"
@@ -571,7 +533,7 @@ export default function Home() {
               <span aria-hidden="true">↗</span>
             </button>
             <Link href="/docs" onClick={() => setMobileMenuOpen(false)}>
-              Dokumentasi API &amp; Panduan ↗
+              Dokumentasi API (Docs) ↗
             </Link>
             <Link href="/status" onClick={() => setMobileMenuOpen(false)}>
               Status Sistem (Live) ↗
@@ -598,79 +560,11 @@ export default function Home() {
       {/* 3. Main Content Container - Full Width Company Profile Layout */}
       <div className="company-container">
         <main className="company-main">
-          {/* Breadcrumb & Live Status Strip */}
-          <div className="breadcrumb">
-            <span>Juragantoken</span> / <span>AI Gateway Profile</span>
-            <span className="demo-pill">One Gateway · Every Intelligence</span>
-          </div>
-
-          <div className="gateway-status-strip" data-reveal="fade-up">
-            <div className="gateway-status-left">
-              <span className="live-pulse-dot" />
-              <strong>Gateway api.tokotokenai.com</strong>
-              <span>· Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4 &amp; Qwen 3.7 dalam 1 endpoint</span>
-            </div>
-            <div className="gateway-status-right">
-              <span>Protokol: <b>OpenAI-Compatible (/v1)</b></span>
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => setBalanceModalOpen(true)}
-              >
-                Cek Saldo Key ↗
-              </button>
-            </div>
-          </div>
-
-          {/* Hero Section (Company Profile + Animated Orbit Visual) */}
-          <section className="jt-hero" id="top">
-            <div className="jt-hero-copy">
-              <div className="jt-hero-eyebrow">
-                <span>✦</span>
-                <span>ONE GATEWAY · EVERY INTELLIGENCE</span>
-              </div>
-              <h1>
-                Satu Gerbang API AI Terpadu untuk{" "}
-                <span className="jt-hero-accent">Seluruh Model Terkemuka.</span>
-              </h1>
-              <p className="jt-hero-desc">
-                Juragantoken menjembatani kebutuhan developer, tim riset, dan operasional bisnis di Indonesia untuk
-                mengakses Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, hingga Qwen melalui satu endpoint
-                dan satu API Key tanpa repot mengelola banyak akun vendor terpisah.
-              </p>
-              <div className="jt-hero-actions">
-                <button type="button" className="jt-btn-primary" onClick={scrollToCatalog}>
-                  <span>Jelajahi Katalog Model</span>
-                  <span aria-hidden="true">↗</span>
-                </button>
-                <a
-                  href={buildWhatsappUrl("Halo Tim Juragantoken, saya ingin konsultasi penggunaan AI Gateway untuk proyek kami.")}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="jt-btn-secondary"
-                >
-                  <span>Konsultasi via WhatsApp</span>
-                  <span aria-hidden="true">↗</span>
-                </a>
-              </div>
-              <div className="jt-hero-facts">
-                <span className="jt-hero-fact">
-                  <Icon name="check" size={16} />
-                  <span>{models.length} Model AI Terkurasi</span>
-                </span>
-                <span className="jt-hero-fact">
-                  <Icon name="check" size={16} />
-                  <span>Kompatibel Cursor, Claude Code &amp; Python SDK</span>
-                </span>
-                <span className="jt-hero-fact">
-                  <Icon name="check" size={16} />
-                  <span>Dukungan Lokal Indonesia</span>
-                </span>
-              </div>
-            </div>
-
-            <HeroOrbit />
-          </section>
+          {/* Hero Section (Gaya bersih sesuai referensi gambar 1 + sinkron PRD/PDF) */}
+          <HeroOrbit
+            onExploreCatalog={scrollToCatalog}
+            onSelectModel={handleOpenDetail}
+          />
 
           {/* Animated Moving LLM Showcase (Original Marquee Inspired by Industry Patterns) */}
           <LogoMarquee onSelectModel={handleOpenDetail} />
@@ -1673,10 +1567,10 @@ export default function Home() {
               <a className="footer-brand" href="#top" aria-label="Juragantoken Beranda">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/logo-juragantoken.jpg"
+                  src="/images/logo-juragantoken-tight.png"
                   alt="Juragantoken — One Gateway. Every Intelligence."
                   className="footer-logo-img"
-                  width={150}
+                  width={175}
                   height={34}
                 />
               </a>
