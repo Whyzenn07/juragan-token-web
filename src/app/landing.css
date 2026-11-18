@@ -3,6 +3,17 @@
    Original styles reusing core tokens from globals.css
    ========================================================================== */
 
+/* Ensure all sections stay 100% visible across HMR / Fast Refresh & initial render */
+[data-reveal],
+[data-reveal="scale"],
+[data-reveal="fade-in"],
+[data-reveal="fade-up"],
+[data-reveal="fade-left"],
+[data-reveal="fade-right"] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 .footer-logo-img {
   height: 34px;
   width: auto;

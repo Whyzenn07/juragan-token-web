@@ -560,6 +560,25 @@ export default function Home() {
       {/* 3. Main Content Container - Full Width Company Profile Layout */}
       <div className="company-container">
         <main className="company-main">
+          {/* Live Gateway Status Strip */}
+          <div className="gateway-status-strip">
+            <div className="gateway-status-left">
+              <span className="live-pulse-dot" />
+              <strong>Gateway api.tokotokenai.com</strong>
+              <span>· Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4 &amp; Qwen 3.7 dalam 1 endpoint</span>
+            </div>
+            <div className="gateway-status-right">
+              <span>Protokol: <b>OpenAI-Compatible (/v1)</b></span>
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => setBalanceModalOpen(true)}
+              >
+                Cek Saldo Key ↗
+              </button>
+            </div>
+          </div>
+
           {/* Hero Section (Gaya bersih sesuai referensi gambar 1 + sinkron PRD/PDF) */}
           <HeroOrbit
             onExploreCatalog={scrollToCatalog}

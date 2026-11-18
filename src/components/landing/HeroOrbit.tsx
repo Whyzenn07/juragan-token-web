@@ -199,7 +199,9 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
                 <div
                   key={node.orbitLabel}
                   className="jt-orbit-slot"
-                  style={{ "--orbit-angle": `${node.angle}deg` } as React.CSSProperties}
+                  style={{
+                    transform: `rotate(${node.angle}deg) translateY(calc(var(--orbit-radius) * -1)) rotate(-${node.angle}deg)`,
+                  }}
                 >
                   <div className="jt-orbit-counter">
                     <button
