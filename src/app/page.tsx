@@ -1094,7 +1094,7 @@ export default function Home() {
                             {m.category}
                           </span>
                           <span className="mc-cap-pill">
-                            {perImage ? "Generasi Gambar" : tier === "Hemat" ? "Efisiensi Biaya" : tier === "Premium" ? "Flagship Frontier" : "Seimbang"}
+                            {perImage ? "Generasi Gambar" : tier === "Hemat" ? "Efisiensi Biaya" : tier === "Premium" ? "Performa Tinggi" : "Seimbang"}
                           </span>
                           <span className="mc-cap-pill">
                             Input: {m.inputs.join(" + ")}
