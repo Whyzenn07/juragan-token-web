@@ -185,7 +185,7 @@ export function ModelExpertiseShowcase({ onSelectModel, onBrowseCategory }: Mode
         })}
       </div>
 
-      <div className="jt-expertise-panel" role="tabpanel">
+      <div key={activeTab} className="jt-expertise-panel jt-slide-down-panel" role="tabpanel">
         <div className="jt-exp-panel-top">
           <div>
             <h3>{current.headline}</h3>
@@ -201,8 +201,12 @@ export function ModelExpertiseShowcase({ onSelectModel, onBrowseCategory }: Mode
         </div>
 
         <div className="jt-exp-grid">
-          {current.models.map((item) => (
-            <article key={item.id} className="jt-exp-card">
+          {current.models.map((item, idx) => (
+            <article
+              key={item.id}
+              className="jt-exp-card jt-slide-down-card"
+              style={{ animationDelay: `${idx * 65}ms` }}
+            >
               <div className="jt-exp-card-head">
                 <ProviderLogo provider={item.providerId} size={30} />
                 <div>

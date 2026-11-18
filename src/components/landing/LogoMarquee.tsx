@@ -54,7 +54,9 @@ export function LogoMarquee({ onSelectModel }: LogoMarqueeProps) {
                 tabIndex={isClone ? -1 : undefined}
                 title={item.label}
               >
-                <ProviderLogo provider={item.providerId} size={28} />
+                <span className="jt-marquee-logo-box">
+                  <ProviderLogo provider={item.providerId} size={22} />
+                </span>
                 <span className="jt-brand-name">{item.label}</span>
               </button>
             );

@@ -12,7 +12,7 @@ type HeroModelShowcase = {
   orbitLabel: string;
   modelId: string;
   roleTag: string;
-  /** Normalized (cos, sin) position on unit circle so pill center sits dead-on the ring */
+  headlineWord: string;
   xFactor: number;
   yFactor: number;
 };
@@ -24,6 +24,7 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Claude",
     modelId: "claude-opus-5-5",
     roleTag: "Ngoding & Arsitektur",
+    headlineWord: "platform.",
     xFactor: 0,
     yFactor: -1,
   },
@@ -33,6 +34,7 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "ChatGPT",
     modelId: "chatgpt-6-astra",
     roleTag: "Arsitektur & Debug",
+    headlineWord: "gateway.",
     xFactor: 0.866025,
     yFactor: -0.5,
   },
@@ -42,6 +44,7 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Gemini",
     modelId: "gemini-4-argon",
     roleTag: "Full-Stack & Konteks",
+    headlineWord: "ekosistem.",
     xFactor: 0.866025,
     yFactor: 0.5,
   },
@@ -51,6 +54,7 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "DeepSeek",
     modelId: "deepseek-v4-pro",
     roleTag: "Riset & Efisiensi",
+    headlineWord: "integrasi.",
     xFactor: 0,
     yFactor: 1,
   },
@@ -60,6 +64,7 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Qwen",
     modelId: "qwen3.7-max",
     roleTag: "Multi-Bahasa Hemat",
+    headlineWord: "kendali.",
     xFactor: -0.866025,
     yFactor: 0.5,
   },
@@ -69,6 +74,7 @@ export const HERO_SHOWCASE_ITEMS: HeroModelShowcase[] = [
     orbitLabel: "Grok",
     modelId: "grok-4",
     roleTag: "Penalaran Cepat",
+    headlineWord: "platform.",
     xFactor: -0.866025,
     yFactor: -0.5,
   },
@@ -112,7 +118,7 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Left Column: Clean 2-Line Headline + Description + Interactive Model Features */}
+      {/* Left Column: Clean 2-Line Headline with Slide-Down Cycling Word + Interactive Model Features */}
       <div className="jt-hero-left landing-animate-fade-up">
         <div className="jt-hero-pill-badge">
           <span className="jt-badge-spark" aria-hidden="true">✦</span>
@@ -122,7 +128,10 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
         <h1 className="jt-hero-headline">
           Semua model AI
           <br />
-          dalam satu platform.
+          dalam satu{" "}
+          <span key={current.headlineWord + activeIndex} className="jt-slide-word">
+            {current.headlineWord}
+          </span>
         </h1>
 
         <p className="jt-hero-subtitle">
@@ -150,19 +159,22 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
           })}
         </div>
 
-        {/* Active Model Pill (Click to inspect model specs) */}
-        <button
-          type="button"
-          className="jt-active-model-pill"
-          onClick={handleOpenActiveModel}
-          title="Klik untuk melihat detail & cara pakai model ini"
-        >
-          <span className="jt-amp-label">MODEL</span>
-          <span className="jt-amp-name">
-            {current.providerName} · <strong>{current.modelId}</strong>
-          </span>
-          <span className="jt-amp-role">{current.roleTag}</span>
-        </button>
+        {/* Active Model Pill with Slide-Down Disappear/Appear Transition */}
+        <div className="jt-amp-slot">
+          <button
+            key={current.modelId}
+            type="button"
+            className="jt-active-model-pill jt-slide-down-item"
+            onClick={handleOpenActiveModel}
+            title="Klik untuk melihat detail & cara pakai model ini"
+          >
+            <span className="jt-amp-label">MODEL</span>
+            <span className="jt-amp-name">
+              {current.providerName} · <strong>{current.modelId}</strong>
+            </span>
+            <span className="jt-amp-role">{current.roleTag}</span>
+          </button>
+        </div>
 
         {/* CTA Buttons */}
         <div className="jt-hero-cta-row">
@@ -192,56 +204,70 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
         </div>
       </div>
 
-      {/* Right Column: Pure Centered Orbit Ring with Juragantoken Logo in Center */}
+      {/* Right Column: Balanced Motion Frame housing the Centered Orbit Ring */}
       <div className="jt-hero-visual landing-animate-scale-in" aria-label="Animasi orbit model AI mengelilingi Juragantoken">
-        <div className="jt-orbit-stage">
-          <div className="jt-orbit-glow" aria-hidden="true" />
-
-          {/* SVG Orbital Rings with Animated Signal Arc */}
-          <svg className="jt-orbit-svg" viewBox="0 0 420 420" fill="none" aria-hidden="true">
-            <circle cx="210" cy="210" r="154" className="jt-orbit-svg-outer" />
-            <circle cx="210" cy="210" r="154" className="jt-orbit-svg-pulse" />
-            <circle cx="210" cy="210" r="108" className="jt-orbit-svg-inner" />
-          </svg>
-
-          {/* Direct (x,y) polar placement on the r=154px circle — zero wobble */}
-          <div className="jt-orbit-track" aria-hidden="true">
-            {HERO_SHOWCASE_ITEMS.map((node, idx) => {
-              const isSelected = idx === activeIndex;
-              return (
-                <button
-                  key={node.orbitLabel}
-                  type="button"
-                  className={`jt-orbit-pill ${isSelected ? "is-selected" : ""}`}
-                  style={
-                    {
-                      left: `calc(50% + var(--orbit-radius) * ${node.xFactor})`,
-                      top: `calc(50% + var(--orbit-radius) * ${node.yFactor})`,
-                    } as React.CSSProperties
-                  }
-                  onClick={() => setActiveIndex(idx)}
-                  tabIndex={-1}
-                >
-                  <ProviderLogo provider={node.providerId} size={22} />
-                  <span>{node.orbitLabel}</span>
-                </button>
-              );
-            })}
+        <div className="jt-motion-frame">
+          <div className="jt-mf-topbar">
+            <span className="jt-mf-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className="jt-mf-title">juragantoken · multi-model hub</span>
+            <span className="jt-mf-live">
+              <span className="jt-mf-live-dot" /> Aktif
+            </span>
           </div>
 
-          {/* Center Circle: Juragantoken Logo Only */}
-          <div className="jt-orbit-core">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/logo-mark.png"
-              alt="Juragantoken"
-              width={56}
-              height={46}
-              className="jt-core-logo-mark"
-            />
-            <strong className="jt-core-brand">
-              juragan<span className="jt-core-accent">token.</span>
-            </strong>
+          <div className="jt-orbit-stage">
+            <div className="jt-orbit-glow" aria-hidden="true" />
+
+            {/* SVG Orbital Rings with Animated Signal Arc */}
+            <svg className="jt-orbit-svg" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+              <circle cx="200" cy="200" r="144" className="jt-orbit-svg-outer" />
+              <circle cx="200" cy="200" r="144" className="jt-orbit-svg-pulse" />
+              <circle cx="200" cy="200" r="100" className="jt-orbit-svg-inner" />
+            </svg>
+
+            {/* Direct (x,y) polar placement on the r=144px circle — zero wobble */}
+            <div className="jt-orbit-track" aria-hidden="true">
+              {HERO_SHOWCASE_ITEMS.map((node, idx) => {
+                const isSelected = idx === activeIndex;
+                return (
+                  <button
+                    key={node.orbitLabel}
+                    type="button"
+                    className={`jt-orbit-pill ${isSelected ? "is-selected" : ""}`}
+                    style={
+                      {
+                        left: `calc(50% + var(--orbit-radius) * ${node.xFactor})`,
+                        top: `calc(50% + var(--orbit-radius) * ${node.yFactor})`,
+                      } as React.CSSProperties
+                    }
+                    onClick={() => setActiveIndex(idx)}
+                    tabIndex={-1}
+                  >
+                    <ProviderLogo provider={node.providerId} size={20} />
+                    <span>{node.orbitLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Center Circle: Juragantoken Logo Only */}
+            <div className="jt-orbit-core">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo-mark.png"
+                alt="Juragantoken"
+                width={52}
+                height={43}
+                className="jt-core-logo-mark"
+              />
+              <strong className="jt-core-brand">
+                juragan<span className="jt-core-accent">token.</span>
+              </strong>
+            </div>
           </div>
         </div>
       </div>

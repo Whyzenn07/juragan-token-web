@@ -1,8 +1,16 @@
 /* ==========================================================================
-   Juragantoken — Comprehensive UI/UX & Animation System (v3.0.0)
-   Combines tokotokenai light grid & entrance motion with tokenku.ai deep-navy
-   marquee, .tk-mcard glass cards, and .tks-card animated step visuals.
+   Juragantoken — Comprehensive UI/UX & Balanced Motion System (v3.0.0)
+   Royal Blue (#1d63dc / #2563eb) + Crisp White Mix & Slide-Down Cycle Motion
    ========================================================================== */
+
+:root {
+  --jt-royal: #1d63dc;
+  --jt-royal-bright: #2563eb;
+  --jt-royal-deep: #1550b8;
+  --jt-ice: #f4f8ff;
+  --jt-border-blue: #cfe0f5;
+  --ease-balanced: cubic-bezier(0.22, 1, 0.36, 1);
+}
 
 /* Keep all sections 100% visible across HMR / Fast Refresh & initial render */
 [data-reveal],
@@ -15,9 +23,9 @@
   transform: none !important;
 }
 
-/* Entrance animations from tokotokenai */
+/* Balanced Motion & Slide-Down Disappear -> Appear Keyframes */
 @keyframes landing-fade-up {
-  0% { opacity: 0; transform: translateY(20px); }
+  0% { opacity: 0; transform: translateY(18px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
@@ -26,17 +34,103 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* Slide down from top -> hold -> slide down & disappear at end of 2.8s cycle */
+@keyframes jt-slide-word-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px);
+    filter: blur(4px);
+  }
+  14%, 84% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(3px);
+  }
+}
+
+@keyframes jt-slide-down-item {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+  }
+  14%, 85% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@keyframes jt-slide-down-panel {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes jt-slide-down-card {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes tableRowEnter {
-  0% { opacity: 0; transform: translateY(6px); }
+  0% { opacity: 0; transform: translateY(-8px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 .landing-animate-fade-up {
-  animation: 0.6s cubic-bezier(0.16, 1, 0.3, 1) both landing-fade-up;
+  animation: 0.6s var(--ease-balanced) both landing-fade-up;
 }
 
 .landing-animate-scale-in {
-  animation: 0.65s cubic-bezier(0.16, 1, 0.3, 1) both landing-scale-in;
+  animation: 0.65s var(--ease-balanced) both landing-scale-in;
+}
+
+.jt-slide-word {
+  display: inline-block;
+  color: var(--jt-royal);
+  animation: jt-slide-word-cycle 2.8s var(--ease-balanced) both;
+  will-change: transform, opacity, filter;
+}
+
+.jt-hero-stage:hover .jt-slide-word,
+.jt-hero-stage:hover .jt-slide-down-item {
+  animation-play-state: paused;
+}
+
+.jt-amp-slot {
+  min-height: 44px;
+  margin-bottom: 22px;
+}
+
+.jt-slide-down-item {
+  animation: jt-slide-down-item 2.8s var(--ease-balanced) both;
+  will-change: transform, opacity;
+}
+
+.jt-slide-down-panel {
+  animation: jt-slide-down-panel 0.45s var(--ease-balanced) both;
+}
+
+.jt-slide-down-card {
+  animation: jt-slide-down-card 0.48s var(--ease-balanced) both;
 }
 
 .footer-logo-img {
@@ -49,7 +143,7 @@
   border-radius: 8px;
 }
 
-/* 1. Floating Pill Navbar (tokotokenai executive glass pill) */
+/* 1. Floating Pill Navbar */
 .jt-pill-header-wrap {
   position: sticky;
   top: 0;
@@ -65,22 +159,22 @@
   height: 58px;
   padding: 0 10px 0 20px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid #dce6f2;
-  box-shadow: 0 8px 28px rgba(10, 37, 64, 0.06);
+  border: 1px solid #d5e3f5;
+  box-shadow: 0 8px 28px rgba(29, 99, 220, 0.07);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+  transition: box-shadow 0.25s var(--ease-balanced), border-color 0.25s var(--ease-balanced);
 }
 
 .jt-pill-header-wrap.is-scrolled .jt-pill-navbar {
-  background: rgba(255, 255, 255, 0.97);
-  border-color: #cbd8ea;
-  box-shadow: 0 12px 34px rgba(10, 37, 64, 0.1);
+  background: rgba(255, 255, 255, 0.98);
+  border-color: #bdd3f0;
+  box-shadow: 0 12px 34px rgba(29, 99, 220, 0.11);
 }
 
 .jt-pill-brand {
@@ -109,7 +203,7 @@
 }
 
 .jt-pill-brand-blue {
-  color: #0a58ca;
+  color: var(--jt-royal);
 }
 
 .jt-pill-brand-dot {
@@ -134,7 +228,7 @@
 
 .jt-pill-nav-link:hover,
 .jt-pill-nav-link.is-active {
-  color: #0a2540;
+  color: var(--jt-royal);
   font-weight: 600;
 }
 
@@ -159,7 +253,7 @@
 }
 
 .jt-pill-util-link:hover {
-  color: #0a2540;
+  color: var(--jt-royal);
 }
 
 .jt-pill-cta-btn {
@@ -168,30 +262,30 @@
   justify-content: center;
   padding: 10px 20px;
   border-radius: 999px;
-  background: #1d63dc;
+  background: var(--jt-royal);
   color: #ffffff !important;
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none !important;
   box-shadow: 0 4px 14px rgba(29, 99, 220, 0.28);
-  transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  transition: background-color 0.2s var(--ease-balanced), transform 0.2s var(--ease-balanced), box-shadow 0.2s var(--ease-balanced);
   white-space: nowrap;
 }
 
 .jt-pill-cta-btn:hover {
-  background: #1550b8;
+  background: var(--jt-royal-deep);
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(29, 99, 220, 0.36);
 }
 
-/* 2. Hero Section (2-Column Light Grid + Zero-Wobble Centered Orbit) */
+/* 2. Hero Section + Balanced Motion Frame around Orbit */
 .jt-hero-stage {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 44px;
+  gap: 40px;
   align-items: center;
-  padding: 28px 0 36px;
+  padding: 26px 0 36px;
 }
 
 .jt-hero-stage::before {
@@ -199,8 +293,8 @@
   position: absolute;
   inset: -20px -32px 0;
   background-image:
-    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    linear-gradient(to right, rgba(29, 99, 220, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(29, 99, 220, 0.06) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: radial-gradient(ellipse at 50% 42%, #000 48%, transparent 85%);
   -webkit-mask-image: radial-gradient(ellipse at 50% 42%, #000 48%, transparent 85%);
@@ -221,8 +315,8 @@
   padding: 7px 15px;
   border-radius: 999px;
   background: #eaf3ff;
-  border: 1px solid #d4e4ff;
-  color: #1d58c8;
+  border: 1px solid #cfe2ff;
+  color: var(--jt-royal);
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 22px;
@@ -230,7 +324,7 @@
 
 .jt-badge-spark {
   font-size: 12px;
-  color: #2563eb;
+  color: var(--jt-royal-bright);
 }
 
 .jt-hero-headline {
@@ -238,13 +332,13 @@
   font-family: var(--font-h);
   font-size: clamp(38px, 4.4vw, 54px);
   font-weight: 800;
-  line-height: 1.07;
+  line-height: 1.08;
   letter-spacing: -0.035em;
   color: #0b192c;
 }
 
 .jt-hero-subtitle {
-  margin: 0 0 26px;
+  margin: 0 0 24px;
   font-size: 16.5px;
   line-height: 1.62;
   color: #52657a;
@@ -264,22 +358,22 @@
   height: 44px;
   border-radius: 50%;
   background: #ffffff;
-  border: 1px solid #dce6f2;
+  border: 1px solid #d5e3f5;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(29, 99, 220, 0.06);
+  transition: transform 0.24s var(--ease-balanced), border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .jt-provider-tile:hover {
-  transform: translateY(-2px) scale(1.04);
-  border-color: #93c5fd;
+  transform: translateY(-2px) scale(1.05);
+  border-color: #60a5fa;
 }
 
 .jt-provider-tile.is-selected {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18), 0 6px 16px rgba(15, 23, 42, 0.08);
+  border-color: var(--jt-royal);
+  box-shadow: 0 0 0 3px rgba(29, 99, 220, 0.18), 0 6px 16px rgba(29, 99, 220, 0.12);
 }
 
 .jt-active-model-pill {
@@ -289,18 +383,17 @@
   gap: 10px;
   padding: 9px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid #dce6f2;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  background: #ffffff;
+  border: 1px solid #cfe0f5;
+  box-shadow: 0 4px 14px rgba(29, 99, 220, 0.06);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 12.5px;
   color: #334155;
-  margin-bottom: 24px;
-  transition: border-color 0.18s ease, transform 0.18s ease;
+  transition: border-color 0.2s var(--ease-balanced), transform 0.2s var(--ease-balanced);
 }
 
 .jt-active-model-pill:hover {
-  border-color: #3b82f6;
+  border-color: var(--jt-royal);
   transform: translateY(-1px);
 }
 
@@ -312,7 +405,7 @@
 }
 
 .jt-amp-name {
-  color: #1d58c8;
+  color: var(--jt-royal);
   font-weight: 600;
 }
 
@@ -324,10 +417,10 @@
   font-family: var(--font);
   font-size: 11.5px;
   font-weight: 600;
-  color: #0f766e;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  padding: 2px 8px;
+  color: var(--jt-royal);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 2px 9px;
   border-radius: 999px;
 }
 
@@ -344,16 +437,16 @@
   gap: 8px;
   padding: 12px 22px;
   border-radius: 999px;
-  background: #1d63dc;
+  background: var(--jt-royal);
   color: #ffffff;
   font-weight: 700;
   font-size: 14px;
   box-shadow: 0 8px 20px rgba(29, 99, 220, 0.24);
-  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.22s var(--ease-balanced), background-color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .jt-btn-primary:hover {
-  background: #1550b8;
+  background: var(--jt-royal-deep);
   transform: translateY(-2px);
   box-shadow: 0 12px 26px rgba(29, 99, 220, 0.32);
 }
@@ -369,11 +462,11 @@
   border: 1px solid #cbd5e1;
   font-weight: 600;
   font-size: 14px;
-  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.22s var(--ease-balanced), background-color 0.22s ease, transform 0.22s var(--ease-balanced);
 }
 
 .jt-btn-secondary:hover {
-  border-color: var(--blue);
+  border-color: var(--jt-royal);
   background: #f8fbff;
   transform: translateY(-2px);
 }
@@ -395,33 +488,108 @@
 }
 
 .jt-hero-hl-item svg {
-  color: #0d9488;
+  color: var(--jt-royal);
 }
 
-/* Pure Centered Orbit Visual (Right Column - Direct Polar (x,y) on r=154px) */
+/* Balanced Motion Frame housing the Centered Orbit Visual */
 .jt-hero-visual {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.jt-motion-frame {
+  width: 100%;
+  max-width: 450px;
+  border-radius: 22px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(236, 245, 255, 0.92) 100%);
+  border: 1px solid #cfe0f5;
+  box-shadow:
+    0 20px 50px rgba(29, 99, 220, 0.1),
+    0 0 0 6px rgba(255, 255, 255, 0.65);
+  overflow: hidden;
+  transition: transform 0.35s var(--ease-balanced), box-shadow 0.35s var(--ease-balanced);
+}
+
+.jt-motion-frame:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 26px 60px rgba(29, 99, 220, 0.14),
+    0 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.jt-mf-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  background: linear-gradient(90deg, #1d63dc 0%, #2563eb 100%);
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.jt-mf-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.jt-mf-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  display: inline-block;
+}
+
+.jt-mf-dots i:last-child {
+  background: #ffffff;
+}
+
+.jt-mf-title {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.jt-mf-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: #ffffff;
+}
+
+.jt-mf-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+}
+
 .jt-orbit-stage {
   position: relative;
-  width: 420px;
-  height: 420px;
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
   max-width: 100%;
-  --orbit-radius: 154px;
+  --orbit-radius: 144px;
 }
 
 .jt-orbit-glow {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 340px;
-  height: 340px;
+  width: 320px;
+  height: 320px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(29, 99, 220, 0.06) 55%, transparent 75%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.16) 0%, rgba(29, 99, 220, 0.04) 58%, transparent 75%);
   pointer-events: none;
 }
 
@@ -434,27 +602,27 @@
 }
 
 .jt-orbit-svg-outer {
-  stroke: rgba(29, 99, 220, 0.24);
+  stroke: rgba(29, 99, 220, 0.26);
   stroke-width: 1.5;
   stroke-dasharray: 6 6;
 }
 
 .jt-orbit-svg-pulse {
-  stroke: #38bdf8;
+  stroke: var(--jt-royal-bright);
   stroke-width: 2.5;
   stroke-linecap: round;
-  stroke-dasharray: 90 880;
-  animation: jt-svg-arc-flow 8s linear infinite;
+  stroke-dasharray: 85 820;
+  animation: jt-svg-arc-flow 7.5s linear infinite;
 }
 
 .jt-orbit-svg-inner {
-  stroke: rgba(29, 99, 220, 0.12);
+  stroke: rgba(29, 99, 220, 0.14);
   stroke-width: 1;
-  fill: rgba(255, 255, 255, 0.45);
+  fill: rgba(255, 255, 255, 0.6);
 }
 
 @keyframes jt-svg-arc-flow {
-  from { stroke-dashoffset: 970; }
+  from { stroke-dashoffset: 905; }
   to { stroke-dashoffset: 0; }
 }
 
@@ -479,24 +647,24 @@
   will-change: transform;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 15px;
+  gap: 7px;
+  padding: 7px 14px;
   border-radius: 999px;
   background: #ffffff;
-  border: 1px solid #d8e3ef;
-  box-shadow: 0 8px 20px rgba(10, 37, 64, 0.08);
-  font-size: 13px;
+  border: 1px solid #cfe0f5;
+  box-shadow: 0 6px 18px rgba(29, 99, 220, 0.1);
+  font-size: 12.5px;
   font-weight: 700;
   color: #0a2540;
   white-space: nowrap;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s var(--ease-balanced), box-shadow 0.2s var(--ease-balanced);
 }
 
 .jt-orbit-pill.is-selected,
 .jt-orbit-pill:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 10px 24px rgba(10, 37, 64, 0.14);
+  border-color: var(--jt-royal);
+  box-shadow: 0 0 0 4px rgba(29, 99, 220, 0.18), 0 10px 24px rgba(29, 99, 220, 0.16);
 }
 
 @keyframes jt-orbit-spin {
@@ -516,26 +684,26 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  width: 162px;
-  height: 162px;
+  width: 152px;
+  height: 152px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2px solid #dbeafe;
+  border: 2px solid #bfdbfe;
   box-shadow:
-    0 16px 38px rgba(10, 37, 64, 0.12),
-    0 0 0 10px rgba(29, 99, 220, 0.06);
+    0 14px 34px rgba(29, 99, 220, 0.14),
+    0 0 0 9px rgba(29, 99, 220, 0.07);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 14px;
+  gap: 5px;
+  padding: 12px;
   text-align: center;
 }
 
 .jt-core-logo-mark {
-  width: 56px;
-  height: 46px;
+  width: 52px;
+  height: 43px;
   object-fit: contain;
   display: block;
   mix-blend-mode: multiply;
@@ -543,7 +711,7 @@
 
 .jt-core-brand {
   font-family: var(--font-h);
-  font-size: 17.5px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: #0a2540;
@@ -551,17 +719,19 @@
 }
 
 .jt-core-accent {
-  color: #0a58ca;
+  color: var(--jt-royal);
 }
 
-/* 3. Deep Midnight Navy AI Marquee (Adopted from tokenku.ai .tk-logo-marquee) */
+/* 3. Royal Blue + White Mix AI Marquee (Matches Jelajahi Katalog Model #1d63dc) */
 .jt-marquee-section {
   margin: 8px 0 44px;
-  padding: 26px 0;
-  background: linear-gradient(135deg, #041026 0%, #09234c 52%, #051329 100%);
-  border: 1px solid #1e3a6d;
+  padding: 22px 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.24) 0%, transparent 68%),
+    linear-gradient(135deg, #1d63dc 0%, #2563eb 50%, #1954c0 100%);
+  border: 1px solid #3b82f6;
   border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(4, 16, 38, 0.22);
+  box-shadow: 0 14px 34px rgba(29, 99, 220, 0.2);
 }
 
 .jt-marquee-viewport {
@@ -570,16 +740,16 @@
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
 }
 
 .jt-marquee-track {
   display: flex;
   align-items: center;
-  gap: 60px;
+  gap: 52px;
   width: max-content;
-  padding: 4px 30px;
+  padding: 4px 28px;
   animation: jt-marquee-scroll 22s linear infinite;
   will-change: transform;
 }
@@ -596,23 +766,35 @@
 .jt-marquee-brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: transparent;
-  border: 0;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  gap: 11px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  transition: transform 0.22s var(--ease-balanced), background-color 0.22s ease;
   flex-shrink: 0;
 }
 
 .jt-marquee-brand:hover {
-  transform: translateY(-2px) scale(1.04);
-  opacity: 0.9;
+  transform: translateY(-2px) scale(1.03);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.jt-marquee-logo-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(10, 37, 64, 0.12);
+  flex-shrink: 0;
 }
 
 .jt-brand-name {
   font-family: var(--font-h);
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #ffffff;
@@ -635,7 +817,7 @@
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--blue);
+  color: var(--jt-royal);
   margin-bottom: 8px;
 }
 
@@ -655,7 +837,7 @@
   color: #475569;
 }
 
-/* 4. Model Expertise Showcase (Adopted from tokenku.ai .tk-mcard deep-navy glass cards) */
+/* 4. Model Expertise Showcase (Royal Blue #1d63dc Frame + Clean White Mixed Cards) */
 .jt-expertise-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -668,26 +850,26 @@
   align-items: center;
   gap: 8px;
   padding: 11px 18px;
-  border-radius: 12px;
+  border-radius: 999px;
   background: #ffffff;
-  border: 1px solid #d8e3ef;
+  border: 1px solid #cfe0f5;
   font-weight: 700;
   font-size: 13.5px;
   color: #334155;
-  transition: all 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
+  transition: all 0.22s var(--ease-balanced);
 }
 
 .jt-exp-tab:hover {
-  border-color: #2E5FA0;
-  color: #051329;
+  border-color: var(--jt-royal);
+  color: var(--jt-royal);
   transform: translateY(-2px);
 }
 
 .jt-exp-tab.is-active {
-  background: linear-gradient(135deg, #06152d 0%, #0b2555 100%);
-  border-color: #2E5FA0;
+  background: linear-gradient(135deg, #1d63dc 0%, #2563eb 100%);
+  border-color: #1d63dc;
   color: #ffffff;
-  box-shadow: 0 10px 24px rgba(6, 21, 45, 0.22);
+  box-shadow: 0 8px 20px rgba(29, 99, 220, 0.24);
 }
 
 .jt-exp-badge {
@@ -695,23 +877,24 @@
   font-weight: 700;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(10, 88, 202, 0.1);
-  color: var(--blue-deep);
+  background: #eff6ff;
+  color: var(--jt-royal);
 }
 
 .jt-exp-tab.is-active .jt-exp-badge {
-  background: rgba(245, 166, 35, 0.2);
-  color: #fcd34d;
-  border: 1px solid rgba(245, 166, 35, 0.4);
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .jt-expertise-panel {
-  background: radial-gradient(circle at 80% 10%, rgba(46, 95, 160, 0.32) 0%, transparent 55%),
-              linear-gradient(160deg, #051329 0%, #081e42 55%, #06152d 100%);
-  border: 1px solid #2E5FA0;
-  border-radius: 20px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(255, 255, 255, 0.26) 0%, transparent 55%),
+    linear-gradient(145deg, #1d63dc 0%, #2563eb 55%, #1854c2 100%);
+  border: 1px solid #3b82f6;
+  border-radius: 22px;
   padding: 28px;
-  box-shadow: 0 20px 44px rgba(5, 19, 41, 0.22);
+  box-shadow: 0 18px 42px rgba(29, 99, 220, 0.18);
   color: #ffffff;
 }
 
@@ -723,7 +906,7 @@
   gap: 16px;
   padding-bottom: 20px;
   margin-bottom: 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .jt-exp-panel-top h3 {
@@ -736,25 +919,26 @@
 .jt-exp-panel-top p {
   margin: 0;
   font-size: 14px;
-  color: #B9CBE9;
+  color: rgba(255, 255, 255, 0.9);
   max-width: 66ch;
   line-height: 1.6;
 }
 
 .jt-link-pill {
   padding: 10px 16px;
-  border-radius: 10px;
-  background: rgba(79, 163, 255, 0.16);
-  border: 1px solid #4FA3FF;
-  color: #ffffff;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  color: var(--jt-royal);
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 14px rgba(10, 37, 64, 0.12);
+  transition: background-color 0.2s var(--ease-balanced), transform 0.2s var(--ease-balanced);
 }
 
 .jt-link-pill:hover {
-  background: rgba(79, 163, 255, 0.28);
+  background: #f0f7ff;
   transform: translateY(-2px);
 }
 
@@ -764,20 +948,21 @@
   gap: 16px;
 }
 
+/* Inner Cards: Clean White mixed with Soft Blue inside the Royal Blue Panel */
 .jt-exp-card {
   display: flex;
   flex-direction: column;
   padding: 18px 20px;
-  border-radius: 14px;
-  background: rgba(9, 42, 94, 0.58);
-  border: 1px solid #2E5FA0;
-  transition: transform 0.24s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 24px rgba(10, 37, 64, 0.12);
+  transition: transform 0.26s var(--ease-balanced), box-shadow 0.26s var(--ease-balanced);
 }
 
 .jt-exp-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: #4FA3FF;
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 16px 32px rgba(10, 37, 64, 0.18);
 }
 
 .jt-exp-card-head {
@@ -786,14 +971,14 @@
   gap: 12px;
   padding-bottom: 12px;
   margin-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid #e2ecf9;
 }
 
 .jt-exp-card-head h4 {
   margin: 0 0 2px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
+  font-size: 17.5px;
+  font-weight: 800;
+  color: #0b192c;
   line-height: 1.15;
 }
 
@@ -803,16 +988,16 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #7FA3D6;
+  color: var(--jt-royal);
 }
 
 .jt-exp-list {
   margin: 0 0 16px;
   padding-left: 18px;
   list-style: disc;
-  font-size: 12.8px;
+  font-size: 13px;
   line-height: 1.55;
-  color: #B9CBE9;
+  color: #334155;
   flex: 1;
 }
 
@@ -820,27 +1005,27 @@
   text-align: left;
   font-size: 13px;
   font-weight: 700;
-  color: #8fcaff;
+  color: var(--jt-royal);
   padding: 4px 0;
   transition: color 0.18s ease;
 }
 
 .jt-exp-detail-btn:hover {
-  color: #ffffff;
+  color: var(--jt-royal-deep);
   text-decoration: underline;
 }
 
-/* 5. Gateway Flow SVG Animation + tokenku.ai .tks-card Animated Step Cards */
+/* 5. Gateway Flow + Royal Blue & White Mixed Step Cards */
 .jt-flow-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   padding: 26px;
-  border-radius: 18px;
-  background: #ffffff;
-  border: 1px solid #d8e3ef;
-  box-shadow: 0 10px 28px rgba(10, 37, 64, 0.05);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
+  border: 1px solid #cfe0f5;
+  box-shadow: 0 12px 30px rgba(29, 99, 220, 0.06);
   margin-bottom: 22px;
 }
 
@@ -848,29 +1033,33 @@
   display: inline-block;
   font-size: 11.5px;
   font-weight: 700;
-  color: var(--blue-deep);
-  background: var(--wash);
-  padding: 4px 10px;
+  color: var(--jt-royal);
+  background: #eaf3ff;
+  border: 1px solid #cfe2ff;
+  padding: 4px 11px;
   border-radius: 999px;
   margin-bottom: 10px;
 }
 
 .jt-flow-hub {
-  padding: 20px;
-  border-radius: 14px;
-  background: linear-gradient(145deg, #06152d 0%, #0b2555 100%);
-  border: 1px solid #2E5FA0;
+  padding: 22px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(255, 255, 255, 0.24) 0%, transparent 60%),
+    linear-gradient(145deg, #1d63dc 0%, #2563eb 100%);
+  border: 1px solid #3b82f6;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  box-shadow: 0 12px 28px rgba(29, 99, 220, 0.22);
 }
 
 .jt-flow-hub-badge {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #7FA3D6;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .jt-flow-hub strong {
@@ -880,10 +1069,10 @@
 .jt-flow-hub code {
   display: inline-block;
   font-size: 12px;
-  background: rgba(79, 163, 255, 0.15);
-  border: 1px solid rgba(79, 163, 255, 0.35);
-  color: #8fcaff;
-  padding: 4px 9px;
+  background: #ffffff;
+  color: var(--jt-royal);
+  font-weight: 700;
+  padding: 4px 10px;
   border-radius: 6px;
   width: fit-content;
 }
@@ -891,7 +1080,7 @@
 .jt-flow-hub p {
   margin: 4px 0 0;
   font-size: 12.5px;
-  color: #B9CBE9;
+  color: rgba(255, 255, 255, 0.92);
   line-height: 1.5;
 }
 
@@ -907,7 +1096,7 @@
 }
 
 .jt-wire-pulse {
-  stroke: #1d63dc;
+  stroke: var(--jt-royal-bright);
   stroke-width: 2.5;
   stroke-linecap: round;
   stroke-dasharray: 28 190;
@@ -935,14 +1124,14 @@
   gap: 12px;
   padding: 11px 14px;
   border-radius: 12px;
-  background: #f8fafc;
-  border: 1px solid #d8e3ef;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: #ffffff;
+  border: 1px solid #d5e3f5;
+  transition: transform 0.22s var(--ease-balanced), border-color 0.22s ease;
 }
 
 .jt-flow-target:hover {
   transform: translateX(4px);
-  border-color: #4FA3FF;
+  border-color: var(--jt-royal);
 }
 
 .jt-flow-target strong {
@@ -956,7 +1145,7 @@
   color: #475569;
 }
 
-/* 3 Animated Step Cards (.tks-card style from tokenku.ai) */
+/* 3 Animated Step Cards: Clean White Card + Royal Blue Animated Visual Box */
 .jt-steps-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -965,76 +1154,89 @@
 
 .jt-step-card.jt-tks-card {
   padding: 20px 22px;
-  border-radius: 16px;
-  background: linear-gradient(155deg, #06152d 0%, #09234c 100%);
-  border: 1px solid #2E5FA0;
-  color: #ffffff;
-  box-shadow: 0 14px 30px rgba(5, 19, 41, 0.16);
-  transition: transform 0.24s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+  border: 1px solid #cfe0f5;
+  color: var(--ink);
+  box-shadow: 0 10px 26px rgba(29, 99, 220, 0.07);
+  transition: transform 0.26s var(--ease-balanced), box-shadow 0.26s var(--ease-balanced), border-color 0.26s ease;
 }
 
 .jt-step-card.jt-tks-card:hover {
-  transform: translateY(-4px) scale(1.015);
-  border-color: #4FA3FF;
-  box-shadow: 0 18px 36px rgba(5, 19, 41, 0.26);
+  transform: translateY(-4px);
+  border-color: var(--jt-royal);
+  box-shadow: 0 16px 34px rgba(29, 99, 220, 0.13);
 }
 
 .jt-step-card.jt-tks-card .jt-step-num {
   display: inline-block;
   font-family: var(--font-h);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 800;
-  color: #8fcaff;
-  background: rgba(79, 163, 255, 0.16);
-  border: 1px solid rgba(79, 163, 255, 0.35);
+  color: var(--jt-royal);
+  background: #eaf3ff;
+  border: 1px solid #cfe2ff;
   padding: 3px 10px;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  border-radius: 999px;
+  margin-bottom: 12px;
 }
 
 .jt-step-card.jt-tks-card h3 {
-  margin: 10px 0 6px;
+  margin: 14px 0 6px;
   font-size: 17px;
-  color: #ffffff;
-  font-weight: 700;
+  color: #0b192c;
+  font-weight: 800;
 }
 
 .jt-step-card.jt-tks-card p {
   margin: 0;
   font-size: 13.5px;
   line-height: 1.58;
-  color: #B9CBE9;
+  color: #475569;
 }
 
-/* Step 01 Visual: Key -> Dashed Line -> Pulsing Dot */
+/* Royal Blue + White Mixed Visual Stage inside each Step Card */
+.tks-visual,
+.tks-visual-fan,
+.tks-meter {
+  height: 98px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(255, 255, 255, 0.24) 0%, transparent 65%),
+    linear-gradient(135deg, #1d63dc 0%, #2563eb 100%);
+  border: 1px solid #3b82f6;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Step 01 Visual */
 .tks-visual {
-  height: 82px;
   display: flex;
   align-items: center;
-  padding: 0 6px;
 }
 
 .tks-key {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: rgba(245, 166, 35, 0.18);
-  border: 1px solid rgba(245, 166, 35, 0.4);
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(10, 37, 64, 0.14);
 }
 
 .tks-key svg {
   width: 20px;
   height: 20px;
+  stroke: var(--jt-royal);
 }
 
 .tks-line {
   flex: 1 1 auto;
   height: 1px;
-  border-top: 2px dashed rgba(255, 255, 255, 0.35);
+  border-top: 2px dashed rgba(255, 255, 255, 0.65);
   margin: 0 12px;
   min-width: 24px;
 }
@@ -1043,7 +1245,7 @@
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background: #F5A623;
+  background: #ffffff;
   position: relative;
   flex-shrink: 0;
 }
@@ -1053,19 +1255,18 @@
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  border: 2px solid #F5A623;
-  opacity: 0.6;
+  border: 2px solid #ffffff;
+  opacity: 0.75;
   animation: tks-pulse 1.8s ease-out infinite;
 }
 
 @keyframes tks-pulse {
-  0% { transform: scale(0.6); opacity: 0.75; }
+  0% { transform: scale(0.6); opacity: 0.85; }
   100% { transform: scale(1.95); opacity: 0; }
 }
 
-/* Step 02 Visual: API Core -> Fan-out Animated Dashed Paths */
+/* Step 02 Visual */
 .tks-visual-fan {
-  height: 92px;
   display: flex;
   align-items: center;
 }
@@ -1073,7 +1274,7 @@
 .tks-fan {
   position: relative;
   width: 100%;
-  height: 92px;
+  height: 82px;
 }
 
 .tks-fan-lines {
@@ -1087,10 +1288,9 @@
 
 .tks-fan-lines path {
   fill: none;
-  stroke: #4FA3FF;
+  stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 1.6;
   stroke-linecap: round;
-  opacity: 0.78;
   stroke-dasharray: 5 5;
   animation: tks-flow 1.2s linear infinite;
 }
@@ -1106,23 +1306,23 @@
   transform: translateY(-50%);
   width: 40px;
   height: 30px;
-  background: #07316F;
-  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: #ffffff;
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--jt-royal);
   font-size: 10.5px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
+  box-shadow: 0 4px 10px rgba(10, 37, 64, 0.14);
 }
 
 .tks-branch {
   position: absolute;
-  left: 68%;
-  height: 20px;
-  font-size: 11.5px;
+  left: 64%;
+  height: 19px;
+  font-size: 11px;
   font-weight: 700;
   color: #ffffff;
   display: flex;
@@ -1132,9 +1332,8 @@
   white-space: nowrap;
 }
 
-/* Step 03 Visual: Animated Striped Token Meter Bar */
+/* Step 03 Visual */
 .tks-meter {
-  height: 82px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -1143,16 +1342,16 @@
 
 .tks-meter-lbl {
   font-size: 9.5px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   font-weight: 700;
-  color: #7FA3D6;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 8px;
 }
 
 .tks-bar-track {
   height: 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.24);
   overflow: hidden;
   margin-bottom: 8px;
   width: 100%;
@@ -1162,9 +1361,9 @@
   height: 100%;
   width: 72%;
   border-radius: 999px;
-  background: repeating-linear-gradient(135deg, #4FA3FF 0 10px, #8fcaff 10px 20px);
+  background: repeating-linear-gradient(135deg, #ffffff 0 10px, #bfdbfe 10px 20px);
   background-size: 28px 28px;
-  animation: tks-bargrow 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards, tks-barstripe 0.7s linear infinite;
+  animation: tks-bargrow 1.4s var(--ease-balanced) forwards, tks-barstripe 0.7s linear infinite;
 }
 
 @keyframes tks-bargrow {
@@ -1178,7 +1377,7 @@
 
 .tks-meter-sub {
   font-size: 11.5px;
-  color: #8fcaff;
+  color: #ffffff;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -1189,16 +1388,17 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4FA3FF;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
   animation: tks-liveblink 1.1s ease-in-out infinite;
 }
 
 @keyframes tks-liveblink {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.25; transform: scale(0.75); }
+  50% { opacity: 0.35; transform: scale(0.75); }
 }
 
-/* 6. Why Choose Us & Neutral Comparison */
+/* 6. Why Choose Us & Royal Blue + White Comparison Table */
 .jt-adv-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1208,25 +1408,28 @@
 
 .jt-adv-card {
   padding: 22px;
-  border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #d8e3ef;
-  box-shadow: 0 4px 14px rgba(10, 37, 64, 0.03);
-  transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
+  border: 1px solid #cfe0f5;
+  box-shadow: 0 6px 18px rgba(29, 99, 220, 0.05);
+  transition: transform 0.24s var(--ease-balanced), box-shadow 0.24s var(--ease-balanced), border-color 0.24s ease;
 }
 
 .jt-adv-card:hover {
   transform: translateY(-3px);
-  border-color: #93c5fd;
-  box-shadow: 0 12px 28px rgba(10, 37, 64, 0.08);
+  border-color: var(--jt-royal);
+  box-shadow: 0 14px 30px rgba(29, 99, 220, 0.1);
 }
 
 .jt-adv-kicker {
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  color: var(--blue);
-  margin-bottom: 6px;
+  color: var(--jt-royal);
+  background: #eaf3ff;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
 }
 
 .jt-adv-card h3 {
@@ -1243,21 +1446,21 @@
 }
 
 .jt-compare-wrap {
-  background: #ffffff;
-  border: 1px solid #d8e3ef;
-  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+  border: 1px solid #cfe0f5;
+  border-radius: 20px;
   padding: 24px;
   margin-bottom: 22px;
-  box-shadow: 0 8px 24px rgba(10, 37, 64, 0.04);
+  box-shadow: 0 10px 28px rgba(29, 99, 220, 0.07);
 }
 
 .jt-compare-head {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .jt-compare-head h3 {
   margin: 0 0 4px;
-  font-size: 18px;
+  font-size: 18.5px;
   color: var(--ink);
 }
 
@@ -1268,6 +1471,9 @@
 
 .jt-compare-scroll {
   overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #cfe0f5;
+  background: #ffffff;
 }
 
 .jt-compare-table {
@@ -1278,45 +1484,53 @@
 }
 
 .jt-compare-table tbody tr {
-  animation: 0.3s cubic-bezier(0.33, 1, 0.68, 1) both tableRowEnter;
+  animation: 0.32s var(--ease-balanced) both tableRowEnter;
 }
 
-.jt-compare-table tbody tr:nth-child(2) { animation-delay: 40ms; }
-.jt-compare-table tbody tr:nth-child(3) { animation-delay: 80ms; }
-.jt-compare-table tbody tr:nth-child(4) { animation-delay: 120ms; }
+.jt-compare-table tbody tr:nth-child(2) { animation-delay: 45ms; }
+.jt-compare-table tbody tr:nth-child(3) { animation-delay: 90ms; }
+.jt-compare-table tbody tr:nth-child(4) { animation-delay: 135ms; }
 
 .jt-compare-table th,
 .jt-compare-table td {
-  padding: 13px 15px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2ecf9;
   text-align: left;
   vertical-align: top;
   color: #334155;
-  line-height: 1.5;
+  line-height: 1.55;
+}
+
+.jt-compare-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .jt-compare-table th {
   font-weight: 700;
-  color: var(--ink);
-  background: #f8fafc;
+  color: #0b192c;
+  background: #eff6ff;
 }
 
 .jt-aspect-cell {
   font-weight: 700;
-  color: var(--ink);
+  color: #0b192c;
+  background: #f8fbff;
 }
 
 .jt-compare-table .jt-col-highlight {
-  background: #eff6ff;
-  color: #0a2540;
+  background: linear-gradient(180deg, #eff6ff 0%, #e0edff 100%);
+  color: #0b192c;
   font-weight: 600;
+  border-left: 1px solid #bfdbfe;
 }
 
 .jt-compare-table th.jt-col-highlight {
-  background: #dbeafe;
-  color: #06326b;
+  background: linear-gradient(135deg, #1d63dc 0%, #2563eb 100%);
+  color: #ffffff;
+  border-left: 1px solid #1d63dc;
 }
 
+/* Contact Callout Banner: Clean Royal Blue + White Mix */
 .jt-contact-banner {
   display: flex;
   flex-wrap: wrap;
@@ -1324,15 +1538,17 @@
   justify-content: space-between;
   gap: 18px;
   padding: 26px 30px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #051329 0%, #0b2555 100%);
-  border: 1px solid #2E5FA0;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(255, 255, 255, 0.25) 0%, transparent 58%),
+    linear-gradient(135deg, #1d63dc 0%, #2563eb 55%, #1854c2 100%);
+  border: 1px solid #3b82f6;
   color: #ffffff;
-  box-shadow: 0 16px 36px rgba(5, 19, 41, 0.2);
+  box-shadow: 0 16px 36px rgba(29, 99, 220, 0.2);
 }
 
 .jt-contact-banner .jt-kicker {
-  color: #7dd3fc;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .jt-contact-banner h3 {
@@ -1344,7 +1560,7 @@
 .jt-contact-banner p {
   margin: 0;
   font-size: 14px;
-  color: #B9CBE9;
+  color: rgba(255, 255, 255, 0.92);
   max-width: 60ch;
 }
 
@@ -1354,17 +1570,17 @@
   gap: 8px;
   padding: 12px 22px;
   border-radius: 999px;
-  background: #15803d;
-  color: #ffffff;
-  font-weight: 700;
+  background: #ffffff;
+  color: var(--jt-royal) !important;
+  font-weight: 800;
   font-size: 14px;
   white-space: nowrap;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  transition: background-color 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 8px 20px rgba(10, 37, 64, 0.16);
+  transition: background-color 0.2s var(--ease-balanced), transform 0.2s var(--ease-balanced);
 }
 
 .jt-wa-cta:hover {
-  background: #166534;
+  background: #f0f7ff;
   transform: translateY(-2px);
 }
 
@@ -1388,7 +1604,7 @@
 
 .mc-cap-pill.is-tier {
   background: #eff6ff;
-  color: #06326b;
+  color: #1d63dc;
   border-color: #bfdbfe;
 }
 
@@ -1441,12 +1657,12 @@
   .jt-orbit-stage {
     width: 310px;
     height: 310px;
-    --orbit-radius: 114px;
+    --orbit-radius: 112px;
   }
 
   .jt-orbit-core {
-    width: 124px;
-    height: 124px;
+    width: 122px;
+    height: 122px;
   }
 
   .jt-core-logo-mark {
@@ -1464,11 +1680,11 @@
   }
 
   .jt-marquee-track {
-    gap: 38px;
+    gap: 34px;
   }
 
   .jt-brand-name {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .jt-expertise-panel,
@@ -1483,6 +1699,10 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-animate-fade-up,
   .landing-animate-scale-in,
+  .jt-slide-word,
+  .jt-slide-down-item,
+  .jt-slide-down-panel,
+  .jt-slide-down-card,
   .jt-orbit-track,
   .jt-orbit-pill,
   .jt-orbit-svg-pulse,
