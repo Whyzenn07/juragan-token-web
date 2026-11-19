@@ -40,9 +40,6 @@ export function LogoMarquee({ onSelectModel }: LogoMarqueeProps) {
 
   return (
     <section className="jt-marquee-section" aria-label="Provider AI yang didukung Juragantoken" data-reveal="fade-in">
-      <p className="jt-marquee-caption">
-        Terintegrasi dengan 10 ekosistem model AI terkemuka dalam 1 API Key universal
-      </p>
       <div className="jt-marquee-viewport">
         <div className="jt-marquee-track">
           {doubled.map((item, idx) => {
