@@ -12,6 +12,13 @@
   --ease-balanced: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Single-scrollbar guarantee: clip horizontal overflow without creating a nested vertical scroll context */
+.site-canvas {
+  width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
 /* SSR-safe default: tetap terlihat 100% sebelum hidrasi JS */
 [data-reveal],
 [data-reveal="scale"],
@@ -23,63 +30,78 @@
   transform: none;
 }
 
-/* Bi-Directional Scroll Animation Mix Fade (Scroll Bawah & Scroll Atas) */
+/* Fast, Clean Bi-Directional Scroll Animation Mix Fade (Scroll Bawah & Scroll Atas) */
 html.jt-scroll-anim [data-reveal] {
   opacity: 0;
-  transform: translate3d(0, 32px, 0) scale(0.985);
+  transform: translate3d(0, 14px, 0);
   transition:
-    opacity 0.58s var(--ease-balanced),
-    transform 0.65s var(--ease-balanced);
+    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
 html.jt-scroll-anim [data-reveal].from-bottom {
-  transform: translate3d(0, 32px, 0) scale(0.985);
+  transform: translate3d(0, 14px, 0);
 }
 
 html.jt-scroll-anim [data-reveal].from-top {
-  transform: translate3d(0, -28px, 0) scale(0.985);
+  transform: translate3d(0, -14px, 0);
 }
 
 html.jt-scroll-anim [data-reveal="scale"].from-bottom {
-  transform: translate3d(0, 30px, 0) scale(0.955);
+  transform: translate3d(0, 14px, 0) scale(0.985);
 }
 
 html.jt-scroll-anim [data-reveal="scale"].from-top {
-  transform: translate3d(0, -26px, 0) scale(0.955);
+  transform: translate3d(0, -14px, 0) scale(0.985);
 }
 
-html.jt-scroll-anim [data-reveal="fade-in"].from-bottom {
-  transform: translate3d(0, 18px, 0);
-}
-
+html.jt-scroll-anim [data-reveal="fade-in"].from-bottom,
 html.jt-scroll-anim [data-reveal="fade-in"].from-top {
-  transform: translate3d(0, -18px, 0);
+  transform: translate3d(0, 0, 0);
 }
 
 html.jt-scroll-anim [data-reveal="fade-left"].from-bottom {
-  transform: translate3d(-26px, 16px, 0);
+  transform: translate3d(-16px, 8px, 0);
 }
 
 html.jt-scroll-anim [data-reveal="fade-left"].from-top {
-  transform: translate3d(-26px, -16px, 0);
+  transform: translate3d(-16px, -8px, 0);
 }
 
 html.jt-scroll-anim [data-reveal="fade-right"].from-bottom {
-  transform: translate3d(26px, 16px, 0);
+  transform: translate3d(16px, 8px, 0);
 }
 
 html.jt-scroll-anim [data-reveal="fade-right"].from-top {
-  transform: translate3d(26px, -16px, 0);
+  transform: translate3d(16px, -8px, 0);
 }
 
-/* Reset cepat tanpa delay saat keluar viewport agar siap masuk lagi dari arah berlawanan */
+/* Micro-stagger yang singkat agar kartu langsung tampil cepat tanpa terasa menunggu */
+html.jt-scroll-anim [data-reveal][data-delay="50"],
+html.jt-scroll-anim [data-reveal][data-delay="60"] { transition-delay: 25ms !important; }
+html.jt-scroll-anim [data-reveal][data-delay="70"],
+html.jt-scroll-anim [data-reveal][data-delay="80"] { transition-delay: 40ms !important; }
+html.jt-scroll-anim [data-reveal][data-delay="100"],
+html.jt-scroll-anim [data-reveal][data-delay="120"] { transition-delay: 55ms !important; }
+html.jt-scroll-anim [data-reveal][data-delay="140"],
+html.jt-scroll-anim [data-reveal][data-delay="150"],
+html.jt-scroll-anim [data-reveal][data-delay="160"],
+html.jt-scroll-anim [data-reveal][data-delay="180"] { transition-delay: 75ms !important; }
+html.jt-scroll-anim [data-reveal][data-delay="200"],
+html.jt-scroll-anim [data-reveal][data-delay="240"],
+html.jt-scroll-anim [data-reveal][data-delay="250"],
+html.jt-scroll-anim [data-reveal][data-delay="300"],
+html.jt-scroll-anim [data-reveal][data-delay="320"],
+html.jt-scroll-anim [data-reveal][data-delay="400"] { transition-delay: 90ms !important; }
+
+/* Reset cepat tanpa delay saat keluar jauh dari viewport */
 html.jt-scroll-anim [data-reveal]:not(.is-revealed) {
   transition-delay: 0ms !important;
-  transition-duration: 0.38s;
+  transition-duration: 0.18s;
 }
 
-/* Status tampil (masuk mulus baik saat scroll ke bawah maupun ke atas) */
+/* Status tampil (masuk mulus, cepat & clean baik saat scroll ke bawah maupun ke atas) */
 html.jt-scroll-anim [data-reveal].is-revealed {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) scale(1) !important;

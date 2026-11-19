@@ -109,11 +109,11 @@ function useScrollEffects(depsKey?: string) {
     const vh = window.innerHeight || 800;
     targets.forEach((el) => {
       const rect = el.getBoundingClientRect();
-      const inView = rect.top < vh * 0.96 && rect.bottom > vh * 0.04;
+      const inView = rect.top < vh + 48 && rect.bottom > -48;
       if (inView) {
         el.classList.remove("from-top", "from-bottom");
         el.classList.add("is-revealed");
-      } else if (rect.bottom <= vh * 0.04) {
+      } else if (rect.bottom <= -48) {
         el.classList.remove("is-revealed", "from-bottom");
         el.classList.add("from-top");
       } else {
@@ -133,18 +133,16 @@ function useScrollEffects(depsKey?: string) {
           } else {
             el.classList.remove("is-revealed");
             if (entry.boundingClientRect.top < 0) {
-              // Terlewat di atas viewport -> saat scroll ke atas, masuk halus dari atas + fade
               el.classList.remove("from-bottom");
               el.classList.add("from-top");
             } else {
-              // Berada di bawah viewport -> saat scroll ke bawah, masuk halus dari bawah + fade
               el.classList.remove("from-top");
               el.classList.add("from-bottom");
             }
           }
         });
       },
-      { threshold: 0.04, rootMargin: "-20px 0px -20px 0px" }
+      { threshold: 0.01, rootMargin: "48px 0px 48px 0px" }
     );
 
     targets.forEach((target) => observer.observe(target));
