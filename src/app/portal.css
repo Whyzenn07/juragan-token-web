@@ -7,7 +7,15 @@
   min-height: 100vh;
   background: #f8fafc;
   color: #0f172a;
-  font-family: var(--font-b, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif);
+  font-family: var(--font, 'IBM Plex Sans', system-ui, sans-serif);
+}
+
+.jt-portal-body h1,
+.jt-portal-body h2,
+.jt-portal-body h3,
+.jt-auth-brand-text,
+.jt-kpi-val {
+  font-family: var(--font-h, 'Plus Jakarta Sans', system-ui, sans-serif);
 }
 
 /* ---------- Auth Layout (/login & /signup) ---------- */
