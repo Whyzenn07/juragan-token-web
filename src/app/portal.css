@@ -810,9 +810,20 @@
   margin-top: 18px;
 }
 
+.jt-form-row-2 {
+  display: flex;
+  gap: 10px;
+}
+
+.jt-form-row-2 > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 @media (max-width: 1024px) {
   .jt-admin-shell {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
   }
 
   .jt-admin-sidebar {
@@ -821,21 +832,34 @@
     border-right: 0;
     border-bottom: 1px solid #e2e8f0;
     padding: 14px 16px;
+    gap: 10px;
   }
 
   .jt-sidebar-nav {
+    display: flex;
     flex-direction: row;
     overflow-x: auto;
+    gap: 6px;
     padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .jt-sidebar-item {
     width: auto;
+    flex: 0 0 auto;
+    min-height: 42px;
     white-space: nowrap;
   }
 
   .jt-kpi-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .jt-kpi-grid > .jt-kpi-card {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 220px;
   }
 
   .jt-admin-main {
@@ -846,10 +870,63 @@
 @media (max-width: 640px) {
   .jt-kpi-grid,
   .jt-kpi-grid.cols-3 {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
-  .jt-auth-card {
-    padding: 22px 20px;
+  .jt-kpi-grid > .jt-kpi-card {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .jt-page-head,
+  .jt-panel-card-head,
+  .jt-toolbar,
+  .jt-user-topbar-inner,
+  .jt-form-row-2 {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jt-head-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .jt-head-actions > *,
+  .jt-toolbar .jt-input,
+  .jt-modal-foot > * {
+    width: 100% !important;
+    min-height: 44px;
+  }
+
+  .jt-modal-foot {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .jt-filter-pills {
+    display: flex;
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .jt-filter-pill {
+    flex: 0 0 auto;
+    min-height: 36px;
+  }
+
+  .jt-auth-card,
+  .jt-modal-dialog {
+    padding: 20px 18px;
+  }
+
+  .jt-user-container {
+    padding: 20px 14px 44px;
   }
 }

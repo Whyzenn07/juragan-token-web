@@ -23,8 +23,7 @@ import {
 } from "@/components";
 import {
   ENABLE_CHECKOUT,
-  SHOW_CATALOG_PRICING,
-  WHATSAPP_RAW
+  SHOW_CATALOG_PRICING
 } from "@/lib/site-config";
 import {
   ANSWER_INPUT_TOKENS,
@@ -32,7 +31,6 @@ import {
   Category,
   categories,
   compatibleApps,
-  GATEWAY_ORIGIN,
   inputIdrPer1M,
   isPerImage,
   ModelItem,
@@ -257,46 +255,6 @@ export default function Home() {
   ] as const;
 
   const [activeSection, setActiveSection] = useState<string>("expertise");
-  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
-  const navRef = useRef<HTMLElement>(null);
-  const linkRefs = useRef<Record<string, HTMLElement | null>>({});
-
-  // Sliding indicator calculation: follows hovered item or active section
-  useEffect(() => {
-    const targetId = hoveredNav || activeSection;
-    const targetEl = linkRefs.current[targetId];
-    const container = navRef.current;
-    if (targetEl && container) {
-      const targetRect = targetEl.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      setIndicatorStyle({
-        left: targetRect.left - containerRect.left,
-        width: targetRect.width,
-        opacity: 1,
-      });
-    }
-  }, [hoveredNav, activeSection]);
-
-  // Recalculate indicator position on resize
-  useEffect(() => {
-    const handleResize = () => {
-      const targetId = hoveredNav || activeSection;
-      const targetEl = linkRefs.current[targetId];
-      const container = navRef.current;
-      if (targetEl && container) {
-        const targetRect = targetEl.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        setIndicatorStyle({
-          left: targetRect.left - containerRect.left,
-          width: targetRect.width,
-          opacity: 1,
-        });
-      }
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [hoveredNav, activeSection]);
 
   // Scroll spy to sync activeSection with visible viewport section
   useEffect(() => {
@@ -456,22 +414,16 @@ export default function Home() {
           </a>
 
           <nav
-            ref={navRef}
             className="jt-pill-nav-links"
             aria-label="Navigasi Utama"
-            onMouseLeave={() => setHoveredNav(null)}
           >
             {NAV_ITEMS.map((item) => {
               const isCurrent = activeSection === item.id;
               return (
                 <a
                   key={item.id}
-                  ref={(el) => {
-                    linkRefs.current[item.id] = el;
-                  }}
                   href={item.href}
                   className={`jt-pill-nav-link ${isCurrent ? "is-active" : ""}`}
-                  onMouseEnter={() => setHoveredNav(item.id)}
                   onClick={() => setActiveSection(item.id)}
                 >
                   {item.label}

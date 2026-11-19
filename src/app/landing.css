@@ -2577,21 +2577,263 @@ html.jt-scroll-anim [data-reveal].is-revealed {
 }
 
 @media (max-width: 720px) {
-  .jt-metrics-grid,
-  .jt-usecases-grid {
-    grid-template-columns: 1fr;
+  /* Flexbox Mobile-First Reflow (Zero Horizontal Overflow, >= 44px Tap Targets) */
+  .company-container {
+    padding-left: 14px;
+    padding-right: 14px;
   }
 
-  .jt-prefooter-actions {
+  .jt-pill-header-wrap {
+    padding: 10px 12px 0;
+  }
+
+  .jt-pill-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 8px 0 12px;
+    min-height: 56px;
+  }
+
+  .jt-pill-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .mobile-menu.icon-button {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .jt-hero-stage {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 14px;
+    padding-bottom: 18px;
+  }
+
+  .jt-hero-left,
+  .jt-hero-visual {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .jt-hero-headline {
+    font-size: clamp(28px, 7.8vw, 38px);
+    line-height: 1.15;
+  }
+
+  .jt-provider-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .jt-provider-tile {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .jt-hero-cta-row {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+  }
+
+  .jt-btn-primary,
+  .jt-btn-secondary {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  .jt-hero-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .jt-motion-frame {
+    width: 100%;
+    max-width: 100%;
+    padding: 14px 12px 18px;
+  }
+
+  .jt-orbit-stage {
+    width: min(300px, calc(100vw - 64px));
+    height: min(300px, calc(100vw - 64px));
+    --orbit-radius: min(104px, calc((100vw - 120px) * 0.42));
+  }
+
+  /* Flexbox Stacks untuk Seluruh Section Cards */
+  .jt-metrics-grid,
+  .jt-exp-grid,
+  .jt-steps-grid,
+  .jt-usecases-grid,
+  .jt-risks-grid,
+  .jt-tier-grid,
+  .jt-adv-grid,
+  .jt-ts-steps,
+  .faq-grid,
+  .model-grid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .jt-metrics-grid > *,
+  .jt-exp-grid > *,
+  .jt-steps-grid > *,
+  .jt-usecases-grid > *,
+  .jt-risks-grid > *,
+  .jt-tier-grid > *,
+  .jt-adv-grid > *,
+  .jt-ts-steps > *,
+  .faq-grid > *,
+  .model-grid > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .jt-expertise-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .jt-exp-tab {
+    flex: 1 1 100%;
+    min-height: 44px;
+    justify-content: space-between;
+  }
+
+  .jt-exp-panel-top,
+  .jt-flow-card,
+  .jt-contact-banner,
+  .jt-prefooter-card,
+  .dps-banner-card {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .jt-flow-wires {
+    display: none;
+  }
+
+  .jt-flow-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Catalog Toolbar & Filter Flexbox Mobile */
+  .toolbar-top-row,
+  .toolbar-selects-group {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .toolbar-search-wrapper,
+  .toolbar-select-box {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .toolbar-select-box select,
+  .toolbar-search-wrapper input {
+    min-height: 44px;
+  }
+
+  .category-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .category-pills > button {
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+
+  /* Enterprise / Standard & Pre-Footer CTAs */
+  .jt-tier-card {
+    padding: 22px 18px;
+  }
+
+  .jt-tier-actions,
+  .jt-prefooter-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .jt-tier-btn-white,
+  .jt-tier-btn-royal,
+  .jt-tier-btn-ghost-dark,
+  .jt-tier-btn-outline,
+  .jt-pf-btn-white,
+  .jt-pf-btn-outline,
+  .jt-wa-cta,
+  .cpe-btn-white {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  /* Footer Flexbox Stack */
+  .spf-main-grid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .spf-bottom-bar {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .jt-back-to-top {
     bottom: 74px;
     right: 16px;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Di layar ponsel sangat kecil, pindahkan Sign In ke Mobile Drawer agar Navbar Pill tetap lapang */
+  .jt-pill-navbar .jt-pill-signin-btn {
+    display: none;
+  }
+
+  .jt-pill-brand-text {
+    font-size: 16.5px;
+  }
+
+  .jt-pill-cta-btn {
+    padding: 8px 13px;
+    font-size: 12.5px;
+    min-height: 38px;
   }
 }
 

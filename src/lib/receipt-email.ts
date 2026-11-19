@@ -62,7 +62,6 @@ export async function sendReceiptEmail(payload: SendReceiptPayload): Promise<Sen
   const adminWaFormatted = adminWaRaw.startsWith("62")
     ? `+62 ${adminWaRaw.slice(2, 5)}-${adminWaRaw.slice(5, 9)}-${adminWaRaw.slice(9)}`
     : `+${adminWaRaw}`;
-  const officialWeb = "https://api.tokotokenai.com/";
 
   // Domain asal aset publik: pastikan mengarah ke hosting frontend publik yang valid (hindari localhost & alias 404)
   const fallbackOrigin = "https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app";

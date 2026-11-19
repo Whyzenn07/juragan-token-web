@@ -156,7 +156,10 @@ export function AdminDashboardClient() {
   }, [router]);
 
   useEffect(() => {
-    loadAll();
+    const id = window.setTimeout(() => {
+      void loadAll();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [loadAll]);
 
   const handleLogout = async () => {
@@ -1194,7 +1197,7 @@ export function AdminDashboardClient() {
                   onChange={(e) => setProvPlan(e.target.value)}
                 />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <div className="jt-form-row-2">
                 <div className="jt-field">
                   <label htmlFor="prov-tier">Tipe Akun</label>
                   <select
@@ -1223,7 +1226,7 @@ export function AdminDashboardClient() {
                 </div>
               </div>
               {provTier === "enterprise" && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <div className="jt-form-row-2">
                   <div className="jt-field">
                     <label htmlFor="prov-company">Nama Perusahaan</label>
                     <input
@@ -1340,7 +1343,7 @@ export function AdminDashboardClient() {
                   required
                 />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <div className="jt-form-row-2">
                 <div className="jt-field">
                   <label htmlFor="mo-pkg">Nama Paket</label>
                   <input
@@ -1365,7 +1368,7 @@ export function AdminDashboardClient() {
                   />
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <div className="jt-form-row-2">
                 <div className="jt-field">
                   <label htmlFor="mo-method">Metode Bayar</label>
                   <input
@@ -1524,7 +1527,7 @@ export function AdminDashboardClient() {
                   <option value="enterprise">Enterprise B2B</option>
                 </select>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <div className="jt-form-row-2">
                 <div className="jt-field">
                   <label htmlFor="ip-company">Perusahaan (Opsional)</label>
                   <input

@@ -391,7 +391,7 @@ export function UserDashboardClient() {
 
               {accountTier === "enterprise" && (
                 <>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div className="jt-form-row-2">
                     <div className="jt-field">
                       <label htmlFor="uo-company">Nama Perusahaan</label>
                       <input

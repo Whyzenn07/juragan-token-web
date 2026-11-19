@@ -165,7 +165,6 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export function rowToOrder(co: any): Order {
   return {
     id: co.id,
@@ -227,7 +226,6 @@ export function rowToKey(ck: any): KeyRecord {
     allowedIps: Array.isArray(ck.allowed_ips) ? ck.allowed_ips.map(String) : [],
   };
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export async function fetchOrderFromSupabase(id: string): Promise<Order | null> {
   const { url, key, isConfigured } = getSupabaseConfig();
