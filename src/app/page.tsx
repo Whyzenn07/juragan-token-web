@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
+  BackToTop,
   CurrencyRateModal,
   GatewayFlow,
   HeroOrbit,
@@ -10,10 +11,13 @@ import {
   LogoMarquee,
   ModelDetailModal,
   ModelExpertiseShowcase,
+  PlatformMetricsBar,
+  PreFooterCta,
   ProviderLogo,
   SetupGuides,
   PaymentModal,
   TokenBalanceModal,
+  UseCasesGrid,
   WhyChooseUs
 } from "@/components";
 import {
@@ -555,6 +559,9 @@ export default function Home() {
 
           {/* Animated Moving LLM Showcase (Original Marquee Inspired by Industry Patterns) */}
           <LogoMarquee onSelectModel={handleOpenDetail} />
+
+          {/* Ringkasan Kapabilitas & Metrik Infrastruktur Gateway */}
+          <PlatformMetricsBar />
 
           {/* Model Expertise by Use Case (Coding, Research, Cost Efficiency) */}
           <ModelExpertiseShowcase
@@ -1367,7 +1374,17 @@ export default function Home() {
           </>
           )}
 
-          {/* 7. Why Choose Juragantoken & Neutral Integration Comparison */}
+          {/* 7. Skenario Penerapan Nyata per Segmen Tim */}
+          <UseCasesGrid
+            onSelectCategory={(cat) => {
+              setViewSavedOnly(false);
+              setSelectedProvider("all");
+              setActiveCategory(cat);
+              scrollToCatalog();
+            }}
+          />
+
+          {/* 8. Why Choose Juragantoken & Neutral Integration Comparison */}
           <WhyChooseUs />
 
           {/* 8. Setup Guides Section */}
@@ -1513,6 +1530,9 @@ export default function Home() {
             </div>
           </section>
 
+          {/* 10. Final CTA Banner Penutup Sebelum Footer */}
+          <PreFooterCta onOpenBalanceModal={() => setBalanceModalOpen(true)} />
+
         </main>
       </div>
 
@@ -1538,6 +1558,11 @@ export default function Home() {
               <div className="spf-meta-info">
                 One Gateway. Every Intelligence. • SLA Uptime 99.98%
               </div>
+              <Link href="/status" className="spf-live-status">
+                <span className="spf-live-dot" aria-hidden="true" />
+                <span>Semua Sistem Operasional</span>
+                <span aria-hidden="true">↗</span>
+              </Link>
             </div>
 
             {/* Kolom 2: Produk & Layanan */}
@@ -1691,6 +1716,9 @@ export default function Home() {
         syncNotification={syncNotification}
         onSyncPricing={handleSyncPricing}
       />
+
+      {/* Tombol Kembali ke Atas (muncul saat scroll melewati Hero) */}
+      <BackToTop />
     </div>
   );
 }

@@ -3,6 +3,7 @@ export * from "./ui/Icon";
 export * from "./ui/ProviderLogo";
 export * from "./ui/RegionBadge";
 export * from "./ui/PaymentSuccessMark";
+export * from "./ui/BackToTop";
 
 // Modals
 export * from "./modals/Dialog";
