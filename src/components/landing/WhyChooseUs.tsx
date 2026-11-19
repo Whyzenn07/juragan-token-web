@@ -58,8 +58,8 @@ export function WhyChooseUs() {
   );
 
   return (
-    <section className="jt-section" id="kenapa-kami" aria-labelledby="why-heading" data-reveal="fade-up">
-      <div className="jt-section-head">
+    <section className="jt-section" id="kenapa-kami" aria-labelledby="why-heading">
+      <div className="jt-section-head" data-reveal="fade-up">
         <span className="jt-kicker">KENAPA MEMILIH JURAGANTOKEN</span>
         <h2 id="why-heading">Menjembatani Kebutuhan Teknis &amp; Efisiensi Operasional</h2>
         <p>
@@ -70,8 +70,8 @@ export function WhyChooseUs() {
 
       {/* 4 Core Real Advantages */}
       <div className="jt-adv-grid">
-        {ADVANTAGES.map((adv) => (
-          <article key={adv.title} className="jt-adv-card">
+        {ADVANTAGES.map((adv, idx) => (
+          <article key={adv.title} className="jt-adv-card" data-reveal="fade-up" data-delay={idx * 60}>
             <span className="jt-adv-kicker">{adv.kicker}</span>
             <h3>{adv.title}</h3>
             <p>{adv.desc}</p>
@@ -80,7 +80,7 @@ export function WhyChooseUs() {
       </div>
 
       {/* Neutral Category Comparison Table (no third-party competitor names) */}
-      <div className="jt-compare-wrap">
+      <div className="jt-compare-wrap" data-reveal="scale">
         <div className="jt-compare-head">
           <h3>Perbandingan Pendekatan Integrasi</h3>
           <span>Evaluasi objektif antara daftar ke tiap vendor, agregator global umum, dan Juragantoken</span>
@@ -110,7 +110,7 @@ export function WhyChooseUs() {
       </div>
 
       {/* Contact Callout Strip (using testing WA 0812-2698-3990) */}
-      <div className="jt-contact-banner">
+      <div className="jt-contact-banner" data-reveal="fade-up">
         <div>
           <span className="jt-kicker">KONSULTASI &amp; UJI COBA AKSES</span>
           <h3>Butuh Rekomendasi Model untuk Proyek atau Tim Anda?</h3>

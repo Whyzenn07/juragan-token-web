@@ -11,8 +11,8 @@ const ENDPOINT_PROVIDERS = [
 
 export function GatewayFlow() {
   return (
-    <section className="jt-section" id="cara-kerja" aria-labelledby="workflow-heading" data-reveal="fade-up">
-      <div className="jt-section-head">
+    <section className="jt-section" id="cara-kerja" aria-labelledby="workflow-heading">
+      <div className="jt-section-head" data-reveal="fade-up">
         <span className="jt-kicker">CARA KERJA PLATFORM</span>
         <h2 id="workflow-heading">Satu Gerbang Terpadu untuk Seluruh Provider AI</h2>
         <p>
@@ -22,7 +22,7 @@ export function GatewayFlow() {
       </div>
 
       {/* Unified Routing Diagram (PDF Slide 3 & 4, animated SVG lines) */}
-      <div className="jt-flow-card">
+      <div className="jt-flow-card" data-reveal="scale">
         <div className="jt-flow-left">
           <div className="jt-flow-step-pill">1 Integrasi Tunggal</div>
           <div className="jt-flow-hub">
@@ -63,7 +63,7 @@ export function GatewayFlow() {
 
       {/* 3 Animated Step Cards (Adopted from tokenku.ai .tks-card visual micro-animations, keeping our exact text) */}
       <div className="jt-steps-grid">
-        <article className="jt-step-card jt-tks-card">
+        <article className="jt-step-card jt-tks-card" data-reveal="fade-up" data-delay="0">
           <span className="jt-step-num">01</span>
           <div className="tks-visual" aria-hidden="true">
             <div className="tks-key">
@@ -78,7 +78,7 @@ export function GatewayFlow() {
           <p>Pengembang hanya memelihara satu konvensi SDK OpenAI tanpa perlu mengurus autentikasi masing-masing vendor.</p>
         </article>
 
-        <article className="jt-step-card jt-tks-card">
+        <article className="jt-step-card jt-tks-card" data-reveal="fade-up" data-delay="100">
           <span className="jt-step-num">02</span>
           <div className="tks-visual-fan" aria-hidden="true">
             <div className="tks-fan">
@@ -111,7 +111,7 @@ export function GatewayFlow() {
           <p>Beralih dari Claude Opus untuk ngoding ke GPT-6 Sol untuk riset atau DeepSeek untuk efisiensi dalam hitungan detik.</p>
         </article>
 
-        <article className="jt-step-card jt-tks-card">
+        <article className="jt-step-card jt-tks-card" data-reveal="fade-up" data-delay="200">
           <span className="jt-step-num">03</span>
           <div className="tks-meter" aria-hidden="true">
             <div className="tks-meter-lbl">TOKENS METERED · REAL-TIME</div>

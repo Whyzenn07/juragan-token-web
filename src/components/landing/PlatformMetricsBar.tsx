@@ -36,11 +36,15 @@ export function PlatformMetricsBar() {
     <section
       className="jt-metrics-section"
       aria-label="Ringkasan kapabilitas infrastruktur Juragantoken"
-      data-reveal="fade-up"
     >
       <div className="jt-metrics-grid">
-        {METRIC_ITEMS.map((item) => (
-          <article key={item.label} className="jt-metric-card">
+        {METRIC_ITEMS.map((item, idx) => (
+          <article
+            key={item.label}
+            className="jt-metric-card"
+            data-reveal="fade-up"
+            data-delay={idx * 60}
+          >
             <div className="jt-metric-top">
               <strong className={`jt-metric-value is-${item.accent}`}>{item.value}</strong>
               {"href" in item && item.href && (

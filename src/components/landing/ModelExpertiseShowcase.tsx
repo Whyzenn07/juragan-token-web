@@ -155,8 +155,8 @@ export function ModelExpertiseShowcase({ onSelectModel, onBrowseCategory }: Mode
     activeTab === "coding" ? "Ngoding" : activeTab === "research" ? "Tugas & Riset" : "Chat Hemat";
 
   return (
-    <section className="jt-section" id="keahlian-model" aria-labelledby="expertise-heading" data-reveal="fade-up">
-      <div className="jt-section-head">
+    <section className="jt-section" id="keahlian-model" aria-labelledby="expertise-heading">
+      <div className="jt-section-head" data-reveal="fade-up">
         <span className="jt-kicker">REKOMENDASI BERDASARKAN KEBUTUHAN</span>
         <h2 id="expertise-heading">Pilih Model Sesuai Keahlian &amp; Efektivitas Kerja</h2>
         <p>
@@ -165,7 +165,7 @@ export function ModelExpertiseShowcase({ onSelectModel, onBrowseCategory }: Mode
         </p>
       </div>
 
-      <div className="jt-expertise-tabs" role="tablist" aria-label="Kategori keahlian model AI">
+      <div className="jt-expertise-tabs" role="tablist" aria-label="Kategori keahlian model AI" data-reveal="fade-in">
         {(Object.keys(SPECIALTY_GROUPS) as SpecialtyTab[]).map((key) => {
           const group = SPECIALTY_GROUPS[key];
           const isActive = activeTab === key;
@@ -185,7 +185,8 @@ export function ModelExpertiseShowcase({ onSelectModel, onBrowseCategory }: Mode
         })}
       </div>
 
-      <div key={activeTab} className="jt-expertise-panel jt-slide-down-panel" role="tabpanel">
+      <div data-reveal="scale">
+        <div key={activeTab} className="jt-expertise-panel jt-slide-down-panel" role="tabpanel">
         <div className="jt-exp-panel-top">
           <div>
             <h3>{current.headline}</h3>
@@ -229,6 +230,7 @@ export function ModelExpertiseShowcase({ onSelectModel, onBrowseCategory }: Mode
             </article>
           ))}
         </div>
+      </div>
       </div>
     </section>
   );

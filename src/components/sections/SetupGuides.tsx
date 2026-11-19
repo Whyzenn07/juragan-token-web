@@ -52,8 +52,8 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)`;
 
   return (
-    <div className="setup-guides-section" id="panduan-setup" data-reveal>
-      <div className="setup-header">
+    <div className="setup-guides-section" id="panduan-setup">
+      <div className="setup-header" data-reveal="fade-up">
         <span className="badge-pill">Panduan Setup 1-Menit</span>
         <h2>Token Anda bisa langsung dicolok ke mana saja.</h2>
         <p>
@@ -61,7 +61,7 @@ print(response.choices[0].message.content)`;
         </p>
       </div>
 
-      <div className="tabs-nav" role="tablist">
+      <div className="tabs-nav" role="tablist" data-reveal="fade-in">
         <button
           role="tab"
           aria-selected={activeTab === "claudecode"}
@@ -96,7 +96,7 @@ print(response.choices[0].message.content)`;
         </button>
       </div>
 
-      <div className="tab-panel">
+      <div className="tab-panel" data-reveal="scale">
         {activeTab === "claudecode" && (
           <div className="panel-content">
             <div className="panel-text">

@@ -39,7 +39,7 @@ export function LogoMarquee({ onSelectModel }: LogoMarqueeProps) {
   const doubled = [...AI_BRANDS, ...AI_BRANDS];
 
   return (
-    <section className="jt-marquee-section" aria-label="Provider AI yang didukung Juragantoken">
+    <section className="jt-marquee-section" aria-label="Provider AI yang didukung Juragantoken" data-reveal="fade-in">
       <div className="jt-marquee-viewport">
         <div className="jt-marquee-track">
           {doubled.map((item, idx) => {

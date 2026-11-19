@@ -93,26 +93,60 @@ function useScrollEffects(depsKey?: string) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     updateScrollMetrics();
 
+    const rootEl = document.documentElement;
+    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
+      rootEl.classList.remove("jt-scroll-anim");
+      targets.forEach((el) => {
+        el.classList.remove("from-top", "from-bottom");
         el.classList.add("is-revealed");
       });
       return () => window.removeEventListener("scroll", handleScroll);
     }
 
+    // Tetapkan arah awal (atas/bawah viewport) sebelum mengaktifkan animasi scroll dua arah
+    const vh = window.innerHeight || 800;
+    targets.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const inView = rect.top < vh * 0.96 && rect.bottom > vh * 0.04;
+      if (inView) {
+        el.classList.remove("from-top", "from-bottom");
+        el.classList.add("is-revealed");
+      } else if (rect.bottom <= vh * 0.04) {
+        el.classList.remove("is-revealed", "from-bottom");
+        el.classList.add("from-top");
+      } else {
+        el.classList.remove("is-revealed", "from-top");
+        el.classList.add("from-bottom");
+      }
+    });
+
+    rootEl.classList.add("jt-scroll-anim");
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const el = entry.target as HTMLElement;
           if (entry.isIntersecting) {
-            entry.target.classList.add("is-revealed");
-            observer.unobserve(entry.target);
+            el.classList.add("is-revealed");
+          } else {
+            el.classList.remove("is-revealed");
+            if (entry.boundingClientRect.top < 0) {
+              // Terlewat di atas viewport -> saat scroll ke atas, masuk halus dari atas + fade
+              el.classList.remove("from-bottom");
+              el.classList.add("from-top");
+            } else {
+              // Berada di bawah viewport -> saat scroll ke bawah, masuk halus dari bawah + fade
+              el.classList.remove("from-top");
+              el.classList.add("from-bottom");
+            }
           }
         });
       },
-      { threshold: 0.05, rootMargin: "0px 0px 60px 0px" }
+      { threshold: 0.04, rootMargin: "-20px 0px -20px 0px" }
     );
 
-    const targets = document.querySelectorAll<HTMLElement>("[data-reveal]");
     targets.forEach((target) => observer.observe(target));
 
     return () => {
@@ -1391,15 +1425,17 @@ export default function Home() {
           <SetupGuides />
 
           {/* 9. FAQ Section */}
-          <section className="faq-section" id="faq" aria-labelledby="faq-heading" data-reveal="fade-up">
-            <div className="section-kicker">JURAGANTOKEN</div>
-            <h2 id="faq-heading">Pertanyaan Umum (FAQ)</h2>
-            <p className="faq-section-lead">
-              Informasi lengkap mengenai arsitektur gateway, pemilihan model AI sesuai keahlian, kompatibilitas aplikasi, dan keamanan data.
-            </p>
+          <section className="faq-section" id="faq" aria-labelledby="faq-heading">
+            <div data-reveal="fade-up">
+              <div className="section-kicker">JURAGANTOKEN</div>
+              <h2 id="faq-heading">Pertanyaan Umum (FAQ)</h2>
+              <p className="faq-section-lead">
+                Informasi lengkap mengenai arsitektur gateway, pemilihan model AI sesuai keahlian, kompatibilitas aplikasi, dan keamanan data.
+              </p>
+            </div>
 
             <div className="faq-grid">
-              <details className="faq-card" open>
+              <details className="faq-card" open data-reveal="fade-up" data-delay="0">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Multi-AI Gateway</span>
@@ -1419,7 +1455,7 @@ export default function Home() {
                 </div>
               </details>
 
-              <details className="faq-card">
+              <details className="faq-card" data-reveal="fade-up" data-delay="80">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Pemilihan Model</span>
@@ -1441,7 +1477,7 @@ export default function Home() {
                 </div>
               </details>
 
-              <details className="faq-card">
+              <details className="faq-card" data-reveal="fade-up" data-delay="0">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Kompatibilitas</span>
@@ -1461,7 +1497,7 @@ export default function Home() {
                 </div>
               </details>
 
-              <details className="faq-card">
+              <details className="faq-card" data-reveal="fade-up" data-delay="80">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Masa Aktif</span>
@@ -1481,7 +1517,7 @@ export default function Home() {
                 </div>
               </details>
 
-              <details className="faq-card">
+              <details className="faq-card" data-reveal="fade-up" data-delay="0">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Monitoring</span>
@@ -1501,7 +1537,7 @@ export default function Home() {
                 </div>
               </details>
 
-              <details className="faq-card">
+              <details className="faq-card" data-reveal="fade-up" data-delay="80">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">Privasi &amp; Keamanan</span>

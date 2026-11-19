@@ -115,6 +115,7 @@ export function HeroOrbit({ onExploreCatalog, onSelectModel }: HeroOrbitProps) {
     <section
       className="jt-hero-stage"
       id="top"
+      data-reveal="fade-in"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

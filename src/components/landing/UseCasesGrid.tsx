@@ -56,9 +56,8 @@ export function UseCasesGrid({ onSelectCategory }: UseCasesGridProps) {
       className="jt-section"
       id="skenario-penggunaan"
       aria-labelledby="usecases-heading"
-      data-reveal="fade-up"
     >
-      <div className="jt-section-head">
+      <div className="jt-section-head" data-reveal="fade-up">
         <span className="jt-kicker">SKENARIO PENERAPAN NYATA</span>
         <h2 id="usecases-heading">Dirancang untuk Berbagai Skala Tim &amp; Kebutuhan Industri</h2>
         <p>
@@ -68,8 +67,13 @@ export function UseCasesGrid({ onSelectCategory }: UseCasesGridProps) {
       </div>
 
       <div className="jt-usecases-grid">
-        {USE_CASES.map((item) => (
-          <article key={item.title} className="jt-usecase-card">
+        {USE_CASES.map((item, idx) => (
+          <article
+            key={item.title}
+            className="jt-usecase-card"
+            data-reveal="fade-up"
+            data-delay={idx % 2 === 0 ? 0 : 100}
+          >
             <span className="jt-usecase-tag">{item.tag}</span>
             <h3>{item.title}</h3>
             <p>{item.desc}</p>
