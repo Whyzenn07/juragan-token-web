@@ -232,16 +232,16 @@ html.jt-scroll-anim [data-reveal].is-revealed {
   position: sticky;
   top: 0;
   z-index: 60;
-  padding: 14px 20px 6px;
+  padding: 18px clamp(24px, 4.5vw, 64px) 8px;
   pointer-events: none;
 }
 
 .jt-pill-navbar {
   pointer-events: auto;
-  max-width: 1180px;
+  max-width: 1232px;
   margin: 0 auto;
-  height: 58px;
-  padding: 0 10px 0 20px;
+  height: 60px;
+  padding: 0 12px 0 24px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
@@ -872,12 +872,12 @@ html.jt-scroll-anim [data-reveal].is-revealed {
 
 /* Shared Section Framing */
 .jt-section {
-  margin: 52px 0;
+  margin: 68px 0;
 }
 
 .jt-section-head {
   max-width: 72ch;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .jt-kicker {
@@ -2578,13 +2578,14 @@ html.jt-scroll-anim [data-reveal].is-revealed {
 
 @media (max-width: 720px) {
   /* Flexbox Mobile-First Reflow (Zero Horizontal Overflow, >= 44px Tap Targets) */
-  .company-container {
-    padding-left: 14px;
-    padding-right: 14px;
+  .company-container,
+  .spf-container {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 
   .jt-pill-header-wrap {
-    padding: 10px 12px 0;
+    padding: 12px 16px 4px;
   }
 
   .jt-pill-navbar {

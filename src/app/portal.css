@@ -446,8 +446,8 @@
 
 /* Main Panel */
 .jt-admin-main {
-  padding: 28px 32px 48px;
-  max-width: 1280px;
+  padding: 36px clamp(24px, 3.8vw, 52px) 60px;
+  max-width: 1360px;
   width: 100%;
   margin: 0 auto;
 }
@@ -727,9 +727,9 @@
 }
 
 .jt-user-topbar-inner {
-  max-width: 1120px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 12px 24px;
+  padding: 14px clamp(20px, 4vw, 48px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -737,9 +737,9 @@
 }
 
 .jt-user-container {
-  max-width: 1120px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 28px 24px 56px;
+  padding: 36px clamp(20px, 4vw, 48px) 64px;
 }
 
 /* Clean Modal Overlay */

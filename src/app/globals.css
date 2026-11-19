@@ -976,9 +976,9 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 /* Company Profile Master Container */
 .company-container {
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 clamp(24px, 4.5vw, 64px);
   width: 100%;
 }
 
@@ -1797,6 +1797,7 @@ main {
   color: #0a58ca;
   background: linear-gradient(135deg, #0a58ca 0%, #0284c7 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 900;
 }
@@ -7860,9 +7861,9 @@ footer {
 }
 
 .spf-container {
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 clamp(24px, 4.5vw, 64px);
   width: 100%;
 }
 
@@ -7992,9 +7993,9 @@ footer {
     padding: 44px 0 28px;
   }
   .spf-container {
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 clamp(24px, 4.5vw, 64px);
   width: 100%;
 }
   .spf-main-grid {
@@ -9376,8 +9377,8 @@ footer {
   .announcement-container,
   .company-container,
   .spf-container {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: clamp(24px, 4vw, 48px);
+    padding-right: clamp(24px, 4vw, 48px);
   }
 }
 
@@ -9386,8 +9387,8 @@ footer {
   .announcement-container,
   .company-container,
   .spf-container {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 
