@@ -1,0 +1,847 @@
+/* ==========================================================================
+   Juragantoken Portal & Admin Dashboard — Minimalist Enterprise Design System
+   Clean White Surfaces · Hairline Slate Borders · Royal Blue Focused Actions
+   ========================================================================== */
+
+.jt-portal-body {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: var(--font-b, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif);
+}
+
+/* ---------- Auth Layout (/login & /signup) ---------- */
+.jt-auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(29, 99, 220, 0.06), transparent 48%),
+    #f8fafc;
+}
+
+.jt-auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+
+.jt-auth-back:hover {
+  color: #0f172a;
+}
+
+.jt-auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.jt-auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  margin-bottom: 18px;
+}
+
+.jt-auth-brand-text {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.jt-auth-brand-text span {
+  color: #1d63dc;
+}
+
+.jt-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.jt-auth-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #475569;
+  text-decoration: none;
+  transition: all 0.16s ease;
+}
+
+.jt-auth-tab.is-active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.jt-auth-title {
+  margin: 0 0 6px;
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  color: #0f172a;
+}
+
+.jt-auth-sub {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #64748b;
+}
+
+.jt-google-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  font-size: 13.5px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.jt-google-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.jt-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.jt-auth-divider::before,
+.jt-auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.jt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.jt-field label {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: #334155;
+}
+
+.jt-input,
+.jt-select,
+.jt-textarea {
+  width: 100%;
+  padding: 9.5px 12px;
+  border-radius: 9px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.jt-input:focus,
+.jt-select:focus,
+.jt-textarea:focus {
+  border-color: #1d63dc;
+  box-shadow: 0 0 0 3px rgba(29, 99, 220, 0.12);
+}
+
+.jt-btn-primary-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: 1px solid #1d63dc;
+  background: #1d63dc;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.16s ease, transform 0.12s ease;
+}
+
+.jt-btn-primary-solid:hover:not(:disabled) {
+  background: #1550b8;
+}
+
+.jt-btn-primary-solid:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.jt-btn-primary-solid.full {
+  width: 100%;
+}
+
+.jt-btn-secondary-clean {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.jt-btn-secondary-clean:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.jt-btn-danger-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #fecdd3;
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.jt-btn-danger-ghost:hover:not(:disabled) {
+  background: #ffe4e6;
+}
+
+.jt-alert {
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.jt-alert.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.jt-alert.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+}
+
+.jt-alert.info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.jt-dev-hint {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.jt-dev-hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  background: #e2e8f0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #0f172a;
+}
+
+/* ---------- Admin & User Workspace Shell ---------- */
+.jt-admin-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.jt-admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  padding: 20px 14px;
+}
+
+.jt-sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 14px;
+  text-decoration: none;
+}
+
+.jt-sidebar-role-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1d63dc;
+}
+
+.jt-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.jt-sidebar-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9.5px 12px;
+  border-radius: 9px;
+  border: 0;
+  background: transparent;
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.14s ease, color 0.14s ease;
+}
+
+.jt-sidebar-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.jt-sidebar-item.is-active {
+  background: #eff6ff;
+  color: #1d63dc;
+}
+
+.jt-sidebar-count {
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.jt-sidebar-item.is-active .jt-sidebar-count {
+  background: #dbeafe;
+  color: #1d63dc;
+}
+
+.jt-sidebar-count.is-alert {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.jt-sidebar-footer {
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jt-account-box {
+  padding: 10px 10px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.jt-account-name {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jt-account-email {
+  display: block;
+  font-size: 11.5px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Main Panel */
+.jt-admin-main {
+  padding: 28px 32px 48px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.jt-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.jt-page-head h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  color: #0f172a;
+}
+
+.jt-page-head p {
+  margin: 0;
+  font-size: 13.5px;
+  color: #64748b;
+}
+
+.jt-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* KPI Grid */
+.jt-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.jt-kpi-grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.jt-kpi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 18px 16px;
+}
+
+.jt-kpi-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.jt-kpi-val {
+  display: block;
+  font-size: 24px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+}
+
+.jt-kpi-sub {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Data Card & Table */
+.jt-panel-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.jt-panel-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.jt-panel-card-head h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.jt-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.jt-filter-pills {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+.jt-filter-pill {
+  border: 0;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+.jt-filter-pill.is-active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.jt-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.jt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.jt-table th {
+  text-align: left;
+  padding: 11px 16px;
+  font-size: 11.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.jt-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.jt-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.jt-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.jt-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.jt-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.jt-cell-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jt-cell-primary {
+  font-weight: 650;
+  color: #0f172a;
+}
+
+.jt-cell-muted {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Status Badges */
+.jt-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3.5px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.jt-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.jt-status.paid,
+.jt-status.active {
+  background: #ecfdf5;
+  color: #047857;
+}
+.jt-status.paid::before,
+.jt-status.active::before {
+  background: #10b981;
+}
+
+.jt-status.pending {
+  background: #fffbeb;
+  color: #b45309;
+}
+.jt-status.pending::before {
+  background: #f59e0b;
+}
+
+.jt-status.suspended {
+  background: #fff7ed;
+  color: #c2410c;
+}
+.jt-status.suspended::before {
+  background: #f97316;
+}
+
+.jt-status.expired,
+.jt-status.revoked {
+  background: #f1f5f9;
+  color: #475569;
+}
+.jt-status.expired::before,
+.jt-status.revoked::before {
+  background: #94a3b8;
+}
+
+.jt-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.jt-empty-box {
+  padding: 36px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13.5px;
+}
+
+/* User Dashboard Header */
+.jt-user-topbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.jt-user-topbar-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jt-user-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+
+/* Clean Modal Overlay */
+.jt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.jt-modal-dialog {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.2);
+}
+
+.jt-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.jt-modal-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 750;
+  color: #0f172a;
+}
+
+.jt-modal-close {
+  border: 0;
+  background: #f1f5f9;
+  color: #475569;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.jt-key-reveal-box {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  word-break: break-all;
+  margin: 12px 0;
+}
+
+.jt-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+@media (max-width: 1024px) {
+  .jt-admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .jt-admin-sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 14px 16px;
+  }
+
+  .jt-sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .jt-sidebar-item {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .jt-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jt-admin-main {
+    padding: 20px 16px 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .jt-kpi-grid,
+  .jt-kpi-grid.cols-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .jt-auth-card {
+    padding: 22px 20px;
+  }
+}

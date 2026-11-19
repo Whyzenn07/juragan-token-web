@@ -21,7 +21,6 @@ import {
   WhyChooseUs
 } from "@/components";
 import {
-  buildWhatsappUrl,
   ENABLE_CHECKOUT,
   SHOW_CATALOG_PRICING,
   WHATSAPP_RAW
@@ -225,6 +224,27 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [viewSavedOnly, setViewSavedOnly] = useState(false);
+  const [authUser, setAuthUser] = useState<{ email: string; fullName: string; role: "user" | "admin" } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.authenticated && data.user) {
+          setAuthUser({
+            email: data.user.email,
+            fullName: data.user.fullName,
+            role: data.user.role === "admin" ? "admin" : "user",
+          });
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
+  const handleNavbarLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
+    setAuthUser(null);
+  };
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const catalogRef = useRef<HTMLElement>(null);
@@ -483,29 +503,32 @@ export default function Home() {
             <Link href="/docs" className="jt-pill-util-link">
               Docs
             </Link>
-            {ENABLE_CHECKOUT ? (
-              <a
-                href="#katalog-retail"
-                className="jt-pill-cta-btn"
-                onClick={(e) => {
-                  const el = document.getElementById("katalog-retail");
-                  if (el) {
-                    e.preventDefault();
-                    el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-              >
-                Beli Token
-              </a>
+            {authUser ? (
+              <>
+                <Link
+                  href={authUser.role === "admin" ? "/admin" : "/dashboard"}
+                  className="jt-pill-cta-btn"
+                  title={authUser.email}
+                >
+                  {authUser.role === "admin" ? "Admin Panel" : "Dashboard"}
+                </Link>
+                <button
+                  type="button"
+                  className="jt-pill-signin-btn"
+                  onClick={handleNavbarLogout}
+                >
+                  Keluar
+                </button>
+              </>
             ) : (
-              <a
-                href={buildWhatsappUrl("Halo Tim Juragantoken, saya ingin berdiskusi mengenai akses API AI & uji coba.")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="jt-pill-cta-btn"
-              >
-                Hubungi Tim
-              </a>
+              <>
+                <Link href="/login" className="jt-pill-signin-btn">
+                  Sign In
+                </Link>
+                <Link href="/signup" className="jt-pill-cta-btn">
+                  Sign Up
+                </Link>
+              </>
             )}
             <button
               type="button"
@@ -567,17 +590,45 @@ export default function Home() {
               Bantuan &amp; FAQ
             </a>
           </nav>
-          <div className="mobile-drawer-footer">
-            <button
-              type="button"
-              className="primary-button full"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                scrollToCatalog();
-              }}
-            >
-              Jelajahi Katalog Model ↗
-            </button>
+          <div className="mobile-drawer-footer" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            {authUser ? (
+              <>
+                <Link
+                  href={authUser.role === "admin" ? "/admin" : "/dashboard"}
+                  className="primary-button full"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {authUser.role === "admin" ? "Admin Panel" : "Dashboard"}
+                </Link>
+                <button
+                  type="button"
+                  className="secondary-button full"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleNavbarLogout();
+                  }}
+                >
+                  Keluar
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="secondary-button full"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="primary-button full"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

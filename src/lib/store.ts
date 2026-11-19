@@ -3,10 +3,39 @@ import path from "path";
 
 export type OrderStatus = "pending" | "paid" | "expired";
 export type EmailStatus = "none" | "sent" | "simulated" | "error";
+export type KeyStatus = "active" | "suspended" | "revoked";
+export type UserRole = "user" | "admin";
+
+export type UserProfile = {
+  id: string;
+  email: string;
+  fullName: string;
+  avatarUrl?: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt?: string;
+};
+
+export type LocalUserAccount = UserProfile & {
+  passwordHash: string;
+  provider: "email" | "google";
+};
+
+export type AdminAuditLog = {
+  id: string;
+  adminId: string;
+  adminEmail: string;
+  action: string;
+  targetType: "order" | "key" | "user";
+  targetId: string;
+  details: Record<string, unknown>;
+  createdAt: string;
+};
 
 export type Order = {
   id: string;
   tokenHash: string;
+  userId?: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -34,17 +63,24 @@ export type Order = {
   qrUrl?: string;
   qrString?: string;
   payCode?: string;
+  adminNotes?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
 };
 
 export type KeyRecord = {
   hash: string;
   last4: string;
   orderId: string;
+  userId?: string;
+  userEmail?: string;
+  label?: string;
   planName: string;
   estPackage: string;
   balanceIdr: number;
   createdAt: string;
-  status: "active";
+  updatedAt?: string;
+  status: KeyStatus;
 };
 
 export type UsageLog = {
@@ -65,6 +101,8 @@ type Db = {
   orders: Record<string, Order>;
   keys: Record<string, KeyRecord>;
   usageLogs?: UsageLog[];
+  users?: Record<string, LocalUserAccount>;
+  auditLogs?: AdminAuditLog[];
 };
 
 const FILE = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
@@ -84,10 +122,12 @@ async function readDb(): Promise<Db> {
       orders: parsed.orders ?? {},
       keys: parsed.keys ?? {},
       usageLogs: parsed.usageLogs ?? [],
+      users: parsed.users ?? {},
+      auditLogs: parsed.auditLogs ?? [],
     };
   } catch {
     if (memDb) return JSON.parse(JSON.stringify(memDb)) as Db;
-    return { orders: {}, keys: {}, usageLogs: [] };
+    return { orders: {}, keys: {}, usageLogs: [], users: {}, auditLogs: [] };
   }
 }
 

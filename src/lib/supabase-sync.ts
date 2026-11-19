@@ -124,6 +124,13 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
     qr_url: order.qrUrl || null,
     pay_code: order.payCode || null,
   };
+  const withAdminMeta = {
+    ...withGateway,
+    user_id: order.userId || null,
+    admin_notes: order.adminNotes || null,
+    reviewed_by: order.reviewedBy || null,
+    reviewed_at: order.reviewedAt || null,
+  };
 
   const post = (body: unknown) =>
     fetch(`${url}/rest/v1/orders?on_conflict=id`, {
@@ -133,7 +140,8 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
     });
 
   try {
-    let res = await post(withGateway);
+    let res = await post(withAdminMeta);
+    if (!res.ok && res.status === 400) res = await post(withGateway);
     if (!res.ok && res.status === 400) res = await post(withTopUp);
     // Kolom top-up belum dimigrasi di database: ulangi tanpa kolom tersebut.
     if (!res.ok && res.status === 400) res = await post(base);
@@ -157,6 +165,7 @@ export function rowToOrder(co: any): Order {
   return {
     id: co.id,
     tokenHash: co.token_hash,
+    userId: co.user_id || undefined,
     customerName: co.customer_name,
     customerEmail: co.customer_email,
     customerPhone: co.customer_phone || "",
@@ -182,6 +191,9 @@ export function rowToOrder(co: any): Order {
     paymentUrl: co.payment_url || undefined,
     qrUrl: co.qr_url || undefined,
     payCode: co.pay_code || undefined,
+    adminNotes: co.admin_notes || undefined,
+    reviewedBy: co.reviewed_by || undefined,
+    reviewedAt: co.reviewed_at || undefined,
   };
 }
 
@@ -190,11 +202,15 @@ export function rowToKey(ck: any): KeyRecord {
     hash: ck.hash,
     last4: ck.last4,
     orderId: ck.order_id,
+    userId: ck.user_id || undefined,
+    userEmail: ck.user_email || undefined,
+    label: ck.label || undefined,
     planName: ck.plan_name,
     estPackage: ck.est_package,
     balanceIdr: ck.balance_idr,
     status: ck.status,
     createdAt: ck.created_at,
+    updatedAt: ck.updated_at || undefined,
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -261,21 +277,34 @@ export async function syncKeyToSupabase(keyRecord: KeyRecord): Promise<boolean> 
   const { url, key, isConfigured } = getSupabaseConfig();
   if (!isConfigured) return false;
 
-  try {
-    const res = await fetch(`${url}/rest/v1/keys?on_conflict=hash`, {
+  const base = {
+    hash: keyRecord.hash,
+    last4: keyRecord.last4,
+    order_id: keyRecord.orderId || null,
+    plan_name: keyRecord.planName,
+    est_package: keyRecord.estPackage || null,
+    balance_idr: keyRecord.balanceIdr,
+    status: keyRecord.status,
+    created_at: keyRecord.createdAt,
+  };
+  const withOwner = {
+    ...base,
+    user_id: keyRecord.userId || null,
+    user_email: keyRecord.userEmail || null,
+    label: keyRecord.label || null,
+    updated_at: keyRecord.updatedAt || new Date().toISOString(),
+  };
+
+  const post = (body: unknown) =>
+    fetch(`${url}/rest/v1/keys?on_conflict=hash`, {
       method: "POST",
       headers: getHeaders(key, "resolution=merge-duplicates"),
-      body: JSON.stringify({
-        hash: keyRecord.hash,
-        last4: keyRecord.last4,
-        order_id: keyRecord.orderId || null,
-        plan_name: keyRecord.planName,
-        est_package: keyRecord.estPackage || null,
-        balance_idr: keyRecord.balanceIdr,
-        status: keyRecord.status,
-        created_at: keyRecord.createdAt,
-      }),
+      body: JSON.stringify(body),
     });
+
+  try {
+    let res = await post(withOwner);
+    if (!res.ok && res.status === 400) res = await post(base);
 
     if (res.ok) {
       console.log(`[SUPABASE SYNC OK] Key ${keyRecord.last4} berhasil disinkronkan ke cloud.`);
