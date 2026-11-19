@@ -590,11 +590,11 @@ export default function Home() {
             onSelectModel={handleOpenDetail}
           />
 
-          {/* Animated Moving LLM Showcase (Original Marquee Inspired by Industry Patterns) */}
-          <LogoMarquee onSelectModel={handleOpenDetail} />
-
           {/* Ringkasan Kapabilitas & Metrik Infrastruktur Gateway */}
           <PlatformMetricsBar />
+
+          {/* Animated Moving LLM Showcase (Di bawah Metrik sebagai pembuktian visual 10 Provider) */}
+          <LogoMarquee onSelectModel={handleOpenDetail} />
 
           {/* Model Expertise by Use Case (Coding, Research, Cost Efficiency) */}
           <ModelExpertiseShowcase

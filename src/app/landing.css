@@ -808,11 +808,22 @@ html.jt-scroll-anim [data-reveal].is-revealed {
 
 /* 3. Clean Pure White AI Logo + Name Marquee (No box, no circle, no pill) */
 .jt-marquee-section {
-  margin: 8px 0 40px;
-  padding: 20px 0;
+  margin: 0 0 48px;
+  padding: 20px 0 22px;
   background: #ffffff;
   border: 0;
   border-radius: 14px;
+}
+
+.jt-marquee-caption {
+  margin: 0 0 16px;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
 }
 
 .jt-marquee-viewport {
@@ -1844,7 +1855,7 @@ html.jt-scroll-anim [data-reveal].is-revealed {
 
 /* A. Platform Metrics Trust Bar */
 .jt-metrics-section {
-  margin: 4px 0 44px;
+  margin: 10px 0 28px;
 }
 
 .jt-metrics-grid {
