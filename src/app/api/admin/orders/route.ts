@@ -46,6 +46,11 @@ export async function POST(req: NextRequest) {
     baseIdr?: number;
     methodName?: string;
     adminNotes?: string;
+    accountTier?: "standard" | "enterprise";
+    companyName?: string;
+    department?: string;
+    requiresTaxInvoice?: boolean;
+    npwp?: string;
     autoApprove?: boolean;
   };
 
@@ -58,6 +63,11 @@ export async function POST(req: NextRequest) {
     baseIdr: body.baseIdr,
     methodName: body.methodName,
     adminNotes: body.adminNotes,
+    accountTier: body.accountTier,
+    companyName: body.companyName,
+    department: body.department,
+    requiresTaxInvoice: Boolean(body.requiresTaxInvoice),
+    npwp: body.npwp,
     autoApprove: Boolean(body.autoApprove),
     admin: guard.session.user,
   });

@@ -29,6 +29,10 @@ export async function POST(req: NextRequest) {
     label?: string;
     planName?: string;
     balanceIdr?: number;
+    accountTier?: "standard" | "enterprise";
+    companyName?: string;
+    department?: string;
+    allowedIps?: string[] | string;
     sendEmail?: boolean;
   };
 
@@ -37,6 +41,10 @@ export async function POST(req: NextRequest) {
     label: body.label,
     planName: body.planName,
     balanceIdr: Number(body.balanceIdr ?? 0),
+    accountTier: body.accountTier,
+    companyName: body.companyName,
+    department: body.department,
+    allowedIps: body.allowedIps,
     sendEmail: Boolean(body.sendEmail),
     admin: guard.session.user,
   });

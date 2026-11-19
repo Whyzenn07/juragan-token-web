@@ -49,6 +49,12 @@ export function UserDashboardClient() {
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [orderOpen, setOrderOpen] = useState(false);
+  const [accountTier, setAccountTier] = useState<"standard" | "enterprise">("standard");
+  const [targetKeyHash, setTargetKeyHash] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [department, setDepartment] = useState("");
+  const [requiresTaxInvoice, setRequiresTaxInvoice] = useState(false);
+  const [npwp, setNpwp] = useState("");
   const [amount, setAmount] = useState("50000");
   const [methodName, setMethodName] = useState("QRIS Instan");
   const [phone, setPhone] = useState("");
@@ -94,6 +100,12 @@ export function UserDashboardClient() {
           methodName,
           customerPhone: phone,
           note,
+          accountTier,
+          companyName: accountTier === "enterprise" ? companyName : undefined,
+          department: accountTier === "enterprise" ? department : undefined,
+          requiresTaxInvoice: accountTier === "enterprise" ? requiresTaxInvoice : false,
+          npwp: accountTier === "enterprise" && requiresTaxInvoice ? npwp : undefined,
+          targetKeyHash: targetKeyHash || undefined,
         }),
       });
       const json = await res.json();
@@ -204,22 +216,28 @@ export function UserDashboardClient() {
         {/* Tabel API Key Terintegrasi */}
         <section className="jt-panel-card">
           <div className="jt-panel-card-head">
-            <h2>Virtual API Key Terintegrasi ({data.keys.length})</h2>
+            <div>
+              <h2>1 Universal API Key Anda ({data.keys.length})</h2>
+              <span className="jt-cell-muted">
+                Satu kunci langsung membuka akses OpenAI, Claude, Gemini, DeepSeek, Qwen &amp; 100+ model AI.
+              </span>
+            </div>
             <Link href="/docs" className="jt-btn-secondary-clean">
               Panduan Integrasi API ↗
             </Link>
           </div>
           {data.keys.length === 0 ? (
             <div className="jt-empty-box">
-              Belum ada API Key terhubung ke akun Gmail Anda. Ajukan pesanan token baru agar Admin menerbitkan Virtual API Key Anda.
+              Belum ada API Key terhubung ke akun Gmail Anda. Ajukan pesanan token baru (Standard maupun Enterprise) agar Admin menerbitkan Virtual API Key universal Anda.
             </div>
           ) : (
             <div className="jt-table-scroll">
               <table className="jt-table">
                 <thead>
                   <tr>
-                    <th>API Key</th>
-                    <th>Label &amp; Paket</th>
+                    <th>Universal API Key</th>
+                    <th>Tier &amp; Label</th>
+                    <th>IP Whitelist</th>
                     <th>Sisa Saldo</th>
                     <th>Status</th>
                     <th>Dibuat</th>
@@ -231,9 +249,20 @@ export function UserDashboardClient() {
                       <td className="jt-mono">{k.maskedKey}</td>
                       <td>
                         <div className="jt-cell-stack">
-                          <span className="jt-cell-primary">{k.label || "Key Utama"}</span>
-                          <span className="jt-cell-muted">{k.planName}</span>
+                          <span className="jt-cell-primary">
+                            {k.accountTier === "enterprise" ? "Enterprise" : "Standard"} · {k.label || "Key Utama"}
+                          </span>
+                          <span className="jt-cell-muted">
+                            {[k.companyName, k.department].filter(Boolean).join(" / ") || k.planName}
+                          </span>
                         </div>
+                      </td>
+                      <td>
+                        {k.allowedIps && k.allowedIps.length > 0 ? (
+                          <span className="jt-status active">{k.allowedIps.length} IP Terdaftar</span>
+                        ) : (
+                          <span className="jt-cell-muted">Bebas (Fleksibel)</span>
+                        )}
                       </td>
                       <td className="jt-num">{formatIdr(k.balanceIdr)}</td>
                       <td>
@@ -316,8 +345,103 @@ export function UserDashboardClient() {
               </button>
             </div>
             <form onSubmit={handleCreateOrder}>
+              <div className="jt-field">
+                <label htmlFor="uo-tier">Pilih Jalur Layanan</label>
+                <select
+                  id="uo-tier"
+                  className="jt-select"
+                  value={accountTier}
+                  onChange={(e) => {
+                    const next = e.target.value as "standard" | "enterprise";
+                    setAccountTier(next);
+                    if (next === "enterprise") {
+                      setMethodName("Invoice B2B & Transfer PT (IDR)");
+                      setAmount("500000");
+                    } else {
+                      setMethodName("QRIS Instan");
+                      setAmount("50000");
+                    }
+                  }}
+                >
+                  <option value="standard">Standard (Developer / Mandiri — Fleksibel)</option>
+                  <option value="enterprise">Enterprise B2B (PT Rejeki Digital Cemerlang · Faktur Pajak)</option>
+                </select>
+              </div>
+
+              {data.keys.filter((k) => k.status === "active").length > 0 && (
+                <div className="jt-field">
+                  <label htmlFor="uo-target-key">Tujuan Pengisian</label>
+                  <select
+                    id="uo-target-key"
+                    className="jt-select"
+                    value={targetKeyHash}
+                    onChange={(e) => setTargetKeyHash(e.target.value)}
+                  >
+                    <option value="">Terbitkan 1 Universal API Key Baru</option>
+                    {data.keys
+                      .filter((k) => k.status === "active")
+                      .map((k) => (
+                        <option key={k.hash} value={k.hash}>
+                          Top-Up ke Key Eksisting ({k.maskedKey} · Saldo {formatIdr(k.balanceIdr)})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
+
+              {accountTier === "enterprise" && (
+                <>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                    <div className="jt-field">
+                      <label htmlFor="uo-company">Nama Perusahaan</label>
+                      <input
+                        id="uo-company"
+                        type="text"
+                        className="jt-input"
+                        placeholder="PT Contoh Indonesia"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="jt-field">
+                      <label htmlFor="uo-dept">Departemen</label>
+                      <input
+                        id="uo-dept"
+                        type="text"
+                        className="jt-input"
+                        placeholder="IT / Engineering / Purchasing"
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12.5px", color: "#334155", marginBottom: "10px" }}>
+                    <input
+                      type="checkbox"
+                      checked={requiresTaxInvoice}
+                      onChange={(e) => setRequiresTaxInvoice(e.target.checked)}
+                    />
+                    <span>Butuh Faktur Pajak Resmi (PT Rejeki Digital Cemerlang)</span>
+                  </label>
+                  {requiresTaxInvoice && (
+                    <div className="jt-field">
+                      <label htmlFor="uo-npwp">NPWP Perusahaan (Opsional)</label>
+                      <input
+                        id="uo-npwp"
+                        type="text"
+                        className="jt-input"
+                        placeholder="00.000.000.0-000.000"
+                        value={npwp}
+                        onChange={(e) => setNpwp(e.target.value)}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+
               <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "14px" }}>
-                {[25000, 50000, 100000, 250000].map((v) => (
+                {(accountTier === "enterprise" ? [250000, 500000, 1000000, 2500000] : [25000, 50000, 100000, 250000]).map((v) => (
                   <button
                     key={v}
                     type="button"

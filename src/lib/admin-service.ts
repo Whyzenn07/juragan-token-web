@@ -11,6 +11,7 @@ import { sendReceiptEmail } from "./receipt-email";
 import {
   mutate,
   query,
+  type AccountTier,
   type AdminAuditLog,
   type KeyRecord,
   type KeyStatus,
@@ -264,6 +265,19 @@ export async function getAdminOverview() {
   };
 }
 
+export function parseIpWhitelistInput(raw?: string[] | string): string[] {
+  const list = Array.isArray(raw)
+    ? raw
+    : typeof raw === "string"
+    ? raw.split(/[\n,;]+/)
+    : [];
+  const cleaned = list
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0 && /^[0-9a-fA-F:.*\/]+$/.test(s))
+    .slice(0, 32);
+  return Array.from(new Set(cleaned));
+}
+
 export async function adminCreateOrder(input: {
   customerEmail: string;
   customerName: string;
@@ -273,6 +287,11 @@ export async function adminCreateOrder(input: {
   baseIdr?: number;
   methodName?: string;
   adminNotes?: string;
+  accountTier?: AccountTier;
+  companyName?: string;
+  department?: string;
+  requiresTaxInvoice?: boolean;
+  npwp?: string;
   autoApprove?: boolean;
   admin: UserProfile;
 }): Promise<{ ok: true; order: Order; issuedKey?: string } | { ok: false; status: number; error: string }> {
@@ -320,6 +339,11 @@ export async function adminCreateOrder(input: {
     emailStatus: "none",
     gatewayProvider: "manual",
     adminNotes: input.adminNotes?.trim().slice(0, 300) || undefined,
+    accountTier: input.accountTier === "enterprise" ? "enterprise" : "standard",
+    companyName: input.companyName?.trim().slice(0, 100) || undefined,
+    department: input.department?.trim().slice(0, 60) || undefined,
+    requiresTaxInvoice: Boolean(input.requiresTaxInvoice),
+    npwp: input.npwp?.trim().slice(0, 32) || undefined,
   };
 
   await mutate((db) => {
@@ -404,6 +428,10 @@ export async function adminApproveOrder(
       createdAt: now,
       updatedAt: now,
       status: "active",
+      accountTier: existing.accountTier || "standard",
+      companyName: existing.companyName,
+      department: existing.department,
+      allowedIps: [],
     };
     await mutate((db) => {
       db.keys[keyHash] = updatedKeyRecord!;
@@ -506,6 +534,10 @@ export async function adminProvisionKeyForGmail(input: {
   label?: string;
   planName?: string;
   balanceIdr: number;
+  accountTier?: AccountTier;
+  companyName?: string;
+  department?: string;
+  allowedIps?: string[] | string;
   sendEmail?: boolean;
   admin: UserProfile;
 }): Promise<{ ok: true; key: KeyRecord; plaintextKey: string; maskedKey: string } | { ok: false; status: number; error: string }> {
@@ -541,6 +573,10 @@ export async function adminProvisionKeyForGmail(input: {
     createdAt: now,
     updatedAt: now,
     status: "active",
+    accountTier: input.accountTier === "enterprise" ? "enterprise" : "standard",
+    companyName: input.companyName?.trim().slice(0, 100) || undefined,
+    department: input.department?.trim().slice(0, 60) || undefined,
+    allowedIps: parseIpWhitelistInput(input.allowedIps),
   };
 
   await mutate((db) => {
@@ -573,10 +609,14 @@ export async function adminProvisionKeyForGmail(input: {
 
 export async function adminControlKey(input: {
   hash: string;
-  action: "suspend" | "activate" | "revoke" | "adjust_balance" | "rotate" | "assign_email";
+  action: "suspend" | "activate" | "revoke" | "adjust_balance" | "rotate" | "assign_email" | "update_ip_whitelist";
   deltaIdr?: number;
   userEmail?: string;
   label?: string;
+  allowedIps?: string[] | string;
+  accountTier?: AccountTier;
+  companyName?: string;
+  department?: string;
   admin: UserProfile;
 }): Promise<
   | { ok: true; key: KeyRecord; rotatedPlaintextKey?: string; newKey?: KeyRecord }
@@ -691,6 +731,36 @@ export async function adminControlKey(input: {
     return { ok: true, key: revokedOld, newKey: replacement, rotatedPlaintextKey: newPlaintext };
   }
 
+  if (input.action === "update_ip_whitelist") {
+    const allowedIps = parseIpWhitelistInput(input.allowedIps);
+    const updated: KeyRecord = {
+      ...existing,
+      allowedIps,
+      accountTier: input.accountTier ?? existing.accountTier ?? (allowedIps.length > 0 ? "enterprise" : "standard"),
+      companyName: input.companyName !== undefined ? input.companyName.trim().slice(0, 100) || undefined : existing.companyName,
+      department: input.department !== undefined ? input.department.trim().slice(0, 60) || undefined : existing.department,
+      updatedAt: now,
+    };
+    await mutate((db) => {
+      db.keys[updated.hash] = updated;
+    });
+    await syncKeyToSupabase(updated);
+
+    await recordAdminAudit({
+      admin: input.admin,
+      action: "key.update_ip_whitelist",
+      targetType: "key",
+      targetId: existing.last4,
+      details: {
+        userEmail: existing.userEmail,
+        accountTier: updated.accountTier,
+        allowedIpsCount: allowedIps.length,
+        allowedIps,
+      },
+    });
+    return { ok: true, key: updated };
+  }
+
   return { ok: false, status: 400, error: "Aksi API Key tidak dikenali." };
 }
 
@@ -764,15 +834,31 @@ export async function getUserDashboardData(user: UserProfile) {
 
 export async function createUserOrderRequest(
   user: UserProfile,
-  input: { packageId?: string; baseIdr?: number; methodName?: string; customerPhone?: string; note?: string }
+  input: {
+    packageId?: string;
+    baseIdr?: number;
+    methodName?: string;
+    customerPhone?: string;
+    note?: string;
+    accountTier?: AccountTier;
+    companyName?: string;
+    department?: string;
+    requiresTaxInvoice?: boolean;
+    npwp?: string;
+    targetKeyHash?: string;
+  }
 ): Promise<{ ok: true; order: Order } | { ok: false; status: number; error: string }> {
   const pkg = retailPackages.find((p) => p.id === input.packageId);
   const baseIdr = Math.max(
     15_000,
     Math.min(50_000_000, Math.round(Number(input.baseIdr ?? pkg?.priceIdr ?? 50_000)))
   );
-  const packageName = pkg?.name || `Permintaan Kredit Rp ${new Intl.NumberFormat("id-ID").format(baseIdr)}`;
-  const estPackage = pkg?.estToken || `Saldo Rp ${new Intl.NumberFormat("id-ID").format(baseIdr)} · Multi-Model`;
+  const tier: AccountTier = input.accountTier === "enterprise" ? "enterprise" : "standard";
+  const isTopUp = Boolean(input.targetKeyHash?.trim());
+  const packageName =
+    pkg?.name ||
+    `${isTopUp ? "Top-Up" : "Deposit"} ${tier === "enterprise" ? "Enterprise B2B" : "Standard"} Rp ${new Intl.NumberFormat("id-ID").format(baseIdr)}`;
+  const estPackage = pkg?.estToken || `Saldo Rp ${new Intl.NumberFormat("id-ID").format(baseIdr)} · 1 Key Semua AI`;
 
   const invoiceId = generateInvoiceId();
   const now = new Date().toISOString();
@@ -784,19 +870,26 @@ export async function createUserOrderRequest(
     customerName: user.fullName || user.email.split("@")[0] || "Pengguna",
     customerEmail: user.email.toLowerCase(),
     customerPhone: (input.customerPhone || "").trim().slice(0, 20),
-    packageId: pkg?.id || "portal-request",
+    packageId: pkg?.id || (tier === "enterprise" ? "enterprise-b2b" : "standard-portal"),
     packageName,
     estPackage,
     baseIdr,
     feeIdr: 0,
     totalIdr: baseIdr,
-    methodId: "portal-transfer",
-    methodName: (input.methodName || "QRIS / Transfer Bank").trim().slice(0, 50),
+    methodId: tier === "enterprise" ? "invoice-b2b" : "portal-transfer",
+    methodName: (input.methodName || (tier === "enterprise" ? "Invoice B2B / Transfer PT" : "QRIS / Transfer Bank")).trim().slice(0, 50),
     status: "pending",
     createdAt: now,
     emailStatus: "none",
     gatewayProvider: "manual",
+    isTopUp,
+    targetKeyHash: isTopUp ? input.targetKeyHash?.trim() : undefined,
     adminNotes: input.note?.trim().slice(0, 250) || undefined,
+    accountTier: tier,
+    companyName: input.companyName?.trim().slice(0, 100) || undefined,
+    department: input.department?.trim().slice(0, 60) || undefined,
+    requiresTaxInvoice: tier === "enterprise" ? Boolean(input.requiresTaxInvoice) : false,
+    npwp: input.npwp?.trim().slice(0, 32) || undefined,
   };
 
   await mutate((db) => {

@@ -4,5 +4,6 @@ export * from "./PlatformMetricsBar";
 export * from "./ModelExpertiseShowcase";
 export * from "./GatewayFlow";
 export * from "./UseCasesGrid";
+export * from "./EnterpriseStandardSection";
 export * from "./WhyChooseUs";
 export * from "./PreFooterCta";

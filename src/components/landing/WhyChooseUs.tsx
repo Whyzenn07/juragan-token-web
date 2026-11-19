@@ -27,28 +27,28 @@ const ADVANTAGES = [
 
 const NEUTRAL_COMPARE_ROWS = [
   {
-    aspect: "Cara Integrasi Developer",
-    directVendor: "Harus mengelola SDK, akun, dan API Key terpisah per vendor AI.",
-    genericAggregator: "Endpoint agregat tersedia, namun dokumentasi & dukungan serba mandiri.",
-    juragan: "Satu endpoint OpenAI-compatible + panduan cepat Cursor, Claude Code, & Python.",
+    aspect: "Entitas Hukum & Kepatuhan",
+    directVendor: "Entitas luar negeri; sulit memenuhi syarat vendor lokal & faktur pajak.",
+    genericAggregator: "Entitas asing / tidak diketahui tanpa dukungan legalitas lokal Indonesia.",
+    juragan: "PT Lokal Resmi di Indonesia (PT Rejeki Digital Cemerlang) lengkap dengan Faktur Pajak.",
   },
   {
-    aspect: "Kurasi & Rekomendasi Model",
-    directVendor: "Hanya menyediakan katalog model dari masing-masing vendor.",
-    genericAggregator: "Ratusan model bercampur tanpa pengelompokan beban kerja.",
-    juragan: "Dikurasi jelas per keahlian: Ngoding, Riset Mendalam, dan Chat Hemat (DeepSeek/Qwen).",
+    aspect: "Mekanisme Pembayaran",
+    directVendor: "Kartu kredit internasional per vendor + risiko selisih kurs & reimbursement.",
+    genericAggregator: "Kartu kredit luar negeri / crypto tanpa dukungan invoice korporat IDR.",
+    juragan: "Invoice B2B & Transfer Bank IDR untuk Enterprise, serta QRIS/Transfer fleksibel untuk Standard.",
   },
   {
-    aspect: "Manajemen Kunci & Saldo",
-    directVendor: "Tagihan dan batas kuota tersebar di banyak dashboard berbeda.",
-    genericAggregator: "Pengaturan bergantung dashboard luar negeri & dokumentasi berbahasa Inggris.",
-    juragan: "Virtual API Key terpusat dengan pengecekan status & riwayat pemakaian instan.",
+    aspect: "Kontrol Keamanan & API Key",
+    directVendor: "Banyak API Key terpisah antar vendor; sulit dipantau terpusat oleh tim IT.",
+    genericAggregator: "Kontrol akses tim terbatas dan tidak terintegrasi alur persetujuan lokal.",
+    juragan: "1 API Key Universal untuk 100+ AI + Whitelist IP opsional + Audit Log real-time.",
   },
   {
-    aspect: "Dukungan Teknis",
+    aspect: "Dukungan (SLA) & Keamanan Deposit",
     directVendor: "Tiket email global dengan antrean zona waktu luar negeri.",
-    genericAggregator: "Forum komunitas / tiket email anonim.",
-    juragan: `Komunikasi langsung tim lokal via WhatsApp (${WHATSAPP_DISPLAY}) & halaman status live.`,
+    genericAggregator: "Sistem tiket anonim dengan risiko pemblokiran akun sepihak.",
+    juragan: `Didukung jalur langsung Principal, keamanan deposit 100%, & dukungan WA lokal (${WHATSAPP_DISPLAY}).`,
   },
 ];
 

@@ -2143,6 +2143,339 @@ html.jt-scroll-anim [data-reveal].is-revealed {
   text-decoration: underline;
 }
 
+/* C2. Enterprise & Standard Dual-Track Section (PDF 12-Slide Alignment) */
+.jt-risks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.jt-risk-card {
+  background: #ffffff;
+  border: 1px solid #e2ebf6;
+  border-top: 3px solid #1d63dc;
+  border-radius: 16px;
+  padding: 20px 20px 18px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+}
+
+.jt-risk-div {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #1d63dc;
+  margin-bottom: 8px;
+}
+
+.jt-risk-card h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 750;
+  color: #0a2540;
+  letter-spacing: -0.015em;
+}
+
+.jt-risk-card p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.58;
+  color: #475569;
+}
+
+.jt-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.jt-tier-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px;
+  padding: 28px 26px 24px;
+}
+
+.jt-tier-card.is-enterprise {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.18), transparent 45%),
+    linear-gradient(145deg, #1550b8 0%, #1d63dc 56%, #2563eb 100%);
+  border: 1px solid #60a5fa;
+  color: #ffffff;
+  box-shadow: 0 18px 40px rgba(29, 99, 220, 0.22);
+}
+
+.jt-tier-card.is-standard {
+  background: #ffffff;
+  border: 1px solid #dbe7f5;
+  color: #0a2540;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+}
+
+.jt-tier-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.jt-tier-pill {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.jt-tier-pill.enterprise {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.jt-tier-pill.standard {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d63dc;
+}
+
+.jt-tier-entity {
+  font-size: 12px;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.jt-tier-entity.muted {
+  color: #64748b;
+}
+
+.jt-tier-card h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.jt-tier-lead {
+  margin: 0 0 16px;
+  font-size: 13.75px;
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+.jt-tier-card.is-standard .jt-tier-lead {
+  color: #475569;
+  opacity: 1;
+}
+
+.jt-tier-list {
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.jt-tier-list li {
+  position: relative;
+  padding-left: 20px;
+}
+
+.jt-tier-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 800;
+  color: #93c5fd;
+}
+
+.jt-tier-card.is-standard .jt-tier-list li {
+  color: #334155;
+}
+
+.jt-tier-card.is-standard .jt-tier-list li::before {
+  color: #1d63dc;
+}
+
+.jt-tier-actions {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.jt-tier-btn-white,
+.jt-tier-btn-royal,
+.jt-tier-btn-ghost-dark,
+.jt-tier-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.18s var(--ease-balanced), background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.jt-tier-btn-white {
+  background: #ffffff;
+  color: #0a2540;
+  box-shadow: 0 6px 16px rgba(10, 37, 64, 0.18);
+}
+
+.jt-tier-btn-white:hover {
+  transform: translateY(-1px);
+  color: #1d63dc;
+}
+
+.jt-tier-btn-ghost-dark {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  color: #ffffff;
+}
+
+.jt-tier-btn-ghost-dark:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.jt-tier-btn-royal {
+  background: #1d63dc;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(29, 99, 220, 0.22);
+}
+
+.jt-tier-btn-royal:hover {
+  background: #1550b8;
+  transform: translateY(-1px);
+}
+
+.jt-tier-btn-outline {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0a2540;
+}
+
+.jt-tier-btn-outline:hover {
+  border-color: #93c5fd;
+  color: #1d63dc;
+  background: #f8fbff;
+}
+
+/* Process Transformation Strip (Slide 7 PDF) */
+.jt-transform-strip {
+  background: #ffffff;
+  border: 1px solid #dbe7f5;
+  border-radius: 18px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.jt-ts-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.jt-ts-badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d63dc;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.jt-ts-head strong {
+  font-size: 14.5px;
+  color: #0a2540;
+}
+
+.jt-ts-steps {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.jt-ts-node {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f8fbff;
+  border: 1px solid #d5e3f3;
+}
+
+.jt-ts-node.is-done {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.jt-ts-node span {
+  font-size: 11px;
+  font-weight: 800;
+  color: #1d63dc;
+}
+
+.jt-ts-node.is-done span {
+  color: #047857;
+}
+
+.jt-ts-node strong {
+  font-size: 14px;
+  color: #0a2540;
+}
+
+.jt-ts-node small {
+  font-size: 12px;
+  color: #475569;
+}
+
+.jt-ts-arrow {
+  font-size: 18px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .jt-risks-grid,
+  .jt-tier-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jt-ts-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .jt-ts-arrow {
+    transform: rotate(90deg);
+  }
+}
+
 /* D. Footer Live Operational Status Pill */
 .spf-live-status {
   display: inline-flex;

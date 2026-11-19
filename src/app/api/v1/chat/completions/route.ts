@@ -162,17 +162,26 @@ function createOpenAISanitizerStream(
 }
 
 export async function POST(req: NextRequest) {
-  // 1. Verifikasi Kredensial API Key `jt-live-...`
+  // 1. Verifikasi Kredensial API Key `jt-live-...` & Enterprise IP Whitelist (opsional)
   const authHeader = req.headers.get("authorization") || req.headers.get("x-api-key");
-  const auth = await authenticateGatewayKey(authHeader);
+  const clientIp =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip")?.trim() ||
+    "127.0.0.1";
+  const auth = await authenticateGatewayKey(authHeader, clientIp);
 
   if (!auth.ok || !auth.keyRecord || !auth.keyHash) {
     return NextResponse.json(
       {
         error: {
           message: auth.error,
-          type: "invalid_request_error",
-          code: auth.status === 402 ? "insufficient_quota" : "invalid_api_key",
+          type: auth.status === 403 ? "permission_error" : "invalid_request_error",
+          code:
+            auth.status === 402
+              ? "insufficient_quota"
+              : auth.status === 403
+              ? "ip_not_whitelisted_or_inactive"
+              : "invalid_api_key",
         },
       },
       { status: auth.status || 401, headers: CORS_HEADERS }

@@ -5,6 +5,7 @@ export type OrderStatus = "pending" | "paid" | "expired";
 export type EmailStatus = "none" | "sent" | "simulated" | "error";
 export type KeyStatus = "active" | "suspended" | "revoked";
 export type UserRole = "user" | "admin";
+export type AccountTier = "standard" | "enterprise";
 
 export type UserProfile = {
   id: string;
@@ -66,6 +67,11 @@ export type Order = {
   adminNotes?: string;
   reviewedBy?: string;
   reviewedAt?: string;
+  accountTier?: AccountTier;
+  companyName?: string;
+  department?: string;
+  requiresTaxInvoice?: boolean;
+  npwp?: string;
 };
 
 export type KeyRecord = {
@@ -81,6 +87,11 @@ export type KeyRecord = {
   createdAt: string;
   updatedAt?: string;
   status: KeyStatus;
+  accountTier?: AccountTier;
+  companyName?: string;
+  department?: string;
+  /** Kosong = bebas akses dari mana saja (Standard); Diisi = Enterprise IP Whitelist aktif di Gateway */
+  allowedIps?: string[];
 };
 
 export type UsageLog = {

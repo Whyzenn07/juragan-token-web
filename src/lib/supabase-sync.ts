@@ -130,6 +130,11 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
     admin_notes: order.adminNotes || null,
     reviewed_by: order.reviewedBy || null,
     reviewed_at: order.reviewedAt || null,
+    account_tier: order.accountTier || "standard",
+    company_name: order.companyName || null,
+    department: order.department || null,
+    requires_tax_invoice: Boolean(order.requiresTaxInvoice),
+    npwp: order.npwp || null,
   };
 
   const post = (body: unknown) =>
@@ -194,6 +199,11 @@ export function rowToOrder(co: any): Order {
     adminNotes: co.admin_notes || undefined,
     reviewedBy: co.reviewed_by || undefined,
     reviewedAt: co.reviewed_at || undefined,
+    accountTier: co.account_tier === "enterprise" ? "enterprise" : "standard",
+    companyName: co.company_name || undefined,
+    department: co.department || undefined,
+    requiresTaxInvoice: Boolean(co.requires_tax_invoice),
+    npwp: co.npwp || undefined,
   };
 }
 
@@ -211,6 +221,10 @@ export function rowToKey(ck: any): KeyRecord {
     status: ck.status,
     createdAt: ck.created_at,
     updatedAt: ck.updated_at || undefined,
+    accountTier: ck.account_tier === "enterprise" ? "enterprise" : "standard",
+    companyName: ck.company_name || undefined,
+    department: ck.department || undefined,
+    allowedIps: Array.isArray(ck.allowed_ips) ? ck.allowed_ips.map(String) : [],
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -293,6 +307,10 @@ export async function syncKeyToSupabase(keyRecord: KeyRecord): Promise<boolean> 
     user_email: keyRecord.userEmail || null,
     label: keyRecord.label || null,
     updated_at: keyRecord.updatedAt || new Date().toISOString(),
+    account_tier: keyRecord.accountTier || "standard",
+    company_name: keyRecord.companyName || null,
+    department: keyRecord.department || null,
+    allowed_ips: keyRecord.allowedIps ?? [],
   };
 
   const post = (body: unknown) =>

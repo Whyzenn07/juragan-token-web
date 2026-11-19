@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   BackToTop,
   CurrencyRateModal,
+  EnterpriseStandardSection,
   GatewayFlow,
   HeroOrbit,
   Icon,
@@ -500,9 +501,6 @@ export default function Home() {
             >
               Cek Saldo
             </button>
-            <Link href="/docs" className="jt-pill-util-link">
-              Docs
-            </Link>
             {authUser ? (
               <>
                 <Link
@@ -1469,6 +1467,9 @@ export default function Home() {
             }}
           />
 
+          {/* 7B. Sinergi Enterprise (PT Rejeki Digital Cemerlang) & Jalur Standard Fleksibel */}
+          <EnterpriseStandardSection />
+
           {/* 8. Why Choose Juragantoken & Neutral Integration Comparison */}
           <WhyChooseUs />
 
@@ -1640,10 +1641,10 @@ export default function Home() {
                 />
               </a>
               <p className="spf-desc">
-                Gerbang API AI terpadu di Indonesia. Akses model frontier Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, dan Qwen melalui satu integrasi OpenAI-compatible.
+                Gerbang API AI terpadu di Indonesia yang dikelola oleh <strong>PT Rejeki Digital Cemerlang</strong>. Akses 100+ model AI frontier melalui 1 API Key universal untuk kebutuhan Enterprise B2B maupun Standard.
               </p>
               <div className="spf-meta-info">
-                One Gateway. Every Intelligence. • SLA Uptime 99.98%
+                PT Rejeki Digital Cemerlang • Faktur Pajak B2B • SLA 99.98%
               </div>
               <Link href="/status" className="spf-live-status">
                 <span className="spf-live-dot" aria-hidden="true" />

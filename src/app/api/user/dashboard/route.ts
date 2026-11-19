@@ -27,6 +27,12 @@ export async function POST(req: NextRequest) {
     methodName?: string;
     customerPhone?: string;
     note?: string;
+    accountTier?: "standard" | "enterprise";
+    companyName?: string;
+    department?: string;
+    requiresTaxInvoice?: boolean;
+    npwp?: string;
+    targetKeyHash?: string;
   };
 
   const result = await createUserOrderRequest(guard.session.user, body);

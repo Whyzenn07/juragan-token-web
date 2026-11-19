@@ -10,10 +10,14 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ hash: str
 
   const { hash } = await ctx.params;
   const body = (await req.json().catch(() => ({}))) as {
-    action?: "suspend" | "activate" | "revoke" | "adjust_balance" | "rotate" | "assign_email";
+    action?: "suspend" | "activate" | "revoke" | "adjust_balance" | "rotate" | "assign_email" | "update_ip_whitelist";
     deltaIdr?: number;
     userEmail?: string;
     label?: string;
+    allowedIps?: string[] | string;
+    accountTier?: "standard" | "enterprise";
+    companyName?: string;
+    department?: string;
   };
 
   if (!body.action) {
@@ -26,6 +30,10 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ hash: str
     deltaIdr: body.deltaIdr,
     userEmail: body.userEmail,
     label: body.label,
+    allowedIps: body.allowedIps,
+    accountTier: body.accountTier,
+    companyName: body.companyName,
+    department: body.department,
     admin: guard.session.user,
   });
 

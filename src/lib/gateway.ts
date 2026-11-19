@@ -75,10 +75,46 @@ export type AuthResult = {
   keyHash?: string;
 };
 
+function normalizeIp(ip: string): string {
+  const cleaned = ip.trim().toLowerCase();
+  if (cleaned.startsWith("::ffff:")) return cleaned.slice(7);
+  return cleaned;
+}
+
+export function isIpAllowed(clientIp: string | null | undefined, allowedIps?: string[]): boolean {
+  if (!allowedIps || allowedIps.length === 0) return true;
+  if (!clientIp) return false;
+
+  const ip = normalizeIp(clientIp);
+  return allowedIps.some((entry) => {
+    const rule = normalizeIp(entry);
+    if (!rule) return false;
+    if (rule === "*" || rule === ip) return true;
+    // Dukungan wildcard prefix sederhana (misal 103.45.12.*)
+    if (rule.endsWith(".*")) {
+      const prefix = rule.slice(0, -1);
+      return ip.startsWith(prefix);
+    }
+    // Dukungan CIDR /24 umum untuk subnet kantor Enterprise
+    if (rule.endsWith("/24")) {
+      const baseParts = rule.slice(0, -3).split(".");
+      const ipParts = ip.split(".");
+      if (baseParts.length === 4 && ipParts.length === 4) {
+        return baseParts[0] === ipParts[0] && baseParts[1] === ipParts[1] && baseParts[2] === ipParts[2];
+      }
+    }
+    return false;
+  });
+}
+
 /**
  * Autentikasi API Key `jt-live-...` dari database lokal atau Supabase cloud
+ * termasuk penegakan opsional Enterprise IP Whitelist (PDF Slide 5).
  */
-export async function authenticateGatewayKey(authHeader: string | null): Promise<AuthResult> {
+export async function authenticateGatewayKey(
+  authHeader: string | null,
+  clientIp?: string | null
+): Promise<AuthResult> {
   if (!authHeader) {
     return {
       ok: false,
@@ -126,7 +162,15 @@ export async function authenticateGatewayKey(authHeader: string | null): Promise
     return {
       ok: false,
       status: 403,
-      error: `API Key dalam status non-aktif (${record.status}). Hubungi bantuan di WhatsApp 081226983990.`,
+      error: `API Key dalam status non-aktif (${record.status}). Hubungi bantuan di WhatsApp 0812-2698-3990.`,
+    };
+  }
+
+  if (record.allowedIps && record.allowedIps.length > 0 && !isIpAllowed(clientIp, record.allowedIps)) {
+    return {
+      ok: false,
+      status: 403,
+      error: `Akses ditolak oleh Enterprise IP Whitelist. Alamat IP (${clientIp || "tidak dikenal"}) tidak terdaftar pada API Key ini.`,
     };
   }
 

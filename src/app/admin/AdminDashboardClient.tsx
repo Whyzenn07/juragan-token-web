@@ -78,10 +78,21 @@ export function AdminDashboardClient() {
   // Modal: Provision Key to Gmail
   const [provisionOpen, setProvisionOpen] = useState(false);
   const [provEmail, setProvEmail] = useState("");
-  const [provLabel, setProvLabel] = useState("API Key Utama");
-  const [provPlan, setProvPlan] = useState("Multi-Model Gateway");
+  const [provLabel, setProvLabel] = useState("1 Key Universal (Semua AI)");
+  const [provPlan, setProvPlan] = useState("Universal Gateway 100+ AI");
   const [provBalance, setProvBalance] = useState("50000");
+  const [provTier, setProvTier] = useState<"standard" | "enterprise">("standard");
+  const [provCompany, setProvCompany] = useState("");
+  const [provDept, setProvDept] = useState("");
+  const [provIps, setProvIps] = useState("");
   const [provSendEmail, setProvSendEmail] = useState(true);
+
+  // Modal: IP Whitelist & Enterprise Tier Control
+  const [ipTarget, setIpTarget] = useState<EnrichedKey | null>(null);
+  const [ipInput, setIpInput] = useState("");
+  const [ipTier, setIpTier] = useState<"standard" | "enterprise">("standard");
+  const [ipCompany, setIpCompany] = useState("");
+  const [ipDept, setIpDept] = useState("");
 
   // Modal: Create Manual Order
   const [manualOrderOpen, setManualOrderOpen] = useState(false);
@@ -255,6 +266,10 @@ export function AdminDashboardClient() {
           label: provLabel,
           planName: provPlan,
           balanceIdr: Number(provBalance),
+          accountTier: provTier,
+          companyName: provCompany,
+          department: provDept,
+          allowedIps: provIps,
           sendEmail: provSendEmail,
         }),
       });
@@ -333,6 +348,35 @@ export function AdminDashboardClient() {
       }
       showToast("success", `Saldo API Key ••••${balanceTarget.last4} diperbarui.`);
       setBalanceTarget(null);
+      await loadAll();
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleSaveIpWhitelist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ipTarget) return;
+    setBusyId(ipTarget.hash);
+    try {
+      const res = await fetch(`/api/admin/keys/${encodeURIComponent(ipTarget.hash)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_ip_whitelist",
+          allowedIps: ipInput,
+          accountTier: ipTier,
+          companyName: ipCompany,
+          department: ipDept,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast("error", data.error || "Gagal menyimpan IP Whitelist.");
+        return;
+      }
+      showToast("success", `Pengaturan Tier & IP Whitelist ••••${ipTarget.last4} disimpan.`);
+      setIpTarget(null);
       await loadAll();
     } finally {
       setBusyId(null);
@@ -742,7 +786,15 @@ export function AdminDashboardClient() {
                         <td>
                           <div className="jt-cell-stack">
                             <span>{ord.packageName}</span>
-                            <span className="jt-cell-muted">{ord.methodName}</span>
+                            <span className="jt-cell-muted">
+                              {ord.accountTier === "enterprise" ? "Enterprise B2B" : "Standard"} · {ord.methodName}
+                              {ord.requiresTaxInvoice ? " · Faktur Pajak" : ""}
+                            </span>
+                            {(ord.companyName || ord.department) && (
+                              <span className="jt-cell-muted">
+                                {[ord.companyName, ord.department].filter(Boolean).join(" / ")}
+                              </span>
+                            )}
                           </div>
                         </td>
                         <td className="jt-num">{formatIdr(ord.totalIdr)}</td>
@@ -907,9 +959,10 @@ export function AdminDashboardClient() {
                   <table className="jt-table">
                     <thead>
                       <tr>
-                        <th>Virtual API Key</th>
+                        <th>1 Universal API Key (100+ AI)</th>
                         <th>Pemilik (Gmail)</th>
-                        <th>Label &amp; Paket</th>
+                        <th>Tier &amp; Departemen</th>
+                        <th>IP Whitelist</th>
                         <th>Saldo</th>
                         <th>Status</th>
                         <th>Kontrol Akses</th>
@@ -918,7 +971,12 @@ export function AdminDashboardClient() {
                     <tbody>
                       {filteredKeys.map((k) => (
                         <tr key={k.hash}>
-                          <td className="jt-mono">{k.maskedKey}</td>
+                          <td>
+                            <div className="jt-cell-stack">
+                              <span className="jt-mono">{k.maskedKey}</span>
+                              <span className="jt-cell-muted">{k.label || "Universal Key"}</span>
+                            </div>
+                          </td>
                           <td>
                             <div className="jt-cell-stack">
                               <span className="jt-cell-primary">{k.ownerName}</span>
@@ -927,9 +985,22 @@ export function AdminDashboardClient() {
                           </td>
                           <td>
                             <div className="jt-cell-stack">
-                              <span>{k.label || "Key Utama"}</span>
-                              <span className="jt-cell-muted">{k.planName}</span>
+                              <span className="jt-cell-primary">
+                                {k.accountTier === "enterprise" ? "Enterprise" : "Standard"}
+                              </span>
+                              <span className="jt-cell-muted">
+                                {[k.companyName, k.department].filter(Boolean).join(" · ") || k.planName}
+                              </span>
                             </div>
+                          </td>
+                          <td>
+                            {k.allowedIps && k.allowedIps.length > 0 ? (
+                              <span className="jt-status active" title={k.allowedIps.join(", ")}>
+                                {k.allowedIps.length} IP Aktif
+                              </span>
+                            ) : (
+                              <span className="jt-cell-muted">Bebas (Standard)</span>
+                            )}
                           </td>
                           <td className="jt-num">{formatIdr(k.balanceIdr)}</td>
                           <td>
@@ -955,6 +1026,20 @@ export function AdminDashboardClient() {
                                     }}
                                   >
                                     ± Saldo
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="jt-btn-secondary-clean"
+                                    disabled={busyId === k.hash}
+                                    onClick={() => {
+                                      setIpTarget(k);
+                                      setIpInput((k.allowedIps || []).join(", "));
+                                      setIpTier(k.accountTier === "enterprise" ? "enterprise" : "standard");
+                                      setIpCompany(k.companyName || "");
+                                      setIpDept(k.department || "");
+                                    }}
+                                  >
+                                    IP / Tier
                                   </button>
                                   {k.status === "active" ? (
                                     <button
@@ -1109,18 +1194,69 @@ export function AdminDashboardClient() {
                   onChange={(e) => setProvPlan(e.target.value)}
                 />
               </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <div className="jt-field">
+                  <label htmlFor="prov-tier">Tipe Akun</label>
+                  <select
+                    id="prov-tier"
+                    className="jt-select"
+                    value={provTier}
+                    onChange={(e) => setProvTier(e.target.value as "standard" | "enterprise")}
+                  >
+                    <option value="standard">Standard (Fleksibel)</option>
+                    <option value="enterprise">Enterprise B2B</option>
+                  </select>
+                </div>
+                <div className="jt-field">
+                  <label htmlFor="prov-balance">Saldo Awal (IDR)</label>
+                  <input
+                    id="prov-balance"
+                    type="number"
+                    min={0}
+                    max={100000000}
+                    step={5000}
+                    className="jt-input"
+                    value={provBalance}
+                    onChange={(e) => setProvBalance(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              {provTier === "enterprise" && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div className="jt-field">
+                    <label htmlFor="prov-company">Nama Perusahaan</label>
+                    <input
+                      id="prov-company"
+                      type="text"
+                      className="jt-input"
+                      placeholder="PT Contoh Nusantara"
+                      value={provCompany}
+                      onChange={(e) => setProvCompany(e.target.value)}
+                    />
+                  </div>
+                  <div className="jt-field">
+                    <label htmlFor="prov-dept">Departemen</label>
+                    <input
+                      id="prov-dept"
+                      type="text"
+                      className="jt-input"
+                      placeholder="IT / Engineering / Riset"
+                      value={provDept}
+                      onChange={(e) => setProvDept(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="jt-field">
-                <label htmlFor="prov-balance">Saldo Awal (IDR)</label>
+                <label htmlFor="prov-ips">IP Whitelist Opsional (Kosong = Bebas Akses)</label>
                 <input
-                  id="prov-balance"
-                  type="number"
-                  min={0}
-                  max={100000000}
-                  step={5000}
+                  id="prov-ips"
+                  type="text"
                   className="jt-input"
-                  value={provBalance}
-                  onChange={(e) => setProvBalance(e.target.value)}
-                  required
+                  placeholder="Contoh Enterprise: 103.45.12.88, 202.150.10.0/24"
+                  value={provIps}
+                  onChange={(e) => setProvIps(e.target.value)}
                 />
               </div>
               <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#334155" }}>
@@ -1350,6 +1486,93 @@ export function AdminDashboardClient() {
                   disabled={busyId === balanceTarget.hash}
                 >
                   Simpan Perubahan Saldo
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3B: PENGATURAN TIER & IP WHITELIST ENTERPRISE */}
+      {ipTarget && (
+        <div className="jt-modal-backdrop" role="dialog" aria-modal="true" aria-label="Pengaturan Tier dan IP Whitelist">
+          <div className="jt-modal-dialog">
+            <div className="jt-modal-head">
+              <h3>Tier &amp; IP Whitelist ({ipTarget.maskedKey})</h3>
+              <button
+                type="button"
+                className="jt-modal-close"
+                onClick={() => setIpTarget(null)}
+                aria-label="Tutup"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="jt-auth-sub" style={{ marginBottom: "12px" }}>
+              Kosongkan daftar IP agar fleksibel (Standard). Isi alamat IP kantor/server (dipisah koma atau baris baru) untuk mengunci akses khusus Enterprise di Gateway.
+            </p>
+            <form onSubmit={handleSaveIpWhitelist}>
+              <div className="jt-field">
+                <label htmlFor="ip-tier">Tipe Akun</label>
+                <select
+                  id="ip-tier"
+                  className="jt-select"
+                  value={ipTier}
+                  onChange={(e) => setIpTier(e.target.value as "standard" | "enterprise")}
+                >
+                  <option value="standard">Standard (Fleksibel)</option>
+                  <option value="enterprise">Enterprise B2B</option>
+                </select>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <div className="jt-field">
+                  <label htmlFor="ip-company">Perusahaan (Opsional)</label>
+                  <input
+                    id="ip-company"
+                    type="text"
+                    className="jt-input"
+                    value={ipCompany}
+                    onChange={(e) => setIpCompany(e.target.value)}
+                    placeholder="PT ..."
+                  />
+                </div>
+                <div className="jt-field">
+                  <label htmlFor="ip-dept">Departemen (Opsional)</label>
+                  <input
+                    id="ip-dept"
+                    type="text"
+                    className="jt-input"
+                    value={ipDept}
+                    onChange={(e) => setIpDept(e.target.value)}
+                    placeholder="Tim IT / Data"
+                  />
+                </div>
+              </div>
+              <div className="jt-field">
+                <label htmlFor="ip-list">Daftar IP Diizinkan (IPv4 / CIDR /24)</label>
+                <textarea
+                  id="ip-list"
+                  rows={3}
+                  className="jt-textarea jt-mono"
+                  placeholder="103.45.12.88, 202.150.10.0/24"
+                  value={ipInput}
+                  onChange={(e) => setIpInput(e.target.value)}
+                />
+              </div>
+              <div className="jt-modal-foot">
+                <button
+                  type="button"
+                  className="jt-btn-secondary-clean"
+                  onClick={() => setIpTarget(null)}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="jt-btn-primary-solid"
+                  disabled={busyId === ipTarget.hash}
+                >
+                  Simpan Pengaturan
                 </button>
               </div>
             </form>
