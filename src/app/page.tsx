@@ -1152,14 +1152,6 @@ export default function Home() {
                     <span aria-hidden="true">↗</span>
                   </a>
                 </div>
-
-                {/* Status Counter */}
-                <div className="cpe-status-bar">
-                  <span className="cpe-counter">
-                    Menampilkan <strong className="cpe-strong">{displayedModels.length}</strong> model pilihan di web ·{" "}
-                    <strong className="cpe-strong">100+ model</strong> lengkap di Gateway
-                  </span>
-                </div>
               </div>
             )}
 
