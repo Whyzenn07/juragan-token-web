@@ -72,6 +72,11 @@ export type Order = {
   department?: string;
   requiresTaxInvoice?: boolean;
   npwp?: string;
+  paymentProofUrl?: string;
+  paymentProofName?: string;
+  paymentProofUploadedAt?: string;
+  paymentProofUploadedBy?: "admin" | "user";
+  paymentReference?: string;
 };
 
 export type KeyRecord = {

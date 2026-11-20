@@ -278,6 +278,53 @@ export function parseIpWhitelistInput(raw?: string[] | string): string[] {
   return Array.from(new Set(cleaned));
 }
 
+export function validatePaymentProofUrl(
+  raw?: string | null
+): { ok: true; value?: string } | { ok: false; error: string } {
+  if (raw === undefined || raw === null) return { ok: true, value: undefined };
+  const trimmed = String(raw).trim();
+  if (!trimmed) return { ok: true, value: undefined };
+
+  // Explicitly allow ONLY safe raster image data URLs (PNG/JPEG/WebP), blocking SVG/XSS
+  if (trimmed.startsWith("data:")) {
+    if (trimmed.length > 1_200_000) {
+      return {
+        ok: false,
+        error: "Ukuran gambar bukti transaksi terlalu besar (maksimal ~900 KB setelah kompresi).",
+      };
+    }
+    if (!/^data:image\/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=]+$/.test(trimmed)) {
+      return {
+        ok: false,
+        error: "Format bukti transaksi harus berupa gambar PNG, JPG/JPEG, atau WebP yang valid.",
+      };
+    }
+    return { ok: true, value: trimmed };
+  }
+
+  // Safe local asset path under /images/
+  if (trimmed.startsWith("/")) {
+    if (!/^\/images\/[a-zA-Z0-9._-]+$/.test(trimmed) || trimmed.includes("..")) {
+      return { ok: false, error: "Path lokal gambar bukti transaksi tidak valid." };
+    }
+    return { ok: true, value: trimmed };
+  }
+
+  // Strictly HTTPS external URL without whitespace or HTML delimiters
+  if (trimmed.length > 1000 || /[\s<>'"]/.test(trimmed)) {
+    return { ok: false, error: "URL bukti transaksi tidak valid." };
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "https:") {
+      return { ok: false, error: "URL eksternal bukti transaksi harus menggunakan protokol HTTPS." };
+    }
+    return { ok: true, value: parsed.toString() };
+  } catch {
+    return { ok: false, error: "Format bukti transaksi tidak dikenali." };
+  }
+}
+
 export async function adminCreateOrder(input: {
   customerEmail: string;
   customerName: string;
@@ -292,6 +339,9 @@ export async function adminCreateOrder(input: {
   department?: string;
   requiresTaxInvoice?: boolean;
   npwp?: string;
+  paymentProofUrl?: string;
+  paymentProofName?: string;
+  paymentReference?: string;
   autoApprove?: boolean;
   admin: UserProfile;
 }): Promise<{ ok: true; order: Order; issuedKey?: string } | { ok: false; status: number; error: string }> {
@@ -302,6 +352,11 @@ export async function adminCreateOrder(input: {
   }
   if (name.length < 2) {
     return { ok: false, status: 400, error: "Nama pelanggan minimal 2 karakter." };
+  }
+
+  const proofCheck = validatePaymentProofUrl(input.paymentProofUrl);
+  if (!proofCheck.ok) {
+    return { ok: false, status: 400, error: proofCheck.error };
   }
 
   const pkg = retailPackages.find((p) => p.id === input.packageId);
@@ -344,6 +399,13 @@ export async function adminCreateOrder(input: {
     department: input.department?.trim().slice(0, 60) || undefined,
     requiresTaxInvoice: Boolean(input.requiresTaxInvoice),
     npwp: input.npwp?.trim().slice(0, 32) || undefined,
+    paymentProofUrl: proofCheck.value,
+    paymentProofName: proofCheck.value
+      ? (input.paymentProofName || "bukti-transfer.png").trim().slice(0, 120)
+      : undefined,
+    paymentProofUploadedAt: proofCheck.value ? now : undefined,
+    paymentProofUploadedBy: proofCheck.value ? "admin" : undefined,
+    paymentReference: input.paymentReference?.trim().slice(0, 120) || undefined,
   };
 
   await mutate((db) => {
@@ -524,6 +586,87 @@ export async function adminUpdateOrderStatus(input: {
     targetType: "order",
     targetId: updated.id,
     details: { previousStatus: existing.status, nextStatus, adminNotes: updated.adminNotes },
+  });
+
+  return { ok: true, order: updated };
+}
+
+export async function adminUpdateOrderPaymentProof(input: {
+  orderId: string;
+  paymentProofUrl?: string | null;
+  paymentProofName?: string;
+  paymentReference?: string;
+  adminNotes?: string;
+  admin: UserProfile;
+}): Promise<{ ok: true; order: Order } | { ok: false; status: number; error: string }> {
+  const allOrders = await listAllOrders();
+  const existing = allOrders.find((o) => o.id === input.orderId);
+  if (!existing) {
+    return { ok: false, status: 404, error: "Pesanan tidak ditemukan." };
+  }
+
+  const now = new Date().toISOString();
+  const isRemoving = input.paymentProofUrl === null;
+
+  let nextProofUrl = existing.paymentProofUrl;
+  let nextProofName = existing.paymentProofName;
+  let nextUploadedAt = existing.paymentProofUploadedAt;
+  let nextUploadedBy = existing.paymentProofUploadedBy;
+  let actionName = "order.update_proof_meta";
+
+  if (isRemoving) {
+    nextProofUrl = undefined;
+    nextProofName = undefined;
+    nextUploadedAt = undefined;
+    nextUploadedBy = undefined;
+    actionName = "order.remove_proof";
+  } else if (input.paymentProofUrl !== undefined) {
+    const check = validatePaymentProofUrl(input.paymentProofUrl);
+    if (!check.ok) {
+      return { ok: false, status: 400, error: check.error };
+    }
+    if (check.value) {
+      nextProofUrl = check.value;
+      nextProofName = (input.paymentProofName || "bukti-transaksi.png").trim().slice(0, 120);
+      nextUploadedAt = now;
+      nextUploadedBy = "admin";
+      actionName = "order.upload_proof";
+    }
+  }
+
+  const updated: Order = {
+    ...existing,
+    paymentProofUrl: nextProofUrl,
+    paymentProofName: nextProofName,
+    paymentProofUploadedAt: nextUploadedAt,
+    paymentProofUploadedBy: nextUploadedBy,
+    paymentReference:
+      input.paymentReference !== undefined
+        ? input.paymentReference.trim().slice(0, 120) || undefined
+        : existing.paymentReference,
+    adminNotes:
+      input.adminNotes !== undefined
+        ? input.adminNotes.trim().slice(0, 300) || undefined
+        : existing.adminNotes,
+    reviewedBy: input.admin.id,
+    reviewedAt: now,
+  };
+
+  await mutate((db) => {
+    db.orders[updated.id] = updated;
+  });
+  await syncOrderToSupabase(updated);
+
+  await recordAdminAudit({
+    admin: input.admin,
+    action: actionName,
+    targetType: "order",
+    targetId: updated.id,
+    details: {
+      customerEmail: updated.customerEmail,
+      paymentProofName: updated.paymentProofName ?? null,
+      paymentReference: updated.paymentReference ?? null,
+    },
   });
 
   return { ok: true, order: updated };
@@ -846,8 +989,16 @@ export async function createUserOrderRequest(
     requiresTaxInvoice?: boolean;
     npwp?: string;
     targetKeyHash?: string;
+    paymentProofUrl?: string;
+    paymentProofName?: string;
+    paymentReference?: string;
   }
 ): Promise<{ ok: true; order: Order } | { ok: false; status: number; error: string }> {
+  const proofCheck = validatePaymentProofUrl(input.paymentProofUrl);
+  if (!proofCheck.ok) {
+    return { ok: false, status: 400, error: proofCheck.error };
+  }
+
   const pkg = retailPackages.find((p) => p.id === input.packageId);
   const baseIdr = Math.max(
     15_000,
@@ -890,6 +1041,13 @@ export async function createUserOrderRequest(
     department: input.department?.trim().slice(0, 60) || undefined,
     requiresTaxInvoice: tier === "enterprise" ? Boolean(input.requiresTaxInvoice) : false,
     npwp: input.npwp?.trim().slice(0, 32) || undefined,
+    paymentProofUrl: proofCheck.value,
+    paymentProofName: proofCheck.value
+      ? (input.paymentProofName || "bukti-transfer.png").trim().slice(0, 120)
+      : undefined,
+    paymentProofUploadedAt: proofCheck.value ? now : undefined,
+    paymentProofUploadedBy: proofCheck.value ? "user" : undefined,
+    paymentReference: input.paymentReference?.trim().slice(0, 120) || undefined,
   };
 
   await mutate((db) => {
@@ -898,4 +1056,55 @@ export async function createUserOrderRequest(
   await syncOrderToSupabase(order);
 
   return { ok: true, order };
+}
+
+export async function userAttachOrderProof(
+  user: UserProfile,
+  orderId: string,
+  input: {
+    paymentProofUrl: string;
+    paymentProofName?: string;
+    paymentReference?: string;
+  }
+): Promise<{ ok: true; order: Order } | { ok: false; status: number; error: string }> {
+  const proofCheck = validatePaymentProofUrl(input.paymentProofUrl);
+  if (!proofCheck.ok) {
+    return { ok: false, status: 400, error: proofCheck.error };
+  }
+  if (!proofCheck.value) {
+    return { ok: false, status: 400, error: "File gambar bukti pembayaran wajib diunggah." };
+  }
+
+  const allOrders = await listAllOrders();
+  const existing = allOrders.find((o) => o.id === orderId);
+  if (!existing) {
+    return { ok: false, status: 404, error: "Pesanan tidak ditemukan." };
+  }
+
+  const isOwner =
+    existing.userId === user.id ||
+    existing.customerEmail.toLowerCase() === user.email.toLowerCase();
+  if (!isOwner) {
+    return { ok: false, status: 403, error: "Anda tidak memiliki akses ke pesanan ini." };
+  }
+
+  const now = new Date().toISOString();
+  const updated: Order = {
+    ...existing,
+    paymentProofUrl: proofCheck.value,
+    paymentProofName: (input.paymentProofName || "bukti-pembayaran.png").trim().slice(0, 120),
+    paymentProofUploadedAt: now,
+    paymentProofUploadedBy: "user",
+    paymentReference:
+      input.paymentReference !== undefined
+        ? input.paymentReference.trim().slice(0, 120) || existing.paymentReference
+        : existing.paymentReference,
+  };
+
+  await mutate((db) => {
+    db.orders[updated.id] = updated;
+  });
+  await syncOrderToSupabase(updated);
+
+  return { ok: true, order: updated };
 }

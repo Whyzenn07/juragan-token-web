@@ -1,9 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function FloatingWhatsApp() {
+  const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
   const adminPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "");
   const defaultText = encodeURIComponent(
     "Halo Admin Juragan Token! 👋 Saya ingin konsultasi mengenai pembelian kredit API AI."

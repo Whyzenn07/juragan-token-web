@@ -51,6 +51,9 @@ export async function POST(req: NextRequest) {
     department?: string;
     requiresTaxInvoice?: boolean;
     npwp?: string;
+    paymentProofUrl?: string;
+    paymentProofName?: string;
+    paymentReference?: string;
     autoApprove?: boolean;
   };
 
@@ -68,6 +71,9 @@ export async function POST(req: NextRequest) {
     department: body.department,
     requiresTaxInvoice: Boolean(body.requiresTaxInvoice),
     npwp: body.npwp,
+    paymentProofUrl: body.paymentProofUrl,
+    paymentProofName: body.paymentProofName,
+    paymentReference: body.paymentReference,
     autoApprove: Boolean(body.autoApprove),
     admin: guard.session.user,
   });

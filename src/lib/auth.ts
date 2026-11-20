@@ -235,6 +235,11 @@ export async function ensureLocalDevSeed(): Promise<void> {
         keyHash: "a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0",
         emailStatus: "sent",
         gatewayProvider: "manual",
+        paymentProofUrl: "/images/sample-bukti-transfer.png",
+        paymentProofName: "bukti-qris-budi.png",
+        paymentProofUploadedAt: new Date(Date.now() - 86_400_000 * 2 + 60_000).toISOString(),
+        paymentProofUploadedBy: "user",
+        paymentReference: "RRN 261118094122 · QRIS BCA",
       };
 
       db.orders["INV-JT-DEMO02"] = {

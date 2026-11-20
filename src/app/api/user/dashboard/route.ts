@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
-import { createUserOrderRequest, getUserDashboardData } from "@/lib/admin-service";
+import {
+  createUserOrderRequest,
+  getUserDashboardData,
+  userAttachOrderProof,
+} from "@/lib/admin-service";
 
 export async function GET() {
   const guard = await requireUser();
@@ -33,9 +37,42 @@ export async function POST(req: NextRequest) {
     requiresTaxInvoice?: boolean;
     npwp?: string;
     targetKeyHash?: string;
+    paymentProofUrl?: string;
+    paymentProofName?: string;
+    paymentReference?: string;
   };
 
   const result = await createUserOrderRequest(guard.session.user, body);
+  if (!result.ok) {
+    return NextResponse.json({ success: false, error: result.error }, { status: result.status });
+  }
+
+  return NextResponse.json({ success: true, order: result.order });
+}
+
+export async function PATCH(req: NextRequest) {
+  const guard = await requireUser();
+  if (!guard.ok) {
+    return NextResponse.json({ success: false, error: guard.error }, { status: guard.status });
+  }
+
+  const body = (await req.json().catch(() => ({}))) as {
+    orderId?: string;
+    paymentProofUrl?: string;
+    paymentProofName?: string;
+    paymentReference?: string;
+  };
+
+  if (!body.orderId?.trim()) {
+    return NextResponse.json({ success: false, error: "ID pesanan wajib disertakan." }, { status: 400 });
+  }
+
+  const result = await userAttachOrderProof(guard.session.user, body.orderId.trim(), {
+    paymentProofUrl: body.paymentProofUrl ?? "",
+    paymentProofName: body.paymentProofName,
+    paymentReference: body.paymentReference,
+  });
+
   if (!result.ok) {
     return NextResponse.json({ success: false, error: result.error }, { status: result.status });
   }

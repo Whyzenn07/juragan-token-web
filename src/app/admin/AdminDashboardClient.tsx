@@ -1,12 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { AdminAuditLog, Order, UserProfile } from "@/lib/store";
 import type { EnrichedKey, EnrichedUser } from "@/lib/admin-service";
+import { Icon } from "@/components/ui/Icon";
+import { ProofUploadDropzone } from "@/components/portal/ProofUploadDropzone";
+import { InvoiceDocument } from "@/components/portal/InvoiceDocument";
 
 type AdminTab = "overview" | "orders" | "users-keys" | "audit";
+type OrderDrawerTab = "proof" | "invoice";
+type UserKeySubTab = "keys" | "users";
 
 type OverviewStats = {
   totalOrders: number;
@@ -17,6 +22,13 @@ type OverviewStats = {
   activeKeys: number;
   totalBalanceIdr: number;
   totalUsers: number;
+};
+
+type MenuState = {
+  kind: "order" | "key";
+  id: string;
+  top: number;
+  right: number;
 };
 
 const formatIdr = (val: number) =>
@@ -41,9 +53,103 @@ const formatDate = (iso?: string) => {
   }
 };
 
+function getInitials(name?: string, email?: string): string {
+  const src = (name || email || "JT").trim();
+  const parts = src.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return src.slice(0, 2).toUpperCase();
+}
+
+function formatAuditMeta(action: string): { label: string; tone: "active" | "pending" | "suspended" } {
+  const map: Record<string, { label: string; tone: "active" | "pending" | "suspended" }> = {
+    "order.approve": { label: "Pesanan Disetujui", tone: "active" },
+    "order.create_manual": { label: "Pesanan Manual", tone: "pending" },
+    "order.update_paid": { label: "Tandai Lunas", tone: "active" },
+    "order.update_expired": { label: "Tandai Expired", tone: "suspended" },
+    "order.update_pending": { label: "Kembalikan Pending", tone: "pending" },
+    "order.upload_proof": { label: "Upload Bukti SS", tone: "active" },
+    "order.remove_proof": { label: "Hapus Bukti SS", tone: "suspended" },
+    "order.update_proof_meta": { label: "Update Info Transaksi", tone: "pending" },
+    "key.provision_gmail": { label: "Terbitkan API Key", tone: "active" },
+    "key.adjust_balance": { label: "Sesuaikan Saldo", tone: "active" },
+    "key.update_ip_whitelist": { label: "Atur IP / Tier", tone: "active" },
+    "key.suspend": { label: "Suspend Key", tone: "suspended" },
+    "key.activate": { label: "Aktifkan Key", tone: "active" },
+    "key.rotate": { label: "Rotasi Key", tone: "pending" },
+    "key.revoke": { label: "Cabut Key Permanen", tone: "suspended" },
+    "user.update_role": { label: "Ubah Role User", tone: "pending" },
+  };
+  return map[action] || { label: action, tone: "pending" };
+}
+
+function formatAuditChips(details: Record<string, unknown>): { key: string; value: string }[] {
+  const labelMap: Record<string, string> = {
+    customerEmail: "Email",
+    userEmail: "Gmail",
+    totalIdr: "Nominal",
+    balanceIdr: "Saldo",
+    deltaIdr: "Perubahan",
+    nextBalance: "Saldo Baru",
+    carriedBalanceIdr: "Saldo Dipindah",
+    keyLast4: "Key",
+    label: "Label",
+    accountTier: "Tier",
+    allowedIpsCount: "Jml IP",
+    paymentProofName: "Bukti SS",
+    paymentReference: "Ref",
+    nextStatus: "Status",
+    previousStatus: "Sebelumnya",
+    isTopUp: "Top-Up",
+    sendEmail: "Kirim Email",
+    autoApprove: "Auto-Approve",
+    role: "Role",
+  };
+
+  const chips: { key: string; value: string }[] = [];
+  for (const [k, raw] of Object.entries(details || {})) {
+    if (raw === null || raw === undefined || raw === "" || k === "allowedIps") continue;
+    let formatted = String(raw);
+    if (typeof raw === "number" && (k.includes("Idr") || k.toLowerCase().includes("balance"))) {
+      formatted = formatIdr(raw);
+    } else if (typeof raw === "boolean") {
+      formatted = raw ? "Ya" : "Tidak";
+    }
+    chips.push({ key: labelMap[k] || k, value: formatted });
+  }
+  return chips;
+}
+
+function NavGlyph({ name }: { name: AdminTab }) {
+  switch (name) {
+    case "overview":
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="9" rx="1.5" />
+          <rect x="14" y="3" width="7" height="5" rx="1.5" />
+          <rect x="14" y="12" width="7" height="9" rx="1.5" />
+          <rect x="3" y="16" width="7" height="5" rx="1.5" />
+        </svg>
+      );
+    case "orders":
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z" />
+          <path d="M9 8h6M9 12h6M9 16h4" />
+        </svg>
+      );
+    case "users-keys":
+      return <Icon name="key" size={16} />;
+    case "audit":
+      return <Icon name="terminal" size={16} />;
+  }
+}
+
 export function AdminDashboardClient() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
+  const [userKeySubTab, setUserKeySubTab] = useState<UserKeySubTab>("keys");
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [adminUser, setAdminUser] = useState<UserProfile | null>(null);
@@ -69,11 +175,21 @@ export function AdminDashboardClient() {
   const [keyStatusFilter, setKeyStatusFilter] = useState<string>("all");
   const [userKeySearch, setUserKeySearch] = useState("");
 
-  // Action feedback & modals
+  // Action feedback & Inspector Drawer
   const [busyId, setBusyId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [revealedKey, setRevealedKey] = useState<{ key: string; email: string; context: string } | null>(null);
   const [copiedReveal, setCopiedReveal] = useState(false);
+
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [drawerTab, setDrawerTab] = useState<OrderDrawerTab>("proof");
+  const [draftProofUrl, setDraftProofUrl] = useState<string | null | undefined>(undefined);
+  const [draftProofName, setDraftProofName] = useState<string>("");
+  const [draftRef, setDraftRef] = useState<string>("");
+  const [draftNotes, setDraftNotes] = useState<string>("");
+  const [copiedInvoiceId, setCopiedInvoiceId] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [openMenu, setOpenMenu] = useState<MenuState | null>(null);
 
   // Modal: Provision Key to Gmail
   const [provisionOpen, setProvisionOpen] = useState(false);
@@ -102,7 +218,10 @@ export function AdminDashboardClient() {
   const [moPackageName, setMoPackageName] = useState("Paket Developer Pro");
   const [moAmount, setMoAmount] = useState("50000");
   const [moMethod, setMoMethod] = useState("Transfer Bank / QRIS");
+  const [moRef, setMoRef] = useState("");
   const [moNotes, setMoNotes] = useState("");
+  const [moProofUrl, setMoProofUrl] = useState<string | undefined>(undefined);
+  const [moProofName, setMoProofName] = useState<string | undefined>(undefined);
   const [moAutoApprove, setMoAutoApprove] = useState(false);
 
   // Modal: Adjust Balance
@@ -111,7 +230,7 @@ export function AdminDashboardClient() {
 
   const showToast = (type: "success" | "error", text: string) => {
     setToast({ type, text });
-    setTimeout(() => setToast(null), 4500);
+    window.setTimeout(() => setToast(null), 4500);
   };
 
   const loadAll = useCallback(async () => {
@@ -162,19 +281,95 @@ export function AdminDashboardClient() {
     return () => window.clearTimeout(id);
   }, [loadAll]);
 
+  // Dismiss menus / lightbox / drawer with Escape or outside interaction
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (lightboxUrl) setLightboxUrl(null);
+        else if (openMenu) setOpenMenu(null);
+        else if (selectedOrderId) setSelectedOrderId(null);
+      }
+    };
+    const onPointerDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(".adm-menu-pop") || target?.closest("[data-menu-trigger]")) return;
+      setOpenMenu(null);
+    };
+    const onScrollOrResize = () => setOpenMenu(null);
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
+    };
+  }, [lightboxUrl, openMenu, selectedOrderId]);
+
+  const switchTab = (tab: AdminTab) => {
+    setOpenMenu(null);
+    setActiveTab(tab);
+  };
+
+  const selectedOrder = useMemo(
+    () => (selectedOrderId ? orders.find((o) => o.id === selectedOrderId) ?? null : null),
+    [orders, selectedOrderId]
+  );
+
+  const selectedLinkedKey = useMemo(() => {
+    if (!selectedOrder) return undefined;
+    const match = keys.find(
+      (k) =>
+        (selectedOrder.keyHash && k.hash === selectedOrder.keyHash) ||
+        k.orderId === selectedOrder.id
+    );
+    return match?.maskedKey;
+  }, [keys, selectedOrder]);
+
+  const openOrderInspector = (order: Order, initialTab: OrderDrawerTab = "proof") => {
+    setOpenMenu(null);
+    setSelectedOrderId(order.id);
+    setDrawerTab(initialTab);
+    setDraftProofUrl(order.paymentProofUrl ?? undefined);
+    setDraftProofName(order.paymentProofName ?? "");
+    setDraftRef(order.paymentReference ?? order.gatewayReference ?? "");
+    setDraftNotes(order.adminNotes ?? "");
+    setCopiedInvoiceId(false);
+  };
+
+  const toggleRowMenu = (kind: "order" | "key", id: string, triggerEl: HTMLElement) => {
+    if (openMenu?.kind === kind && openMenu.id === id) {
+      setOpenMenu(null);
+      return;
+    }
+    const rect = triggerEl.getBoundingClientRect();
+    const estHeight = kind === "key" ? 210 : 120;
+    const flipUp = window.innerHeight - rect.bottom < estHeight;
+    setOpenMenu({
+      kind,
+      id,
+      top: flipUp ? Math.max(12, rect.top - estHeight) : rect.bottom + 6,
+      right: Math.max(12, window.innerWidth - rect.right),
+    });
+  };
+
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
     router.refresh();
   };
 
-  const handleApproveOrder = async (order: Order) => {
+  const handleApproveOrder = async (order: Order, customNotes?: string) => {
     setBusyId(order.id);
+    setOpenMenu(null);
     try {
       const res = await fetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "approve" }),
+        body: JSON.stringify({ action: "approve", adminNotes: customNotes }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -185,7 +380,7 @@ export function AdminDashboardClient() {
         setRevealedKey({
           key: data.issuedKey,
           email: order.customerEmail,
-          context: `Pesanan ${order.id} berhasil disetujui & API Key terintegrasi ke akun Gmail pelanggan.`,
+          context: `Pesanan ${order.id} disetujui & API Key terintegrasi ke akun Gmail pelanggan.`,
         });
       }
       showToast("success", `Pesanan ${order.id} disetujui.`);
@@ -197,6 +392,7 @@ export function AdminDashboardClient() {
 
   const handleExpireOrder = async (order: Order) => {
     setBusyId(order.id);
+    setOpenMenu(null);
     try {
       const res = await fetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, {
         method: "PATCH",
@@ -209,6 +405,43 @@ export function AdminDashboardClient() {
         return;
       }
       showToast("success", `Pesanan ${order.id} ditandai expired.`);
+      await loadAll();
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleSaveProofAndNotes = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedOrder) return;
+    setBusyId(`proof-${selectedOrder.id}`);
+    try {
+      let proofPayload: string | null | undefined;
+      if (draftProofUrl === null) {
+        proofPayload = selectedOrder.paymentProofUrl ? null : undefined;
+      } else if (draftProofUrl && draftProofUrl !== selectedOrder.paymentProofUrl) {
+        proofPayload = draftProofUrl;
+      }
+
+      const res = await fetch(`/api/admin/orders/${encodeURIComponent(selectedOrder.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_proof",
+          paymentProofUrl: proofPayload,
+          paymentProofName: draftProofName || undefined,
+          paymentReference: draftRef,
+          adminNotes: draftNotes,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast("error", data.error || "Gagal menyimpan bukti transaksi.");
+        return;
+      }
+      setDraftProofUrl(data.order.paymentProofUrl ?? undefined);
+      setDraftProofName(data.order.paymentProofName ?? "");
+      showToast("success", `Bukti & catatan transaksi ${selectedOrder.id} disimpan.`);
       await loadAll();
     } finally {
       setBusyId(null);
@@ -229,6 +462,9 @@ export function AdminDashboardClient() {
           packageName: moPackageName,
           baseIdr: Number(moAmount),
           methodName: moMethod,
+          paymentReference: moRef,
+          paymentProofUrl: moProofUrl,
+          paymentProofName: moProofName,
           adminNotes: moNotes,
           autoApprove: moAutoApprove,
         }),
@@ -242,7 +478,10 @@ export function AdminDashboardClient() {
       setMoEmail("");
       setMoName("");
       setMoPhone("");
+      setMoRef("");
       setMoNotes("");
+      setMoProofUrl(undefined);
+      setMoProofName(undefined);
       if (data.issuedKey) {
         setRevealedKey({
           key: data.issuedKey,
@@ -298,6 +537,7 @@ export function AdminDashboardClient() {
     keyItem: EnrichedKey,
     action: "suspend" | "activate" | "revoke" | "rotate"
   ) => {
+    setOpenMenu(null);
     if (action === "revoke" && !window.confirm(`Cabut permanen API Key ••••${keyItem.last4}?`)) {
       return;
     }
@@ -386,15 +626,25 @@ export function AdminDashboardClient() {
     }
   };
 
+  const withProofCount = useMemo(
+    () => orders.filter((o) => Boolean(o.paymentProofUrl)).length,
+    [orders]
+  );
+
   const filteredOrders = orders.filter((o) => {
-    if (orderStatusFilter !== "all" && o.status !== orderStatusFilter) return false;
+    if (orderStatusFilter === "with-proof") {
+      if (!o.paymentProofUrl) return false;
+    } else if (orderStatusFilter !== "all" && o.status !== orderStatusFilter) {
+      return false;
+    }
     if (!orderSearch.trim()) return true;
     const q = orderSearch.trim().toLowerCase();
     return (
       o.id.toLowerCase().includes(q) ||
       o.customerEmail.toLowerCase().includes(q) ||
       o.customerName.toLowerCase().includes(q) ||
-      o.packageName.toLowerCase().includes(q)
+      o.packageName.toLowerCase().includes(q) ||
+      (o.paymentReference || "").toLowerCase().includes(q)
     );
   });
 
@@ -412,9 +662,15 @@ export function AdminDashboardClient() {
       k.ownerEmail.toLowerCase().includes(q) ||
       k.ownerName.toLowerCase().includes(q) ||
       k.last4.toLowerCase().includes(q) ||
-      (k.label || "").toLowerCase().includes(q)
+      (k.label || "").toLowerCase().includes(q) ||
+      (k.companyName || "").toLowerCase().includes(q)
     );
   });
+
+  const menuOrder =
+    openMenu?.kind === "order" ? orders.find((o) => o.id === openMenu.id) ?? null : null;
+  const menuKey =
+    openMenu?.kind === "key" ? keys.find((k) => k.hash === openMenu.id) ?? null : null;
 
   if (loading) {
     return <div className="jt-auth-shell">Memuat Panel Admin Juragantoken...</div>;
@@ -442,64 +698,85 @@ export function AdminDashboardClient() {
   const pendingOrders = orders.filter((o) => o.status === "pending");
 
   return (
-    <div className="jt-admin-shell">
-      {/* Sidebar Navigasi Minimalis */}
-      <aside className="jt-admin-sidebar" aria-label="Navigasi Panel Admin">
-        <Link href="/" className="jt-sidebar-brand">
-          <span className="jt-auth-brand-text">
-            juragan<span>token.</span>
+    <div className="adm-shell">
+      {/* Sidebar Navigasi */}
+      <aside className="adm-sidebar" aria-label="Navigasi Panel Admin">
+        <Link href="/" className="adm-brand-row" aria-label="Juragantoken Beranda">
+          <span className="adm-brand-left">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo-mark.png" alt="" width={26} height={22} className="adm-brand-logo" />
+            <span className="adm-brand-word">
+              juragan<span>token.</span>
+            </span>
           </span>
-          <span className="jt-sidebar-role-tag">Admin</span>
+          <span className="adm-role-chip">Admin</span>
         </Link>
 
-        <nav className="jt-sidebar-nav">
+        <nav className="adm-nav">
           <button
             type="button"
-            className={`jt-sidebar-item ${activeTab === "overview" ? "is-active" : ""}`}
-            onClick={() => setActiveTab("overview")}
+            className={`adm-nav-btn ${activeTab === "overview" ? "is-active" : ""}`}
+            onClick={() => switchTab("overview")}
           >
-            <span>Ringkasan</span>
+            <span className="adm-nav-label">
+              <NavGlyph name="overview" />
+              <span>Ringkasan</span>
+            </span>
           </button>
 
           <button
             type="button"
-            className={`jt-sidebar-item ${activeTab === "orders" ? "is-active" : ""}`}
-            onClick={() => setActiveTab("orders")}
+            className={`adm-nav-btn ${activeTab === "orders" ? "is-active" : ""}`}
+            onClick={() => switchTab("orders")}
           >
-            <span>Pesanan Masuk</span>
-            <span className={`jt-sidebar-count ${stats.pendingOrders > 0 ? "is-alert" : ""}`}>
+            <span className="adm-nav-label">
+              <NavGlyph name="orders" />
+              <span>Pesanan &amp; Invoice</span>
+            </span>
+            <span className={`adm-nav-badge ${stats.pendingOrders > 0 ? "is-alert" : ""}`}>
               {stats.pendingOrders > 0 ? `${stats.pendingOrders} baru` : stats.totalOrders}
             </span>
           </button>
 
           <button
             type="button"
-            className={`jt-sidebar-item ${activeTab === "users-keys" ? "is-active" : ""}`}
-            onClick={() => setActiveTab("users-keys")}
+            className={`adm-nav-btn ${activeTab === "users-keys" ? "is-active" : ""}`}
+            onClick={() => switchTab("users-keys")}
           >
-            <span>User Gmail &amp; API Key</span>
-            <span className="jt-sidebar-count">{stats.activeKeys}</span>
+            <span className="adm-nav-label">
+              <NavGlyph name="users-keys" />
+              <span>User &amp; API Key</span>
+            </span>
+            <span className="adm-nav-badge">{stats.activeKeys}</span>
           </button>
 
           <button
             type="button"
-            className={`jt-sidebar-item ${activeTab === "audit" ? "is-active" : ""}`}
-            onClick={() => setActiveTab("audit")}
+            className={`adm-nav-btn ${activeTab === "audit" ? "is-active" : ""}`}
+            onClick={() => switchTab("audit")}
           >
-            <span>Audit Log</span>
-            <span className="jt-sidebar-count">{auditLogs.length}</span>
+            <span className="adm-nav-label">
+              <NavGlyph name="audit" />
+              <span>Audit Log</span>
+            </span>
+            <span className="adm-nav-badge">{auditLogs.length}</span>
           </button>
         </nav>
 
-        <div className="jt-sidebar-footer">
+        <div className="adm-sidebar-foot">
           {adminUser && (
-            <div className="jt-account-box">
-              <span className="jt-account-name">{adminUser.fullName}</span>
-              <span className="jt-account-email">{adminUser.email}</span>
+            <div className="adm-admin-card">
+              <span className="adm-avatar is-admin" aria-hidden="true">
+                {getInitials(adminUser.fullName, adminUser.email)}
+              </span>
+              <div className="adm-admin-meta">
+                <strong>{adminUser.fullName}</strong>
+                <span>{adminUser.email}</span>
+              </div>
             </div>
           )}
-          <div style={{ display: "flex", gap: "6px" }}>
-            <Link href="/" className="jt-btn-secondary-clean" style={{ flex: 1 }}>
+          <div className="adm-foot-btns">
+            <Link href="/" className="jt-btn-secondary-clean">
               ← Web Utama
             </Link>
             <button type="button" className="jt-btn-secondary-clean" onClick={handleLogout}>
@@ -509,41 +786,36 @@ export function AdminDashboardClient() {
         </div>
       </aside>
 
-      {/* Konten Utama Panel Admin */}
-      <main className="jt-admin-main">
+      {/* Workspace Utama */}
+      <main className="adm-main">
         {toast && (
           <div className={`jt-alert ${toast.type}`} role="status">
             {toast.text}
           </div>
         )}
 
-        {/* Header Dinamis */}
-        <header className="jt-page-head">
-          <div>
+        <header className="adm-topbar">
+          <div className="adm-topbar-copy">
             <h1>
               {activeTab === "overview" && "Ringkasan Operasional"}
-              {activeTab === "orders" && "Manajemen Pesanan Masuk"}
+              {activeTab === "orders" && "Pesanan, Invoice & Bukti Transaksi"}
               {activeTab === "users-keys" && "Akun Gmail & Integrasi API Key"}
               {activeTab === "audit" && "Log Audit Aktivitas Admin"}
             </h1>
             <p>
               {activeTab === "overview" &&
-                "Pantau pesanan masuk, status pembayaran, dan API Key terintegrasi di seluruh akun Gmail pengguna."}
+                "Verifikasi bukti pembayaran, terbitkan Virtual API Key, dan pantau saldo aktif pelanggan."}
               {activeTab === "orders" &&
-                "Setujui pesanan untuk menerbitkan Virtual API Key otomatis atau buat pesanan manual."}
+                "Periksa screenshot bukti transfer, cetak invoice resmi, dan setujui aktivasi API Key."}
               {activeTab === "users-keys" &&
-                "Kelola setiap akun Gmail yang terdaftar, terbitkan API Key baru, sesuaikan saldo, dan kontrol status akses."}
+                "Kelola 1 Universal API Key per akun, sesuaikan saldo IDR, dan atur IP Whitelist Enterprise."}
               {activeTab === "audit" &&
-                "Rekam jejak seluruh perubahan pesanan, saldo, dan siklus hidup API Key oleh administrator."}
+                "Rekam jejak seluruh verifikasi bukti transaksi, persetujuan pesanan, saldo, dan kontrol API Key."}
             </p>
           </div>
 
-          <div className="jt-head-actions">
-            <button
-              type="button"
-              className="jt-btn-secondary-clean"
-              onClick={() => loadAll()}
-            >
+          <div className="adm-topbar-actions">
+            <button type="button" className="jt-btn-secondary-clean" onClick={() => loadAll()}>
               Muat Ulang
             </button>
             <button
@@ -561,45 +833,65 @@ export function AdminDashboardClient() {
                 setProvisionOpen(true);
               }}
             >
-              + Integrasikan API Key
+              + Terbitkan Key
             </button>
           </div>
         </header>
 
-        {/* TAB 1: RINGKASAN (OVERVIEW) */}
+        {/* TAB 1: RINGKASAN */}
         {activeTab === "overview" && (
           <>
-            <section className="jt-kpi-grid" aria-label="Metrik utama">
-              <article className="jt-kpi-card">
-                <span className="jt-kpi-label">Pesanan Menunggu</span>
-                <strong className="jt-kpi-val">{stats.pendingOrders}</strong>
-                <span className="jt-kpi-sub">dari total {stats.totalOrders} pesanan masuk</span>
+            <section className="adm-kpi-grid" aria-label="Metrik utama">
+              <article className={`adm-kpi-card ${stats.pendingOrders > 0 ? "is-highlight" : ""}`}>
+                <div className="adm-kpi-top">
+                  <span>Menunggu Verifikasi</span>
+                  <span className="adm-kpi-dot is-warn" aria-hidden="true" />
+                </div>
+                <strong className="adm-kpi-val">{stats.pendingOrders}</strong>
+                <span className="adm-kpi-sub">dari total {stats.totalOrders} pesanan masuk</span>
               </article>
-              <article className="jt-kpi-card">
-                <span className="jt-kpi-label">Total Transaksi Lunas</span>
-                <strong className="jt-kpi-val">{formatIdr(stats.totalRevenueIdr)}</strong>
-                <span className="jt-kpi-sub">{stats.paidOrders} pesanan terkonfirmasi</span>
+
+              <article className="adm-kpi-card">
+                <div className="adm-kpi-top">
+                  <span>Transaksi Lunas</span>
+                  <span className="adm-kpi-dot is-ok" aria-hidden="true" />
+                </div>
+                <strong className="adm-kpi-val">{formatIdr(stats.totalRevenueIdr)}</strong>
+                <span className="adm-kpi-sub">
+                  {stats.paidOrders} pesanan · {withProofCount} bukti SS
+                </span>
               </article>
-              <article className="jt-kpi-card">
-                <span className="jt-kpi-label">API Key Aktif</span>
-                <strong className="jt-kpi-val">{stats.activeKeys}</strong>
-                <span className="jt-kpi-sub">Total saldo aktif {formatIdr(stats.totalBalanceIdr)}</span>
+
+              <article className="adm-kpi-card">
+                <div className="adm-kpi-top">
+                  <span>API Key Aktif</span>
+                  <span className="adm-kpi-dot is-blue" aria-hidden="true" />
+                </div>
+                <strong className="adm-kpi-val">{stats.activeKeys}</strong>
+                <span className="adm-kpi-sub">Total saldo aktif {formatIdr(stats.totalBalanceIdr)}</span>
               </article>
-              <article className="jt-kpi-card">
-                <span className="jt-kpi-label">Akun Gmail Terdaftar</span>
-                <strong className="jt-kpi-val">{stats.totalUsers}</strong>
-                <span className="jt-kpi-sub">Tersinkron dengan {stats.totalKeys} Virtual Key</span>
+
+              <article className="adm-kpi-card">
+                <div className="adm-kpi-top">
+                  <span>Akun Gmail Terdaftar</span>
+                  <span className="adm-kpi-dot" aria-hidden="true" />
+                </div>
+                <strong className="adm-kpi-val">{stats.totalUsers}</strong>
+                <span className="adm-kpi-sub">Tersinkron dengan {stats.totalKeys} Virtual Key</span>
               </article>
             </section>
 
-            {/* Pesanan Pending yang Memerlukan Tindakan */}
-            <section className="jt-panel-card">
-              <div className="jt-panel-card-head">
-                <h2>Pesanan Menunggu Persetujuan ({pendingOrders.length})</h2>
+            {/* Antrean Pesanan Pending */}
+            <section className="adm-card">
+              <div className="adm-card-head">
+                <div className="adm-card-title-group">
+                  <h2>Antrean Verifikasi Pesanan ({pendingOrders.length})</h2>
+                  <span>Klik &ldquo;Periksa&rdquo; untuk melihat bukti screenshot transfer atau invoice.</span>
+                </div>
                 <button
                   type="button"
                   className="jt-btn-secondary-clean"
-                  onClick={() => setActiveTab("orders")}
+                  onClick={() => switchTab("orders")}
                 >
                   Lihat Semua Pesanan →
                 </button>
@@ -607,52 +899,85 @@ export function AdminDashboardClient() {
 
               {pendingOrders.length === 0 ? (
                 <div className="jt-empty-box">
-                  Semua pesanan telah diproses. Tidak ada pesanan yang menunggu konfirmasi saat ini.
+                  Seluruh pesanan telah diproses. Tidak ada antrean konfirmasi saat ini.
                 </div>
               ) : (
-                <div className="jt-table-scroll">
-                  <table className="jt-table">
+                <div className="adm-table-wrap">
+                  <table className="adm-table">
                     <thead>
                       <tr>
-                        <th>Invoice</th>
-                        <th>Akun Gmail &amp; Pelanggan</th>
+                        <th>Invoice &amp; Waktu</th>
+                        <th>Pelanggan</th>
                         <th>Paket</th>
+                        <th>Bukti SS</th>
                         <th>Nominal</th>
-                        <th>Waktu</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       {pendingOrders.slice(0, 6).map((ord) => (
                         <tr key={ord.id}>
-                          <td className="jt-mono">{ord.id}</td>
                           <td>
                             <div className="jt-cell-stack">
-                              <span className="jt-cell-primary">{ord.customerName}</span>
-                              <span className="jt-cell-muted jt-mono">{ord.customerEmail}</span>
+                              <span className="adm-id-pill">{ord.id}</span>
+                              <span className="adm-sub-line">{formatDate(ord.createdAt)}</span>
                             </div>
                           </td>
-                          <td>{ord.packageName}</td>
-                          <td className="jt-num">{formatIdr(ord.totalIdr)}</td>
-                          <td className="jt-cell-muted">{formatDate(ord.createdAt)}</td>
                           <td>
-                            <div className="jt-row-actions">
+                            <div className="adm-user-cell">
+                              <span className="adm-avatar" aria-hidden="true">
+                                {getInitials(ord.customerName, ord.customerEmail)}
+                              </span>
+                              <div className="jt-cell-stack adm-min-w-0">
+                                <span className="jt-cell-primary adm-truncate">{ord.customerName}</span>
+                                <span className="adm-sub-line adm-mono-nowrap adm-truncate">{ord.customerEmail}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="jt-cell-stack adm-pkg-cell">
+                              <span className="jt-cell-primary">{ord.packageName}</span>
+                              <span className="adm-sub-line">{ord.methodName}</span>
+                            </div>
+                          </td>
+                          <td>
+                            {ord.paymentProofUrl ? (
                               <button
                                 type="button"
-                                className="jt-btn-primary-solid"
-                                style={{ padding: "6px 11px", fontSize: "12px" }}
-                                disabled={busyId === ord.id}
-                                onClick={() => handleApproveOrder(ord)}
+                                className="adm-proof-btn"
+                                onClick={() => openOrderInspector(ord, "proof")}
                               >
-                                {busyId === ord.id ? "Memproses..." : "Setujui & Terbitkan Key"}
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={ord.paymentProofUrl} alt="" className="adm-proof-mini-thumb" />
+                                <span>Lihat SS ✓</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="adm-proof-empty-btn"
+                                onClick={() => openOrderInspector(ord, "proof")}
+                              >
+                                + Upload SS
+                              </button>
+                            )}
+                          </td>
+                          <td className="jt-num adm-mono-nowrap">{formatIdr(ord.totalIdr)}</td>
+                          <td>
+                            <div className="adm-row-actions">
+                              <button
+                                type="button"
+                                className="adm-btn-xs"
+                                onClick={() => openOrderInspector(ord, "invoice")}
+                              >
+                                Periksa
                               </button>
                               <button
                                 type="button"
-                                className="jt-btn-secondary-clean"
+                                className="adm-btn-xs is-primary"
                                 disabled={busyId === ord.id}
-                                onClick={() => handleExpireOrder(ord)}
+                                onClick={() => handleApproveOrder(ord)}
                               >
-                                Expired
+                                {busyId === ord.id ? "Memproses..." : "Setujui"}
                               </button>
                             </div>
                           </td>
@@ -664,27 +989,30 @@ export function AdminDashboardClient() {
               )}
             </section>
 
-            {/* Ringkasan Akun Gmail & Integrasi API Key */}
-            <section className="jt-panel-card">
-              <div className="jt-panel-card-head">
-                <h2>Akun Gmail Terbaru &amp; API Key Terintegrasi</h2>
+            {/* Akun Gmail Terbaru */}
+            <section className="adm-card">
+              <div className="adm-card-head">
+                <div className="adm-card-title-group">
+                  <h2>Akun Gmail Terbaru &amp; Saldo Terintegrasi</h2>
+                  <span>Ringkasan kepemilikan key dan riwayat transaksi pengguna.</span>
+                </div>
                 <button
                   type="button"
                   className="jt-btn-secondary-clean"
-                  onClick={() => setActiveTab("users-keys")}
+                  onClick={() => switchTab("users-keys")}
                 >
-                  Kelola Semua User &amp; Key →
+                  Kelola User &amp; Key →
                 </button>
               </div>
-              <div className="jt-table-scroll">
-                <table className="jt-table">
+              <div className="adm-table-wrap">
+                <table className="adm-table">
                   <thead>
                     <tr>
-                      <th>Pengguna &amp; Gmail</th>
+                      <th>Pengguna</th>
                       <th>Peran</th>
-                      <th>API Key Aktif</th>
-                      <th>Total Saldo</th>
-                      <th>Pesanan</th>
+                      <th>Key Aktif</th>
+                      <th>Saldo Aktif</th>
+                      <th>Transaksi</th>
                       <th>Aksi Cepat</th>
                     </tr>
                   </thead>
@@ -692,9 +1020,14 @@ export function AdminDashboardClient() {
                     {users.slice(0, 5).map((u) => (
                       <tr key={u.id}>
                         <td>
-                          <div className="jt-cell-stack">
-                            <span className="jt-cell-primary">{u.fullName || "Pengguna"}</span>
-                            <span className="jt-cell-muted jt-mono">{u.email}</span>
+                          <div className="adm-user-cell">
+                            <span className={`adm-avatar ${u.role === "admin" ? "is-admin" : ""}`} aria-hidden="true">
+                              {getInitials(u.fullName, u.email)}
+                            </span>
+                            <div className="jt-cell-stack adm-min-w-0">
+                              <span className="jt-cell-primary adm-truncate">{u.fullName || "Pengguna"}</span>
+                              <span className="adm-sub-line adm-mono-nowrap adm-truncate">{u.email}</span>
+                            </div>
                           </div>
                         </td>
                         <td>
@@ -703,12 +1036,12 @@ export function AdminDashboardClient() {
                           </span>
                         </td>
                         <td className="jt-num">{u.activeKeysCount} key</td>
-                        <td className="jt-num">{formatIdr(u.totalBalanceIdr)}</td>
+                        <td className="jt-num adm-mono-nowrap">{formatIdr(u.totalBalanceIdr)}</td>
                         <td className="jt-cell-muted">{u.ordersCount} transaksi</td>
                         <td>
                           <button
                             type="button"
-                            className="jt-btn-secondary-clean"
+                            className="adm-btn-xs"
                             onClick={() => {
                               setProvEmail(u.email);
                               setProvisionOpen(true);
@@ -726,15 +1059,16 @@ export function AdminDashboardClient() {
           </>
         )}
 
-        {/* TAB 2: MANAJEMEN PESANAN MASUK */}
+        {/* TAB 2: PESANAN, INVOICE & BUKTI TRANSAKSI */}
         {activeTab === "orders" && (
-          <section className="jt-panel-card">
-            <div className="jt-panel-card-head">
+          <section className="adm-card">
+            <div className="adm-controls">
               <div className="jt-filter-pills" role="tablist" aria-label="Filter status pesanan">
                 {[
                   { id: "all", label: `Semua (${orders.length})` },
-                  { id: "pending", label: `Pending (${stats.pendingOrders})` },
-                  { id: "paid", label: `Paid (${stats.paidOrders})` },
+                  { id: "pending", label: `Menunggu (${stats.pendingOrders})` },
+                  { id: "paid", label: `Lunas (${stats.paidOrders})` },
+                  { id: "with-proof", label: `Ada Bukti SS (${withProofCount})` },
                   { id: "expired", label: "Expired" },
                 ].map((f) => (
                   <button
@@ -748,12 +1082,12 @@ export function AdminDashboardClient() {
                 ))}
               </div>
 
-              <div className="jt-toolbar">
+              <div className="adm-search-box">
+                <Icon name="search" size={15} />
                 <input
                   type="search"
-                  className="jt-input"
-                  style={{ width: "260px" }}
-                  placeholder="Cari invoice, Gmail, atau nama..."
+                  placeholder="Cari nomor invoice, Gmail, nama, atau referensi..."
+                  aria-label="Cari pesanan masuk"
                   value={orderSearch}
                   onChange={(e) => setOrderSearch(e.target.value)}
                 />
@@ -761,82 +1095,119 @@ export function AdminDashboardClient() {
             </div>
 
             {filteredOrders.length === 0 ? (
-              <div className="jt-empty-box">Tidak ada pesanan yang cocok dengan filter saat ini.</div>
+              <div className="jt-empty-box">Tidak ada pesanan yang cocok dengan filter atau kata kunci.</div>
             ) : (
-              <div className="jt-table-scroll">
-                <table className="jt-table">
+              <div className="adm-table-wrap">
+                <table className="adm-table">
                   <thead>
                     <tr>
-                      <th>Invoice</th>
-                      <th>Pelanggan &amp; Gmail</th>
-                      <th>Paket &amp; Metode</th>
-                      <th>Total</th>
-                      <th>Status</th>
-                      <th>Tanggal</th>
+                      <th>Invoice &amp; Waktu</th>
+                      <th>Pelanggan</th>
+                      <th>Paket &amp; Jalur</th>
+                      <th>Bukti Transaksi</th>
+                      <th>Total &amp; Status</th>
                       <th>Tindakan</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredOrders.map((ord) => (
                       <tr key={ord.id}>
-                        <td className="jt-mono">{ord.id}</td>
                         <td>
                           <div className="jt-cell-stack">
-                            <span className="jt-cell-primary">{ord.customerName}</span>
-                            <span className="jt-cell-muted jt-mono">{ord.customerEmail}</span>
+                            <span className="adm-id-pill">{ord.id}</span>
+                            <span className="adm-sub-line">{formatDate(ord.createdAt)}</span>
                           </div>
                         </td>
                         <td>
-                          <div className="jt-cell-stack">
-                            <span>{ord.packageName}</span>
-                            <span className="jt-cell-muted">
-                              {ord.accountTier === "enterprise" ? "Enterprise B2B" : "Standard"} · {ord.methodName}
-                              {ord.requiresTaxInvoice ? " · Faktur Pajak" : ""}
+                          <div className="adm-user-cell">
+                            <span className="adm-avatar" aria-hidden="true">
+                              {getInitials(ord.customerName, ord.customerEmail)}
                             </span>
-                            {(ord.companyName || ord.department) && (
-                              <span className="jt-cell-muted">
-                                {[ord.companyName, ord.department].filter(Boolean).join(" / ")}
+                            <div className="jt-cell-stack adm-min-w-0">
+                              <span className="jt-cell-primary adm-truncate">{ord.customerName}</span>
+                              <span className="adm-sub-line adm-mono-nowrap adm-truncate">{ord.customerEmail}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="jt-cell-stack adm-pkg-cell">
+                            <span className="jt-cell-primary">{ord.packageName}</span>
+                            <div className="adm-meta-row">
+                              <span className={`adm-tier-tag ${ord.accountTier === "enterprise" ? "is-ent" : ""}`}>
+                                {ord.accountTier === "enterprise" ? "Enterprise B2B" : "Standard"}
+                              </span>
+                              <span className="adm-sub-line">{ord.methodName}</span>
+                              {ord.requiresTaxInvoice && <span className="adm-tier-tag is-tax">Faktur Pajak</span>}
+                            </div>
+                            {(ord.companyName || ord.department || ord.paymentReference) && (
+                              <span className="adm-sub-line adm-wrap-text">
+                                {[ord.companyName, ord.department, ord.paymentReference].filter(Boolean).join(" · ")}
                               </span>
                             )}
                           </div>
                         </td>
-                        <td className="jt-num">{formatIdr(ord.totalIdr)}</td>
                         <td>
-                          <span className={`jt-status ${ord.status}`}>
-                            {ord.status === "paid"
-                              ? "Lunas"
-                              : ord.status === "pending"
-                              ? "Menunggu"
-                              : "Expired"}
-                          </span>
+                          {ord.paymentProofUrl ? (
+                            <button
+                              type="button"
+                              className="adm-proof-btn"
+                              onClick={() => openOrderInspector(ord, "proof")}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={ord.paymentProofUrl} alt="" className="adm-proof-mini-thumb" />
+                              <span>Lihat SS ✓</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="adm-proof-empty-btn"
+                              onClick={() => openOrderInspector(ord, "proof")}
+                            >
+                              + Upload SS
+                            </button>
+                          )}
                         </td>
-                        <td className="jt-cell-muted">{formatDate(ord.createdAt)}</td>
                         <td>
-                          {ord.status === "pending" ? (
-                            <div className="jt-row-actions">
+                          <div className="jt-cell-stack">
+                            <span className="jt-num adm-mono-nowrap">{formatIdr(ord.totalIdr)}</span>
+                            <div>
+                              <span className={`jt-status ${ord.status}`}>
+                                {ord.status === "paid" ? "Lunas" : ord.status === "pending" ? "Menunggu" : "Expired"}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="adm-row-actions">
+                            <button
+                              type="button"
+                              className="adm-btn-xs"
+                              onClick={() => openOrderInspector(ord, "invoice")}
+                            >
+                              Invoice
+                            </button>
+                            {ord.status === "pending" && (
                               <button
                                 type="button"
-                                className="jt-btn-primary-solid"
-                                style={{ padding: "6px 11px", fontSize: "12px" }}
+                                className="adm-btn-xs is-primary"
                                 disabled={busyId === ord.id}
                                 onClick={() => handleApproveOrder(ord)}
                               >
-                                Setujui &amp; Terbitkan Key
+                                {busyId === ord.id ? "Memproses..." : "Setujui"}
                               </button>
-                              <button
-                                type="button"
-                                className="jt-btn-secondary-clean"
-                                disabled={busyId === ord.id}
-                                onClick={() => handleExpireOrder(ord)}
-                              >
-                                Expired
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="jt-cell-muted">
-                              {ord.paidAt ? `Lunas ${formatDate(ord.paidAt)}` : "Selesai"}
-                            </span>
-                          )}
+                            )}
+                            <button
+                              type="button"
+                              data-menu-trigger="true"
+                              className="adm-btn-xs"
+                              aria-haspopup="menu"
+                              aria-expanded={openMenu?.kind === "order" && openMenu.id === ord.id}
+                              aria-label={`Opsi pesanan ${ord.id}`}
+                              onClick={(e) => toggleRowMenu("order", ord.id, e.currentTarget)}
+                            >
+                              •••
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -847,128 +1218,85 @@ export function AdminDashboardClient() {
           </section>
         )}
 
-        {/* TAB 3: USER GMAIL & API KEY TERINTEGRASI */}
+        {/* TAB 3: USER GMAIL & API KEY (SUB-TABBED & RAPIH) */}
         {activeTab === "users-keys" && (
-          <>
-            <section className="jt-panel-card">
-              <div className="jt-panel-card-head">
-                <h2>Akun Gmail Terdaftar ({filteredUsers.length})</h2>
-                <div className="jt-toolbar">
+          <section className="adm-card">
+            <div className="adm-controls">
+              <div className="adm-subtabs" role="tablist" aria-label="Pilih tampilan User atau API Key">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={userKeySubTab === "keys"}
+                  className={`adm-subtab ${userKeySubTab === "keys" ? "is-active" : ""}`}
+                  onClick={() => {
+                    setOpenMenu(null);
+                    setUserKeySubTab("keys");
+                  }}
+                >
+                  API Key Terintegrasi ({filteredKeys.length})
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={userKeySubTab === "users"}
+                  className={`adm-subtab ${userKeySubTab === "users" ? "is-active" : ""}`}
+                  onClick={() => {
+                    setOpenMenu(null);
+                    setUserKeySubTab("users");
+                  }}
+                >
+                  Akun Gmail Terdaftar ({filteredUsers.length})
+                </button>
+              </div>
+
+              <div className="jt-toolbar">
+                {userKeySubTab === "keys" && (
+                  <div className="jt-filter-pills">
+                    {[
+                      { id: "all", label: "Semua" },
+                      { id: "active", label: "Aktif" },
+                      { id: "suspended", label: "Suspended" },
+                      { id: "revoked", label: "Revoked" },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        className={`jt-filter-pill ${keyStatusFilter === f.id ? "is-active" : ""}`}
+                        onClick={() => setKeyStatusFilter(f.id)}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="adm-search-box">
+                  <Icon name="search" size={15} />
                   <input
                     type="search"
-                    className="jt-input"
-                    style={{ width: "260px" }}
-                    placeholder="Cari email Gmail, nama, atau 4 digit key..."
+                    placeholder="Cari email Gmail, nama, atau 4 digit terakhir key..."
+                    aria-label="Cari akun Gmail atau API Key"
                     value={userKeySearch}
                     onChange={(e) => setUserKeySearch(e.target.value)}
                   />
                 </div>
               </div>
+            </div>
 
-              {filteredUsers.length === 0 ? (
-                <div className="jt-empty-box">Belum ada akun Gmail yang cocok dengan pencarian.</div>
+            {userKeySubTab === "keys" ? (
+              filteredKeys.length === 0 ? (
+                <div className="jt-empty-box">Belum ada API Key yang cocok dengan filter ini.</div>
               ) : (
-                <div className="jt-table-scroll">
-                  <table className="jt-table">
+                <div className="adm-table-wrap">
+                  <table className="adm-table">
                     <thead>
                       <tr>
-                        <th>Akun Gmail &amp; Nama</th>
-                        <th>Role</th>
-                        <th>API Key Terhubung</th>
-                        <th>Saldo Aktif</th>
-                        <th>Terdaftar</th>
-                        <th>Aksi</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredUsers.map((u) => (
-                        <tr key={u.id}>
-                          <td>
-                            <div className="jt-cell-stack">
-                              <span className="jt-cell-primary">{u.fullName || "Pengguna"}</span>
-                              <span className="jt-cell-muted jt-mono">{u.email}</span>
-                            </div>
-                          </td>
-                          <td>
-                            <span className={`jt-status ${u.role === "admin" ? "active" : "expired"}`}>
-                              {u.role === "admin" ? "Admin" : "User"}
-                            </span>
-                          </td>
-                          <td>
-                            {u.keys.length === 0 ? (
-                              <span className="jt-cell-muted">Belum ada API Key</span>
-                            ) : (
-                              <div className="jt-cell-stack">
-                                {u.keys.slice(0, 2).map((k) => (
-                                  <span key={k.hash} className="jt-mono">
-                                    {k.maskedKey} ({k.status})
-                                  </span>
-                                ))}
-                                {u.keys.length > 2 && (
-                                  <span className="jt-cell-muted">+{u.keys.length - 2} key lainnya</span>
-                                )}
-                              </div>
-                            )}
-                          </td>
-                          <td className="jt-num">{formatIdr(u.totalBalanceIdr)}</td>
-                          <td className="jt-cell-muted">{formatDate(u.createdAt)}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="jt-btn-primary-solid"
-                              style={{ padding: "6px 11px", fontSize: "12px" }}
-                              onClick={() => {
-                                setProvEmail(u.email);
-                                setProvisionOpen(true);
-                              }}
-                            >
-                              + Terbitkan Key
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-
-            <section className="jt-panel-card">
-              <div className="jt-panel-card-head">
-                <h2>Daftar API Key Terintegrasi ({filteredKeys.length})</h2>
-                <div className="jt-filter-pills">
-                  {[
-                    { id: "all", label: "Semua" },
-                    { id: "active", label: "Aktif" },
-                    { id: "suspended", label: "Suspended" },
-                    { id: "revoked", label: "Revoked" },
-                  ].map((f) => (
-                    <button
-                      key={f.id}
-                      type="button"
-                      className={`jt-filter-pill ${keyStatusFilter === f.id ? "is-active" : ""}`}
-                      onClick={() => setKeyStatusFilter(f.id)}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {filteredKeys.length === 0 ? (
-                <div className="jt-empty-box">Belum ada API Key pada filter ini.</div>
-              ) : (
-                <div className="jt-table-scroll">
-                  <table className="jt-table">
-                    <thead>
-                      <tr>
-                        <th>1 Universal API Key (100+ AI)</th>
+                        <th>API Key</th>
                         <th>Pemilik (Gmail)</th>
-                        <th>Tier &amp; Departemen</th>
+                        <th>Tier &amp; Paket</th>
                         <th>IP Whitelist</th>
-                        <th>Saldo</th>
-                        <th>Status</th>
-                        <th>Kontrol Akses</th>
+                        <th>Saldo &amp; Status</th>
+                        <th>Kelola</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -976,22 +1304,29 @@ export function AdminDashboardClient() {
                         <tr key={k.hash}>
                           <td>
                             <div className="jt-cell-stack">
-                              <span className="jt-mono">{k.maskedKey}</span>
-                              <span className="jt-cell-muted">{k.label || "Universal Key"}</span>
+                              <span className="adm-id-pill">{k.maskedKey}</span>
+                              <span className="adm-sub-line">{k.label || "Universal Key"}</span>
                             </div>
                           </td>
                           <td>
-                            <div className="jt-cell-stack">
-                              <span className="jt-cell-primary">{k.ownerName}</span>
-                              <span className="jt-cell-muted jt-mono">{k.ownerEmail}</span>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="jt-cell-stack">
-                              <span className="jt-cell-primary">
-                                {k.accountTier === "enterprise" ? "Enterprise" : "Standard"}
+                            <div className="adm-user-cell">
+                              <span className="adm-avatar" aria-hidden="true">
+                                {getInitials(k.ownerName, k.ownerEmail)}
                               </span>
-                              <span className="jt-cell-muted">
+                              <div className="jt-cell-stack adm-min-w-0">
+                                <span className="jt-cell-primary adm-truncate">{k.ownerName}</span>
+                                <span className="adm-sub-line adm-mono-nowrap adm-truncate">{k.ownerEmail}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="jt-cell-stack adm-tier-cell">
+                              <div>
+                                <span className={`adm-tier-tag ${k.accountTier === "enterprise" ? "is-ent" : ""}`}>
+                                  {k.accountTier === "enterprise" ? "Enterprise B2B" : "Standard"}
+                                </span>
+                              </div>
+                              <span className="adm-sub-line">
                                 {[k.companyName, k.department].filter(Boolean).join(" · ") || k.planName}
                               </span>
                             </div>
@@ -1002,133 +1337,122 @@ export function AdminDashboardClient() {
                                 {k.allowedIps.length} IP Aktif
                               </span>
                             ) : (
-                              <span className="jt-cell-muted">Bebas (Standard)</span>
+                              <span className="adm-sub-line">Bebas (Standard)</span>
                             )}
                           </td>
-                          <td className="jt-num">{formatIdr(k.balanceIdr)}</td>
                           <td>
-                            <span className={`jt-status ${k.status}`}>
-                              {k.status === "active"
-                                ? "Aktif"
-                                : k.status === "suspended"
-                                ? "Suspended"
-                                : "Revoked"}
-                            </span>
+                            <div className="jt-cell-stack">
+                              <span className="jt-num adm-mono-nowrap">{formatIdr(k.balanceIdr)}</span>
+                              <div>
+                                <span className={`jt-status ${k.status}`}>
+                                  {k.status === "active"
+                                    ? "Aktif"
+                                    : k.status === "suspended"
+                                    ? "Suspended"
+                                    : "Revoked"}
+                                </span>
+                              </div>
+                            </div>
                           </td>
                           <td>
-                            <div className="jt-row-actions">
-                              {k.status !== "revoked" && (
-                                <>
-                                  <button
-                                    type="button"
-                                    className="jt-btn-secondary-clean"
-                                    disabled={busyId === k.hash}
-                                    onClick={() => {
-                                      setBalanceTarget(k);
-                                      setBalanceDelta("50000");
-                                    }}
-                                  >
-                                    ± Saldo
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="jt-btn-secondary-clean"
-                                    disabled={busyId === k.hash}
-                                    onClick={() => {
-                                      setIpTarget(k);
-                                      setIpInput((k.allowedIps || []).join(", "));
-                                      setIpTier(k.accountTier === "enterprise" ? "enterprise" : "standard");
-                                      setIpCompany(k.companyName || "");
-                                      setIpDept(k.department || "");
-                                    }}
-                                  >
-                                    IP / Tier
-                                  </button>
-                                  {k.status === "active" ? (
-                                    <button
-                                      type="button"
-                                      className="jt-btn-secondary-clean"
-                                      disabled={busyId === k.hash}
-                                      onClick={() => handleKeyAction(k, "suspend")}
-                                    >
-                                      Suspend
-                                    </button>
-                                  ) : (
-                                    <button
-                                      type="button"
-                                      className="jt-btn-secondary-clean"
-                                      disabled={busyId === k.hash}
-                                      onClick={() => handleKeyAction(k, "activate")}
-                                    >
-                                      Aktifkan
-                                    </button>
-                                  )}
-                                  <button
-                                    type="button"
-                                    className="jt-btn-secondary-clean"
-                                    disabled={busyId === k.hash}
-                                    onClick={() => handleKeyAction(k, "rotate")}
-                                  >
-                                    Rotasi
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="jt-btn-danger-ghost"
-                                    disabled={busyId === k.hash}
-                                    onClick={() => handleKeyAction(k, "revoke")}
-                                  >
-                                    Revoke
-                                  </button>
-                                </>
-                              )}
-                              {k.status === "revoked" && (
-                                <span className="jt-cell-muted">Dicabut permanen</span>
-                              )}
-                            </div>
+                            {k.status === "revoked" ? (
+                              <span className="adm-sub-line">Dicabut permanen</span>
+                            ) : (
+                              <div className="adm-row-actions">
+                                <button
+                                  type="button"
+                                  className="adm-btn-xs"
+                                  disabled={busyId === k.hash}
+                                  onClick={() => {
+                                    setBalanceTarget(k);
+                                    setBalanceDelta("50000");
+                                  }}
+                                >
+                                  ± Saldo
+                                </button>
+                                <button
+                                  type="button"
+                                  data-menu-trigger="true"
+                                  className="adm-btn-xs"
+                                  aria-haspopup="menu"
+                                  aria-expanded={openMenu?.kind === "key" && openMenu.id === k.hash}
+                                  disabled={busyId === k.hash}
+                                  onClick={(e) => toggleRowMenu("key", k.hash, e.currentTarget)}
+                                >
+                                  Kelola ▾
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              )}
-            </section>
-          </>
-        )}
-
-        {/* TAB 4: AUDIT LOG */}
-        {activeTab === "audit" && (
-          <section className="jt-panel-card">
-            <div className="jt-panel-card-head">
-              <h2>Riwayat Aktivitas Administrator ({auditLogs.length})</h2>
-            </div>
-            {auditLogs.length === 0 ? (
-              <div className="jt-empty-box">Belum ada catatan aktivitas admin.</div>
+              )
+            ) : filteredUsers.length === 0 ? (
+              <div className="jt-empty-box">Belum ada akun Gmail yang cocok dengan pencarian.</div>
             ) : (
-              <div className="jt-table-scroll">
-                <table className="jt-table">
+              <div className="adm-table-wrap">
+                <table className="adm-table">
                   <thead>
                     <tr>
-                      <th>Waktu</th>
-                      <th>Admin</th>
+                      <th>Akun Gmail &amp; Nama</th>
+                      <th>Role</th>
+                      <th>API Key Terhubung</th>
+                      <th>Saldo Aktif</th>
+                      <th>Terdaftar</th>
                       <th>Aksi</th>
-                      <th>Target</th>
-                      <th>Ringkasan</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {auditLogs.map((log) => (
-                      <tr key={log.id}>
-                        <td className="jt-cell-muted">{formatDate(log.createdAt)}</td>
-                        <td className="jt-mono">{log.adminEmail}</td>
+                    {filteredUsers.map((u) => (
+                      <tr key={u.id}>
                         <td>
-                          <span className="jt-status active">{log.action}</span>
+                          <div className="adm-user-cell">
+                            <span className={`adm-avatar ${u.role === "admin" ? "is-admin" : ""}`} aria-hidden="true">
+                              {getInitials(u.fullName, u.email)}
+                            </span>
+                            <div className="jt-cell-stack adm-min-w-0">
+                              <span className="jt-cell-primary adm-truncate">{u.fullName || "Pengguna"}</span>
+                              <span className="adm-sub-line adm-mono-nowrap adm-truncate">{u.email}</span>
+                            </div>
+                          </div>
                         </td>
-                        <td className="jt-mono">
-                          {log.targetType}: {log.targetId}
+                        <td>
+                          <span className={`jt-status ${u.role === "admin" ? "active" : "expired"}`}>
+                            {u.role === "admin" ? "Admin" : "User"}
+                          </span>
                         </td>
-                        <td className="jt-cell-muted jt-mono">
-                          {JSON.stringify(log.details)}
+                        <td>
+                          {u.keys.length === 0 ? (
+                            <span className="adm-sub-line">Belum ada API Key</span>
+                          ) : (
+                            <div className="jt-cell-stack">
+                              {u.keys.slice(0, 2).map((k) => (
+                                <span key={k.hash} className="adm-mono-nowrap">
+                                  {k.maskedKey} ({k.status})
+                                </span>
+                              ))}
+                              {u.keys.length > 2 && (
+                                <span className="adm-sub-line">+{u.keys.length - 2} key lainnya</span>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td className="jt-num adm-mono-nowrap">{formatIdr(u.totalBalanceIdr)}</td>
+                        <td className="adm-sub-line">{formatDate(u.createdAt)}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="adm-btn-xs is-primary"
+                            onClick={() => {
+                              setProvEmail(u.email);
+                              setProvisionOpen(true);
+                            }}
+                          >
+                            + Terbitkan Key
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1138,7 +1462,434 @@ export function AdminDashboardClient() {
             )}
           </section>
         )}
+
+        {/* TAB 4: AUDIT LOG */}
+        {activeTab === "audit" && (
+          <section className="adm-card">
+            <div className="adm-card-head">
+              <div className="adm-card-title-group">
+                <h2>Riwayat Aktivitas Administrator ({auditLogs.length})</h2>
+                <span>Setiap perubahan status pesanan, bukti transaksi, saldo, dan IP Whitelist tercatat otomatis.</span>
+              </div>
+            </div>
+            {auditLogs.length === 0 ? (
+              <div className="jt-empty-box">Belum ada catatan aktivitas admin.</div>
+            ) : (
+              <div className="adm-table-wrap">
+                <table className="adm-table">
+                  <thead>
+                    <tr>
+                      <th>Waktu</th>
+                      <th>Admin</th>
+                      <th>Aktivitas</th>
+                      <th>Target</th>
+                      <th>Rincian Perubahan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {auditLogs.map((log) => {
+                      const meta = formatAuditMeta(log.action);
+                      const chips = formatAuditChips(log.details);
+                      return (
+                        <tr key={log.id}>
+                          <td className="adm-sub-line">{formatDate(log.createdAt)}</td>
+                          <td className="adm-mono-nowrap">{log.adminEmail}</td>
+                          <td>
+                            <span className={`jt-status ${meta.tone}`}>{meta.label}</span>
+                          </td>
+                          <td>
+                            <span className="adm-id-pill">
+                              {log.targetType.toUpperCase()} · {log.targetId}
+                            </span>
+                          </td>
+                          <td>
+                            {chips.length === 0 ? (
+                              <span className="adm-sub-line">—</span>
+                            ) : (
+                              <div className="adm-audit-chips">
+                                {chips.map((c) => (
+                                  <span key={c.key} className="adm-audit-chip">
+                                    <strong>{c.key}:</strong> {c.value}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
       </main>
+
+      {/* FLOATING POPOVER MENU (••• & Kelola ▾) */}
+      {openMenu && menuOrder && (
+        <div
+          className="adm-menu-pop"
+          role="menu"
+          style={{ top: `${openMenu.top}px`, right: `${openMenu.right}px` }}
+        >
+          <button
+            type="button"
+            className="adm-menu-item"
+            onClick={() => openOrderInspector(menuOrder, "proof")}
+          >
+            <span>{menuOrder.paymentProofUrl ? "Lihat / Ganti Bukti SS" : "Upload Bukti Pembayaran"}</span>
+          </button>
+          <button
+            type="button"
+            className="adm-menu-item"
+            onClick={() => openOrderInspector(menuOrder, "invoice")}
+          >
+            <span>Buka &amp; Cetak Invoice</span>
+          </button>
+          {menuOrder.status === "pending" && (
+            <>
+              <div className="adm-menu-sep" />
+              <button
+                type="button"
+                className="adm-menu-item is-danger"
+                onClick={() => handleExpireOrder(menuOrder)}
+              >
+                <span>Tandai Expired</span>
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {openMenu && menuKey && (
+        <div
+          className="adm-menu-pop"
+          role="menu"
+          style={{ top: `${openMenu.top}px`, right: `${openMenu.right}px` }}
+        >
+          <button
+            type="button"
+            className="adm-menu-item"
+            onClick={() => {
+              setOpenMenu(null);
+              setIpTarget(menuKey);
+              setIpInput((menuKey.allowedIps || []).join(", "));
+              setIpTier(menuKey.accountTier === "enterprise" ? "enterprise" : "standard");
+              setIpCompany(menuKey.companyName || "");
+              setIpDept(menuKey.department || "");
+            }}
+          >
+            <span>Atur IP Whitelist &amp; Tier</span>
+          </button>
+          <button
+            type="button"
+            className="adm-menu-item"
+            onClick={() => handleKeyAction(menuKey, menuKey.status === "active" ? "suspend" : "activate")}
+          >
+            <span>{menuKey.status === "active" ? "Suspend Sementara" : "Aktifkan Kembali"}</span>
+          </button>
+          <button
+            type="button"
+            className="adm-menu-item"
+            onClick={() => handleKeyAction(menuKey, "rotate")}
+          >
+            <span>Rotasi API Key</span>
+          </button>
+          <div className="adm-menu-sep" />
+          <button
+            type="button"
+            className="adm-menu-item is-danger"
+            onClick={() => handleKeyAction(menuKey, "revoke")}
+          >
+            <span>Cabut Permanen (Revoke)</span>
+          </button>
+        </div>
+      )}
+
+      {/* SIGNATURE 760PX SLIDE-OVER DRAWER: INVOICE & BUKTI TRANSAKSI */}
+      {selectedOrder && (
+        <div
+          className="adm-drawer-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Detail Invoice & Bukti ${selectedOrder.id}`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedOrderId(null);
+          }}
+        >
+          <aside className="adm-drawer">
+            <div className="adm-drawer-head">
+              <div>
+                <div className="adm-drawer-title-row">
+                  <h3>{selectedOrder.id}</h3>
+                  <span className={`jt-status ${selectedOrder.status}`}>
+                    {selectedOrder.status === "paid"
+                      ? "Lunas"
+                      : selectedOrder.status === "pending"
+                      ? "Menunggu Verifikasi"
+                      : "Expired"}
+                  </span>
+                  <span className={`adm-tier-tag ${selectedOrder.accountTier === "enterprise" ? "is-ent" : ""}`}>
+                    {selectedOrder.accountTier === "enterprise" ? "Enterprise B2B" : "Standard"}
+                  </span>
+                </div>
+                <p className="adm-drawer-sub">
+                  {selectedOrder.customerName} ({selectedOrder.customerEmail}) ·{" "}
+                  <strong>{formatIdr(selectedOrder.totalIdr)}</strong> via {selectedOrder.methodName}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="jt-modal-close"
+                aria-label="Tutup inspector"
+                onClick={() => setSelectedOrderId(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="adm-drawer-tabs" role="tablist" aria-label="Pilih tab detail transaksi">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={drawerTab === "proof"}
+                className={`adm-drawer-tab ${drawerTab === "proof" ? "is-active" : ""}`}
+                onClick={() => setDrawerTab("proof")}
+              >
+                <span>Bukti Pembayaran (SS)</span>
+                {selectedOrder.paymentProofUrl && <span className="adm-nav-badge">Ada ✓</span>}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={drawerTab === "invoice"}
+                className={`adm-drawer-tab ${drawerTab === "invoice" ? "is-active" : ""}`}
+                onClick={() => setDrawerTab("invoice")}
+              >
+                <span>Invoice Resmi</span>
+              </button>
+            </div>
+
+            <div className="adm-drawer-body">
+              {drawerTab === "proof" ? (
+                <>
+                  <div className="adm-drawer-section">
+                    <div className="adm-drawer-section-head">
+                      <h4>Screenshot Pembayaran Berhasil</h4>
+                      {selectedOrder.paymentProofUrl && (
+                        <div className="adm-row-actions">
+                          <button
+                            type="button"
+                            className="adm-btn-xs"
+                            onClick={() => setLightboxUrl(selectedOrder.paymentProofUrl || null)}
+                          >
+                            Perbesar Penuh
+                          </button>
+                          <a
+                            href={selectedOrder.paymentProofUrl}
+                            download={selectedOrder.paymentProofName || `${selectedOrder.id}-bukti.png`}
+                            className="adm-btn-xs"
+                            style={{ textDecoration: "none" }}
+                          >
+                            Unduh SS
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    {selectedOrder.paymentProofUrl ? (
+                      <div className="adm-proof-frame">
+                        <button
+                          type="button"
+                          className="adm-proof-img-btn"
+                          onClick={() => setLightboxUrl(selectedOrder.paymentProofUrl || null)}
+                          title="Klik untuk memperbesar screenshot"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={selectedOrder.paymentProofUrl}
+                            alt={`Bukti pembayaran ${selectedOrder.id}`}
+                          />
+                        </button>
+                        <div className="adm-proof-bar">
+                          <span>
+                            File: <strong>{selectedOrder.paymentProofName || "bukti-transfer.png"}</strong> ·{" "}
+                            Sumber:{" "}
+                            {selectedOrder.paymentProofUploadedBy === "admin" ? "Admin" : "Pelanggan"}
+                          </span>
+                          <span>Diunggah: {formatDate(selectedOrder.paymentProofUploadedAt)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="jt-empty-box" style={{ background: "#f8fafc", borderRadius: "10px", padding: "22px" }}>
+                        Belum ada screenshot bukti transfer terlampir pada transaksi ini. Pelanggan atau Admin dapat mengunggahnya melalui form di bawah.
+                      </div>
+                    )}
+                  </div>
+
+                  <form onSubmit={handleSaveProofAndNotes} className="adm-drawer-section">
+                    <div className="adm-drawer-section-head">
+                      <h4>Unggah / Perbarui Bukti &amp; Referensi</h4>
+                    </div>
+
+                    <ProofUploadDropzone
+                      value={draftProofUrl ?? undefined}
+                      fileName={draftProofName}
+                      disabled={busyId === `proof-${selectedOrder.id}`}
+                      onChange={({ url, fileName }) => {
+                        setDraftProofUrl(url);
+                        if (fileName) setDraftProofName(fileName);
+                      }}
+                    />
+
+                    <div className="jt-form-row-2">
+                      <div className="jt-field" style={{ marginBottom: 0 }}>
+                        <label htmlFor="drw-ref">Referensi Transfer / RRN / Bank</label>
+                        <input
+                          id="drw-ref"
+                          type="text"
+                          className="jt-input jt-mono"
+                          placeholder="Misal: RRN 261118094122 · QRIS BCA"
+                          value={draftRef}
+                          onChange={(e) => setDraftRef(e.target.value)}
+                        />
+                      </div>
+                      <div className="jt-field" style={{ marginBottom: 0 }}>
+                        <label htmlFor="drw-notes">Catatan Verifikasi Admin</label>
+                        <input
+                          id="drw-notes"
+                          type="text"
+                          className="jt-input"
+                          placeholder="Misal: Mutasi bank terkonfirmasi masuk"
+                          value={draftNotes}
+                          onChange={(e) => setDraftNotes(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                      <button
+                        type="submit"
+                        className="jt-btn-primary-solid"
+                        disabled={busyId === `proof-${selectedOrder.id}`}
+                      >
+                        {busyId === `proof-${selectedOrder.id}`
+                          ? "Menyimpan..."
+                          : "Simpan Bukti & Catatan"}
+                      </button>
+                    </div>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <div className="adm-drawer-section">
+                    <div className="adm-drawer-section-head">
+                      <h4>Pratinjau Invoice Resmi</h4>
+                      <div className="adm-row-actions">
+                        <button
+                          type="button"
+                          className="jt-btn-secondary-clean"
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(selectedOrder.id);
+                            setCopiedInvoiceId(true);
+                            window.setTimeout(() => setCopiedInvoiceId(false), 1800);
+                          }}
+                        >
+                          {copiedInvoiceId ? "No. Invoice Tersalin ✓" : "Salin No. Invoice"}
+                        </button>
+                        <button
+                          type="button"
+                          className="jt-btn-primary-solid"
+                          onClick={() => window.print()}
+                        >
+                          Cetak / Simpan PDF
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <InvoiceDocument order={selectedOrder} linkedKeyMasked={selectedLinkedKey} />
+                </>
+              )}
+            </div>
+
+            <div className="adm-drawer-foot">
+              <span className="adm-sub-line">
+                {selectedOrder.paidAt
+                  ? `Dilunasi pada ${formatDate(selectedOrder.paidAt)}`
+                  : `Dibuat pada ${formatDate(selectedOrder.createdAt)}`}
+              </span>
+              <div className="adm-drawer-foot-right">
+                {selectedOrder.status === "pending" && (
+                  <>
+                    <button
+                      type="button"
+                      className="jt-btn-danger-ghost"
+                      disabled={busyId === selectedOrder.id}
+                      onClick={() => handleExpireOrder(selectedOrder)}
+                    >
+                      Tandai Expired
+                    </button>
+                    <button
+                      type="button"
+                      className="jt-btn-primary-solid"
+                      disabled={busyId === selectedOrder.id}
+                      onClick={() => handleApproveOrder(selectedOrder, draftNotes)}
+                    >
+                      {busyId === selectedOrder.id
+                        ? "Memproses..."
+                        : "Setujui & Terbitkan API Key"}
+                    </button>
+                  </>
+                )}
+                {selectedOrder.status !== "pending" && (
+                  <button
+                    type="button"
+                    className="jt-btn-secondary-clean"
+                    onClick={() => setSelectedOrderId(null)}
+                  >
+                    Tutup Panel
+                  </button>
+                )}
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* FULLSCREEN LIGHTBOX UNTUK ZOOM SS */}
+      {lightboxUrl && (
+        <div
+          className="adm-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Perbesar bukti transaksi"
+          onClick={() => setLightboxUrl(null)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={lightboxUrl}
+            alt="Tangkapan layar bukti transaksi penuh"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="adm-lightbox-bar" onClick={(e) => e.stopPropagation()}>
+            <a
+              href={lightboxUrl}
+              download="bukti-pembayaran-juragantoken.png"
+              className="jt-btn-secondary-clean"
+            >
+              Unduh Gambar
+            </a>
+            <button
+              type="button"
+              className="jt-btn-primary-solid"
+              onClick={() => setLightboxUrl(null)}
+            >
+              Tutup Zoom (Esc)
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* MODAL 1: INTEGRASIKAN API KEY BARU KE AKUN GMAIL */}
       {provisionOpen && (
@@ -1292,12 +2043,12 @@ export function AdminDashboardClient() {
         </div>
       )}
 
-      {/* MODAL 2: BUAT PESANAN MANUAL */}
+      {/* MODAL 2: BUAT PESANAN MANUAL + OPSIONAL BUKTI SS */}
       {manualOrderOpen && (
         <div className="jt-modal-backdrop" role="dialog" aria-modal="true" aria-label="Buat Pesanan Manual">
-          <div className="jt-modal-dialog">
+          <div className="jt-modal-dialog is-wide">
             <div className="jt-modal-head">
-              <h3>Catat Pesanan Masuk Manual</h3>
+              <h3>Catat Pesanan &amp; Bukti Transaksi Manual</h3>
               <button
                 type="button"
                 className="jt-modal-close"
@@ -1308,40 +2059,42 @@ export function AdminDashboardClient() {
               </button>
             </div>
             <form onSubmit={handleCreateManualOrder}>
-              <div className="jt-field">
-                <label htmlFor="mo-email">Email Gmail Pelanggan</label>
-                <input
-                  id="mo-email"
-                  list="registered-gmails-order"
-                  type="email"
-                  className="jt-input"
-                  placeholder="pelanggan@gmail.com"
-                  value={moEmail}
-                  onChange={(e) => {
-                    setMoEmail(e.target.value);
-                    const matched = users.find((u) => u.email.toLowerCase() === e.target.value.toLowerCase());
-                    if (matched && !moName) setMoName(matched.fullName);
-                  }}
-                  required
-                />
-                <datalist id="registered-gmails-order">
-                  {users.map((u) => (
-                    <option key={u.id} value={u.email}>
-                      {u.fullName}
-                    </option>
-                  ))}
-                </datalist>
-              </div>
-              <div className="jt-field">
-                <label htmlFor="mo-name">Nama Pelanggan</label>
-                <input
-                  id="mo-name"
-                  type="text"
-                  className="jt-input"
-                  value={moName}
-                  onChange={(e) => setMoName(e.target.value)}
-                  required
-                />
+              <div className="jt-form-row-2">
+                <div className="jt-field">
+                  <label htmlFor="mo-email">Email Gmail Pelanggan</label>
+                  <input
+                    id="mo-email"
+                    list="registered-gmails-order"
+                    type="email"
+                    className="jt-input"
+                    placeholder="pelanggan@gmail.com"
+                    value={moEmail}
+                    onChange={(e) => {
+                      setMoEmail(e.target.value);
+                      const matched = users.find((u) => u.email.toLowerCase() === e.target.value.toLowerCase());
+                      if (matched && !moName) setMoName(matched.fullName);
+                    }}
+                    required
+                  />
+                  <datalist id="registered-gmails-order">
+                    {users.map((u) => (
+                      <option key={u.id} value={u.email}>
+                        {u.fullName}
+                      </option>
+                    ))}
+                  </datalist>
+                </div>
+                <div className="jt-field">
+                  <label htmlFor="mo-name">Nama Pelanggan</label>
+                  <input
+                    id="mo-name"
+                    type="text"
+                    className="jt-input"
+                    value={moName}
+                    onChange={(e) => setMoName(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
               <div className="jt-form-row-2">
                 <div className="jt-field">
@@ -1380,6 +2133,19 @@ export function AdminDashboardClient() {
                   />
                 </div>
                 <div className="jt-field">
+                  <label htmlFor="mo-ref">Referensi Transfer / RRN (Opsional)</label>
+                  <input
+                    id="mo-ref"
+                    type="text"
+                    className="jt-input jt-mono"
+                    value={moRef}
+                    onChange={(e) => setMoRef(e.target.value)}
+                    placeholder="Misal: QRIS-261120..."
+                  />
+                </div>
+              </div>
+              <div className="jt-form-row-2">
+                <div className="jt-field">
                   <label htmlFor="mo-phone">WhatsApp (Opsional)</label>
                   <input
                     id="mo-phone"
@@ -1390,18 +2156,29 @@ export function AdminDashboardClient() {
                     placeholder="08..."
                   />
                 </div>
+                <div className="jt-field">
+                  <label htmlFor="mo-notes">Catatan Admin (Opsional)</label>
+                  <input
+                    id="mo-notes"
+                    type="text"
+                    className="jt-input"
+                    value={moNotes}
+                    onChange={(e) => setMoNotes(e.target.value)}
+                    placeholder="Keterangan mutasi / kebutuhan"
+                  />
+                </div>
               </div>
-              <div className="jt-field">
-                <label htmlFor="mo-notes">Catatan Admin (Opsional)</label>
-                <input
-                  id="mo-notes"
-                  type="text"
-                  className="jt-input"
-                  value={moNotes}
-                  onChange={(e) => setMoNotes(e.target.value)}
-                  placeholder="Referensi transfer / kebutuhan khusus"
-                />
-              </div>
+
+              <ProofUploadDropzone
+                value={moProofUrl}
+                fileName={moProofName}
+                label="Lampiran SS Pembayaran (Opsional)"
+                onChange={({ url, fileName }) => {
+                  setMoProofUrl(url ?? undefined);
+                  setMoProofName(fileName);
+                }}
+              />
+
               <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#334155" }}>
                 <input
                   type="checkbox"
@@ -1583,7 +2360,7 @@ export function AdminDashboardClient() {
         </div>
       )}
 
-      {/* MODAL 4: ONE-TIME REVEAL API KEY (ZERO-KNOWLEDGE) */}
+      {/* MODAL 4: ONE-TIME REVEAL API KEY */}
       {revealedKey && (
         <div className="jt-modal-backdrop" role="dialog" aria-modal="true" aria-label="Kunci API Baru Diterbitkan">
           <div className="jt-modal-dialog">
@@ -1615,7 +2392,7 @@ export function AdminDashboardClient() {
                 onClick={async () => {
                   await navigator.clipboard.writeText(revealedKey.key);
                   setCopiedReveal(true);
-                  setTimeout(() => setCopiedReveal(false), 2000);
+                  window.setTimeout(() => setCopiedReveal(false), 2000);
                 }}
               >
                 {copiedReveal ? "Tersalin ✓" : "Salin API Key"}

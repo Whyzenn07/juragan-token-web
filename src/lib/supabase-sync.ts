@@ -136,6 +136,14 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
     requires_tax_invoice: Boolean(order.requiresTaxInvoice),
     npwp: order.npwp || null,
   };
+  const withProof = {
+    ...withAdminMeta,
+    payment_proof_url: order.paymentProofUrl || null,
+    payment_proof_name: order.paymentProofName || null,
+    payment_proof_uploaded_at: order.paymentProofUploadedAt || null,
+    payment_proof_uploaded_by: order.paymentProofUploadedBy || null,
+    payment_reference: order.paymentReference || null,
+  };
 
   const post = (body: unknown) =>
     fetch(`${url}/rest/v1/orders?on_conflict=id`, {
@@ -145,7 +153,8 @@ export async function syncOrderToSupabase(order: Order): Promise<boolean> {
     });
 
   try {
-    let res = await post(withAdminMeta);
+    let res = await post(withProof);
+    if (!res.ok && res.status === 400) res = await post(withAdminMeta);
     if (!res.ok && res.status === 400) res = await post(withGateway);
     if (!res.ok && res.status === 400) res = await post(withTopUp);
     // Kolom top-up belum dimigrasi di database: ulangi tanpa kolom tersebut.
@@ -203,6 +212,14 @@ export function rowToOrder(co: any): Order {
     department: co.department || undefined,
     requiresTaxInvoice: Boolean(co.requires_tax_invoice),
     npwp: co.npwp || undefined,
+    paymentProofUrl: co.payment_proof_url || undefined,
+    paymentProofName: co.payment_proof_name || undefined,
+    paymentProofUploadedAt: co.payment_proof_uploaded_at || undefined,
+    paymentProofUploadedBy:
+      co.payment_proof_uploaded_by === "admin" || co.payment_proof_uploaded_by === "user"
+        ? co.payment_proof_uploaded_by
+        : undefined,
+    paymentReference: co.payment_reference || undefined,
   };
 }
 
@@ -447,27 +464,7 @@ export async function syncBidirectionalStore(): Promise<{
     }
     for (const co of cloudOrders) {
       if (!db.orders[co.id]) {
-        db.orders[co.id] = {
-          id: co.id,
-          tokenHash: co.token_hash,
-          customerName: co.customer_name,
-          customerEmail: co.customer_email,
-          customerPhone: co.customer_phone || "",
-          packageId: co.package_id,
-          packageName: co.package_name,
-          estPackage: co.est_package || "",
-          baseIdr: co.base_idr,
-          feeIdr: co.fee_idr || 0,
-          totalIdr: co.total_idr,
-          methodId: co.method_id,
-          methodName: co.method_name,
-          status: co.status,
-          createdAt: co.created_at,
-          paidAt: co.paid_at,
-          keyHash: co.key_hash,
-          emailStatus: co.email_status || "none",
-          emailMessage: co.email_message,
-        };
+        db.orders[co.id] = rowToOrder(co);
       }
     }
   });

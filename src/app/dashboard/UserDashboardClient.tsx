@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { GATEWAY_BASE_URL } from "@/data/catalog";
 import type { Order, UserProfile } from "@/lib/store";
 import type { EnrichedKey } from "@/lib/admin-service";
+import { ProofUploadDropzone } from "@/components/portal/ProofUploadDropzone";
+import { InvoiceDocument } from "@/components/portal/InvoiceDocument";
 
 type DashboardData = {
   user: UserProfile;
@@ -59,8 +61,17 @@ export function UserDashboardClient() {
   const [methodName, setMethodName] = useState("QRIS Instan");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
+  const [paymentRef, setPaymentRef] = useState("");
+  const [proofUrl, setProofUrl] = useState<string | undefined>(undefined);
+  const [proofName, setProofName] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const [inspectOrderId, setInspectOrderId] = useState<string | null>(null);
+  const [modalProofUrl, setModalProofUrl] = useState<string | undefined>(undefined);
+  const [modalProofName, setModalProofName] = useState<string | undefined>(undefined);
+  const [modalRef, setModalRef] = useState("");
+  const [savingProof, setSavingProof] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -106,6 +117,9 @@ export function UserDashboardClient() {
           requiresTaxInvoice: accountTier === "enterprise" ? requiresTaxInvoice : false,
           npwp: accountTier === "enterprise" && requiresTaxInvoice ? npwp : undefined,
           targetKeyHash: targetKeyHash || undefined,
+          paymentProofUrl: proofUrl,
+          paymentProofName: proofName,
+          paymentReference: paymentRef,
         }),
       });
       const json = await res.json();
@@ -115,6 +129,9 @@ export function UserDashboardClient() {
       }
       setOrderOpen(false);
       setNote("");
+      setPaymentRef("");
+      setProofUrl(undefined);
+      setProofName(undefined);
       setToast({
         type: "success",
         text: `Pesanan ${json.order.id} berhasil diajukan dan masuk ke antrean verifikasi Admin.`,
@@ -122,6 +139,47 @@ export function UserDashboardClient() {
       await loadData();
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const inspectedOrder = inspectOrderId
+    ? data?.orders.find((o) => o.id === inspectOrderId) ?? null
+    : null;
+
+  const openOrderModal = (ord: Order) => {
+    setInspectOrderId(ord.id);
+    setModalProofUrl(ord.paymentProofUrl);
+    setModalProofName(ord.paymentProofName);
+    setModalRef(ord.paymentReference || "");
+  };
+
+  const handleUploadExistingProof = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inspectedOrder || !modalProofUrl) return;
+    setSavingProof(true);
+    try {
+      const res = await fetch("/api/user/dashboard", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: inspectedOrder.id,
+          paymentProofUrl: modalProofUrl,
+          paymentProofName: modalProofName,
+          paymentReference: modalRef,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setToast({ type: "error", text: json.error || "Gagal mengunggah bukti pembayaran." });
+        return;
+      }
+      setToast({
+        type: "success",
+        text: `Bukti transaksi untuk ${inspectedOrder.id} berhasil dikirim ke Admin.`,
+      });
+      await loadData();
+    } finally {
+      setSavingProof(false);
     }
   };
 
@@ -301,12 +359,13 @@ export function UserDashboardClient() {
                     <th>Total</th>
                     <th>Status</th>
                     <th>Tanggal</th>
+                    <th>Invoice &amp; Bukti</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.orders.map((ord) => (
                     <tr key={ord.id}>
-                      <td className="jt-mono">{ord.id}</td>
+                      <td className="jt-mono" style={{ whiteSpace: "nowrap" }}>{ord.id}</td>
                       <td>{ord.packageName}</td>
                       <td className="jt-cell-muted">{ord.methodName}</td>
                       <td className="jt-num">{formatIdr(ord.totalIdr)}</td>
@@ -320,6 +379,15 @@ export function UserDashboardClient() {
                         </span>
                       </td>
                       <td className="jt-cell-muted">{formatDate(ord.createdAt)}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="jt-btn-secondary-clean"
+                          onClick={() => openOrderModal(ord)}
+                        >
+                          {ord.paymentProofUrl ? "Invoice & SS ✓" : "Invoice / Upload SS"}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -501,6 +569,26 @@ export function UserDashboardClient() {
                   onChange={(e) => setNote(e.target.value)}
                 />
               </div>
+              <div className="jt-field">
+                <label htmlFor="uo-ref">Referensi Transfer / Bank Pengirim (Opsional)</label>
+                <input
+                  id="uo-ref"
+                  type="text"
+                  className="jt-input jt-mono"
+                  placeholder="Misal: QRIS BCA a.n Budi / RRN ..."
+                  value={paymentRef}
+                  onChange={(e) => setPaymentRef(e.target.value)}
+                />
+              </div>
+              <ProofUploadDropzone
+                value={proofUrl}
+                fileName={proofName}
+                label="Upload SS Bukti Pembayaran (Opsional)"
+                onChange={({ url, fileName }) => {
+                  setProofUrl(url ?? undefined);
+                  setProofName(fileName);
+                }}
+              />
               <div className="jt-modal-foot">
                 <button
                   type="button"
@@ -518,6 +606,120 @@ export function UserDashboardClient() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Invoice & Bukti Transaksi Pengguna */}
+      {inspectedOrder && (
+        <div
+          className="jt-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Invoice & Bukti ${inspectedOrder.id}`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setInspectOrderId(null);
+          }}
+        >
+          <div className="jt-modal-dialog is-wide">
+            <div className="jt-modal-head">
+              <h3>Invoice &amp; Bukti Transaksi ({inspectedOrder.id})</h3>
+              <button
+                type="button"
+                className="jt-modal-close"
+                onClick={() => setInspectOrderId(null)}
+                aria-label="Tutup"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginBottom: "12px" }}>
+              <button
+                type="button"
+                className="jt-btn-secondary-clean"
+                onClick={() => window.print()}
+              >
+                Cetak / Simpan PDF Invoice
+              </button>
+            </div>
+
+            <InvoiceDocument
+              order={inspectedOrder}
+              linkedKeyMasked={
+                data.keys.find(
+                  (k) =>
+                    (inspectedOrder.keyHash && k.hash === inspectedOrder.keyHash) ||
+                    k.orderId === inspectedOrder.id
+                )?.maskedKey
+              }
+            />
+
+            {inspectedOrder.paymentProofUrl && inspectedOrder.status !== "pending" && (
+              <div className="jt-dropzone-preview" style={{ marginTop: "14px" }}>
+                <div className="jt-dropzone-thumb">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={inspectedOrder.paymentProofUrl} alt={`Bukti pembayaran ${inspectedOrder.id}`} />
+                </div>
+                <div className="jt-dropzone-meta">
+                  <strong className="jt-dropzone-fname">
+                    {inspectedOrder.paymentProofName || "bukti-pembayaran.png"}
+                  </strong>
+                  <span className="jt-dropzone-ready">Bukti transaksi terlampir &amp; terverifikasi</span>
+                  <div className="jt-dropzone-btns">
+                    <a
+                      href={inspectedOrder.paymentProofUrl}
+                      download={inspectedOrder.paymentProofName || `${inspectedOrder.id}-bukti.png`}
+                      className="jt-btn-secondary-clean"
+                    >
+                      Unduh Screenshot
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {inspectedOrder.status === "pending" && (
+              <form onSubmit={handleUploadExistingProof} style={{ marginTop: "18px" }}>
+                <ProofUploadDropzone
+                  value={modalProofUrl}
+                  fileName={modalProofName}
+                  label="Unggah / Perbarui Screenshot Pembayaran Berhasil"
+                  disabled={savingProof}
+                  onChange={({ url, fileName }) => {
+                    setModalProofUrl(url ?? undefined);
+                    setModalProofName(fileName);
+                  }}
+                />
+                <div className="jt-field">
+                  <label htmlFor="user-modal-ref">Referensi Transfer (Opsional)</label>
+                  <input
+                    id="user-modal-ref"
+                    type="text"
+                    className="jt-input jt-mono"
+                    value={modalRef}
+                    onChange={(e) => setModalRef(e.target.value)}
+                    placeholder="Nomor RRN / Bank Pengirim"
+                  />
+                </div>
+                <div className="jt-modal-foot">
+                  <button
+                    type="button"
+                    className="jt-btn-secondary-clean"
+                    onClick={() => setInspectOrderId(null)}
+                  >
+                    Tutup
+                  </button>
+                  <button
+                    type="submit"
+                    className="jt-btn-primary-solid"
+                    disabled={savingProof || !modalProofUrl}
+                  >
+                    {savingProof ? "Mengirim..." : "Kirim Bukti ke Admin"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
