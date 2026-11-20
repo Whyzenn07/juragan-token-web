@@ -104,23 +104,32 @@ function useScrollEffects(depsKey?: string) {
     }
 
     // Tetapkan arah awal (atas/bawah viewport) sebelum mengaktifkan animasi scroll dua arah
-    const vh = window.innerHeight || 800;
-    targets.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      const inView = rect.top < vh + 48 && rect.bottom > -48;
-      if (inView) {
-        el.classList.remove("from-top", "from-bottom");
-        el.classList.add("is-revealed");
-      } else if (rect.bottom <= -48) {
-        el.classList.remove("is-revealed", "from-bottom");
-        el.classList.add("from-top");
-      } else {
-        el.classList.remove("is-revealed", "from-top");
-        el.classList.add("from-bottom");
-      }
-    });
+    const syncInitialReveals = () => {
+      const vh = window.innerHeight || 800;
+      targets.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const inView = rect.top < vh + 48 && rect.bottom > -48;
+        if (inView) {
+          el.classList.remove("from-top", "from-bottom");
+          el.classList.add("is-revealed");
+        } else if (rect.bottom <= -48) {
+          el.classList.remove("is-revealed", "from-bottom");
+          el.classList.add("from-top");
+        } else {
+          el.classList.remove("is-revealed", "from-top");
+          el.classList.add("from-bottom");
+        }
+      });
+    };
 
+    syncInitialReveals();
     rootEl.classList.add("jt-scroll-anim");
+
+    const syncAfterJump = () => {
+      window.requestAnimationFrame(syncInitialReveals);
+    };
+    const rafReveal = window.requestAnimationFrame(syncInitialReveals);
+    window.addEventListener("hashchange", syncAfterJump);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -146,7 +155,9 @@ function useScrollEffects(depsKey?: string) {
     targets.forEach((target) => observer.observe(target));
 
     return () => {
+      window.cancelAnimationFrame(rafReveal);
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("hashchange", syncAfterJump);
       observer.disconnect();
     };
   }, [depsKey]);

@@ -6,7 +6,7 @@ import { DocsClient } from "./DocsClient";
 export const metadata: Metadata = {
   title: "Dokumentasi & Panduan Integrasi API - Juragantoken",
   description:
-    "Panduan integrasi Universal AI Gateway Juragantoken: 1 API Key untuk semua model AI di Cursor, Claude Code, Python, Node.js, dan cURL pada Windows, macOS, dan Linux.",
+    "Panduan integrasi Universal AI Gateway Juragantoken: 1 API Key untuk semua model AI di Cursor, Claude Code CLI, VS Code, Python, Node.js, dan cURL pada Windows, macOS, dan Linux.",
   alternates: {
     canonical: "/docs",
   },
@@ -17,9 +17,20 @@ export default function DocsPage() {
     <div className="dx-page">
       <header className="dx-topbar">
         <div className="dx-topbar-inner">
-          <Link href="/" className="dx-brand" aria-label="Kembali ke Beranda">
-            juragan<span>token.</span>
-            <em>Docs</em>
+          <Link href="/" className="dx-brand" aria-label="Kembali ke Beranda Juragantoken">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo-mark.png"
+              alt=""
+              width={28}
+              height={23}
+              className="dx-brand-icon"
+            />
+            <span className="dx-brand-word">
+              juragan<span>token</span>
+              <em>.</em>
+            </span>
+            <span className="dx-brand-badge">Docs</span>
           </Link>
           <nav className="dx-top-links" aria-label="Navigasi atas">
             <Link href="/">Beranda</Link>

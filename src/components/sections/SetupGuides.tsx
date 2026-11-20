@@ -18,29 +18,77 @@ function buildClaudeSnippet(os: OsId, origin: string): { shell: string; code: st
   switch (os) {
     case "windows-ps":
       return {
-        shell: "Windows PowerShell",
+        shell: "Windows PowerShell — Claude Code CLI",
         code: `$env:ANTHROPIC_BASE_URL = "${origin}"\n$env:ANTHROPIC_API_KEY  = "jt-live-token-anda"${tail}`,
         hint: `Permanen: setx ANTHROPIC_BASE_URL "${origin}" lalu buka ulang terminal.`,
       };
     case "windows-cmd":
       return {
-        shell: "Windows CMD",
+        shell: "Windows CMD — Claude Code CLI",
         code: `set ANTHROPIC_BASE_URL=${origin}\nset ANTHROPIC_API_KEY=jt-live-token-anda${tail}`,
         hint: "Variabel berlaku di jendela CMD ini saja. Gunakan setx untuk menyimpan permanen.",
       };
     case "macos":
       return {
-        shell: "macOS Terminal (zsh)",
+        shell: "macOS Terminal (zsh) — Claude Code CLI",
         code: `export ANTHROPIC_BASE_URL="${origin}"\nexport ANTHROPIC_API_KEY="jt-live-token-anda"${tail}`,
         hint: "Permanen: simpan dua baris export di ~/.zshrc, lalu jalankan source ~/.zshrc.",
       };
     default:
       return {
-        shell: "Linux Terminal (bash)",
+        shell: "Linux Terminal (bash) — Claude Code CLI",
         code: `export ANTHROPIC_BASE_URL="${origin}"\nexport ANTHROPIC_API_KEY="jt-live-token-anda"${tail}`,
         hint: "Permanen: simpan dua baris export di ~/.bashrc, lalu jalankan source ~/.bashrc.",
       };
   }
+}
+
+function buildPythonOsMeta(os: OsId): { header: string; envComment: string; hint: string } {
+  switch (os) {
+    case "windows-ps":
+      return {
+        header: "main.py · Windows PowerShell",
+        envComment: '# Setup: pip install openai  |  $env:JURAGAN_API_KEY="jt-live-token-anda"',
+        hint: "Windows PowerShell: jalankan pip install openai lalu python main.py.",
+      };
+    case "windows-cmd":
+      return {
+        header: "main.py · Windows CMD",
+        envComment: "# Setup: pip install openai  |  set JURAGAN_API_KEY=jt-live-token-anda",
+        hint: "Windows CMD: jalankan pip install openai lalu python main.py.",
+      };
+    case "macos":
+      return {
+        header: "main.py · macOS (zsh)",
+        envComment: '# Setup: pip3 install openai  |  export JURAGAN_API_KEY="jt-live-token-anda"',
+        hint: "macOS Terminal: jalankan pip3 install openai lalu python3 main.py.",
+      };
+    default:
+      return {
+        header: "main.py · Linux (bash)",
+        envComment: '# Setup: pip3 install openai  |  export JURAGAN_API_KEY="jt-live-token-anda"',
+        hint: "Linux Terminal: jalankan pip3 install openai lalu python3 main.py.",
+      };
+  }
+}
+
+function OsSwitcherBar({ os, onChange }: { os: OsId; onChange: (next: OsId) => void }) {
+  return (
+    <div className="code-os-bar" role="tablist" aria-label="Pilih sistem operasi">
+      {OS_TABS.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          role="tab"
+          aria-selected={os === o.id}
+          className={`code-os-btn ${os === o.id ? "is-active" : ""}`}
+          onClick={() => onChange(o.id)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export function SetupGuides() {
@@ -59,11 +107,15 @@ export function SetupGuides() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.origin !== GATEWAY_ORIGIN) {
-      const timer = setTimeout(() => {
-        setOrigin(window.location.origin);
-      }, 0);
-      return () => clearTimeout(timer);
+    if (typeof window !== "undefined") {
+      const host = window.location.hostname;
+      const isLocal = host === "localhost" || host === "127.0.0.1" || host === "::1";
+      if (!isLocal && window.location.origin !== GATEWAY_ORIGIN) {
+        const timer = setTimeout(() => {
+          setOrigin(window.location.origin);
+        }, 0);
+        return () => clearTimeout(timer);
+      }
     }
   }, []);
 
@@ -82,12 +134,15 @@ export function SetupGuides() {
   const claudeSnippet = buildClaudeSnippet(os, origin);
   const claudeCodeSnippet = claudeSnippet.code;
 
-  const pythonSnippet = `from openai import OpenAI
+  const pyOs = buildPythonOsMeta(os);
+  const pythonSnippet = `${pyOs.envComment}
+import os
+from openai import OpenAI
 
 # 1 Key untuk semua model (Gemini, Claude, GPT, DeepSeek)
 client = OpenAI(
     base_url="${activeGatewayUrl}",
-    api_key="jt-live-token-anda"
+    api_key=os.environ.get("JURAGAN_API_KEY", "jt-live-token-anda")
 )
 
 response = client.chat.completions.create(
@@ -155,34 +210,6 @@ print(response.choices[0].message.content)`;
               </ul>
             </div>
             <div className="code-block-box">
-              <div
-                role="tablist"
-                aria-label="Pilih sistem operasi"
-                style={{ display: "flex", flexWrap: "wrap", gap: "6px", padding: "10px 12px 0" }}
-              >
-                {OS_TABS.map((o) => (
-                  <button
-                    key={o.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={os === o.id}
-                    onClick={() => setOs(o.id)}
-                    style={{
-                      minHeight: "36px",
-                      padding: "0 12px",
-                      borderRadius: "999px",
-                      border: `1px solid ${os === o.id ? "#60a5fa" : "rgba(148,163,184,0.35)"}`,
-                      background: os === o.id ? "rgba(96,165,250,0.18)" : "transparent",
-                      color: os === o.id ? "#ffffff" : "#cbd5e1",
-                      fontSize: "12.5px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {o.label}
-                  </button>
-                ))}
-              </div>
               <div className="code-top">
                 <span>{claudeSnippet.shell}</span>
                 <button
@@ -194,10 +221,9 @@ print(response.choices[0].message.content)`;
                   {copied === "claude" ? "Tersalin!" : "Salin Kode"}
                 </button>
               </div>
+              <OsSwitcherBar os={os} onChange={setOs} />
               <pre><code>{claudeCodeSnippet}</code></pre>
-              <p style={{ margin: "0", padding: "0 16px 14px", fontSize: "12.5px", color: "#94a3b8" }}>
-                {claudeSnippet.hint}
-              </p>
+              <p className="code-hint-bar">{claudeSnippet.hint}</p>
             </div>
           </div>
         )}
@@ -279,7 +305,7 @@ print(response.choices[0].message.content)`;
                 <li>Pilih menu <b>Model Provider</b> &gt; pilih <b>OpenAI</b> (karena Juragan Token memakai protokol standar OpenAI).</li>
                 <li>Pada kolom <b>API Host</b>, masukkan: <code>{origin}</code></li>
                 <li>Pada kolom <b>API Key</b>, tempelkan API Key token Anda.</li>
-                <li>Klik tombol <b>+ New</b> di bagian Model, lalu ketik model pilihan (misal: <code>claude-sonnet-5.5</code> atau <code>gemini-3.8-flash</code>). Selesai!</li>
+                <li>Klik tombol <b>+ New</b> di bagian Model, lalu ketik model pilihan (misal: <code>claude-sonnet-5-5</code> atau <code>gemini-3.8-flash</code>). Selesai!</li>
               </ol>
             </div>
 
@@ -309,7 +335,7 @@ print(response.choices[0].message.content)`;
               </div>
               <div className="mock-field">
                 <label>4. Model yang Didukung (Tinggal Ketik)</label>
-                <input readOnly value="claude-sonnet-5.5, gpt-6-sol, gemini-3.8-flash, deepseek-v4-flash" />
+                <input readOnly value="claude-sonnet-5-5, gpt-6-sol, gemini-3.8-flash, deepseek-v4-flash" />
               </div>
               <span className="mock-tag" style={{ color: "#16a34a", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}>
                 <Icon name="check" size={13} />
@@ -326,10 +352,14 @@ print(response.choices[0].message.content)`;
               <p>
                 Gunakan library standar <code>openai</code> di Python. Anda bebas memanggil model apa saja (DeepSeek, Claude, Qwen, GPT) cukup dengan mengganti nama parameter <code>model</code>.
               </p>
+              <ul className="guide-points">
+                <li>Berjalan lancar di Windows PowerShell, CMD, macOS, dan Linux.</li>
+                <li>Ganti <code>model</code> kapan saja tanpa mengubah <code>base_url</code> maupun key.</li>
+              </ul>
             </div>
             <div className="code-block-box">
               <div className="code-top">
-                <span>main.py</span>
+                <span>{pyOs.header}</span>
                 <button
                   type="button"
                   className="copy-btn"
@@ -339,7 +369,9 @@ print(response.choices[0].message.content)`;
                   {copied === "py" ? "Tersalin!" : "Salin Kode"}
                 </button>
               </div>
+              <OsSwitcherBar os={os} onChange={setOs} />
               <pre><code>{pythonSnippet}</code></pre>
+              <p className="code-hint-bar">{pyOs.hint}</p>
             </div>
           </div>
         )}
