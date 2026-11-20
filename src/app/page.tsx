@@ -1601,22 +1601,28 @@ export default function Home() {
           <div className="spf-main-grid">
             {/* Kolom 1: Brand & Profil Platform */}
             <div className="spf-col spf-col-brand">
-              <a className="footer-brand" href="#top" aria-label="Juragantoken Beranda">
+              <a className="spf-brand-lockup" href="#top" aria-label="Juragantoken Beranda">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/logo-juragantoken-tight.png"
-                  alt="Juragantoken — One Gateway. Every Intelligence."
-                  className="footer-logo-img"
-                  width={175}
-                  height={34}
-                />
+                <img src="/images/logo-mark.png" alt="" width={28} height={24} className="spf-brand-img" />
+                <div className="spf-brand-text-wrap">
+                  <span className="spf-brand-word">
+                    juragan<span>token.</span>
+                  </span>
+                  <span className="spf-brand-tag">One Gateway. Every Intelligence.</span>
+                </div>
               </a>
+
               <p className="spf-desc">
-                Gerbang API AI terpadu di Indonesia yang dikelola oleh <strong>PT Rejeki Digital Cemerlang</strong>. Akses 100+ model AI frontier melalui 1 API Key universal untuk kebutuhan Enterprise B2B maupun Standard.
+                Gerbang API AI terpadu di Indonesia yang dikelola oleh{" "}
+                <strong>PT Rejeki Digital Cemerlang</strong>. Hubungkan aplikasi ke 100+ model AI frontier melalui 1 API Key universal untuk kebutuhan Enterprise B2B maupun Standard.
               </p>
-              <div className="spf-meta-info">
-                PT Rejeki Digital Cemerlang • Faktur Pajak B2B • SLA 99.98%
+
+              <div className="spf-trust-chips" aria-label="Standar Layanan">
+                <span className="spf-trust-chip">Faktur Pajak B2B</span>
+                <span className="spf-trust-chip">IP Whitelist</span>
+                <span className="spf-trust-chip">SLA 99.98%</span>
               </div>
+
               <Link href="/status" className="spf-live-status">
                 <span className="spf-live-dot" aria-hidden="true" />
                 <span>Semua Sistem Operasional</span>
@@ -1647,7 +1653,7 @@ export default function Home() {
                   </button>
                 </li>
                 <li>
-                  <a href="#panduan-setup">Panduan Setup Cepat</a>
+                  <a href="#panduan-setup">Panduan Integrasi Cepat</a>
                 </li>
               </ul>
             </div>
@@ -1657,13 +1663,15 @@ export default function Home() {
               <div className="spf-col-heading">Dokumentasi API</div>
               <ul className="spf-links">
                 <li>
-                  <Link href="/docs">Dokumentasi Resmi</Link>
+                  <Link href="/docs">Dokumentasi Lengkap</Link>
                 </li>
                 <li>
-                  <Link href="/docs">Integrasi Cursor &amp; Windsurf</Link>
+                  <Link href="/docs">Panduan CLI &amp; IDE</Link>
                 </li>
                 <li>
-                  <Link href="/docs">Integrasi Claude Code CLI</Link>
+                  <Link href="/dashboard" prefetch={false}>
+                    Portal Akun Pengguna
+                  </Link>
                 </li>
                 <li>
                   <Link href="/status">Status Sistem &amp; Latensi</Link>
@@ -1671,9 +1679,9 @@ export default function Home() {
               </ul>
             </div>
 
-            {/* Kolom 4: Legal & Kontak */}
+            {/* Kolom 4: Legal & Bantuan */}
             <div className="spf-col">
-              <div className="spf-col-heading">Legal &amp; Kontak</div>
+              <div className="spf-col-heading">Legal &amp; Bantuan</div>
               <ul className="spf-links">
                 <li>
                   <Link href="/terms">Syarat &amp; Ketentuan</Link>
@@ -1683,7 +1691,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Halo Admin Juragan Token, saya butuh informasi / bantuan teknis.")}`}
+                    href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281226983990").replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Halo Tim Juragantoken, saya butuh informasi atau bantuan teknis.")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1691,9 +1699,7 @@ export default function Home() {
                   </a>
                 </li>
                 <li>
-                  <a href="https://t.me/juragantoken" target="_blank" rel="noopener noreferrer">
-                    Komunitas Telegram
-                  </a>
+                  <Link href="/login">Masuk / Daftar Akun</Link>
                 </li>
               </ul>
             </div>
@@ -1702,14 +1708,12 @@ export default function Home() {
           {/* Bottom Bar */}
           <div className="spf-bottom-bar">
             <div className="spf-copy">
-              &copy; 2026 Juragantoken Indonesia. Hak Cipta Dilindungi Undang-Undang.
+              &copy; 2026 PT Rejeki Digital Cemerlang · Juragantoken. Seluruh hak cipta dilindungi.
             </div>
             <div className="spf-bottom-meta">
-              <span>Zero-Training Guarantee</span>
-              <span className="spf-sep">•</span>
-              <span>Enkripsi Transit TLS 1.3</span>
-              <span className="spf-sep">•</span>
-              <span>OpenAI-Compatible (/v1)</span>
+              <span className="spf-bottom-pill">Zero-Training Privacy</span>
+              <span className="spf-bottom-pill">TLS 1.3 Encrypted</span>
+              <span className="spf-bottom-pill">OpenAI-Compatible (/v1)</span>
             </div>
           </div>
         </div>
