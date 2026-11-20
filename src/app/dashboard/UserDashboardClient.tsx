@@ -42,11 +42,21 @@ const formatDate = (iso?: string) => {
   }
 };
 
+const getUserInitials = (fullName?: string) => {
+  const parts = (fullName || "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "U";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+};
+
 export function UserDashboardClient() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [activeNav, setActiveNav] = useState<"overview" | "keys" | "orders">("overview");
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const toastTimerRef = useRef<number | null>(null);
 
   const [orderOpen, setOrderOpen] = useState(false);
@@ -139,11 +149,34 @@ export function UserDashboardClient() {
       if (e.key === "Escape") {
         if (inspectOrderId) setInspectOrderId(null);
         else if (orderOpen) setOrderOpen(false);
+        else if (mobileNavOpen) setMobileNavOpen(false);
       }
     };
+    const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [inspectOrderId, orderOpen]);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [inspectOrderId, orderOpen, mobileNavOpen]);
+
+  const scrollToSection = (section: "overview" | "keys" | "orders") => {
+    setActiveNav(section);
+    setMobileNavOpen(false);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (section === "overview") {
+      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+      return;
+    }
+    const idMap = {
+      keys: "portal-keys",
+      orders: "portal-orders",
+    };
+    const el = document.getElementById(idMap[section]);
+    if (!el) return;
+    el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  };
 
   const handleLogout = async () => {
     if (loggingOut) return;
@@ -247,49 +280,175 @@ export function UserDashboardClient() {
     return <div className="jt-auth-shell">Memuat Portal Akun Anda...</div>;
   }
 
+  const userInitials = getUserInitials(data.user.fullName);
+
   return (
     <div>
-      <header className="jt-user-topbar">
-        <div className="jt-user-topbar-inner">
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <Link href="/" className="jt-auth-brand" style={{ marginBottom: 0 }}>
+      <div className={`usr-nav-wrap ${scrolled ? "is-scrolled" : ""}`}>
+        <header className="usr-navbar">
+          <div className="usr-nav-brand-group">
+            <Link href="/" className="usr-nav-brand" aria-label="Juragantoken Beranda">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/logo-mark.png" alt="" width={26} height={22} />
-              <span className="jt-auth-brand-text">
+              <span className="usr-nav-brand-text">
                 juragan<span>token.</span>
               </span>
             </Link>
-            <span className="jt-sidebar-role-tag">Portal Akun</span>
+            <span className="usr-nav-sep" aria-hidden="true" />
+            <span className="usr-portal-chip">Portal</span>
           </div>
 
-          <div className="usr-topbar-right">
+          <nav className="usr-nav-center" aria-label="Navigasi Portal">
+            <div className="usr-nav-track">
+              <button
+                type="button"
+                className={`usr-nav-pill ${activeNav === "overview" ? "is-active" : ""}`}
+                onClick={() => scrollToSection("overview")}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                </svg>
+                <span>Ringkasan</span>
+              </button>
+              <button
+                type="button"
+                className={`usr-nav-pill ${activeNav === "keys" ? "is-active" : ""}`}
+                onClick={() => scrollToSection("keys")}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                </svg>
+                <span>API Key</span>
+              </button>
+              <button
+                type="button"
+                className={`usr-nav-pill ${activeNav === "orders" ? "is-active" : ""}`}
+                onClick={() => scrollToSection("orders")}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z" />
+                  <path d="M9 8h6M9 12h6M9 16h4" />
+                </svg>
+                <span>Pesanan</span>
+              </button>
+            </div>
+          </nav>
+
+          <div className="usr-nav-right">
+            {data.user.role === "admin" && (
+              <Link href="/admin" prefetch={false} className="usr-nav-admin-pill">
+                Admin Panel
+              </Link>
+            )}
+            <Link href="/docs" className="usr-nav-util">
+              Panduan API
+            </Link>
+            <Link href="/" className="usr-nav-util">
+              Beranda
+            </Link>
+            <span className="usr-nav-sep is-desktop-only" aria-hidden="true" />
+            <span
+              className="usr-avatar-badge"
+              title={data.user.fullName || "Pengguna"}
+              aria-label={data.user.fullName || "Pengguna"}
+            >
+              {userInitials}
+            </span>
+            <button
+              type="button"
+              className="usr-logout-btn"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span>{loggingOut ? "Keluar..." : "Keluar"}</span>
+            </button>
+            <button
+              type="button"
+              className="usr-mobile-toggle"
+              aria-label={mobileNavOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
+              aria-expanded={mobileNavOpen}
+              aria-controls="usr-mobile-drawer"
+              onClick={() => setMobileNavOpen((prev) => !prev)}
+            >
+              {mobileNavOpen ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                  <line x1="4" y1="7" x2="20" y2="7" />
+                  <line x1="4" y1="12" x2="20" y2="12" />
+                  <line x1="4" y1="17" x2="20" y2="17" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </header>
+
+        {mobileNavOpen && (
+          <div id="usr-mobile-drawer" className="usr-mobile-drawer" role="region" aria-label="Menu Navigasi Portal">
+            <button
+              type="button"
+              className={`usr-drawer-item ${activeNav === "overview" ? "is-active" : ""}`}
+              onClick={() => scrollToSection("overview")}
+            >
+              <span>Ringkasan</span>
+            </button>
+            <button
+              type="button"
+              className={`usr-drawer-item ${activeNav === "keys" ? "is-active" : ""}`}
+              onClick={() => scrollToSection("keys")}
+            >
+              <span>API Key ({data.keys.length})</span>
+            </button>
+            <button
+              type="button"
+              className={`usr-drawer-item ${activeNav === "orders" ? "is-active" : ""}`}
+              onClick={() => scrollToSection("orders")}
+            >
+              <span>Pesanan ({data.orders.length})</span>
+            </button>
+            <div className="usr-drawer-sep" />
             {data.user.role === "admin" && (
               <Link
                 href="/admin"
                 prefetch={false}
-                className="jt-btn-primary-solid"
-                style={{ padding: "7px 12px", fontSize: "12.5px" }}
+                className="usr-drawer-item is-active"
+                onClick={() => setMobileNavOpen(false)}
               >
-                Admin Panel
+                <span>Buka Admin Panel</span>
+                <span>↗</span>
               </Link>
             )}
-            <Link href="/docs" className="jt-btn-secondary-clean">
-              Panduan API
+            <Link href="/docs" className="usr-drawer-item" onClick={() => setMobileNavOpen(false)}>
+              <span>Panduan API</span>
+              <span>↗</span>
             </Link>
-            <Link href="/" className="jt-btn-secondary-clean">
-              Beranda
+            <Link href="/" className="usr-drawer-item" onClick={() => setMobileNavOpen(false)}>
+              <span>Beranda</span>
+              <span>↗</span>
             </Link>
+            <div className="usr-drawer-sep" />
             <button
               type="button"
-              className="jt-btn-secondary-clean"
+              className="usr-drawer-item is-danger"
               onClick={handleLogout}
               disabled={loggingOut}
             >
-              {loggingOut ? "Keluar..." : "Keluar"}
+              <span>{loggingOut ? "Keluar..." : "Keluar"}</span>
             </button>
           </div>
-        </div>
-      </header>
+        )}
+      </div>
 
       <main className="jt-user-container">
         {toast && (
@@ -338,7 +497,7 @@ export function UserDashboardClient() {
           </div>
         </div>
 
-        <section className="jt-kpi-grid cols-3" aria-label="Ringkasan akun">
+        <section id="portal-ringkasan" className="jt-kpi-grid cols-3 usr-section-anchor" aria-label="Ringkasan akun">
           <article className="jt-kpi-card usr-kpi-card">
             <div className="usr-kpi-head">
               <span className="jt-kpi-label">Total Saldo Aktif</span>
@@ -379,7 +538,7 @@ export function UserDashboardClient() {
         </section>
 
         {/* Tabel API Key Terintegrasi */}
-        <section className="jt-panel-card">
+        <section id="portal-keys" className="jt-panel-card usr-section-anchor">
           <div className="jt-panel-card-head">
             <div>
               <div className="usr-card-title-row">
@@ -469,7 +628,7 @@ export function UserDashboardClient() {
         </section>
 
         {/* Riwayat Pesanan */}
-        <section className="jt-panel-card">
+        <section id="portal-orders" className="jt-panel-card usr-section-anchor">
           <div className="jt-panel-card-head">
             <div>
               <div className="usr-card-title-row">
