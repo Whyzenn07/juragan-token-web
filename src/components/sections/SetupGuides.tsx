@@ -4,10 +4,59 @@ import { useEffect, useState } from "react";
 import { GATEWAY_ORIGIN } from "@/data/catalog";
 import { Icon } from "@/components/ui/Icon";
 
+type OsId = "windows-ps" | "windows-cmd" | "macos" | "linux";
+
+const OS_TABS: { id: OsId; label: string }[] = [
+  { id: "windows-ps", label: "Windows PowerShell" },
+  { id: "windows-cmd", label: "Windows CMD" },
+  { id: "macos", label: "macOS" },
+  { id: "linux", label: "Linux" },
+];
+
+function buildClaudeSnippet(os: OsId, origin: string): { shell: string; code: string; hint: string } {
+  const tail = `\n\n# Pilih model apa saja: claude-sonnet-5-5, gemini-3.8-flash, deepseek-v4-pro\nclaude --model claude-sonnet-5-5`;
+  switch (os) {
+    case "windows-ps":
+      return {
+        shell: "Windows PowerShell",
+        code: `$env:ANTHROPIC_BASE_URL = "${origin}"\n$env:ANTHROPIC_API_KEY  = "jt-live-token-anda"${tail}`,
+        hint: `Permanen: setx ANTHROPIC_BASE_URL "${origin}" lalu buka ulang terminal.`,
+      };
+    case "windows-cmd":
+      return {
+        shell: "Windows CMD",
+        code: `set ANTHROPIC_BASE_URL=${origin}\nset ANTHROPIC_API_KEY=jt-live-token-anda${tail}`,
+        hint: "Variabel berlaku di jendela CMD ini saja. Gunakan setx untuk menyimpan permanen.",
+      };
+    case "macos":
+      return {
+        shell: "macOS Terminal (zsh)",
+        code: `export ANTHROPIC_BASE_URL="${origin}"\nexport ANTHROPIC_API_KEY="jt-live-token-anda"${tail}`,
+        hint: "Permanen: simpan dua baris export di ~/.zshrc, lalu jalankan source ~/.zshrc.",
+      };
+    default:
+      return {
+        shell: "Linux Terminal (bash)",
+        code: `export ANTHROPIC_BASE_URL="${origin}"\nexport ANTHROPIC_API_KEY="jt-live-token-anda"${tail}`,
+        hint: "Permanen: simpan dua baris export di ~/.bashrc, lalu jalankan source ~/.bashrc.",
+      };
+  }
+}
+
 export function SetupGuides() {
   const [activeTab, setActiveTab] = useState<"claudecode" | "cursor" | "chatbox" | "python">("claudecode");
   const [copied, setCopied] = useState<string | null>(null);
   const [origin, setOrigin] = useState(GATEWAY_ORIGIN);
+  const [os, setOs] = useState<OsId>("windows-ps");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const ua = navigator.userAgent.toLowerCase();
+      if (ua.includes("mac")) setOs("macos");
+      else if (ua.includes("linux") && !ua.includes("android")) setOs("linux");
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.origin !== GATEWAY_ORIGIN) {
@@ -30,12 +79,8 @@ export function SetupGuides() {
     }
   };
 
-  const claudeCodeSnippet = `# 1. Buka PowerShell / Terminal di project Anda
-$env:ANTHROPIC_BASE_URL = "${origin}"
-$env:ANTHROPIC_API_KEY  = "jt-live-token-anda"
-
-# 2. Jalankan Claude Code (bisa pilih model: gemini-3.8-flash atau claude-sonnet-5-5)
-claude --model gemini-3.8-flash`;
+  const claudeSnippet = buildClaudeSnippet(os, origin);
+  const claudeCodeSnippet = claudeSnippet.code;
 
   const pythonSnippet = `from openai import OpenAI
 
@@ -110,8 +155,36 @@ print(response.choices[0].message.content)`;
               </ul>
             </div>
             <div className="code-block-box">
+              <div
+                role="tablist"
+                aria-label="Pilih sistem operasi"
+                style={{ display: "flex", flexWrap: "wrap", gap: "6px", padding: "10px 12px 0" }}
+              >
+                {OS_TABS.map((o) => (
+                  <button
+                    key={o.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={os === o.id}
+                    onClick={() => setOs(o.id)}
+                    style={{
+                      minHeight: "36px",
+                      padding: "0 12px",
+                      borderRadius: "999px",
+                      border: `1px solid ${os === o.id ? "#60a5fa" : "rgba(148,163,184,0.35)"}`,
+                      background: os === o.id ? "rgba(96,165,250,0.18)" : "transparent",
+                      color: os === o.id ? "#ffffff" : "#cbd5e1",
+                      fontSize: "12.5px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
               <div className="code-top">
-                <span>PowerShell / Bash</span>
+                <span>{claudeSnippet.shell}</span>
                 <button
                   type="button"
                   className="copy-btn"
@@ -122,6 +195,9 @@ print(response.choices[0].message.content)`;
                 </button>
               </div>
               <pre><code>{claudeCodeSnippet}</code></pre>
+              <p style={{ margin: "0", padding: "0 16px 14px", fontSize: "12.5px", color: "#94a3b8" }}>
+                {claudeSnippet.hint}
+              </p>
             </div>
           </div>
         )}

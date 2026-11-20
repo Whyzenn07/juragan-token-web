@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "./docs.css";
 import { DocsClient } from "./DocsClient";
 
 export const metadata: Metadata = {
-  title: "Dokumentasi Resmi & Panduan Integrasi API - Juragan Token",
+  title: "Dokumentasi & Panduan Integrasi API - Juragantoken",
   description:
-    "Panduan lengkap integrasi Universal AI Gateway Juragan Token untuk Cursor AI, Claude Code CLI, Windsurf, Chatbox, dan Python SDK. 1 API Key untuk semua model AI terkemuka.",
+    "Panduan integrasi Universal AI Gateway Juragantoken: 1 API Key untuk semua model AI di Cursor, Claude Code, Python, Node.js, dan cURL pada Windows, macOS, dan Linux.",
   alternates: {
     canonical: "/docs",
   },
@@ -13,53 +14,36 @@ export const metadata: Metadata = {
 
 export default function DocsPage() {
   return (
-    <div className="docs-page-container">
-      {/* Header Navigasi Docs */}
-      <header className="docs-nav-header">
-        <div className="docs-header-inner">
-          <Link href="/" className="docs-brand" aria-label="Kembali ke Beranda">
-            <strong>
-              juragan<span>token</span>
-              <span className="dot">.</span>
-            </strong>
-            <span className="docs-badge">Docs &amp; API Reference</span>
+    <div className="dx-page">
+      <header className="dx-topbar">
+        <div className="dx-topbar-inner">
+          <Link href="/" className="dx-brand" aria-label="Kembali ke Beranda">
+            juragan<span>token.</span>
+            <em>Docs</em>
           </Link>
-          <div className="docs-header-links">
-            <Link href="/" className="docs-header-link">
-              ← Beranda
+          <nav className="dx-top-links" aria-label="Navigasi atas">
+            <Link href="/">Beranda</Link>
+            <Link href="/status">Status</Link>
+            <Link href="/login" className="dx-top-ghost">
+              Sign In
             </Link>
-            <Link href="/status" className="docs-header-link">
-              Status Sistem
+            <Link href="/signup" className="dx-top-solid">
+              Sign Up
             </Link>
-            <Link href="/#katalog-retail" className="docs-header-btn">
-              Beli Token AI
-            </Link>
-          </div>
+          </nav>
         </div>
       </header>
 
-      {/* Konten Dokumentasi Interaktif */}
       <DocsClient />
 
-      {/* Footer Docs */}
-      <footer className="docs-footer">
-        <div className="docs-footer-inner">
-          <p>© 2026 Juragan Token Indonesia. Universal AI Gateway &amp; Token Marketplace.</p>
-          <div className="docs-footer-nav">
+      <footer className="dx-footer">
+        <div className="dx-footer-inner">
+          <p>© 2026 PT Rejeki Digital Cemerlang · Juragantoken</p>
+          <nav aria-label="Tautan footer">
             <Link href="/terms">Syarat &amp; Ketentuan</Link>
-            <span>•</span>
             <Link href="/privacy">Kebijakan Privasi</Link>
-            <span>•</span>
             <Link href="/status">Status Sistem</Link>
-            <span>•</span>
-            <a
-              href="https://wa.me/6281226983990?text=Halo%20Admin%20Juragan%20Token,%20saya%20butuh%20bantuan%20teknis%20API."
-              target="_blank"
-              rel="noreferrer"
-            >
-              WhatsApp Support
-            </a>
-          </div>
+          </nav>
         </div>
       </footer>
     </div>
