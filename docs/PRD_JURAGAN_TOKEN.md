@@ -1,9 +1,10 @@
 # Product Requirement Document (PRD): Juragantoken
 
-**Versi Dokumen:** 3.0.0  
-**Status:** Living Document / Company Profile & Enterprise Gateway Architecture  
-**Tanggal Pembaruan:** 18 November 2026  
-**Platform:** Web Application (Next.js 16.4.2 App Router, TypeScript, Vanilla CSS, Supabase Cloud)  
+**Versi Dokumen:** 4.0.0  
+**Status:** Living Document / Company Profile, Enterprise & Standard Gateway, User & Admin Portal  
+**Tanggal Pembaruan:** 20 November 2026  
+**Platform:** Web Application (Next.js 16.4.6 App Router, React 19, TypeScript, Vanilla CSS, Supabase Cloud)  
+**Entitas Resmi:** PT Rejeki Digital Cemerlang  
 **Domain Utama:** `https://api.tokotokenai.com`  
 **Repository:** `Whyzenn07/juragan-token-web`  
 
@@ -463,12 +464,88 @@ Untuk membantu calon pengguna dan tim teknis memilih model yang tepat tanpa kebi
 - **`WhyChooseUs.tsx`:** Empat pilar keunggulan aktual Juragantoken dan tabel perbandingan pendekatan integrasi menggunakan **kategori netral** (*Daftar Langsung per Vendor* vs *Platform Agregator Umum* vs *Juragantoken Gateway*) guna menghindari risiko *comparative advertising* terhadap merek pihak ketiga.
 - **Kepatuhan Aksesibilitas & Performa:** Seluruh animasi hanya menggunakan properti GPU (`transform`, `opacity`, `stroke-dashoffset`) tanpa library eksternal, serta mematuhi `@media (prefers-reduced-motion: reduce)`.
 
-### 10.4 Roadmap Fitur Enterprise B2B (Berdasarkan Materi Pitch Deck 12 Slide)
-Fitur-fitur korporat berikut berasal dari dokumen presentasi B2B (*PT Rejeki Digital Cemerlang*) dan dicatat di dalam PRD ini sebagai **Roadmap Pengembangan Tahap Berikutnya** (tidak ditampilkan sebagai klaim fitur aktif di halaman publik sebelum implementasi backend selesai):
+### 10.4 Status Realisasi Roadmap Enterprise B2B (Update v4.0.0)
+Kebutuhan korporat di bawah ini berasal dari dokumen presentasi B2B (*PT Rejeki Digital Cemerlang*) dan sebagian besar telah terealisasi penuh di rilis **v4.0.0**:
 
-| Modul Roadmap B2B | Deskripsi Kebutuhan (Sesuai Pitch Deck PDF) | Status Implementasi Saat Ini | Target Arsitektur Berikutnya |
+| Modul Roadmap B2B | Deskripsi Kebutuhan | Status Implementasi Saat Ini (v4.0.0) | Target Pengembangan Lanjutan |
 | :--- | :--- | :--- | :--- |
-| **1. Kontrol Whitelist IP (Tim IT)** | Membatasi penggunaan Virtual API Key hanya dari alamat IP server kantor atau VPN korporat yang diotorisasi untuk mencegah kebocoran finansial jika key dicuri. | Belum ada di `gateway.ts` (saat ini baru autentikasi SHA-256 + rate-limit per IP/key). | Tambah kolom `allowed_ips text[]` pada tabel `public.keys` di Supabase + pengecekan CIDR/IP di `authenticateApiKey()`. |
-| **2. Alokasi Kuota Multi-Departemen (Tim Purchasing)** | Pembuatan sub-key per divisi (IT, Finance, Legal, Marketing) di bawah satu deposit korporat terpusat untuk memantau konsumsi real-time per departemen dan menghilangkan *reimbursement* kartu kredit pribadi. | Saat ini 1 key = 1 saldo independen (`public.keys`). | Tambah tabel `public.organizations` & `public.departments` dengan relasi parent-child quota cap. |
-| **3. Penagihan Invoice B2B & Faktur Pajak Lokal** | Pengadaan saldo secara terpusat melalui entitas resmi **PT Rejeki Digital Cemerlang** dengan penerbitan Invoice B2B, PO, dan Faktur Pajak (PPN/PPh) resmi dalam mata uang IDR tanpa biaya valas. | Belum ada alur PO/Faktur Pajak di aplikasi web. | Modul permohonan Invoice Korporat + unggah NPWP perusahaan & generasi PDF proforma invoice B2B. |
-| **4. SLA Korporat & Jalur Principal** | Jaminan ketersediaan tinggi (*High Availability*) dan dukungan teknis terdedikasi untuk beban transaksi skala enterprise. | Fallback hybrid Gemini + Central Engine sudah berjalan; dokumen SLA formal B2B disiapkan terpisah. | Kontrak SLA tertulis & multi-region upstream failover otomatis. |
+| **1. Kontrol Whitelist IP (Tim IT)** | Membatasi penggunaan Virtual API Key hanya dari alamat IP server kantor atau VPN korporat agar key tetap aman bila bocor. | **✓ Sudah Aktif:** Kolom `allowed_ips`, fungsi `isIpAllowed()` (IPv4 eksak, wildcard `.*`, subnet `/24`) di `src/lib/gateway.ts`, serta form edit di `/admin` (`PATCH /api/admin/keys/[hash]`). Request dari IP non-terdaftar ditolak `403 ip_not_whitelisted_or_inactive`. | Penambahan wildcard CIDR arbitrer (`/16`, `/20`, IPv6) serta self-service IP whitelist dengan OTP/approval di `/dashboard`. |
+| **2. Identitas Korporat & Alokasi Multi-Key** | Pengelolaan key per perusahaan & departemen (Engineering, Finance, Legal, Marketing) di bawah satu akun Gmail / portal. | **~ Sebagian Aktif:** Metadata `accountTier` (`standard` \| `enterprise`), `companyName`, dan `department` tersimpan pada `orders` & `keys` (tabel PostgreSQL `public.keys`). | Normalisasi tabel `public.organizations` & `public.departments` dengan *shared master wallet* serta limit kuota bulanan otomatis per sub-key. |
+| **3. Invoice B2B, Bukti SS Pembayaran & Permintaan Faktur Pajak** | Pengadaan saldo melalui **PT Rejeki Digital Cemerlang** lengkap dengan nomor invoice resmi, NPWP, permintaan Faktur Pajak, dan bukti screenshot transfer. | **✓ Sudah Aktif:** Komponen cetak `InvoiceDocument` (kop PT Rejeki Digital Cemerlang, detail NPWP, badge Faktur Pajak & status Lunas/Pending), `ProofUploadDropzone` (PNG/JPG/WebP base64 terkompresi), Slide-Over Drawer Admin 760px, serta migrasi SQL `20261120020000_order_payment_proof_invoice.sql`. | Otomasi integrasi nomor seri e-Faktur DJP & PDF generator server-side untuk pengunduhan dokumen pajak langsung dari `/dashboard`. |
+| **4. SLA Korporat & Jalur Principal** | Ketersediaan tinggi dan dukungan teknis terdedikasi untuk beban transaksi enterprise. | Fallback hybrid Gemini + Central Engine (`live_central_engine` / `hybrid_gemini_fallback`) & rate-limit 60/20 RPM sudah aktif. | Multi-region failover upstream, distributed Redis rate limiter, serta halaman *public uptime telemetry*. |
+
+---
+
+## 11. Pembaruan v4.0.0 — Portal User & Admin, Invoice & Bukti SS Transaksi, Precision Docs Workbench, & Next.js 16.4.6
+
+Rilis **v4.0.0** menutup siklus penuh *end-to-end* mulai dari pendaftaran pengguna, pengajuan pesanan + upload screenshot transfer, verifikasi Admin via Slide-Over Drawer, penerbitan 1 Universal API Key (`jt-live-...`), hingga penggunaan langsung dari IDE & Terminal CLI di **Windows, macOS, dan Linux**:
+
+1. **Upgrade Core Framework (`Next.js 16.4.6` + `eslint-config-next 16.4.6`):**
+   - Menutup celah keamanan dependensi (`npm audit --omit=dev` = `0 vulnerabilities`) serta mempertahankan build bersih pada seluruh 32 route App Router + Turbopack + `proxy.ts`.
+2. **Portal Autentikasi & RBAC (`src/lib/auth.ts`, `src/proxy.ts`):**
+   - Route terproteksi `/login`, `/dashboard` (role `user`), dan `/admin` (role `admin`).
+   - Mendukung **Supabase Auth** penuh serta **Local Dev Fallback** otomatis dengan akun ter-seed (`admin@juragantoken.id`, `budi.dev@gmail.com`, `sari.analytics@gmail.com`) saat `.env.local` belum terhubung ke Postgres produksi.
+   - Proteksi server-side (`requireAdmin()`, `requireUser()`, ownership validation anti-IDOR pada `PATCH /api/user/dashboard`).
+3. **Alur Invoice Resmi & Bukti Pembayaran Screenshot (SS):**
+   - **Database & Validasi:** Kolom `payment_proof_url`, `payment_proof_name`, `payment_proof_uploaded_at`, `payment_proof_uploaded_by`, dan `payment_reference` pada tabel `public.orders` (migrasi `20261120020000_order_payment_proof_invoice.sql`). Validasi ketat `validatePaymentProofUrl()` di `src/lib/admin-service.ts` hanya menerima gambar raster PNG/JPG/WebP base64 (`<= 1_200_000` karakter), path lokal `/images/...`, atau `https://`, dan langsung menolak payload SVG/XSS dengan HTTP `400`.
+   - **Komponen UI Portal (`src/components/portal/`):**
+     - `InvoiceDocument.tsx`: Dokumen invoice & kwitansi resmi PT Rejeki Digital Cemerlang lengkap dengan status lunas/pending, rincian NPWP & Faktur Pajak, metode pembayaran, referensi bank, API Key tersamarkan, dan fitur cetak/simpan PDF.
+     - `ProofUploadDropzone.tsx`: Komponen unggah screenshot transfer dengan pratinjau langsung, kompresi gambar sisi klien, dan validasi format aman.
+   - **Admin Console Redesign (`src/app/admin/AdminDashboardClient.tsx`):**
+     - Tata letak 4 tab sidebar ramping (*Ringkasan*, *Pesanan & Invoice*, *User & API Key*, *Audit Log*) bebas tumpang tindih tabel (`overflow-x` bersih di desktop 1440px dan mobile 390px) serta *FloatingWhatsApp* otomatis disembunyikan di `/admin`.
+     - **Signature 760px Slide-Over Drawer:** Memungkinkan Admin memeriksa bukti screenshot transfer beresolusi penuh (*Perbesar Penuh* / *Unduh SS*), memperbarui referensi/SS, meninjau & mencetak `InvoiceDocument` resmi, dan mengeksekusi aksi *Setujui & Terbitkan API Key* tanpa meninggalkan konteks tabel.
+4. **Precision Docs Workbench (`/docs` & `#panduan-setup`):**
+   - Konfigurasi interaktif berbasis `1 Universal Key` (`jt-live-...`) dengan pengalih OS **macOS / Linux / Windows PowerShell / Windows CMD** yang persisten via `localStorage` (`jt-docs-os`), pemilih model cepat across 10 provider, token & syntax highlighting murni CSS tanpa pustaka berat, serta contoh siap tempel untuk **Claude Code CLI, OpenAI Codex CLI, Cursor IDE, Windsurf IDE, Gemini CLI, Continue.dev, VS Code, Python SDK, Node.js SDK, dan cURL**.
+
+---
+
+## 12. Analisis Kesenjangan Sistem (*Gap Analysis*)
+
+Audit kode sumber dan hasil uji *end-to-end* pada tanggal **20 November 2026** mengidentifikasi kesenjangan nyata antara implementasi saat ini dengan kesiapan produksi skala komersial penuh:
+
+| Prioritas | Komponen / File Terkait | Kesenjangan yang Ditemukan (Temuan Nyata Codebase) | Dampak | Rekomendasi Penutupan Gap |
+| :---: | :--- | :--- | :--- | :--- |
+| **P0** | `.env.local`, `src/lib/gateway.ts`, `src/lib/site-config.ts`, `src/lib/receipt-email.ts` | Kredensial produksi belum diisi pada environment aktif: `UPSTREAM_ENGINE_KEY` / `GEMINI_API_KEY` belum terset (`awaiting_dev_key`, sehingga inference `POST /v1/chat/completions` mengembalikan `503`), Supabase masih berada di Local JSON fallback (`data/store.json`), `GMAIL_APP_PASSWORD` belum aktif (`simulated` mode), `WHATSAPP_DISPLAY` masih nomor uji `0812-2698-3990`, dan `ENABLE_CHECKOUT` masih `false`. | Gateway belum dapat meneruskan inference LLM riil ke upstream, notifikasi email/DB cloud berjalan dalam mode lokal/simulasi, dan kasir katalog publik belum terbuka. | Pasang `UPSTREAM_ENGINE_KEY`, `GEMINI_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEY`, `GMAIL_USER`, `GMAIL_APP_PASSWORD`, perbarui nomor WhatsApp resmi, dan atur `NEXT_PUBLIC_ENABLE_CHECKOUT` sesuai fase rilis. |
+| **P0** | `src/lib/gateway.ts`, `src/lib/keys.ts` (`rateLimited`) | Rate limiter gateway (`60 RPM` umum, `20 RPM` frontier, max `5` concurrent stream) dan rate limiter endpoint `/api/auth/*` masih memakai `Map` in-memory per proses/isolate Node.js. | Pada deployment serverless multi-instance (Vercel), batas kecepatan tidak sinkron antar node dan ter-reset saat *cold start*. | Migrasikan `rateLimited()` dan pelacakan concurrent stream ke backend terdistribusi seperti **Upstash Redis** (`@upstash/ratelimit`). |
+| **P0** | `src/app/api/v1/` (`chat/completions`, `models`) vs `src/app/docs/DocsClient.tsx`, `src/components/sections/SetupGuides.tsx`, `next.config.ts` | Folder `src/app/api/v1/` saat ini hanya mengimplementasikan `/api/v1/chat/completions/route.ts` dan `/api/v1/models/route.ts` (direwrite lewat `next.config.ts` `/v1/:path*` $\rightarrow$ `/api/v1/:path*`), belum memiliki `/api/v1/messages/route.ts` (*Anthropic native Messages API adapter*). Padahal panduan `/docs` dan `SetupGuides.tsx` mengarahkan Claude Code CLI menggunakan `ANTHROPIC_BASE_URL`. | Pemanggilan native Claude Code CLI langsung ke server Next.js localhost (`/v1/messages`) belum ditangani di gateway lokal kecuali upstream proxy sudah memetakan `/v1/messages`. | Implementasikan `src/app/api/v1/messages/route.ts` yang menerjemahkan skema Anthropic Messages API (termasuk event SSE) ke layer autentikasi, IP whitelist, dan metering `src/lib/gateway.ts`. |
+| **P1** | `src/app/dashboard/UserDashboardClient.tsx` | 1) Modal *"Ajukan Pesanan Kredit API AI"* belum menampilkan **kartu instruksi rekening/QRIS tujuan bayar** secara eksplisit sebelum user mengunggah SS.<br>2) **One-Time Plaintext API Key Reveal** hanya diterima Admin saat klik *Setujui* (dikirim via email atau salin manual Admin), belum memiliki banner/modal satu-kali lihat di `/dashboard`.<br>3) Tabel **riwayat pemakaian token per request (`usageLogs`)** belum ditampilkan di `/dashboard` (baru tersedia via modal publik `/api/keys/check`). | User baru harus bertanya nomor rekening/QRIS secara manual atau menunggu salinan key dari Admin/email, serta belum bisa memantau konsumsi token harian langsung di portal login. | Tambahkan kartu rekening PT & QRIS dinamis/statis di modal order `/dashboard`, mekanisme *one-time ephemeral reveal token* terenkripsi untuk key baru, serta tab/tabel `usageLogs` per akun user. |
+| **P1** | `src/app/admin/AdminDashboardClient.tsx` vs `src/app/api/admin/users/route.ts` | Endpoint backend `PATCH /api/admin/users` (`adminUpdateUserRole`) untuk mengubah role `user` $\leftrightarrow$ `admin` sudah tersedia, namun tombol ubah role belum ada di UI tab *User & API Key* (juga belum ada tombol ekspor CSV untuk pesanan/audit log). | Promosi/demosi admin masih harus dipanggil lewat API langsung atau database SQL, dan rekonsiliasi keuangan tim Finance membutuhkan salin manual. | Tambahkan kontrol toggle role (dengan konfirmasi aman) di panel *User & API Key* serta fitur unduh laporan **Export CSV / Rekapitulasi Bulanan**. |
+| **P1** | `src/lib/admin-service.ts` (`POST /api/user/dashboard` vs `POST /api/orders`) & Webhook Pembayaran | Pada pengujian live (`POST /api/user/dashboard`), nominal `baseIdr: 75000` tersimpan bulat sebagai `totalIdr: 75000` (tanpa kode unik 3 digit seperti di alur `POST /api/orders` + webhook Tripay/Midtrans/Xendit). Verifikasi order portal masih bertumpu penuh pada approval manual Admin. | Di volume tinggi tanpa kode unik atau API *Create Transaction* Payment Gateway riil, pencocokan mutasi bank manual rentan antrean. | Terapkan kode unik atau integrasikan langsung **Dynamic QRIS / Virtual Account** Tripay/Midtrans pada `createUserOrderRequest()` sehingga status otomatis berpindah ke `paid` via `/api/webhooks/payment`. |
+| **P2** | `src/app/status/page.tsx`, `src/app/privacy/page.tsx`, `src/app/terms/page.tsx`, `src/components/modals/PaymentModal.tsx` | Masih terdapat konsistensi nama entitas lama dan link jangkar usang: `src/app/status/page.tsx` baris 35 mengarah ke `/#katalog-retail` (bagian yang tersembunyi saat `ENABLE_CHECKOUT = false`) dan baris 20–23 & 46 menyebut `Juragan Token Indonesia`; `privacy/page.tsx` & `terms/page.tsx` memakai `Juragan Token Indonesia`; `PaymentModal.tsx` masih menyebut `PT JURAGAN TOKEN INDONESIA`. | Mengurangi keseragaman branding hukum korporat (**PT Rejeki Digital Cemerlang**) serta memicu dead anchor pada tombol navigasi `/status`. | Seragamkan seluruh teks entitas resmi menjadi **PT Rejeki Digital Cemerlang** dan perbarui tautan `/status` ke `/#keunggulan` atau `/docs`. |
+| **P2** | CI/CD & Test Automation (`package.json`, `scripts/`) | Suite `scripts/security-audit.cjs` dan `scripts/test-errors.cjs` sudah ada, tetapi skenario E2E lengkap (User Signup $\rightarrow$ Order+SS $\rightarrow$ RBAC/IDOR $\rightarrow$ Admin Drawer Approve $\rightarrow$ IP Whitelist $\rightarrow$ Gateway $\rightarrow$ CDP Browser UI) belum terintegrasi menjadi perintah `npm test` / GitHub Actions workflow. | Regresi lintas modul (UI, API, Gateway, RBAC) dapat terlewat saat pengembangan cepat jika hanya mengandalkan build Next.js. | Promosikan skrip pengujian E2E lengkap menjadi test runner otomatis (`npm run test:e2e`) di pipeline CI/CD. |
+
+---
+
+## 13. Laporan Pengujian End-to-End Terakhir (20 November 2026)
+
+Seluruh skenario berikut dieksekusi langsung terhadap server lokal **`http://localhost:3000`** (`Next.js 16.4.6` Turbopack, mode lokal aktif tanpa kebocoran kredensial upstream) menggunakan kombinasi skrip audit keamanan bawaan, pengujian negatif/error API, API fungsional User–Admin–Gateway, serta verifikasi peramban **Chrome Headless via Chrome DevTools Protocol (CDP)**:
+
+### 13.1 Security & Error Handling Audit Bawaan Repo
+1. **`node scripts/security-audit.cjs` — LULUS (`Exit Code 0`, 100% Secure):**
+   - Memeriksa dokumen HTML awal dan seluruh **19 client JavaScript bundles** di `_next/static/chunks`. Tidak ditemukan kebocoran rahasia server di browser.
+2. **`node scripts/test-errors.cjs` — LULUS (`13/13` Skenario, 100%):**
+   - Penolakan `401` (tanpa API key & key palsu), `400` (JSON rusak & tanpa array `messages`), `404` (Cek Saldo key fiktif), `400` (nama kosong, format email salah, `packageId` palsu di `POST /api/orders`), `405` (`GET /api/keys/check`), serta `403` (webhook fraud tanpa signature & endpoint sensitif `/api/webhooks/payment`, `/api/supabase/status`, `/api/test-email` tanpa kredensial Admin).
+
+### 13.2 Pengujian E2E Alur User, Admin, Keamanan, Gateway, & UI Browser (`14/14` LULUS)
+Run eksekusi: `e2e.tester.1795148205424@gmail.com` (*Raka Pradipta*, Enterprise B2B — `PT Nusantara Dev / Engineering`), Order `INV-JT-MWOGW4KFFE4E`, Universal Key prefix `jt-live-s61p4V...`:
+
+| No | Skenario Pengujian E2E | Hasil Observasi Live Server & Browser | Status |
+| :---: | :--- | :--- | :---: |
+| **1** | Daftar User Baru (`POST /api/auth/signup`) & Verifikasi Sesi (`GET /api/auth/me`) | HTTP `200`, role `user`, redirect `/dashboard`, sesi cookie HttpOnly aktif | **PASS** |
+| **2** | Isolasi RBAC Negatif: User coba akses endpoint Admin | `GET /api/admin/overview` (`403`), `GET /api/admin/orders` (`403`), `PATCH /api/admin/orders/INV-ANY` (`403`) | **PASS** |
+| **3** | User Mengajukan Pesanan Enterprise + Upload SS PNG (`POST /api/user/dashboard`) | HTTP `200`, Order `INV-JT-MWOGW4KFFE4E`, status `pending`, `totalIdr: 75000`, NPWP & SS tersimpan | **PASS** |
+| **4** | Proteksi Upload XSS (`PATCH /api/user/dashboard` dengan payload `data:image/svg+xml`) | HTTP `400`: *"Format bukti transaksi harus berupa gambar PNG, JPG/JPEG, atau WebP yang valid."* | **PASS** |
+| **5** | User Memperbarui SS Pembayaran & Nomor Referensi (`PATCH /api/user/dashboard`) | HTTP `200`, referensi diperbarui ke `BCA-E2E-UPDATED-991` | **PASS** |
+| **6** | Proteksi Anti-IDOR (`budi.dev@gmail.com` mencoba ubah bukti order milik Raka) | HTTP `403`: *"Anda tidak memiliki akses ke pesanan ini."* | **PASS** |
+| **7** | Admin Login (`admin@juragantoken.id`) & Inspeksi Pesanan Masuk | HTTP `200` (`overview` & `orders`), bukti referensi `BCA-E2E-UPDATED-991` terbaca utuh | **PASS** |
+| **8** | Admin *Approve* Pesanan & Penerbitan Key (`PATCH /api/admin/orders/[id]`) | HTTP `200`, order menjadi `paid`, terbit 1 key `jt-live-...` dengan saldo awal `Rp 75.000` | **PASS** |
+| **9** | Portal Cek Saldo (`POST /api/keys/check`) & Tolak `GET` | `GET` ditolak `405 Method Not Allowed`; `POST` mengembalikan `200` saldo `Rp 75.000` | **PASS** |
+| **10** | Enterprise IP Whitelist (`203.0.113.10`) & Gateway `POST /v1/chat/completions` | Request dari IP lain (`198.51.100.99`) ditolak `403 ip_not_whitelisted_or_inactive`; IP terdaftar `203.0.113.10` lolos auth+IP (`400` saat `messages` kosong, `503` saat payload valid karena upstream key dev belum diset — bebas `401`/`403`) | **PASS** |
+| **11** | Admin Top-Up Manual Saldo +Rp 25.000 (`adjust_balance`) | HTTP `200`, saldo key naik menjadi `Rp 100.000` dan sinkron di `/api/keys/check` | **PASS** |
+| **12** | Admin Kontrol Kunci: `suspend` $\rightarrow$ Gateway `403` $\rightarrow$ `activate` $\rightarrow$ Lolos | Saat `suspended`, gateway menolak `403`; setelah `activate`, gateway kembali menerima autentikasi (`400` validasi body) | **PASS** |
+| **13** | Kelengkapan Admin Audit Log (`GET /api/admin/overview`) | Seluruh 5 aksi tercatat berurutan (`order.approve`, `key.update_ip_whitelist`, `key.adjust_balance`, `key.suspend`, `key.activate`) | **PASS** |
+| **14** | Verifikasi Visual Browser Nyata via Chrome CDP (Desktop `1440x960`) | `/dashboard` menampilkan `Rp 100.000`, `1 IP Terdaftar`, `LUNAS`, `INV-JT-MWOGW4KFFE4E`, Modal `Invoice & Bukti Transaksi` memuat gambar SS & data `PT Nusantara Dev`; `/admin` membuka Slide-Over Drawer berisi SS & Invoice; `overflowX: false`, `consoleErrors: 0` | **PASS** |
+
+> [!NOTE]
+> Catatan cakupan lingkungan dev lokal: Karena `.env.local` pada pengujian ini tidak menyimpan `UPSTREAM_ENGINE_KEY` maupun `GEMINI_API_KEY` aktif, pemanggilan aktual `/v1/chat/completions` dengan payload `messages` lengkap membuktikan jalur autentikasi, validasi saldo `> 0`, status key `active`, dan pencocokan `allowed_ips` lulus seluruhnya lalu berhenti rapi pada penjaga upstream `503 awaiting_dev_key` tanpa memotong saldo secara keliru.
+
