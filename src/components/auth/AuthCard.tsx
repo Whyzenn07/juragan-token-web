@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 type AuthCardProps = {
   mode: "login" | "signup";
 };
 
 export function AuthCard({ mode }: AuthCardProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") || "";
   const urlError = searchParams.get("error") || "";
@@ -27,24 +26,46 @@ export function AuthCard({ mode }: AuthCardProps) {
   });
 
   useEffect(() => {
-    fetch("/api/auth/me")
+    let active = true;
+
+    fetch("/api/auth/me", { cache: "no-store", credentials: "same-origin" })
       .then((r) => r.json())
       .then((data) => {
+        if (!active) return;
         setAuthMeta({
           mode: data.mode || "unconfigured",
           googleOAuthEnabled: Boolean(data.googleOAuthEnabled),
         });
         if (data.authenticated && data.user) {
-          const dest = nextParam.startsWith("/") && !nextParam.startsWith("//")
-            ? nextParam
-            : data.user.role === "admin"
-            ? "/admin"
-            : "/dashboard";
-          router.replace(dest);
+          const dest =
+            nextParam.startsWith("/") && !nextParam.startsWith("//")
+              ? nextParam
+              : data.user.role === "admin"
+              ? "/admin"
+              : "/dashboard";
+          window.location.replace(dest);
+        } else {
+          setLoading(false);
         }
       })
-      .catch(() => undefined);
-  }, [nextParam, router]);
+      .catch(() => {
+        if (active) setLoading(false);
+      });
+
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        setLoading(false);
+        setPassword("");
+        setConfirmPassword("");
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
+
+    return () => {
+      active = false;
+      window.removeEventListener("pageshow", onPageShow);
+    };
+  }, [nextParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +87,8 @@ export function AuthCard({ mode }: AuthCardProps) {
 
       const res = await fetch(endpoint, {
         method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -85,10 +108,11 @@ export function AuthCard({ mode }: AuthCardProps) {
         return;
       }
 
+      setPassword("");
+      setConfirmPassword("");
       const safeNext = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "";
       const target = safeNext || data.redirectTo || "/dashboard";
-      router.push(target);
-      router.refresh();
+      window.location.assign(target);
     } catch {
       setError("Tidak dapat terhubung ke server. Silakan coba kembali.");
       setLoading(false);

@@ -250,8 +250,16 @@ export default function Home() {
   }, []);
 
   const handleNavbarLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
-    setAuthUser(null);
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+      }).catch(() => undefined);
+    } finally {
+      setAuthUser(null);
+      window.location.replace("/");
+    }
   };
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -466,6 +474,7 @@ export default function Home() {
               <>
                 <Link
                   href={authUser.role === "admin" ? "/admin" : "/dashboard"}
+                  prefetch={false}
                   className="jt-pill-cta-btn"
                   title={authUser.email}
                 >
@@ -554,6 +563,7 @@ export default function Home() {
               <>
                 <Link
                   href={authUser.role === "admin" ? "/admin" : "/dashboard"}
+                  prefetch={false}
                   className="primary-button full"
                   onClick={() => setMobileMenuOpen(false)}
                 >

@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { AdminAuditLog, Order, UserProfile } from "@/lib/store";
 import type { EnrichedKey, EnrichedUser } from "@/lib/admin-service";
 import { Icon } from "@/components/ui/Icon";
@@ -147,12 +146,15 @@ function NavGlyph({ name }: { name: AdminTab }) {
 }
 
 export function AdminDashboardClient() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [userKeySubTab, setUserKeySubTab] = useState<UserKeySubTab>("keys");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [adminUser, setAdminUser] = useState<UserProfile | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
 
   const [stats, setStats] = useState<OverviewStats>({
     totalOrders: 0,
@@ -228,51 +230,88 @@ export function AdminDashboardClient() {
   const [balanceTarget, setBalanceTarget] = useState<EnrichedKey | null>(null);
   const [balanceDelta, setBalanceDelta] = useState("50000");
 
-  const showToast = (type: "success" | "error", text: string) => {
+  const showToast = useCallback((type: "success" | "error", text: string) => {
     setToast({ type, text });
-    window.setTimeout(() => setToast(null), 4500);
-  };
-
-  const loadAll = useCallback(async () => {
-    try {
-      const [ovRes, ordRes, keyRes, usrRes] = await Promise.all([
-        fetch("/api/admin/overview", { cache: "no-store" }),
-        fetch("/api/admin/orders", { cache: "no-store" }),
-        fetch("/api/admin/keys", { cache: "no-store" }),
-        fetch("/api/admin/users", { cache: "no-store" }),
-      ]);
-
-      if (ovRes.status === 401) {
-        router.replace("/login?next=/admin");
-        return;
-      }
-      if (ovRes.status === 403) {
-        setAuthError("Akun Anda tidak memiliki hak akses Administrator.");
-        setLoading(false);
-        return;
-      }
-
-      const [ovData, ordData, keyData, usrData] = await Promise.all([
-        ovRes.json(),
-        ordRes.json(),
-        keyRes.json(),
-        usrRes.json(),
-      ]);
-
-      if (ovData.success) {
-        setAdminUser(ovData.admin);
-        setStats(ovData.stats);
-        setAuditLogs(ovData.recentAuditLogs || []);
-      }
-      if (ordData.success) setOrders(ordData.orders || []);
-      if (keyData.success) setKeys(keyData.keys || []);
-      if (usrData.success) setUsers(usrData.users || []);
-    } catch {
-      showToast("error", "Gagal memuat data panel admin.");
-    } finally {
-      setLoading(false);
+    if (toastTimerRef.current !== null) {
+      window.clearTimeout(toastTimerRef.current);
     }
-  }, [router]);
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimerRef.current = null;
+    }, 4500);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current !== null) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
+
+  const loadAll = useCallback(
+    async (opts?: { manual?: boolean }) => {
+      if (opts?.manual) {
+        setRefreshing(true);
+      }
+      try {
+        const ts = Date.now();
+        const reqOpts: RequestInit = { cache: "no-store", credentials: "same-origin" };
+        const [ovRes, ordRes, keyRes, usrRes] = await Promise.all([
+          fetch(`/api/admin/overview?_ts=${ts}`, reqOpts),
+          fetch(`/api/admin/orders?_ts=${ts}`, reqOpts),
+          fetch(`/api/admin/keys?_ts=${ts}`, reqOpts),
+          fetch(`/api/admin/users?_ts=${ts}`, reqOpts),
+        ]);
+
+        if ([ovRes, ordRes, keyRes, usrRes].some((r) => r.status === 401)) {
+          window.location.replace("/login?next=/admin");
+          return;
+        }
+        if (ovRes.status === 403) {
+          setAuthError("Akun Anda tidak memiliki hak akses Administrator.");
+          return;
+        }
+        if ([ovRes, ordRes, keyRes, usrRes].some((r) => !r.ok)) {
+          throw new Error("HTTP error saat memuat data admin");
+        }
+
+        const [ovData, ordData, keyData, usrData] = await Promise.all([
+          ovRes.json(),
+          ordRes.json(),
+          keyRes.json(),
+          usrRes.json(),
+        ]);
+
+        if (ovData.success) {
+          setAdminUser(ovData.admin);
+          setStats(ovData.stats);
+          setAuditLogs(ovData.recentAuditLogs || []);
+        }
+        if (ordData.success) setOrders(ordData.orders || []);
+        if (keyData.success) setKeys(keyData.keys || []);
+        if (usrData.success) setUsers(usrData.users || []);
+
+        setLastUpdatedAt(
+          new Intl.DateTimeFormat("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }).format(new Date())
+        );
+
+        if (opts?.manual) {
+          showToast("success", "Data panel admin berhasil diperbarui.");
+        }
+      } catch {
+        showToast("error", "Gagal memuat ulang data panel admin. Periksa koneksi server.");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [showToast]
+  );
 
   useEffect(() => {
     const id = window.setTimeout(() => {
@@ -357,9 +396,19 @@ export function AdminDashboardClient() {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+    } catch {
+      /* ignore network errors during logout */
+    } finally {
+      window.location.replace("/login");
+    }
   };
 
   const handleApproveOrder = async (order: Order, customNotes?: string) => {
@@ -779,8 +828,13 @@ export function AdminDashboardClient() {
             <Link href="/" className="jt-btn-secondary-clean">
               ← Web Utama
             </Link>
-            <button type="button" className="jt-btn-secondary-clean" onClick={handleLogout}>
-              Keluar
+            <button
+              type="button"
+              className="jt-btn-secondary-clean"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
+              {loggingOut ? "Keluar..." : "Keluar"}
             </button>
           </div>
         </div>
@@ -811,12 +865,36 @@ export function AdminDashboardClient() {
                 "Kelola 1 Universal API Key per akun, sesuaikan saldo IDR, dan atur IP Whitelist Enterprise."}
               {activeTab === "audit" &&
                 "Rekam jejak seluruh verifikasi bukti transaksi, persetujuan pesanan, saldo, dan kontrol API Key."}
+              {lastUpdatedAt && (
+                <span className="adm-sync-stamp">Diperbarui {lastUpdatedAt}</span>
+              )}
             </p>
           </div>
 
           <div className="adm-topbar-actions">
-            <button type="button" className="jt-btn-secondary-clean" onClick={() => loadAll()}>
-              Muat Ulang
+            <button
+              type="button"
+              className="jt-btn-secondary-clean adm-refresh-btn"
+              disabled={refreshing}
+              aria-busy={refreshing}
+              onClick={() => void loadAll({ manual: true })}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={refreshing ? "adm-spin" : ""}
+                aria-hidden="true"
+              >
+                <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                <path d="M21 3v6h-6" />
+              </svg>
+              <span>{refreshing ? "Memuat ulang..." : "Muat Ulang"}</span>
             </button>
             <button
               type="button"

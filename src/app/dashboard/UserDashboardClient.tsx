@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { GATEWAY_BASE_URL } from "@/data/catalog";
 import type { Order, UserProfile } from "@/lib/store";
 import type { EnrichedKey } from "@/lib/admin-service";
@@ -45,9 +44,9 @@ const formatDate = (iso?: string) => {
 };
 
 export function UserDashboardClient() {
-  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [orderOpen, setOrderOpen] = useState(false);
@@ -75,9 +74,12 @@ export function UserDashboardClient() {
 
   const loadData = useCallback(async () => {
     try {
-      const res = await fetch("/api/user/dashboard", { cache: "no-store" });
+      const res = await fetch(`/api/user/dashboard?_ts=${Date.now()}`, {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
       if (res.status === 401) {
-        router.replace("/login?next=/dashboard");
+        window.location.replace("/login?next=/dashboard");
         return;
       }
       const json = await res.json();
@@ -87,16 +89,24 @@ export function UserDashboardClient() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+      }).catch(() => undefined);
+    } finally {
+      window.location.replace("/");
+    }
   };
 
   const handleCreateOrder = async (e: React.FormEvent) => {
@@ -212,8 +222,13 @@ export function UserDashboardClient() {
             <Link href="/" className="jt-btn-secondary-clean">
               Beranda
             </Link>
-            <button type="button" className="jt-btn-secondary-clean" onClick={handleLogout}>
-              Keluar
+            <button
+              type="button"
+              className="jt-btn-secondary-clean"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
+              {loggingOut ? "Keluar..." : "Keluar"}
             </button>
           </div>
         </div>
