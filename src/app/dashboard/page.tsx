@@ -5,7 +5,7 @@ import { UserDashboardClient } from "./UserDashboardClient";
 
 export const metadata: Metadata = {
   title: "Portal Pengguna — API Key & Pesanan | Juragantoken",
-  description: "Kelola Virtual API Key terintegrasi akun Gmail dan pantau riwayat pesanan Anda di Juragantoken.",
+  description: "Kelola Universal API Key, saldo aktif, invoice resmi, dan riwayat pesanan Anda di Juragantoken.",
   robots: { index: false, follow: false },
 };
 

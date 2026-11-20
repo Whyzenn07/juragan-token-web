@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { GATEWAY_BASE_URL } from "@/data/catalog";
 import type { Order, UserProfile } from "@/lib/store";
 import type { EnrichedKey } from "@/lib/admin-service";
 import { ProofUploadDropzone } from "@/components/portal/ProofUploadDropzone";
@@ -46,8 +45,9 @@ const formatDate = (iso?: string) => {
 export function UserDashboardClient() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [copiedUrl, setCopiedUrl] = useState(false);
+  const toastTimerRef = useRef<number | null>(null);
 
   const [orderOpen, setOrderOpen] = useState(false);
   const [accountTier, setAccountTier] = useState<"standard" | "enterprise">("standard");
@@ -72,28 +72,78 @@ export function UserDashboardClient() {
   const [modalRef, setModalRef] = useState("");
   const [savingProof, setSavingProof] = useState(false);
 
-  const loadData = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/user/dashboard?_ts=${Date.now()}`, {
-        cache: "no-store",
-        credentials: "same-origin",
-      });
-      if (res.status === 401) {
-        window.location.replace("/login?next=/dashboard");
-        return;
-      }
-      const json = await res.json();
-      if (json.success) {
-        setData(json);
-      }
-    } finally {
-      setLoading(false);
+  const showToast = useCallback((type: "success" | "error", text: string) => {
+    setToast({ type, text });
+    if (toastTimerRef.current !== null) {
+      window.clearTimeout(toastTimerRef.current);
     }
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimerRef.current = null;
+    }, 4500);
   }, []);
 
   useEffect(() => {
-    loadData();
+    return () => {
+      if (toastTimerRef.current !== null) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
+
+  const loadData = useCallback(
+    async (opts?: { manual?: boolean }) => {
+      if (opts?.manual) {
+        setRefreshing(true);
+      }
+      try {
+        const res = await fetch(`/api/user/dashboard?_ts=${Date.now()}`, {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        if (res.status === 401) {
+          window.location.replace("/login?next=/dashboard");
+          return;
+        }
+        if (!res.ok) {
+          throw new Error("Gagal memuat portal akun.");
+        }
+        const json = await res.json();
+        if (json.success) {
+          setData(json);
+          if (opts?.manual) {
+            showToast("success", "Data portal akun berhasil diperbarui.");
+          }
+        } else {
+          showToast("error", json.error || "Gagal memuat ulang data portal akun.");
+        }
+      } catch {
+        showToast("error", "Gagal memuat ulang data portal akun.");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [showToast]
+  );
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      void loadData();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [loadData]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (inspectOrderId) setInspectOrderId(null);
+        else if (orderOpen) setOrderOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [inspectOrderId, orderOpen]);
 
   const handleLogout = async () => {
     if (loggingOut) return;
@@ -134,7 +184,7 @@ export function UserDashboardClient() {
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setToast({ type: "error", text: json.error || "Gagal membuat permintaan pesanan." });
+        showToast("error", json.error || "Gagal membuat permintaan pesanan.");
         return;
       }
       setOrderOpen(false);
@@ -142,10 +192,10 @@ export function UserDashboardClient() {
       setPaymentRef("");
       setProofUrl(undefined);
       setProofName(undefined);
-      setToast({
-        type: "success",
-        text: `Pesanan ${json.order.id} berhasil diajukan dan masuk ke antrean verifikasi Admin.`,
-      });
+      showToast(
+        "success",
+        `Pesanan ${json.order.id} berhasil diajukan dan masuk ke antrean verifikasi Admin.`
+      );
       await loadData();
     } finally {
       setSubmitting(false);
@@ -180,13 +230,13 @@ export function UserDashboardClient() {
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setToast({ type: "error", text: json.error || "Gagal mengunggah bukti pembayaran." });
+        showToast("error", json.error || "Gagal mengunggah bukti pembayaran.");
         return;
       }
-      setToast({
-        type: "success",
-        text: `Bukti transaksi untuk ${inspectedOrder.id} berhasil dikirim ke Admin.`,
-      });
+      showToast(
+        "success",
+        `Bukti transaksi untuk ${inspectedOrder.id} berhasil dikirim ke Admin.`
+      );
       await loadData();
     } finally {
       setSavingProof(false);
@@ -212,13 +262,20 @@ export function UserDashboardClient() {
             <span className="jt-sidebar-role-tag">Portal Akun</span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-            <span className="jt-cell-muted jt-mono">{data.user.email}</span>
+          <div className="usr-topbar-right">
             {data.user.role === "admin" && (
-              <Link href="/admin" className="jt-btn-primary-solid" style={{ padding: "7px 12px", fontSize: "12.5px" }}>
-                Buka Admin Panel
+              <Link
+                href="/admin"
+                prefetch={false}
+                className="jt-btn-primary-solid"
+                style={{ padding: "7px 12px", fontSize: "12.5px" }}
+              >
+                Admin Panel
               </Link>
             )}
+            <Link href="/docs" className="jt-btn-secondary-clean">
+              Panduan API
+            </Link>
             <Link href="/" className="jt-btn-secondary-clean">
               Beranda
             </Link>
@@ -243,20 +300,33 @@ export function UserDashboardClient() {
 
         <div className="jt-page-head">
           <div>
-            <h1>Halo, {data.user.fullName || data.user.email.split("@")[0]}</h1>
-            <p>Pantau Virtual API Key yang terintegrasi ke akun Gmail Anda dan riwayat pesanan token.</p>
+            <h1>Halo, {data.user.fullName || "Pengguna"}</h1>
+            <p>Kelola Universal API Key, pantau saldo kredit aktif, dan ajukan pesanan token dalam satu tempat.</p>
           </div>
           <div className="jt-head-actions">
             <button
               type="button"
-              className="jt-btn-secondary-clean"
-              onClick={async () => {
-                await navigator.clipboard.writeText(GATEWAY_BASE_URL);
-                setCopiedUrl(true);
-                setTimeout(() => setCopiedUrl(false), 2000);
-              }}
+              className="jt-btn-secondary-clean usr-refresh-btn"
+              disabled={refreshing}
+              aria-busy={refreshing}
+              onClick={() => void loadData({ manual: true })}
             >
-              {copiedUrl ? "Base URL Tersalin ✓" : `Salin Base URL (${GATEWAY_BASE_URL})`}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={refreshing ? "usr-spin" : ""}
+                aria-hidden="true"
+              >
+                <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                <path d="M21 3v6h-6" />
+              </svg>
+              <span>{refreshing ? "Memuat ulang..." : "Muat Ulang"}</span>
             </button>
             <button
               type="button"
@@ -269,20 +339,42 @@ export function UserDashboardClient() {
         </div>
 
         <section className="jt-kpi-grid cols-3" aria-label="Ringkasan akun">
-          <article className="jt-kpi-card">
-            <span className="jt-kpi-label">Total Saldo Aktif</span>
+          <article className="jt-kpi-card usr-kpi-card">
+            <div className="usr-kpi-head">
+              <span className="jt-kpi-label">Total Saldo Aktif</span>
+              <span className="usr-kpi-dot is-blue" aria-hidden="true" />
+            </div>
             <strong className="jt-kpi-val">{formatIdr(data.stats.totalBalanceIdr)}</strong>
-            <span className="jt-kpi-sub">Berlaku lintas 100+ model AI tanpa hangus</span>
+            <span className="jt-kpi-sub">Berlaku lintas 100+ model AI tanpa masa hangus</span>
           </article>
-          <article className="jt-kpi-card">
-            <span className="jt-kpi-label">API Key Terintegrasi</span>
+          <article className="jt-kpi-card usr-kpi-card">
+            <div className="usr-kpi-head">
+              <span className="jt-kpi-label">API Key Aktif</span>
+              <span className="usr-kpi-dot is-green" aria-hidden="true" />
+            </div>
             <strong className="jt-kpi-val">{data.stats.activeKeysCount}</strong>
-            <span className="jt-kpi-sub">dari {data.stats.totalKeysCount} kunci di akun Gmail ini</span>
+            <span className="jt-kpi-sub">
+              {data.stats.totalKeysCount > 0
+                ? `dari ${data.stats.totalKeysCount} kunci terdaftar`
+                : "Belum ada kunci yang aktif"}
+            </span>
           </article>
-          <article className="jt-kpi-card">
-            <span className="jt-kpi-label">Riwayat Pesanan</span>
+          <article className="jt-kpi-card usr-kpi-card">
+            <div className="usr-kpi-head">
+              <span className="jt-kpi-label">Total Pesanan</span>
+              <span
+                className={`usr-kpi-dot ${data.stats.pendingOrdersCount > 0 ? "is-amber" : "is-slate"}`}
+                aria-hidden="true"
+              />
+            </div>
             <strong className="jt-kpi-val">{data.stats.totalOrdersCount}</strong>
-            <span className="jt-kpi-sub">{data.stats.pendingOrdersCount} menunggu konfirmasi admin</span>
+            <span className="jt-kpi-sub">
+              {data.stats.pendingOrdersCount > 0
+                ? `${data.stats.pendingOrdersCount} menunggu verifikasi admin`
+                : data.stats.totalOrdersCount > 0
+                ? "Seluruh pesanan telah diproses"
+                : "Belum ada pesanan masuk"}
+            </span>
           </article>
         </section>
 
@@ -290,18 +382,36 @@ export function UserDashboardClient() {
         <section className="jt-panel-card">
           <div className="jt-panel-card-head">
             <div>
-              <h2>1 Universal API Key Anda ({data.keys.length})</h2>
+              <div className="usr-card-title-row">
+                <h2>Universal API Key</h2>
+                <span className="usr-count-pill">{data.keys.length} kunci</span>
+              </div>
               <span className="jt-cell-muted">
-                Satu kunci langsung membuka akses OpenAI, Claude, Gemini, DeepSeek, Qwen &amp; 100+ model AI.
+                Satu kunci untuk mengakses OpenAI, Claude, Gemini, DeepSeek, Qwen, dan ekosistem model AI lainnya.
               </span>
             </div>
             <Link href="/docs" className="jt-btn-secondary-clean">
-              Panduan Integrasi API ↗
+              Panduan Integrasi ↗
             </Link>
           </div>
           {data.keys.length === 0 ? (
-            <div className="jt-empty-box">
-              Belum ada API Key terhubung ke akun Gmail Anda. Ajukan pesanan token baru (Standard maupun Enterprise) agar Admin menerbitkan Virtual API Key universal Anda.
+            <div className="usr-empty-state">
+              <span className="usr-empty-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                </svg>
+              </span>
+              <strong>Belum ada API Key aktif</strong>
+              <p>
+                Ajukan pesanan kredit Standard atau Enterprise B2B. Setelah pembayaran diverifikasi, Admin akan menerbitkan Universal API Key untuk akun Anda.
+              </p>
+              <button
+                type="button"
+                className="jt-btn-primary-solid"
+                onClick={() => setOrderOpen(true)}
+              >
+                + Ajukan Pesanan Pertama
+              </button>
             </div>
           ) : (
             <div className="jt-table-scroll">
@@ -319,7 +429,9 @@ export function UserDashboardClient() {
                 <tbody>
                   {data.keys.map((k) => (
                     <tr key={k.hash}>
-                      <td className="jt-mono">{k.maskedKey}</td>
+                      <td>
+                        <span className="usr-key-pill">{k.maskedKey}</span>
+                      </td>
                       <td>
                         <div className="jt-cell-stack">
                           <span className="jt-cell-primary">
@@ -334,7 +446,7 @@ export function UserDashboardClient() {
                         {k.allowedIps && k.allowedIps.length > 0 ? (
                           <span className="jt-status active">{k.allowedIps.length} IP Terdaftar</span>
                         ) : (
-                          <span className="jt-cell-muted">Bebas (Fleksibel)</span>
+                          <span className="jt-cell-muted">Fleksibel (Semua IP)</span>
                         )}
                       </td>
                       <td className="jt-num">{formatIdr(k.balanceIdr)}</td>
@@ -359,18 +471,36 @@ export function UserDashboardClient() {
         {/* Riwayat Pesanan */}
         <section className="jt-panel-card">
           <div className="jt-panel-card-head">
-            <h2>Riwayat Pesanan Anda ({data.orders.length})</h2>
+            <div>
+              <div className="usr-card-title-row">
+                <h2>Riwayat Pesanan</h2>
+                <span className="usr-count-pill">{data.orders.length} transaksi</span>
+              </div>
+              <span className="jt-cell-muted">
+                Pantau status pembayaran, unggah bukti transfer (SS), dan cetak invoice resmi.
+              </span>
+            </div>
           </div>
           {data.orders.length === 0 ? (
-            <div className="jt-empty-box">Belum ada riwayat pesanan pada akun ini.</div>
+            <div className="usr-empty-state">
+              <span className="usr-empty-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z" />
+                  <path d="M9 8h6M9 12h6M9 16h4" />
+                </svg>
+              </span>
+              <strong>Belum ada riwayat pesanan</strong>
+              <p>
+                Pesanan baru maupun top-up saldo yang Anda ajukan akan tercatat rapi beserta invoice resminya di sini.
+              </p>
+            </div>
           ) : (
             <div className="jt-table-scroll">
               <table className="jt-table">
                 <thead>
                   <tr>
                     <th>Invoice</th>
-                    <th>Paket</th>
-                    <th>Metode</th>
+                    <th>Paket &amp; Metode</th>
                     <th>Total</th>
                     <th>Status</th>
                     <th>Tanggal</th>
@@ -380,9 +510,15 @@ export function UserDashboardClient() {
                 <tbody>
                   {data.orders.map((ord) => (
                     <tr key={ord.id}>
-                      <td className="jt-mono" style={{ whiteSpace: "nowrap" }}>{ord.id}</td>
-                      <td>{ord.packageName}</td>
-                      <td className="jt-cell-muted">{ord.methodName}</td>
+                      <td>
+                        <span className="usr-invoice-pill">{ord.id}</span>
+                      </td>
+                      <td>
+                        <div className="jt-cell-stack">
+                          <span className="jt-cell-primary">{ord.packageName}</span>
+                          <span className="jt-cell-muted">{ord.methodName}</span>
+                        </div>
+                      </td>
                       <td className="jt-num">{formatIdr(ord.totalIdr)}</td>
                       <td>
                         <span className={`jt-status ${ord.status}`}>
@@ -414,7 +550,15 @@ export function UserDashboardClient() {
 
       {/* Modal Ajukan Pesanan Baru */}
       {orderOpen && (
-        <div className="jt-modal-backdrop" role="dialog" aria-modal="true" aria-label="Ajukan Pesanan Token">
+        <div
+          className="jt-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Ajukan Pesanan Token"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOrderOpen(false);
+          }}
+        >
           <div className="jt-modal-dialog">
             <div className="jt-modal-head">
               <h3>Ajukan Pesanan Kredit API AI</h3>
@@ -523,12 +667,12 @@ export function UserDashboardClient() {
                 </>
               )}
 
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "14px" }}>
+              <div className="usr-preset-row">
                 {(accountTier === "enterprise" ? [250000, 500000, 1000000, 2500000] : [25000, 50000, 100000, 250000]).map((v) => (
                   <button
                     key={v}
                     type="button"
-                    className="jt-btn-secondary-clean"
+                    className={`jt-btn-secondary-clean usr-preset-btn ${Number(amount) === v ? "is-active" : ""}`}
                     onClick={() => setAmount(String(v))}
                   >
                     {formatIdr(v)}
@@ -560,6 +704,7 @@ export function UserDashboardClient() {
                   <option value="BCA Virtual Account">BCA Virtual Account</option>
                   <option value="Mandiri Virtual Account">Mandiri Virtual Account</option>
                   <option value="Transfer Bank">Transfer Bank</option>
+                  <option value="Invoice B2B & Transfer PT (IDR)">Invoice B2B &amp; Transfer PT (IDR)</option>
                 </select>
               </div>
               <div className="jt-field">
@@ -574,7 +719,7 @@ export function UserDashboardClient() {
                 />
               </div>
               <div className="jt-field">
-                <label htmlFor="uo-note">Catatan Kebutuhan (Opsional)</label>
+                <label htmlFor="uo-note">Catatan (Opsional)</label>
                 <input
                   id="uo-note"
                   type="text"
@@ -585,7 +730,7 @@ export function UserDashboardClient() {
                 />
               </div>
               <div className="jt-field">
-                <label htmlFor="uo-ref">Referensi Transfer / Bank Pengirim (Opsional)</label>
+                <label htmlFor="uo-ref">Referensi Transfer (Opsional)</label>
                 <input
                   id="uo-ref"
                   type="text"
@@ -598,7 +743,7 @@ export function UserDashboardClient() {
               <ProofUploadDropzone
                 value={proofUrl}
                 fileName={proofName}
-                label="Upload SS Bukti Pembayaran (Opsional)"
+                label="Upload Screenshot Pembayaran (Opsional)"
                 onChange={({ url, fileName }) => {
                   setProofUrl(url ?? undefined);
                   setProofName(fileName);
