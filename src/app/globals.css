@@ -984,7 +984,7 @@ h1, h2, h3, h4 { font-family: var(--font-h); }
 
 .company-main {
   width: 100%;
-  padding: 20px 0 48px;
+  padding: 20px 0 28px;
 }
 
 /* Breadcrumb & Demo Pill */
@@ -6049,7 +6049,7 @@ footer {
   .footer-link { margin-left: 0; }
   .price-compare-row { grid-template-columns: 1fr; }
   .company-container { max-width: 100%; overflow-x: clip; padding: 0 12px; }
-  .company-main { padding: 12px 0 36px; max-width: 100%; overflow-x: clip; }
+  .company-main { padding: 12px 0 20px; max-width: 100%; overflow-x: clip; }
 }
 
 /* Section Kicker Pill */

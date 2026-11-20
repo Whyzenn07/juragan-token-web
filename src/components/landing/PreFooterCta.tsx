@@ -9,7 +9,7 @@ type PreFooterCtaProps = {
 
 export function PreFooterCta({ onOpenBalanceModal }: PreFooterCtaProps) {
   const waUrl = buildWhatsappUrl(
-    "Halo Tim Juragantoken, saya ingin menjadwalkan konsultasi & uji coba integrasi API AI."
+    "Halo Tim Juragantoken, saya ingin berkonsultasi mengenai rekomendasi model AI dan uji coba endpoint gateway."
   );
 
   return (
@@ -20,13 +20,14 @@ export function PreFooterCta({ onOpenBalanceModal }: PreFooterCtaProps) {
     >
       <div className="jt-prefooter-card">
         <div className="jt-prefooter-content">
-          <span className="jt-prefooter-badge">SIAP BERINTEGRASI DALAM 1 MENIT</span>
+          <span className="jt-prefooter-badge">KONSULTASI &amp; UJI COBA AKSES</span>
           <h2 id="prefooter-cta-heading">
-            Satu API Key Terpadu untuk Seluruh Kebutuhan AI Tim Anda
+            Satu API Key Terpadu untuk Seluruh Kebutuhan AI Proyek &amp; Tim Anda
           </h2>
           <p>
-            Hubungi tim teknis kami melalui WhatsApp <strong>{WHATSAPP_DISPLAY}</strong> untuk diskusi arsitektur,
-            rekomendasi model, atau uji coba langsung endpoint <code>api.tokotokenai.com/v1</code>.
+            Diskusikan rekomendasi model untuk ngoding, riset, maupun automasi chatbot, atau jadwalkan uji coba langsung endpoint{" "}
+            <code>api.tokotokenai.com/v1</code> bersama tim Juragantoken melalui WhatsApp{" "}
+            <strong>{WHATSAPP_DISPLAY}</strong>.
           </p>
         </div>
 
@@ -37,7 +38,7 @@ export function PreFooterCta({ onOpenBalanceModal }: PreFooterCtaProps) {
             rel="noopener noreferrer"
             className="jt-pf-btn-white"
           >
-            <span>Konsultasi via WhatsApp</span>
+            <span>Hubungi via WhatsApp</span>
             <span aria-hidden="true">↗</span>
           </a>
 

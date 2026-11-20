@@ -2042,7 +2042,7 @@ html.jt-scroll-anim [data-reveal].is-revealed {
 
 /* C. Pre-Footer Final CTA Banner (Royal Blue Mix White) */
 .jt-prefooter-section {
-  margin: 24px 0 48px;
+  margin: 20px 0 0;
 }
 
 .jt-prefooter-card {
@@ -2056,7 +2056,7 @@ html.jt-scroll-anim [data-reveal].is-revealed {
     radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.22), transparent 46%),
     linear-gradient(135deg, #1d63dc 0%, #2563eb 58%, #3b82f6 100%);
   border: 1px solid #60a5fa;
-  box-shadow: 0 20px 44px rgba(29, 99, 220, 0.22);
+  box-shadow: 0 14px 32px rgba(29, 99, 220, 0.16);
   color: #ffffff;
 }
 
@@ -3423,8 +3423,8 @@ html.jt-scroll-anim [data-reveal].is-revealed {
 .site-pro-footer {
   background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
   border-top: 1px solid #dce6f4;
-  padding: 56px 0 32px;
-  margin-top: 40px;
+  padding: 44px 0 28px;
+  margin-top: 8px;
   font-family: var(--font), system-ui, -apple-system, sans-serif;
   color: #52647a;
 }

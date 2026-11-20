@@ -1,6 +1,6 @@
 "use client";
 
-import { buildWhatsappUrl, WHATSAPP_DISPLAY } from "@/lib/site-config";
+import { WHATSAPP_DISPLAY } from "@/lib/site-config";
 
 const ADVANTAGES = [
   {
@@ -53,10 +53,6 @@ const NEUTRAL_COMPARE_ROWS = [
 ];
 
 export function WhyChooseUs() {
-  const waHref = buildWhatsappUrl(
-    "Halo Tim Juragantoken, saya ingin berdiskusi mengenai integrasi API AI untuk tim/perusahaan kami."
-  );
-
   return (
     <section className="jt-section" id="kenapa-kami" aria-labelledby="why-heading">
       <div className="jt-section-head" data-reveal="fade-up">
@@ -107,22 +103,6 @@ export function WhyChooseUs() {
             </tbody>
           </table>
         </div>
-      </div>
-
-      {/* Contact Callout Strip (using testing WA 0812-2698-3990) */}
-      <div className="jt-contact-banner" data-reveal="fade-up">
-        <div>
-          <span className="jt-kicker">KONSULTASI &amp; UJI COBA AKSES</span>
-          <h3>Butuh Rekomendasi Model untuk Proyek atau Tim Anda?</h3>
-          <p>
-            Diskusikan kebutuhan ngoding, riset, atau automasi chatbot bersama tim Juragantoken melalui WhatsApp{" "}
-            <strong>{WHATSAPP_DISPLAY}</strong>.
-          </p>
-        </div>
-        <a href={waHref} target="_blank" rel="noopener noreferrer" className="jt-wa-cta">
-          <span>Hubungi via WhatsApp</span>
-          <span aria-hidden="true">↗</span>
-        </a>
       </div>
     </section>
   );
