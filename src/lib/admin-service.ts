@@ -507,6 +507,7 @@ export async function adminApproveOrder(
     status: "paid",
     paidAt: now,
     keyHash: updatedKeyRecord.hash,
+    pendingReveal: issuedKey || existing.pendingReveal,
     adminNotes: adminNotes?.trim() ? adminNotes.trim().slice(0, 300) : existing.adminNotes,
     reviewedBy: admin.id,
     reviewedAt: now,
@@ -1103,6 +1104,37 @@ export async function userAttachOrderProof(
 
   await mutate((db) => {
     db.orders[updated.id] = updated;
+  });
+  await syncOrderToSupabase(updated);
+
+  return { ok: true, order: updated };
+}
+
+export async function userDismissOrderKeyReveal(
+  user: UserProfile,
+  orderId: string
+): Promise<{ ok: true; order: Order } | { ok: false; status: number; error: string }> {
+  const allOrders = await listAllOrders();
+  const existing = allOrders.find((o) => o.id === orderId);
+  if (!existing) {
+    return { ok: false, status: 404, error: "Pesanan tidak ditemukan." };
+  }
+
+  const isOwner =
+    existing.userId === user.id ||
+    existing.customerEmail.toLowerCase() === user.email.toLowerCase();
+  if (!isOwner) {
+    return { ok: false, status: 403, error: "Anda tidak memiliki akses ke pesanan ini." };
+  }
+
+  const updated: Order = {
+    ...existing,
+    pendingReveal: undefined,
+  };
+
+  await mutate((db) => {
+    db.orders[updated.id] = updated;
+    delete db.orders[updated.id].pendingReveal;
   });
   await syncOrderToSupabase(updated);
 

@@ -1954,6 +1954,334 @@
   }
 }
 
+/* ---------- Order Flow: Universal Banner, Payment Destination & API Key Reveal ---------- */
+.jt-modal-dialog.is-order {
+  max-width: 580px;
+}
+
+.usr-universal-banner {
+  background: linear-gradient(135deg, #f0f7ff, #f8fbff);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.usr-universal-banner strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 4px;
+}
+
+.usr-universal-banner p {
+  margin: 0;
+  font-size: 12.2px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.usr-universal-banner code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  background: rgba(29, 99, 220, 0.1);
+  color: #1d4ed8;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.usr-pay-dest-card {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.usr-pay-dest-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.usr-qris-graphic {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.usr-qris-graphic span {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #0a2540;
+}
+
+.usr-pay-dest-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.usr-pay-dest-kicker {
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #1d63dc;
+}
+
+.usr-pay-dest-head strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.usr-pay-dest-head small {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.usr-pay-dest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 10px;
+}
+
+.usr-pay-dest-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.usr-pay-item-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.usr-pay-item-val {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.usr-pay-copy-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.usr-pay-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a2540;
+  word-break: break-all;
+}
+
+.usr-pay-amount {
+  font-size: 13px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: #1d63dc;
+}
+
+.usr-mini-copy-btn {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #1e293b;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.usr-mini-copy-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d63dc;
+}
+
+.usr-pay-dest-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #475569;
+}
+
+/* One-Time Plaintext API Key Reveal Card */
+.usr-reveal-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 45%, #eff6ff 100%);
+  border: 1px solid #86efac;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 26px rgba(16, 185, 129, 0.08);
+}
+
+.usr-reveal-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.usr-reveal-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.usr-reveal-head h2 {
+  margin: 0 0 4px;
+  font-size: 17.5px;
+  font-weight: 750;
+  color: #0f172a;
+}
+
+.usr-reveal-head p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.usr-reveal-keybox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #0a2540;
+  color: #f8fafc;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.usr-reveal-keybox code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13.5px;
+  font-weight: 650;
+  word-break: break-all;
+}
+
+.usr-guide-panel {
+  background: #ffffff;
+  border: 1px solid #dce5f2;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.usr-guide-model-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.usr-guide-model-row label {
+  font-size: 12px;
+  font-weight: 650;
+  color: #334155;
+}
+
+.usr-guide-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.usr-guide-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.usr-guide-label {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: #64748b;
+}
+
+.usr-guide-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.usr-guide-code-row code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: #0f172a;
+  overflow-x: auto;
+  word-break: break-all;
+}
+
+.usr-reveal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.usr-reveal-foot span {
+  font-size: 12px;
+  color: #475569;
+}
+
+@media (max-width: 640px) {
+  .usr-pay-dest-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .usr-reveal-card {
+    padding: 16px;
+  }
+
+  .usr-reveal-keybox,
+  .usr-reveal-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .usr-reveal-keybox button,
+  .usr-reveal-foot button {
+    width: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .usr-navbar,
   .usr-nav-pill,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   ANSWER_INPUT_TOKENS,
   ANSWER_OUTPUT_TOKENS,
@@ -199,6 +200,14 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
             </div>
           </div>
 
+          <div className="modal-universal-note">
+            <strong>1 Saldo &amp; 1 Universal API Key = Semua Model</strong>
+            <p>
+              Tidak perlu membeli paket khusus {model.name}. Ajukan deposit kredit di Portal Akun untuk menerima{" "}
+              <code>jt-live-...</code>, lalu pakai model ID <code>{model.id}</code> (maupun Claude, GPT, Gemini, dan DeepSeek lain) dengan saldo yang sama.
+            </p>
+          </div>
+
           <div className="usage-recommend-box">
             <h4>Bisa langsung dipakai di:</h4>
             <ul>
@@ -309,15 +318,25 @@ export function ModelDetailModal({ open, model, onClose, onSelectTopUp, usdRate 
             Beli saldo untuk model ini
           </button>
         ) : (
-          <a
-            href={buildWhatsappUrl(`Halo Tim Juragantoken, saya ingin konsultasi penggunaan model ${model.name} (${model.id}).`)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button-primary-sm"
-            style={{ padding: "10px 16px", textDecoration: "none" }}
-          >
-            Tanya Tim via WhatsApp ↗
-          </a>
+          <>
+            <a
+              href={buildWhatsappUrl(`Halo Tim Juragantoken, saya ingin konsultasi penggunaan model ${model.name} (${model.id}).`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button-sm-outline"
+              style={{ padding: "9px 14px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
+            >
+              Tanya via WhatsApp ↗
+            </a>
+            <Link
+              href={`/dashboard?order=1&model=${encodeURIComponent(model.id)}`}
+              className="button-primary-sm"
+              style={{ padding: "10px 16px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}
+              onClick={onClose}
+            >
+              Pesan Kredit &amp; Gunakan Model Ini →
+            </Link>
+          </>
         )}
       </div>
     </Dialog>

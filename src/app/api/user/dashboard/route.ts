@@ -4,6 +4,7 @@ import {
   createUserOrderRequest,
   getUserDashboardData,
   userAttachOrderProof,
+  userDismissOrderKeyReveal,
 } from "@/lib/admin-service";
 
 export async function GET() {
@@ -57,6 +58,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   const body = (await req.json().catch(() => ({}))) as {
+    action?: "dismiss_reveal" | "upload_proof";
     orderId?: string;
     paymentProofUrl?: string;
     paymentProofName?: string;
@@ -65,6 +67,14 @@ export async function PATCH(req: NextRequest) {
 
   if (!body.orderId?.trim()) {
     return NextResponse.json({ success: false, error: "ID pesanan wajib disertakan." }, { status: 400 });
+  }
+
+  if (body.action === "dismiss_reveal") {
+    const result = await userDismissOrderKeyReveal(guard.session.user, body.orderId.trim());
+    if (!result.ok) {
+      return NextResponse.json({ success: false, error: result.error }, { status: result.status });
+    }
+    return NextResponse.json({ success: true, order: result.order });
   }
 
   const result = await userAttachOrderProof(guard.session.user, body.orderId.trim(), {

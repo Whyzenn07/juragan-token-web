@@ -4059,10 +4059,39 @@ footer {
 .comp-strong { color: var(--blue-deep); font-size: 18px; font-weight: 800; font-family: var(--font-h); }
 .compare-col small { font-size: 9.5px; color: #6c86a1; line-height: 1.4; margin-top: 4px; }
 
+.modal-universal-note {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 11px 14px;
+  margin-bottom: 14px;
+}
+.modal-universal-note strong {
+  display: block;
+  font-size: 11.5px;
+  color: #1e40af;
+  margin-bottom: 3px;
+}
+.modal-universal-note p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #334155;
+}
+.modal-universal-note code {
+  font-size: 10.5px;
+  background: rgba(29, 99, 220, 0.09);
+  color: #1d4ed8;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
 .modal-footer-actions {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: flex-end;
+  align-items: center;
   margin-top: 20px;
 }
 .button-outline {

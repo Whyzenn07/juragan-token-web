@@ -95,8 +95,8 @@ export function EnterpriseStandardSection() {
               <span>Konsultasi Enterprise B2B</span>
               <span aria-hidden="true">↗</span>
             </a>
-            <Link href="/signup" className="jt-tier-btn-ghost-dark">
-              <span>Daftar Akun Gmail</span>
+            <Link href="/dashboard?order=1&tier=enterprise" className="jt-tier-btn-ghost-dark">
+              <span>Ajukan Deposit Enterprise →</span>
             </Link>
           </div>
         </article>
@@ -126,12 +126,11 @@ export function EnterpriseStandardSection() {
             </li>
           </ul>
           <div className="jt-tier-actions">
-            <Link href="/signup" className="jt-tier-btn-royal">
-              <span>Mulai Gratis (Sign Up)</span>
-              <span aria-hidden="true">→</span>
+            <Link href="/dashboard?order=1&tier=standard" className="jt-tier-btn-royal">
+              <span>Pesan Kredit via Portal →</span>
             </Link>
-            <Link href="/login" className="jt-tier-btn-outline">
-              <span>Sign In Akun</span>
+            <Link href="/signup" className="jt-tier-btn-outline">
+              <span>Daftar Akun Baru</span>
             </Link>
           </div>
         </article>
