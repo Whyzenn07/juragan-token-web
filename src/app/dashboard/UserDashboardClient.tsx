@@ -9,14 +9,16 @@ import { ProofUploadDropzone } from "@/components/portal/ProofUploadDropzone";
 import { InvoiceDocument } from "@/components/portal/InvoiceDocument";
 
 const POPULAR_MODEL_IDS = [
+  "claude-fable-5-2",
   "claude-opus-5-5",
   "claude-sonnet-5-5",
-  "gpt-6-sol",
-  "chatgpt-6-astra",
-  "gemini-4-argon",
+  "gpt-6.2-astra",
+  "gpt-6.1-sol",
+  "gemini-4-carbon",
   "gemini-3.8-flash",
-  "deepseek-v4-pro",
-  "qwen3.7-plus",
+  "deepseek-v4.1-flash",
+  "kimi-k3",
+  "qwen3-coder-3.8-27b",
 ];
 
 const POPULAR_MODELS = POPULAR_MODEL_IDS.map((id) =>

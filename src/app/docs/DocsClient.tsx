@@ -30,12 +30,15 @@ const NAV = [
 ] as const;
 
 const SWITCHER_MODELS = [
+  { id: "claude-fable-5-2", provider: "anthropic", label: "Claude Fable 5.2" },
+  { id: "claude-opus-5-5", provider: "anthropic", label: "Claude Opus 5.5" },
   { id: "claude-sonnet-5-5", provider: "anthropic", label: "Claude Sonnet 5.5" },
-  { id: "chatgpt-6-astra", provider: "openai", label: "Chat GPT 6 Astra" },
-  { id: "gemini-4-argon", provider: "google", label: "Gemini 4 Argon" },
-  { id: "deepseek-v4-pro", provider: "deepseek", label: "DeepSeek V4 Pro" },
-  { id: "qwen3.7-max", provider: "alibaba", label: "Qwen 3.7 Max" },
-  { id: "grok-4", provider: "xai", label: "Grok 4" },
+  { id: "gpt-6.2-astra", provider: "openai", label: "GPT-6.2 Astra" },
+  { id: "gpt-6.1-sol", provider: "openai", label: "GPT-6.1 Sol" },
+  { id: "gemini-4-carbon", provider: "google", label: "Gemini 4 Carbon" },
+  { id: "deepseek-v4.1-flash", provider: "deepseek", label: "DeepSeek V4.1 Flash" },
+  { id: "kimi-k3", provider: "moonshot", label: "Kimi K3" },
+  { id: "qwen3-coder-3.8-27b", provider: "alibaba", label: "Qwen3-Coder (3.8-27B)" },
 ] as const;
 
 const OS_OPTIONS: { id: OsId; label: string }[] = [

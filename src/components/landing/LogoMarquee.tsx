@@ -10,12 +10,12 @@ type MarqueeBrand = {
 };
 
 const AI_BRANDS: MarqueeBrand[] = [
-  { providerId: "anthropic", label: "Claude", sampleModelId: "claude-opus-5-5" },
-  { providerId: "openai", label: "OpenAI", sampleModelId: "chatgpt-6-astra" },
-  { providerId: "google", label: "Gemini", sampleModelId: "gemini-4-argon" },
+  { providerId: "anthropic", label: "Claude", sampleModelId: "claude-fable-5-2" },
+  { providerId: "openai", label: "OpenAI", sampleModelId: "gpt-6.2-astra" },
+  { providerId: "google", label: "Gemini", sampleModelId: "gemini-4-carbon" },
   { providerId: "xai", label: "Grok", sampleModelId: "grok-4" },
-  { providerId: "deepseek", label: "DeepSeek", sampleModelId: "deepseek-v4-pro" },
-  { providerId: "alibaba", label: "Qwen", sampleModelId: "qwen3.7-max" },
+  { providerId: "deepseek", label: "DeepSeek", sampleModelId: "deepseek-v4.1-flash" },
+  { providerId: "alibaba", label: "Qwen", sampleModelId: "qwen3-coder-3.8-27b" },
   { providerId: "moonshot", label: "Kimi", sampleModelId: "kimi-k3" },
   { providerId: "minimax", label: "MiniMax", sampleModelId: "minimax-m2.7" },
   { providerId: "zhipu", label: "GLM", sampleModelId: "glm-5.3-flash" },

@@ -50,15 +50,15 @@ type SortOption = "featured" | "provider" | "name" | "cheapest" | "priciest";
 
 const DEFAULT_VISIBLE_MODELS = 9;
 const FLAGSHIP_MODEL_IDS = [
+  "claude-fable-5-2",
   "claude-opus-5-5",
   "claude-sonnet-5-5",
-  "chatgpt-6-astra",
-  "gpt-6-sol",
-  "gemini-4-argon",
-  "gemini-3.8-flash",
-  "deepseek-v4-pro",
-  "qwen3.7-max",
-  "grok-4",
+  "gpt-6.2-astra",
+  "gpt-6.1-sol",
+  "gemini-4-carbon",
+  "deepseek-v4.1-flash",
+  "kimi-k3",
+  "qwen3-coder-3.8-27b",
 ];
 
 const formatIdr = (val: number) =>
@@ -752,7 +752,7 @@ export default function Home() {
                         <span>JURAGANTOKEN GATEWAY</span>
                       </div>
                       <p className="dps-card-body">
-                        Satu endpoint OpenAI-compatible untuk memanggil Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, hingga Qwen secara fleksibel.
+                        Satu endpoint OpenAI-compatible untuk memanggil Claude Fable 5.2, Claude Opus 5.5, GPT-6.2 Astra, Gemini 4 Carbon, DeepSeek V4.1 Flash, Kimi K3, hingga Qwen3-Coder secara fleksibel.
                       </p>
                     </div>
                   </>
@@ -1471,7 +1471,7 @@ export default function Home() {
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
                     <span className="faq-badge">1 API Key Universal</span>
-                    <h3 className="faq-question">Apakah 1 Virtual API Key bisa dipakai untuk Claude Opus 5.5, GPT-6, Gemini, DeepSeek, dan Qwen sekaligus?</h3>
+                    <h3 className="faq-question">Apakah 1 Virtual API Key bisa dipakai untuk Claude Fable 5.2, Claude Opus 5.5, GPT-6.2 Astra, Gemini 4 Carbon, DeepSeek, Kimi K3, dan Qwen3-Coder sekaligus?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />

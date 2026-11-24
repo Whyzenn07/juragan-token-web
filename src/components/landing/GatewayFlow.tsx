@@ -3,10 +3,10 @@
 import { ProviderLogo } from "@/components/ui/ProviderLogo";
 
 const ENDPOINT_PROVIDERS = [
-  { provider: "anthropic", title: "Anthropic Claude", sub: "Opus 5.5 · Sonnet 5.5" },
-  { provider: "openai", title: "OpenAI GPT", sub: "Chat GPT 6 Astra · Sol · Terra · Luna" },
-  { provider: "google", title: "Google Gemini", sub: "Gemini 4 Argon · 3.8 Flash" },
-  { provider: "deepseek", title: "DeepSeek & Qwen", sub: "V4 Pro · V4 Flash · Qwen 3.7" },
+  { provider: "anthropic", title: "Anthropic Claude", sub: "Fable 5.2 · Opus 5.5 · Sonnet 5.5" },
+  { provider: "openai", title: "OpenAI GPT", sub: "GPT-6.2 Astra · GPT-6.1 Sol" },
+  { provider: "google", title: "Google Gemini", sub: "Gemini 4 Carbon · 3.8 Flash" },
+  { provider: "deepseek", title: "DeepSeek, Kimi & Qwen", sub: "V4.1 Flash · Kimi K3 · Qwen3-Coder" },
 ];
 
 export function GatewayFlow() {
@@ -108,7 +108,7 @@ export function GatewayFlow() {
             </div>
           </div>
           <h3>Eksplorasi &amp; Pindah Model Cepat</h3>
-          <p>Beralih dari Claude Opus untuk ngoding ke GPT-6 Sol untuk riset atau DeepSeek untuk efisiensi dalam hitungan detik.</p>
+          <p>Beralih dari Claude Fable 5.2 atau Opus 5.5 ke GPT-6.2 Astra, Gemini 4 Carbon, atau DeepSeek V4.1 Flash dalam hitungan detik.</p>
         </article>
 
         <article className="jt-step-card jt-tks-card" data-reveal="fade-up" data-delay="200">

@@ -377,7 +377,7 @@ export function PaymentModal({
 
   const resolveFallbackModel = (p?: RetailPackage | null): ModelItem | null => {
     if (!p) return null;
-    if (p.id === "pkt-mhs-uji") return modelsCatalog.find((m) => m.id === "deepseek-v4-flash") || null;
+    if (p.id === "pkt-mhs-uji") return modelsCatalog.find((m) => m.id === "deepseek-v4.1-flash") || null;
     if (p.id === "pkt-mhs-starter") return modelsCatalog.find((m) => m.id === "gemini-3.8-flash") || null;
     if (p.id === "pkt-skripsi-koding") return modelsCatalog.find((m) => m.id === "claude-sonnet-5-5") || null;
     if (p.id === "pkt-pro-builder") return modelsCatalog.find((m) => m.id === "claude-sonnet-5-5") || null;

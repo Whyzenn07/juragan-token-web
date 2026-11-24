@@ -35,24 +35,24 @@ export const providers: Provider[] = [
 
 export const modelsCatalog: ModelItem[] = [
   {
-    id: "chatgpt-6-astra",
-    name: "Chat GPT 6 Astra",
+    id: "gpt-6.2-astra",
+    name: "GPT-6.2 Astra",
     providerId: "openai",
     category: "Ngoding",
-    description: "Frontier tertinggi OpenAI untuk pembuatan web/app otonom, refactoring fullstack, dan coding loop.",
+    description: "Model unggulan OpenAI untuk pembuatan kode baru (greenfield), pemecahan algoritma kompleks, serta dukungan jendela konteks besar hingga 1 juta token.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
-    contextTokens: 1_048_576,
+    contextTokens: 1_000_000,
     ratio: 5.0,
     completionRatio: 5,
     featured: true
   },
   {
-    id: "gpt-6-sol",
-    name: "GPT-6 Sol",
+    id: "gpt-6.1-sol",
+    name: "GPT-6.1 Sol",
     providerId: "openai",
-    category: "Tugas & Riset",
-    description: "Model penalaran profesional generasi ke-6 OpenAI untuk analitika riset multi-langkah, arsitektur sistem, dan sintesis komputasi mendalam.",
+    category: "Ngoding",
+    description: "Pilihan ideal untuk tugas coding sehari-hari dan otomatisasi CLI dengan latensi lebih rendah serta efisiensi token yang tinggi.",
     inputs: ["teks", "gambar"],
     endpoints: ["openai", "anthropic"],
     ratio: 1.75,
@@ -106,14 +106,27 @@ export const modelsCatalog: ModelItem[] = [
     completionRatio: 6
   },
   {
-    id: "claude-opus-5-5",
-    name: "Claude Opus 5.5",
+    id: "claude-fable-5-2",
+    name: "Claude Fable 5.2",
     providerId: "anthropic",
-    category: "Tugas & Riset",
-    description: "Puncak kecerdasan Anthropic untuk penalaran mendalam, tinjauan dokumen strategis, dan arsitektur sistem kritis.",
+    category: "Ngoding",
+    description: "Memimpin puncak papan peringkat benchmark pengkodean (SWE-bench & LiveCodeBench) dengan akurasi penalaran rekayasa perangkat lunak tertinggi.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
     contextTokens: 200_000,
+    ratio: 5.0,
+    completionRatio: 5,
+    featured: true
+  },
+  {
+    id: "claude-opus-5-5",
+    name: "Claude Opus 5.5",
+    providerId: "anthropic",
+    category: "Ngoding",
+    description: "Sangat andal untuk tugas pengkodean agenik (agentic coding) berdurasi panjang dan perubahan lintas banyak file (multi-file refactoring) dengan konteks 1 juta token.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["anthropic", "openai"],
+    contextTokens: 1_000_000,
     ratio: 3.5,
     completionRatio: 5,
     featured: true
@@ -123,24 +136,13 @@ export const modelsCatalog: ModelItem[] = [
     name: "Claude Sonnet 5.5",
     providerId: "anthropic",
     category: "Ngoding",
-    description: "Model koding terkuat di dunia saat ini. Menguasai arsitektur kompleks, debugging multi-file, dan integrasi Claude Code.",
+    description: "Menawarkan keseimbangan kecepatan dan kecerdasan terbaik untuk alur kerja agentic coding harian dengan biaya lebih hemat dibanding seri Opus.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["anthropic", "openai"],
     contextTokens: 200_000,
     ratio: 1.75,
     completionRatio: 5,
     featured: true
-  },
-  {
-    id: "claude-fable-5-1",
-    name: "Claude Fable 5.1",
-    providerId: "anthropic",
-    category: "Ngoding",
-    description: "Generasi khusus seri Fable 5.1 Anthropic untuk sintesis arsitektur backend, review kode presisi, dan alur agentic kompleks.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai", "anthropic"],
-    ratio: 5,
-    completionRatio: 5
   },
   {
     id: "claude-haiku-5-5",
@@ -178,11 +180,24 @@ export const modelsCatalog: ModelItem[] = [
     completionRatio: 5
   },
   {
+    id: "gemini-4-carbon",
+    name: "Gemini 4 Carbon",
+    providerId: "google",
+    category: "Ngoding",
+    description: "Unggul dalam input multimodal asli — mampu membaca diagram arsitektur atau tangkapan layar bug UI langsung bersama kode pada skala frontier.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["openai"],
+    contextTokens: 1_000_000,
+    ratio: 1.5,
+    completionRatio: 5,
+    featured: true
+  },
+  {
     id: "gemini-4-argon",
     name: "Gemini 4 Argon",
     providerId: "google",
     category: "Ngoding",
-    description: "Frontier generasi ke-4 terbaru Google DeepMind untuk reasoning tingkat tinggi dan pemecahan algoritma rumit.",
+    description: "Frontier generasi ke-4 Google DeepMind untuk reasoning tingkat tinggi dan pemecahan algoritma rumit.",
     inputs: ["teks", "gambar", "PDF"],
     endpoints: ["openai"],
     ratio: 1.75,
@@ -194,24 +209,13 @@ export const modelsCatalog: ModelItem[] = [
     name: "Gemini 3.8 Flash",
     providerId: "google",
     category: "Chat Hemat",
-    description: "Multimodal serba-bisa Google generasi terbaru. Jendela konteks raksasa 1 juta token dengan harga super terjangkau.",
+    description: "Multimodal asli Google berbiaya rendah untuk volume tinggi — membaca diagram arsitektur, screenshot bug UI, dan konteks 1 juta token secara efisien.",
     inputs: ["teks", "gambar", "audio", "video", "PDF"],
     endpoints: ["openai"],
     contextTokens: 1_000_000,
     ratio: 0.25,
     completionRatio: 6,
     featured: true
-  },
-  {
-    id: "gemini-3.6-flash",
-    name: "Gemini 3.6 Flash Code",
-    providerId: "google",
-    category: "Ngoding",
-    description: "Model koding kilat Google untuk integrasi CI/CD, parsing log server, dan penulisan skrip automasi.",
-    inputs: ["teks", "gambar"],
-    endpoints: ["openai"],
-    ratio: 0.15,
-    completionRatio: 5
   },
   {
     id: "gemini-3.1-pro",
@@ -263,11 +267,11 @@ export const modelsCatalog: ModelItem[] = [
     featured: true
   },
   {
-    id: "deepseek-v4-flash",
-    name: "DeepSeek V4 Flash",
+    id: "deepseek-v4.1-flash",
+    name: "DeepSeek V4.1 Flash",
     providerId: "deepseek",
     category: "Chat Hemat",
-    description: "Generasi V4 super hemat dari DeepSeek. Respon kilat untuk tanya jawab harian dan ringkasan teks singkat.",
+    description: "Memberikan rasio performa-terhadap-harga terbaik di kelasnya, mendekati skor model frontier dengan biaya API yang jauh lebih murah.",
     inputs: ["teks"],
     endpoints: ["openai"],
     ratio: 0.04,
@@ -335,15 +339,16 @@ export const modelsCatalog: ModelItem[] = [
     completionRatio: 3.133
   },
   {
-    id: "qwen3.7-plus",
-    name: "Qwen 3.7 Plus",
+    id: "qwen3-coder-3.8-27b",
+    name: "Qwen3-Coder (3.8-27B)",
     providerId: "alibaba",
     category: "Ngoding",
-    description: "Model coding dan logic frontier Alibaba Cloud untuk integrasi API, penulisan script, dan automasi bisnis.",
-    inputs: ["teks", "gambar"],
+    description: "Pilihan open-weight berlisensi Apache 2.0 yang ringan namun konsisten untuk coding, integrasi API, dan dijalankan secara lokal di GPU tunggal.",
+    inputs: ["teks"],
     endpoints: ["openai"],
-    ratio: 0.2,
-    completionRatio: 4
+    ratio: 0.12,
+    completionRatio: 4,
+    featured: true
   },
   {
     id: "qwen3.6-flash",
@@ -440,14 +445,15 @@ export const modelsCatalog: ModelItem[] = [
   },
   {
     id: "kimi-k3",
-    name: "Kimi K3 Research",
+    name: "Kimi K3",
     providerId: "moonshot",
-    category: "Tugas & Riset",
-    description: "Model riset kontekstual panjang dari Moonshot AI untuk memproses referensi berlembar-lembar secara utuh.",
-    inputs: ["teks"],
+    category: "Ngoding",
+    description: "Salah satu model open-weight terkuat untuk tugas agen coding dengan dukungan konteks 1 juta token dan kemampuan visi bawaan.",
+    inputs: ["teks", "gambar"],
     endpoints: ["openai"],
-    ratio: 1.43,
-    completionRatio: 5,
+    contextTokens: 1_000_000,
+    ratio: 0.95,
+    completionRatio: 4.5,
     featured: true
   },
   {
@@ -734,10 +740,10 @@ export const retailPackages: RetailPackage[] = [
     subtitle: "Kebutuhan chat, tugas & eksplorasi harian",
     targetUser: "Personal",
     priceIdr: 15000,
-    estToken: answersFor("deepseek-v4-flash", 15000, "DeepSeek"),
+    estToken: answersFor("deepseek-v4.1-flash", 15000, "DeepSeek"),
     description: "Cukup untuk ratusan pertanyaan AI harian, terjemahan dokumen instan, dan asisten chat cepat di smartphone & laptop.",
     popularFor: ["Chat & Tanya Cepat", "Asisten HP & Web", "Terjemah Dokumen"],
-    recommendedModel: "DeepSeek V4 Flash / Gemini 3.8 Flash",
+    recommendedModel: "DeepSeek V4.1 Flash / Gemini 3.8 Flash",
     badge: "Starter Hemat"
   },
   {
@@ -774,7 +780,7 @@ export const retailPackages: RetailPackage[] = [
     estToken: answersFor("claude-sonnet-5-5", 149000, "Claude"),
     description: "Kapasitas saldo besar untuk workflow terminal Claude Code CLI, proyek produksi skala penuh, dan automasi backend tanpa langganan kartu kredit.",
     popularFor: ["Claude Code CLI Terminal", "Automasi Script & API", "Proyek Klien Skala Besar"],
-    recommendedModel: "Claude Sonnet 5.5 / Claude Opus 5.5 / GPT-6 Sol",
+    recommendedModel: "Claude Fable 5.2 / Claude Opus 5.5 / GPT-6.2 Astra",
     badge: "Power User"
   }
 ];
