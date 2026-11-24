@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { modelsCatalog } from "@/data/catalog";
 
 const METRIC_ITEMS = [
   {
     value: "100+",
     label: "Model AI di Gateway",
-    detail: "54 model kurasi utama di web & 100+ pilihan aktif di model picker.",
+    detail: `${modelsCatalog.length} model kurasi utama di web & 100+ pilihan aktif di model picker.`,
     accent: "royal",
   },
   {

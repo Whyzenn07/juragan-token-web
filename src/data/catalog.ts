@@ -119,6 +119,19 @@ export const modelsCatalog: ModelItem[] = [
     featured: true
   },
   {
+    id: "claude-fable-5-1",
+    name: "Claude Fable 5.1",
+    providerId: "anthropic",
+    category: "Tugas & Riset",
+    description: "Seri kelas berat Anthropic untuk tugas analisis paling rumit, sintesis studi mendalam, dan pemecahan masalah yang membutuhkan tingkat penalaran ekstrem.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["anthropic", "openai"],
+    contextTokens: 200_000,
+    ratio: 4.5,
+    completionRatio: 5,
+    featured: true
+  },
+  {
     id: "claude-opus-5-5",
     name: "Claude Opus 5.5",
     providerId: "anthropic",
@@ -222,12 +235,38 @@ export const modelsCatalog: ModelItem[] = [
     name: "Gemini 3.1 Pro",
     providerId: "google",
     category: "Tugas & Riset",
-    description: "Spesialis dokumen riset tebal. Sanggup membaca ratusan halaman PDF, video 1 jam, dan transkrip audio sekaligus.",
+    description: "Skor tinggi pada tolok ukur penalaran penelitian akademik (pembuatan hipotesis, desain studi, dan analisis kausal) dengan konteks 2 juta token untuk ratusan halaman PDF.",
     inputs: ["teks", "gambar", "audio", "video", "PDF"],
     endpoints: ["openai"],
     contextTokens: 2_000_000,
     ratio: 1.0,
     completionRatio: 6,
+    featured: true
+  },
+  {
+    id: "gemini-3.1-flash-lite",
+    name: "Gemini 3.1 Flash Lite",
+    providerId: "google",
+    category: "Tugas & Riset",
+    description: "Varian efisien seri Gemini 3.1 untuk riset akademik berbiaya hemat — cepat merangkum literatur, menyusun hipotesis awal, dan menganalisis data studi.",
+    inputs: ["teks", "gambar", "PDF"],
+    endpoints: ["openai"],
+    contextTokens: 1_000_000,
+    ratio: 0.12,
+    completionRatio: 5,
+    featured: true
+  },
+  {
+    id: "gemma-4",
+    name: "Gemma 4",
+    providerId: "google",
+    category: "Tugas & Riset",
+    description: "Keluarga model terbuka (open-weight) ringan dari Google yang cocok untuk merangkum catatan riset, membantu penulisan tugas, dan pemrosesan dokumen sensitif secara lokal (offline) maupun API hemat.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["openai"],
+    contextTokens: 128_000,
+    ratio: 0.06,
+    completionRatio: 4,
     featured: true
   },
   {
@@ -253,6 +292,19 @@ export const modelsCatalog: ModelItem[] = [
     endpoints: ["openai"],
     ratio: 0.15,
     completionRatio: 4
+  },
+  {
+    id: "deepseek-v4",
+    name: "DeepSeek V4",
+    providerId: "deepseek",
+    category: "Tugas & Riset",
+    description: "Model open-weight generasi V4 dengan penalaran logis dan analitis tajam serta biaya token API sangat terjangkau untuk memproses banyak dokumen riset dan tugas.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    contextTokens: 128_000,
+    ratio: 0.14,
+    completionRatio: 4,
+    featured: true
   },
   {
     id: "deepseek-v4-pro",
@@ -312,6 +364,32 @@ export const modelsCatalog: ModelItem[] = [
     inputs: ["teks"],
     endpoints: ["openai"],
     ratio: 0.14,
+    completionRatio: 4,
+    featured: true
+  },
+  {
+    id: "qwen3-235b",
+    name: "Qwen3-235B",
+    providerId: "alibaba",
+    category: "Tugas & Riset",
+    description: "Model open-weight flagship 235B berlisensi Apache 2.0 yang kuat dalam pemahaman teknis, matematika lanjut, serta penerjemahan dan pembedahan jurnal asing multibahasa.",
+    inputs: ["teks", "gambar"],
+    endpoints: ["openai"],
+    contextTokens: 128_000,
+    ratio: 0.45,
+    completionRatio: 4,
+    featured: true
+  },
+  {
+    id: "qwen3.8-27b",
+    name: "Qwen3.8-27B",
+    providerId: "alibaba",
+    category: "Tugas & Riset",
+    description: "Model open-weight Apache 2.0 berukuran 27B untuk riset dokumen sensitif, matematika, dan pemahaman jurnal multibahasa — ideal dijalankan lokal maupun via API hemat.",
+    inputs: ["teks"],
+    endpoints: ["openai"],
+    contextTokens: 128_000,
+    ratio: 0.12,
     completionRatio: 4,
     featured: true
   },
