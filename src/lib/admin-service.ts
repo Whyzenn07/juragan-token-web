@@ -6,7 +6,7 @@ import {
   sha256,
 } from "./keys";
 import { retailPackages } from "@/data/catalog";
-import { ensureLocalDevSeed, recordAdminAudit } from "./auth";
+import { ensureLocalDevSeed, isAdminEmail, recordAdminAudit } from "./auth";
 import { sendReceiptEmail } from "./receipt-email";
 import {
   mutate,
@@ -93,6 +93,41 @@ export async function listAllProfiles(): Promise<UserProfile[]> {
     })
   );
   if (remote) return remote;
+
+  // Fallback: Supabase Auth Admin Users API (jika tabel public.profiles belum ada/404)
+  const { url, key, isConfigured, isServiceRole } = getSupabaseConfig();
+  if (isConfigured && isServiceRole) {
+    try {
+      const r = await fetch(`${url}/auth/v1/admin/users?per_page=300`, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        cache: "no-store",
+      });
+      if (r.ok) {
+        const data = (await r.json()) as { users?: Record<string, unknown>[] };
+        if (Array.isArray(data.users) && data.users.length > 0) {
+          return data.users.map((u) => {
+            const email = String(u["email"] ?? "").toLowerCase();
+            const userMeta = (u["user_metadata"] as Record<string, unknown>) ?? {};
+            const appMeta = (u["app_metadata"] as Record<string, unknown>) ?? {};
+            const fullName = String(userMeta["full_name"] || email.split("@")[0] || "Pengguna");
+            const role: UserRole =
+              appMeta["role"] === "admin" || isAdminEmail(email) ? "admin" : "user";
+            return {
+              id: String(u["id"] ?? ""),
+              email,
+              fullName,
+              role,
+              createdAt: String(u["created_at"] ?? new Date().toISOString()),
+              updatedAt: String(u["updated_at"] ?? new Date().toISOString()),
+            };
+          });
+        }
+      }
+    } catch {
+      // lanjut ke fallback local
+    }
+  }
+
   const local = await query((db) =>
     Object.values(db.users ?? {}).map<UserProfile>((u) => ({
       id: u.id,
@@ -1018,6 +1053,16 @@ export async function adminUpdateUserRole(input: {
       method: "PATCH",
       headers: getSupaHeaders(key),
       body: JSON.stringify({ role: input.role, updated_at: now }),
+    }).catch(() => undefined);
+
+    await fetch(`${url}/auth/v1/admin/users/${encodeURIComponent(input.userId)}`, {
+      method: "PUT",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ app_metadata: { role: input.role } }),
     }).catch(() => undefined);
   }
 

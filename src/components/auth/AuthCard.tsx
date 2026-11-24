@@ -173,7 +173,22 @@ export function AuthCard({ mode }: AuthCardProps) {
           </div>
         )}
 
-        <a href={googleHref} className="jt-google-btn">
+        <a
+          href={googleHref}
+          className="jt-google-btn"
+          onClick={(e) => {
+            if (authMeta.mode !== "loading" && !authMeta.googleOAuthEnabled) {
+              e.preventDefault();
+              setError(
+                "Login cepat Google OAuth belum diaktifkan di server. Silakan masuk atau daftar langsung menggunakan form Alamat Gmail & Kata Sandi di bawah."
+              );
+              const targetInput = document.getElementById(
+                mode === "signup" ? "auth-fullname" : "auth-email"
+              ) as HTMLElement | null;
+              targetInput?.focus();
+            }
+          }}
+        >
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="#4285F4"

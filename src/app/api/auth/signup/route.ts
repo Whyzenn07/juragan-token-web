@@ -52,6 +52,91 @@ export async function POST(req: NextRequest) {
   // Jalur 1: Supabase Auth
   if (supa.isAuthConfigured) {
     try {
+      // 1A. Jika ada Admin Secret Key, buat user terverifikasi langsung (email_confirm: true)
+      if (supa.isAdminConfigured) {
+        const adminRes = await fetch(`${supa.url}/auth/v1/admin/users`, {
+          method: "POST",
+          headers: {
+            apikey: supa.secretKey,
+            Authorization: `Bearer ${supa.secretKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            email_confirm: true,
+            user_metadata: { full_name: fullName },
+          }),
+        });
+
+        const adminData = (await adminRes.json().catch(() => ({}))) as {
+          id?: string;
+          msg?: string;
+          message?: string;
+          error_description?: string;
+        };
+
+        if (!adminRes.ok) {
+          const errMsg = adminData.msg || adminData.message || adminData.error_description || "";
+          if (
+            adminRes.status === 422 ||
+            errMsg.toLowerCase().includes("already") ||
+            errMsg.toLowerCase().includes("registered")
+          ) {
+            return NextResponse.json(
+              { success: false, error: "Alamat email ini sudah terdaftar. Silakan Sign In." },
+              { status: 409 }
+            );
+          }
+          return NextResponse.json(
+            { success: false, error: errMsg || "Gagal mendaftarkan akun." },
+            { status: 400 }
+          );
+        }
+
+        const userId = adminData.id;
+        if (userId) {
+          const profile = await upsertSupabaseProfile({ id: userId, email, fullName });
+
+          // Ambil token sesi via password grant
+          const tokenRes = await fetch(`${supa.url}/auth/v1/token?grant_type=password`, {
+            method: "POST",
+            headers: {
+              apikey: supa.publishableKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (tokenRes.ok) {
+            const tokenData = (await tokenRes.json().catch(() => ({}))) as {
+              access_token?: string;
+              refresh_token?: string;
+            };
+            if (tokenData.access_token) {
+              const redirectTo = profile.role === "admin" ? "/admin" : "/dashboard";
+              const res = NextResponse.json({
+                success: true,
+                requiresVerification: false,
+                user: profile,
+                redirectTo,
+              });
+              setSessionCookies(res, tokenData.access_token, tokenData.refresh_token);
+              return res;
+            }
+          }
+
+          const redirectTo = profile.role === "admin" ? "/admin" : "/dashboard";
+          return NextResponse.json({
+            success: true,
+            requiresVerification: false,
+            user: profile,
+            redirectTo,
+          });
+        }
+      }
+
+      // 1B. Fallback jika secretKey tidak ada: public signup
       const origin = req.nextUrl.origin;
       const signupRes = await fetch(`${supa.url}/auth/v1/signup`, {
         method: "POST",

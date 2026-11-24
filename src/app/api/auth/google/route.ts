@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   getSupabaseAuthConfig,
+  isSupabaseGoogleOAuthEnabled,
   isValidNextPath,
   OAUTH_NEXT_COOKIE,
   OAUTH_VERIFIER_COOKIE,
@@ -10,14 +11,18 @@ import {
 export async function GET(req: NextRequest) {
   const supa = getSupabaseAuthConfig();
   const nextPath = isValidNextPath(req.nextUrl.searchParams.get("next"));
+  const referer = req.headers.get("referer") || "";
+  const targetPage = referer.includes("/signup") ? "/signup" : "/login";
+  const googleEnabled = await isSupabaseGoogleOAuthEnabled();
 
-  if (!supa.isAuthConfigured) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set(
+  if (!supa.isAuthConfigured || !googleEnabled) {
+    const redirectUrl = new URL(targetPage, req.url);
+    redirectUrl.searchParams.set(
       "error",
-      "Google OAuth membutuhkan konfigurasi SUPABASE_URL & SUPABASE_PUBLISHABLE_KEY aktif. Gunakan Email & Kata Sandi untuk mode lokal."
+      "Login cepat Google OAuth belum diaktifkan di server. Silakan masuk atau daftar langsung menggunakan form Alamat Gmail & Kata Sandi di bawah."
     );
-    return NextResponse.redirect(loginUrl);
+    if (nextPath && nextPath !== "/") redirectUrl.searchParams.set("next", nextPath);
+    return NextResponse.redirect(redirectUrl);
   }
 
   // PKCE S256 verifier + challenge

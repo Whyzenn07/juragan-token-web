@@ -42,6 +42,53 @@ export function isLocalDevAuthEnabled(): boolean {
   return !IS_PROD && !getSupabaseAuthConfig().isAuthConfigured;
 }
 
+// Cache sederhana untuk hasil pengecekan Google OAuth Supabase (TTL 60 detik)
+let _googleOAuthCache: { enabled: boolean; checkedAt: number } | null = null;
+
+/**
+ * Cek apakah provider Google OAuth sudah diaktifkan di Supabase.
+ * Hasil di-cache 60 detik agar tidak flood request ke Supabase.
+ */
+export async function isSupabaseGoogleOAuthEnabled(): Promise<boolean> {
+  const supa = getSupabaseAuthConfig();
+  if (!supa.isAuthConfigured) return false;
+  if (_googleOAuthCache && Date.now() - _googleOAuthCache.checkedAt < 60_000) {
+    return _googleOAuthCache.enabled;
+  }
+  try {
+    const res = await fetch(`${supa.url}/auth/v1/settings`, {
+      headers: { apikey: supa.publishableKey },
+      cache: "no-store",
+    });
+    if (!res.ok) return false;
+    const data = (await res.json().catch(() => ({}))) as {
+      external?: { google?: boolean };
+    };
+    const enabled = Boolean(data?.external?.google);
+    _googleOAuthCache = { enabled, checkedAt: Date.now() };
+    return enabled;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Cocokkan kredensial login dengan akun yang di-seed untuk produksi.
+ * Digunakan saat Supabase Auth belum punya user tersebut (auto-provision via Admin API).
+ */
+export function getSeededAccountMatch(
+  email: string,
+  password: string
+): { email: string; fullName: string; role: UserRole } | null {
+  const adminEmail = getAdminEmails()[0] || "admin@juragantoken.id";
+  const seeded: { email: string; password: string; fullName: string; role: UserRole }[] = [
+    { email: adminEmail, password: "Admin12345!", fullName: "Admin Juragantoken", role: "admin" },
+    { email: "budi.dev@gmail.com", password: "UserDemo123!", fullName: "Budi Santoso", role: "user" },
+    { email: "sari.analytics@gmail.com", password: "UserDemo123!", fullName: "Sari Wijaya", role: "user" },
+  ];
+  return seeded.find((s) => s.email === email && s.password === password) ?? null;
+}
+
 export function getAdminEmails(): string[] {
   const raw = (process.env.ADMIN_EMAILS || "admin@juragantoken.id").trim();
   return raw
@@ -429,6 +476,7 @@ export async function getServerSession(): Promise<AuthSession | null> {
       id?: string;
       email?: string;
       user_metadata?: { full_name?: string; name?: string; avatar_url?: string };
+      app_metadata?: { role?: string };
     };
     if (!supaUser.id || !supaUser.email) return null;
 
@@ -438,6 +486,10 @@ export async function getServerSession(): Promise<AuthSession | null> {
       fullName: supaUser.user_metadata?.full_name || supaUser.user_metadata?.name,
       avatarUrl: supaUser.user_metadata?.avatar_url,
     });
+
+    if (supaUser.app_metadata?.role === "admin") {
+      profile.role = "admin";
+    }
 
     return {
       mode: "supabase",

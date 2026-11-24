@@ -1,16 +1,28 @@
 import { NextResponse } from "next/server";
-import { getServerSession, getSupabaseAuthConfig, isLocalDevAuthEnabled } from "@/lib/auth";
+import {
+  getServerSession,
+  getSupabaseAuthConfig,
+  isLocalDevAuthEnabled,
+  isSupabaseGoogleOAuthEnabled,
+} from "@/lib/auth";
 
 export async function GET() {
   const session = await getServerSession();
   const supa = getSupabaseAuthConfig();
+  const googleOAuthEnabled = await isSupabaseGoogleOAuthEnabled();
 
   return NextResponse.json(
     {
       authenticated: Boolean(session),
       user: session?.user ?? null,
-      mode: session?.mode ?? (supa.isAuthConfigured ? "supabase" : isLocalDevAuthEnabled() ? "local-dev" : "unconfigured"),
-      googleOAuthEnabled: supa.isAuthConfigured,
+      mode:
+        session?.mode ??
+        (supa.isAuthConfigured
+          ? "supabase"
+          : isLocalDevAuthEnabled()
+          ? "local-dev"
+          : "unconfigured"),
+      googleOAuthEnabled,
     },
     {
       headers: {

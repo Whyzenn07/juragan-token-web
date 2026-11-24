@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   ensureLocalDevSeed,
   findLocalUserByEmail,
+  getSeededAccountMatch,
   getSupabaseAuthConfig,
   isAdminEmail,
   isLocalDevAuthEnabled,
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
   // Jalur 1: Supabase Auth (Produksi & Lokal Terkonfigurasi)
   if (supa.isAuthConfigured) {
     try {
-      const authRes = await fetch(`${supa.url}/auth/v1/token?grant_type=password`, {
+      let authRes = await fetch(`${supa.url}/auth/v1/token?grant_type=password`, {
         method: "POST",
         headers: {
           apikey: supa.publishableKey,
@@ -48,13 +49,47 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = (await authRes.json().catch(() => ({}))) as {
+      let data = (await authRes.json().catch(() => ({}))) as {
         access_token?: string;
         refresh_token?: string;
         user?: { id?: string; email?: string; user_metadata?: { full_name?: string; avatar_url?: string } };
         error_description?: string;
         msg?: string;
       };
+
+      // Jika login gagal dan secretKey ada, periksa apakah ini akun seed (auto-provision ke Supabase Auth)
+      if ((!authRes.ok || !data.access_token) && supa.isAdminConfigured) {
+        const seeded = getSeededAccountMatch(email, password);
+        if (seeded) {
+          const adminHeaders = {
+            apikey: supa.secretKey,
+            Authorization: `Bearer ${supa.secretKey}`,
+            "Content-Type": "application/json",
+          };
+          await fetch(`${supa.url}/auth/v1/admin/users`, {
+            method: "POST",
+            headers: adminHeaders,
+            body: JSON.stringify({
+              email: seeded.email,
+              password,
+              email_confirm: true,
+              user_metadata: { full_name: seeded.fullName },
+              app_metadata: { role: seeded.role },
+            }),
+          }).catch(() => null);
+
+          // Coba login kembali
+          authRes = await fetch(`${supa.url}/auth/v1/token?grant_type=password`, {
+            method: "POST",
+            headers: {
+              apikey: supa.publishableKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+          data = (await authRes.json().catch(() => ({}))) as typeof data;
+        }
+      }
 
       if (!authRes.ok || !data.access_token || !data.user?.id || !data.user?.email) {
         return NextResponse.json(
