@@ -114,7 +114,7 @@ export default function PrivacyPage() {
 
       <footer className="docs-footer">
         <div className="docs-footer-inner">
-          <p>© 2026 Juragan Token Indonesia. Privasi Anda adalah Prioritas Utama Kami.</p>
+          <p>© 2026 PT Rejeki Digital Cemerlang (Juragantoken). Privasi Anda adalah Prioritas Utama Kami.</p>
           <div className="docs-footer-nav">
             <Link href="/">Beranda</Link>
             <span>•</span>

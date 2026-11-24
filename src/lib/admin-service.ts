@@ -236,11 +236,17 @@ export async function getEnrichedUsers(search?: string): Promise<EnrichedUser[]>
 }
 
 export async function getAdminOverview() {
-  const [orders, keys, users, auditLogs] = await Promise.all([
+  const [orders, keys, users, auditLogs, localUsageLogs, remoteUsageRows] = await Promise.all([
     listAllOrders(),
     getEnrichedKeys(),
     getEnrichedUsers(),
     listAuditLogs(25),
+    query((db) => db.usageLogs ?? []),
+    fetchAllFromSupabase<{ costIdr: number }>(
+      "usage_logs",
+      "select=cost_idr&order=created_at.desc&limit=1000",
+      (r) => ({ costIdr: Number(r.cost_idr ?? 0) || 0 })
+    ),
   ]);
 
   const pendingOrders = orders.filter((o) => o.status === "pending");
@@ -248,6 +254,9 @@ export async function getAdminOverview() {
   const totalRevenueIdr = paidOrders.reduce((sum, o) => sum + o.totalIdr, 0);
   const activeKeys = keys.filter((k) => k.status === "active");
   const totalBalanceIdr = activeKeys.reduce((sum, k) => sum + k.balanceIdr, 0);
+  const usageSource = remoteUsageRows ?? localUsageLogs.map((l) => ({ costIdr: Number(l.costIdr) || 0 }));
+  const totalUsageChargesIdr = usageSource.reduce((sum, l) => sum + l.costIdr, 0);
+  const totalApiRequests = usageSource.length;
 
   return {
     stats: {
@@ -255,6 +264,8 @@ export async function getAdminOverview() {
       pendingOrders: pendingOrders.length,
       paidOrders: paidOrders.length,
       totalRevenueIdr,
+      totalUsageChargesIdr,
+      totalApiRequests,
       totalKeys: keys.length,
       activeKeys: activeKeys.length,
       totalBalanceIdr,
@@ -276,6 +287,48 @@ export function parseIpWhitelistInput(raw?: string[] | string): string[] {
     .filter((s) => s.length > 0 && /^[0-9a-fA-F:.*\/]+$/.test(s))
     .slice(0, 32);
   return Array.from(new Set(cleaned));
+}
+
+function parseStrictIdrAmount(
+  raw: unknown,
+  fallback: number,
+  min: number,
+  max: number
+): { ok: true; value: number } | { ok: false; error: string } {
+  if (raw === undefined || raw === null) {
+    return { ok: true, value: fallback };
+  }
+  if (typeof raw === "boolean" || (typeof raw === "string" && !raw.trim())) {
+    return { ok: false, error: "Nominal kredit (IDR) harus berupa angka yang valid." };
+  }
+  const num = typeof raw === "number" ? raw : Number(String(raw).trim());
+  if (!Number.isFinite(num)) {
+    return { ok: false, error: "Nominal kredit (IDR) harus berupa angka yang valid." };
+  }
+  const rounded = Math.round(num);
+  if (rounded < min || rounded > max) {
+    const fmt = new Intl.NumberFormat("id-ID");
+    return {
+      ok: false,
+      error: `Nominal pesanan harus berada di antara Rp ${fmt.format(min)} hingga Rp ${fmt.format(max)}.`,
+    };
+  }
+  return { ok: true, value: rounded };
+}
+
+const orderApprovalLocks = new Map<string, Promise<unknown>>();
+
+async function withOrderApprovalLock<T>(orderId: string, task: () => Promise<T>): Promise<T> {
+  const prev = orderApprovalLocks.get(orderId) ?? Promise.resolve();
+  const current = prev.catch(() => undefined).then(task);
+  orderApprovalLocks.set(orderId, current);
+  try {
+    return await current;
+  } finally {
+    if (orderApprovalLocks.get(orderId) === current) {
+      orderApprovalLocks.delete(orderId);
+    }
+  }
 }
 
 export function validatePaymentProofUrl(
@@ -360,10 +413,11 @@ export async function adminCreateOrder(input: {
   }
 
   const pkg = retailPackages.find((p) => p.id === input.packageId);
-  const baseIdr = Math.max(
-    5_000,
-    Math.min(100_000_000, Math.round(Number(input.baseIdr ?? pkg?.priceIdr ?? 50_000)))
-  );
+  const amountCheck = parseStrictIdrAmount(input.baseIdr, pkg?.priceIdr ?? 50_000, 5_000, 100_000_000);
+  if (!amountCheck.ok) {
+    return { ok: false, status: 400, error: amountCheck.error };
+  }
+  const baseIdr = amountCheck.value;
   const packageName = (input.packageName?.trim() || pkg?.name || "Paket Token Custom").slice(0, 80);
   const estPackage = pkg?.estToken || `Saldo Rp ${new Intl.NumberFormat("id-ID").format(baseIdr)} · Multi-Model`;
 
@@ -436,120 +490,153 @@ export async function adminApproveOrder(
   admin: UserProfile,
   adminNotes?: string
 ): Promise<{ ok: true; order: Order; issuedKey?: string; keyRecord?: KeyRecord } | { ok: false; status: number; error: string }> {
-  const allOrders = await listAllOrders();
-  const existing = allOrders.find((o) => o.id === orderId);
-  if (!existing) {
-    return { ok: false, status: 404, error: "Pesanan tidak ditemukan." };
-  }
-  if (existing.status === "paid") {
-    return { ok: true, order: existing };
-  }
-  if (existing.status === "expired") {
-    return { ok: false, status: 409, error: "Pesanan berstatus expired dan tidak dapat disetujui." };
-  }
-
-  const profiles = await listAllProfiles();
-  const owner = profiles.find(
-    (p) => p.id === existing.userId || p.email.toLowerCase() === existing.customerEmail.toLowerCase()
-  );
-
-  const now = new Date().toISOString();
-  let issuedKey: string | undefined;
-  let updatedKeyRecord: KeyRecord | undefined;
-
-  if (existing.isTopUp && existing.targetKeyHash) {
-    const keys = await listAllKeys();
-    const target = keys.find((k) => k.hash === existing.targetKeyHash);
-    if (!target) {
-      return { ok: false, status: 404, error: "API Key target top-up tidak ditemukan." };
+  return withOrderApprovalLock(orderId, async () => {
+    const allOrders = await listAllOrders();
+    const existing = allOrders.find((o) => o.id === orderId);
+    if (!existing) {
+      return { ok: false, status: 404, error: "Pesanan tidak ditemukan." };
     }
-    updatedKeyRecord = {
-      ...target,
-      balanceIdr: target.balanceIdr + existing.baseIdr,
-      userId: target.userId || owner?.id,
-      userEmail: target.userEmail || existing.customerEmail.toLowerCase(),
-      updatedAt: now,
-    };
-    await mutate((db) => {
-      db.keys[updatedKeyRecord!.hash] = updatedKeyRecord!;
-    });
-    await syncKeyToSupabase(updatedKeyRecord);
-  } else {
-    issuedKey = generateApiKey();
-    const keyHash = sha256(issuedKey);
-    updatedKeyRecord = {
-      hash: keyHash,
-      last4: issuedKey.slice(-4),
-      orderId: existing.id,
+    if (existing.status === "paid") {
+      return { ok: true, order: existing };
+    }
+    if (existing.status === "expired") {
+      return { ok: false, status: 409, error: "Pesanan berstatus expired dan tidak dapat disetujui." };
+    }
+
+    const profiles = await listAllProfiles();
+    const owner = profiles.find(
+      (p) => p.id === existing.userId || p.email.toLowerCase() === existing.customerEmail.toLowerCase()
+    );
+
+    const now = new Date().toISOString();
+    let issuedKey: string | undefined;
+    let updatedKeyRecord: KeyRecord | undefined;
+
+    if (existing.isTopUp && existing.targetKeyHash) {
+      const keys = await listAllKeys();
+      const target = keys.find((k) => k.hash === existing.targetKeyHash);
+      if (!target) {
+        return { ok: false, status: 404, error: "API Key target top-up tidak ditemukan." };
+      }
+      if (target.status !== "active") {
+        return {
+          ok: false,
+          status: 400,
+          error: `API Key target berstatus ${target.status} dan tidak dapat menerima top-up.`,
+        };
+      }
+      updatedKeyRecord = {
+        ...target,
+        balanceIdr: target.balanceIdr + existing.baseIdr,
+        userId: target.userId || owner?.id,
+        userEmail: target.userEmail || existing.customerEmail.toLowerCase(),
+        updatedAt: now,
+      };
+    } else {
+      issuedKey = generateApiKey();
+      const keyHash = sha256(issuedKey);
+      updatedKeyRecord = {
+        hash: keyHash,
+        last4: issuedKey.slice(-4),
+        orderId: existing.id,
+        userId: owner?.id || existing.userId,
+        userEmail: existing.customerEmail.toLowerCase(),
+        label: existing.packageName,
+        planName: existing.packageName,
+        estPackage: existing.estPackage,
+        balanceIdr: existing.baseIdr,
+        createdAt: now,
+        updatedAt: now,
+        status: "active",
+        accountTier: existing.accountTier || "standard",
+        companyName: existing.companyName,
+        department: existing.department,
+        allowedIps: [],
+      };
+    }
+
+    const paidOrder: Order = {
+      ...existing,
       userId: owner?.id || existing.userId,
-      userEmail: existing.customerEmail.toLowerCase(),
-      label: existing.packageName,
-      planName: existing.packageName,
-      estPackage: existing.estPackage,
-      balanceIdr: existing.baseIdr,
-      createdAt: now,
-      updatedAt: now,
-      status: "active",
-      accountTier: existing.accountTier || "standard",
-      companyName: existing.companyName,
-      department: existing.department,
-      allowedIps: [],
+      status: "paid",
+      paidAt: now,
+      keyHash: updatedKeyRecord.hash,
+      pendingReveal: issuedKey || existing.pendingReveal,
+      adminNotes: adminNotes?.trim() ? adminNotes.trim().slice(0, 300) : existing.adminNotes,
+      reviewedBy: admin.id,
+      reviewedAt: now,
     };
-    await mutate((db) => {
-      db.keys[keyHash] = updatedKeyRecord!;
+
+    const txResult = await mutate<
+      | { alreadyPaid: true; order: Order }
+      | { alreadyPaid: false; order: Order; keyRecord: KeyRecord }
+    >((db) => {
+      const current = db.orders[existing.id];
+      if (current?.status === "paid") {
+        return { alreadyPaid: true, order: current };
+      }
+      if (updatedKeyRecord!.hash && existing.isTopUp && db.keys[updatedKeyRecord!.hash]) {
+        const liveKey = db.keys[updatedKeyRecord!.hash];
+        updatedKeyRecord = {
+          ...liveKey,
+          balanceIdr: liveKey.balanceIdr + existing.baseIdr,
+          userId: liveKey.userId || owner?.id,
+          userEmail: liveKey.userEmail || existing.customerEmail.toLowerCase(),
+          updatedAt: now,
+        };
+      }
+      db.keys[updatedKeyRecord!.hash] = updatedKeyRecord!;
+      db.orders[paidOrder.id] = paidOrder;
+      return { alreadyPaid: false, order: paidOrder, keyRecord: updatedKeyRecord! };
     });
-    await syncKeyToSupabase(updatedKeyRecord);
-  }
 
-  const paidOrder: Order = {
-    ...existing,
-    userId: owner?.id || existing.userId,
-    status: "paid",
-    paidAt: now,
-    keyHash: updatedKeyRecord.hash,
-    pendingReveal: issuedKey || existing.pendingReveal,
-    adminNotes: adminNotes?.trim() ? adminNotes.trim().slice(0, 300) : existing.adminNotes,
-    reviewedBy: admin.id,
-    reviewedAt: now,
-  };
-
-  if (issuedKey) {
-    try {
-      const mail = await sendReceiptEmail({
-        customerEmail: paidOrder.customerEmail,
-        customerName: paidOrder.customerName,
-        invoiceId: paidOrder.id,
-        packageName: paidOrder.packageName,
-        priceIdr: paidOrder.totalIdr,
-        paymentMethod: paidOrder.methodName,
-        apiKey: issuedKey,
-      });
-      paidOrder.emailStatus = mail.status;
-      paidOrder.emailMessage = mail.message;
-    } catch {
-      paidOrder.emailStatus = "error";
+    if (txResult.alreadyPaid) {
+      return { ok: true, order: txResult.order };
     }
-  }
 
-  await mutate((db) => {
-    db.orders[paidOrder.id] = paidOrder;
+    await syncKeyToSupabase(txResult.keyRecord);
+
+    if (issuedKey) {
+      try {
+        const mail = await sendReceiptEmail({
+          customerEmail: paidOrder.customerEmail,
+          customerName: paidOrder.customerName,
+          invoiceId: paidOrder.id,
+          packageName: paidOrder.packageName,
+          priceIdr: paidOrder.totalIdr,
+          paymentMethod: paidOrder.methodName,
+          apiKey: issuedKey,
+        });
+        paidOrder.emailStatus = mail.status;
+        paidOrder.emailMessage = mail.message;
+        await mutate((db) => {
+          if (db.orders[paidOrder.id]) {
+            db.orders[paidOrder.id].emailStatus = mail.status;
+            db.orders[paidOrder.id].emailMessage = mail.message;
+          }
+        });
+      } catch {
+        paidOrder.emailStatus = "error";
+      }
+    }
+
+    await syncOrderToSupabase(paidOrder);
+
+    await recordAdminAudit({
+      admin,
+      action: "order.approve",
+      targetType: "order",
+      targetId: paidOrder.id,
+      details: {
+        customerEmail: paidOrder.customerEmail,
+        totalIdr: paidOrder.totalIdr,
+        keyLast4: txResult.keyRecord.last4,
+        isTopUp: Boolean(paidOrder.isTopUp),
+      },
+    });
+
+    return { ok: true, order: paidOrder, issuedKey, keyRecord: txResult.keyRecord };
   });
-  await syncOrderToSupabase(paidOrder);
-
-  await recordAdminAudit({
-    admin,
-    action: "order.approve",
-    targetType: "order",
-    targetId: paidOrder.id,
-    details: {
-      customerEmail: paidOrder.customerEmail,
-      totalIdr: paidOrder.totalIdr,
-      keyLast4: updatedKeyRecord.last4,
-      isTopUp: Boolean(paidOrder.isTopUp),
-    },
-  });
-
-  return { ok: true, order: paidOrder, issuedKey, keyRecord: updatedKeyRecord };
 }
 
 export async function adminUpdateOrderStatus(input: {
@@ -1001,12 +1088,32 @@ export async function createUserOrderRequest(
   }
 
   const pkg = retailPackages.find((p) => p.id === input.packageId);
-  const baseIdr = Math.max(
-    15_000,
-    Math.min(50_000_000, Math.round(Number(input.baseIdr ?? pkg?.priceIdr ?? 50_000)))
-  );
+  const amountCheck = parseStrictIdrAmount(input.baseIdr, pkg?.priceIdr ?? 50_000, 15_000, 50_000_000);
+  if (!amountCheck.ok) {
+    return { ok: false, status: 400, error: amountCheck.error };
+  }
+  const baseIdr = amountCheck.value;
   const tier: AccountTier = input.accountTier === "enterprise" ? "enterprise" : "standard";
-  const isTopUp = Boolean(input.targetKeyHash?.trim());
+  const rawTargetKeyHash = input.targetKeyHash?.trim() || "";
+  const isTopUp = Boolean(rawTargetKeyHash);
+
+  if (isTopUp) {
+    const keys = await listAllKeys();
+    const targetKey = keys.find((k) => k.hash === rawTargetKeyHash);
+    if (!targetKey) {
+      return { ok: false, status: 404, error: "API Key tujuan top-up tidak ditemukan." };
+    }
+    const emailLower = user.email.toLowerCase();
+    const isKeyOwner =
+      (targetKey.userId && targetKey.userId === user.id) ||
+      (targetKey.userEmail && targetKey.userEmail.toLowerCase() === emailLower);
+    if (!isKeyOwner) {
+      return { ok: false, status: 403, error: "Anda tidak memiliki akses untuk melakukan top-up ke API Key ini." };
+    }
+    if (targetKey.status !== "active") {
+      return { ok: false, status: 400, error: `API Key berstatus ${targetKey.status} tidak dapat menerima top-up.` };
+    }
+  }
   const packageName =
     pkg?.name ||
     `${isTopUp ? "Top-Up" : "Deposit"} ${tier === "enterprise" ? "Enterprise B2B" : "Standard"} Rp ${new Intl.NumberFormat("id-ID").format(baseIdr)}`;
@@ -1087,6 +1194,13 @@ export async function userAttachOrderProof(
     existing.customerEmail.toLowerCase() === user.email.toLowerCase();
   if (!isOwner) {
     return { ok: false, status: 403, error: "Anda tidak memiliki akses ke pesanan ini." };
+  }
+  if (existing.status !== "pending") {
+    return {
+      ok: false,
+      status: 409,
+      error: `Bukti pembayaran tidak dapat diubah karena pesanan sudah berstatus ${existing.status}.`,
+    };
   }
 
   const now = new Date().toISOString();

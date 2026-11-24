@@ -59,7 +59,7 @@ export function InvoiceDocument({
           </div>
           <p className="jt-invoice-issuer-name">PT Rejeki Digital Cemerlang</p>
           <p className="jt-invoice-issuer-sub">
-            Universal AI Gateway Indonesia · https://api.tokotokenai.com
+            Universal AI Gateway Indonesia · www.juragantoken.co.id
           </p>
         </div>
 

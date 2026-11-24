@@ -32,8 +32,8 @@ export default function StatusPage() {
             <Link href="/docs" className="docs-header-link">
               Dokumentasi API
             </Link>
-            <Link href="/#katalog-retail" className="docs-header-btn">
-              Beli Token
+            <Link href="/dashboard" className="docs-header-btn">
+              Portal Akun
             </Link>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function StatusPage() {
 
       <footer className="docs-footer">
         <div className="docs-footer-inner">
-          <p>© 2026 Juragan Token Indonesia. Real-Time Telemetry &amp; Uptime Monitor.</p>
+          <p>© 2026 PT Rejeki Digital Cemerlang (Juragantoken). Real-Time Telemetry &amp; Uptime Monitor.</p>
           <div className="docs-footer-nav">
             <Link href="/">Beranda</Link>
             <span>•</span>

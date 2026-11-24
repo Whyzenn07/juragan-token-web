@@ -17,6 +17,8 @@ type OverviewStats = {
   pendingOrders: number;
   paidOrders: number;
   totalRevenueIdr: number;
+  totalUsageChargesIdr?: number;
+  totalApiRequests?: number;
   totalKeys: number;
   activeKeys: number;
   totalBalanceIdr: number;
@@ -120,6 +122,29 @@ function formatAuditChips(details: Record<string, unknown>): { key: string; valu
   return chips;
 }
 
+function downloadCsv(
+  filename: string,
+  headers: string[],
+  rows: (string | number | boolean | null | undefined)[][]
+) {
+  const escapeCell = (val: string | number | boolean | null | undefined) => {
+    const raw = val === null || val === undefined ? "" : String(val);
+    return `"${raw.replace(/"/g, '""')}"`;
+  };
+  const csvContent =
+    "\uFEFF" +
+    [headers.map(escapeCell).join(","), ...rows.map((r) => r.map(escapeCell).join(","))].join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 function NavGlyph({ name }: { name: AdminTab }) {
   switch (name) {
     case "overview":
@@ -161,6 +186,8 @@ export function AdminDashboardClient() {
     pendingOrders: 0,
     paidOrders: 0,
     totalRevenueIdr: 0,
+    totalUsageChargesIdr: 0,
+    totalApiRequests: 0,
     totalKeys: 0,
     activeKeys: 0,
     totalBalanceIdr: 0,
@@ -220,6 +247,11 @@ export function AdminDashboardClient() {
   const [moPackageName, setMoPackageName] = useState("Paket Developer Pro");
   const [moAmount, setMoAmount] = useState("50000");
   const [moMethod, setMoMethod] = useState("Transfer Bank / QRIS");
+  const [moTier, setMoTier] = useState<"standard" | "enterprise">("standard");
+  const [moCompany, setMoCompany] = useState("");
+  const [moDept, setMoDept] = useState("");
+  const [moTaxInvoice, setMoTaxInvoice] = useState(false);
+  const [moNpwp, setMoNpwp] = useState("");
   const [moRef, setMoRef] = useState("");
   const [moNotes, setMoNotes] = useState("");
   const [moProofUrl, setMoProofUrl] = useState<string | undefined>(undefined);
@@ -511,6 +543,11 @@ export function AdminDashboardClient() {
           packageName: moPackageName,
           baseIdr: Number(moAmount),
           methodName: moMethod,
+          accountTier: moTier,
+          companyName: moTier === "enterprise" ? moCompany : undefined,
+          department: moTier === "enterprise" ? moDept : undefined,
+          requiresTaxInvoice: moTier === "enterprise" ? moTaxInvoice : false,
+          npwp: moTier === "enterprise" && moTaxInvoice ? moNpwp : undefined,
           paymentReference: moRef,
           paymentProofUrl: moProofUrl,
           paymentProofName: moProofName,
@@ -527,6 +564,11 @@ export function AdminDashboardClient() {
       setMoEmail("");
       setMoName("");
       setMoPhone("");
+      setMoTier("standard");
+      setMoCompany("");
+      setMoDept("");
+      setMoTaxInvoice(false);
+      setMoNpwp("");
       setMoRef("");
       setMoNotes("");
       setMoProofUrl(undefined);
@@ -669,6 +711,31 @@ export function AdminDashboardClient() {
       }
       showToast("success", `Pengaturan Tier & IP Whitelist ••••${ipTarget.last4} disimpan.`);
       setIpTarget(null);
+      await loadAll();
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleToggleUserRole = async (targetUser: EnrichedUser) => {
+    const nextRole = targetUser.role === "admin" ? "user" : "admin";
+    const actionLabel = nextRole === "admin" ? "menjadikan Administrator" : "mengubah ke User biasa";
+    if (!window.confirm(`Yakin ingin ${actionLabel} akun ${targetUser.email}?`)) {
+      return;
+    }
+    setBusyId(`role-${targetUser.id}`);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: targetUser.id, role: nextRole }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast("error", data.error || "Gagal memperbarui role pengguna.");
+        return;
+      }
+      showToast("success", `Role ${targetUser.email} diperbarui menjadi ${nextRole.toUpperCase()}.`);
       await loadAll();
     } finally {
       setBusyId(null);
@@ -931,22 +998,22 @@ export function AdminDashboardClient() {
 
               <article className="adm-kpi-card">
                 <div className="adm-kpi-top">
-                  <span>Transaksi Lunas</span>
+                  <span>Total Deposit Lunas</span>
                   <span className="adm-kpi-dot is-ok" aria-hidden="true" />
                 </div>
                 <strong className="adm-kpi-val">{formatIdr(stats.totalRevenueIdr)}</strong>
                 <span className="adm-kpi-sub">
-                  {stats.paidOrders} pesanan · {withProofCount} bukti SS
+                  {stats.paidOrders} pesanan · Pemakaian API: {formatIdr(stats.totalUsageChargesIdr || 0)} ({stats.totalApiRequests || 0} req)
                 </span>
               </article>
 
               <article className="adm-kpi-card">
                 <div className="adm-kpi-top">
-                  <span>API Key Aktif</span>
+                  <span>API Key &amp; Liabilitas Saldo</span>
                   <span className="adm-kpi-dot is-blue" aria-hidden="true" />
                 </div>
                 <strong className="adm-kpi-val">{stats.activeKeys}</strong>
-                <span className="adm-kpi-sub">Total saldo aktif {formatIdr(stats.totalBalanceIdr)}</span>
+                <span className="adm-kpi-sub">Liabilitas saldo aktif: {formatIdr(stats.totalBalanceIdr)}</span>
               </article>
 
               <article className="adm-kpi-card">
@@ -1160,15 +1227,61 @@ export function AdminDashboardClient() {
                 ))}
               </div>
 
-              <div className="adm-search-box">
-                <Icon name="search" size={15} />
-                <input
-                  type="search"
-                  placeholder="Cari nomor invoice, Gmail, nama, atau referensi..."
-                  aria-label="Cari pesanan masuk"
-                  value={orderSearch}
-                  onChange={(e) => setOrderSearch(e.target.value)}
-                />
+              <div className="jt-toolbar">
+                <div className="adm-search-box">
+                  <Icon name="search" size={15} />
+                  <input
+                    type="search"
+                    placeholder="Cari nomor invoice, Gmail, nama, atau referensi..."
+                    aria-label="Cari pesanan masuk"
+                    value={orderSearch}
+                    onChange={(e) => setOrderSearch(e.target.value)}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="jt-btn-secondary-clean"
+                  disabled={filteredOrders.length === 0}
+                  onClick={() =>
+                    downloadCsv(
+                      `pesanan-juragantoken-${new Date().toISOString().slice(0, 10)}.csv`,
+                      [
+                        "Invoice",
+                        "Tanggal",
+                        "Nama",
+                        "Email",
+                        "Jalur",
+                        "Perusahaan",
+                        "Departemen",
+                        "Faktur Pajak",
+                        "NPWP",
+                        "Paket",
+                        "Metode",
+                        "Nominal IDR",
+                        "Status",
+                        "Referensi",
+                      ],
+                      filteredOrders.map((o) => [
+                        o.id,
+                        o.createdAt,
+                        o.customerName,
+                        o.customerEmail,
+                        o.accountTier || "standard",
+                        o.companyName || "",
+                        o.department || "",
+                        o.requiresTaxInvoice ? "Ya" : "Tidak",
+                        o.npwp || "",
+                        o.packageName,
+                        o.methodName,
+                        o.totalIdr,
+                        o.status,
+                        o.paymentReference || o.gatewayReference || "",
+                      ])
+                    )
+                  }
+                >
+                  Unduh CSV
+                </button>
               </div>
             </div>
 
@@ -1521,16 +1634,32 @@ export function AdminDashboardClient() {
                         <td className="jt-num adm-mono-nowrap">{formatIdr(u.totalBalanceIdr)}</td>
                         <td className="adm-sub-line">{formatDate(u.createdAt)}</td>
                         <td>
-                          <button
-                            type="button"
-                            className="adm-btn-xs is-primary"
-                            onClick={() => {
-                              setProvEmail(u.email);
-                              setProvisionOpen(true);
-                            }}
-                          >
-                            + Terbitkan Key
-                          </button>
+                          <div className="adm-row-actions">
+                            <button
+                              type="button"
+                              className="adm-btn-xs is-primary"
+                              onClick={() => {
+                                setProvEmail(u.email);
+                                setProvisionOpen(true);
+                              }}
+                            >
+                              + Terbitkan Key
+                            </button>
+                            {adminUser?.id !== u.id && (
+                              <button
+                                type="button"
+                                className="adm-btn-xs"
+                                disabled={busyId === `role-${u.id}`}
+                                onClick={() => void handleToggleUserRole(u)}
+                              >
+                                {busyId === `role-${u.id}`
+                                  ? "Memproses..."
+                                  : u.role === "admin"
+                                  ? "Jadikan User"
+                                  : "Jadikan Admin"}
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1549,6 +1678,27 @@ export function AdminDashboardClient() {
                 <h2>Riwayat Aktivitas Administrator ({auditLogs.length})</h2>
                 <span>Setiap perubahan status pesanan, bukti transaksi, saldo, dan IP Whitelist tercatat otomatis.</span>
               </div>
+              <button
+                type="button"
+                className="jt-btn-secondary-clean"
+                disabled={auditLogs.length === 0}
+                onClick={() =>
+                  downloadCsv(
+                    `audit-log-juragantoken-${new Date().toISOString().slice(0, 10)}.csv`,
+                    ["Waktu", "Admin", "Aktivitas", "Tipe Target", "ID Target", "Detail"],
+                    auditLogs.map((l) => [
+                      l.createdAt,
+                      l.adminEmail,
+                      l.action,
+                      l.targetType,
+                      l.targetId,
+                      JSON.stringify(l.details || {}),
+                    ])
+                  )
+                }
+              >
+                Unduh CSV
+              </button>
             </div>
             {auditLogs.length === 0 ? (
               <div className="jt-empty-box">Belum ada catatan aktivitas admin.</div>
@@ -2176,14 +2326,22 @@ export function AdminDashboardClient() {
               </div>
               <div className="jt-form-row-2">
                 <div className="jt-field">
-                  <label htmlFor="mo-pkg">Nama Paket</label>
-                  <input
-                    id="mo-pkg"
-                    type="text"
-                    className="jt-input"
-                    value={moPackageName}
-                    onChange={(e) => setMoPackageName(e.target.value)}
-                  />
+                  <label htmlFor="mo-tier">Jalur Layanan</label>
+                  <select
+                    id="mo-tier"
+                    className="jt-select"
+                    value={moTier}
+                    onChange={(e) => {
+                      const next = e.target.value as "standard" | "enterprise";
+                      setMoTier(next);
+                      if (next === "enterprise" && moMethod === "Transfer Bank / QRIS") {
+                        setMoMethod("Invoice B2B & Transfer PT (IDR)");
+                      }
+                    }}
+                  >
+                    <option value="standard">Standard (Developer / Fleksibel)</option>
+                    <option value="enterprise">Enterprise B2B (PT Rejeki Digital Cemerlang · Faktur Pajak)</option>
+                  </select>
                 </div>
                 <div className="jt-field">
                   <label htmlFor="mo-amount">Nominal (IDR)</label>
@@ -2199,6 +2357,66 @@ export function AdminDashboardClient() {
                   />
                 </div>
               </div>
+              <div className="jt-field">
+                <label htmlFor="mo-pkg">Nama Paket / Keterangan Tagihan</label>
+                <input
+                  id="mo-pkg"
+                  type="text"
+                  className="jt-input"
+                  value={moPackageName}
+                  onChange={(e) => setMoPackageName(e.target.value)}
+                />
+              </div>
+              {moTier === "enterprise" && (
+                <>
+                  <div className="jt-form-row-2">
+                    <div className="jt-field">
+                      <label htmlFor="mo-company">Nama Perusahaan</label>
+                      <input
+                        id="mo-company"
+                        type="text"
+                        className="jt-input"
+                        placeholder="PT Contoh Indonesia"
+                        value={moCompany}
+                        onChange={(e) => setMoCompany(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="jt-field">
+                      <label htmlFor="mo-dept">Departemen</label>
+                      <input
+                        id="mo-dept"
+                        type="text"
+                        className="jt-input"
+                        placeholder="IT / Engineering / Purchasing"
+                        value={moDept}
+                        onChange={(e) => setMoDept(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12.5px", color: "#334155", marginBottom: "10px" }}>
+                    <input
+                      type="checkbox"
+                      checked={moTaxInvoice}
+                      onChange={(e) => setMoTaxInvoice(e.target.checked)}
+                    />
+                    <span>Butuh Faktur Pajak Resmi (PT Rejeki Digital Cemerlang)</span>
+                  </label>
+                  {moTaxInvoice && (
+                    <div className="jt-field">
+                      <label htmlFor="mo-npwp">NPWP Perusahaan (Opsional)</label>
+                      <input
+                        id="mo-npwp"
+                        type="text"
+                        className="jt-input"
+                        placeholder="00.000.000.0-000.000"
+                        value={moNpwp}
+                        onChange={(e) => setMoNpwp(e.target.value)}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
               <div className="jt-form-row-2">
                 <div className="jt-field">
                   <label htmlFor="mo-method">Metode Bayar</label>

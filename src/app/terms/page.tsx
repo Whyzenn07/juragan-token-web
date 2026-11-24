@@ -46,10 +46,10 @@ export default function TermsPage() {
             <section className="legal-section">
               <h2>1. Definisi &amp; Ruang Lingkup Layanan</h2>
               <p>
-                <b>Juragan Token</b> (&quot;Kami&quot;, &quot;Layanan&quot;) adalah platform gateway kredit AI prabayar terpadu yang memfasilitasi akses komputasi ke berbagai penyedia model kecerdasan buatan global (termasuk OpenAI, Anthropic, Google AI, Alibaba Cloud, MiniMax, dan ByteDance) melalui mata uang Rupiah (IDR).
+                <b>Juragan Token</b> (&quot;Kami&quot;, &quot;Layanan&quot;) adalah platform gateway kredit AI prabayar terpadu yang dikelola secara resmi oleh badan usaha <b>PT Rejeki Digital Cemerlang</b>, memfasilitasi akses komputasi ke berbagai penyedia model kecerdasan buatan global (termasuk OpenAI, Anthropic, Google AI, Alibaba Cloud, MiniMax, dan ByteDance) melalui mata uang Rupiah (IDR).
               </p>
               <p>
-                Dengan mengakses website, melakukan pembayaran melalui sistem checkout SingaPay, atau menggunakan Virtual API Key (<code>jt-live-...</code>), Anda menyatakan telah membaca, memahami, dan menyetujui seluruh ketentuan dalam dokumen ini.
+                Dengan mengakses website, melakukan pembayaran melalui kanal pembayaran resmi PT Rejeki Digital Cemerlang (QRIS Nasional, Virtual Account, Transfer Bank Korporat, dan Invoice B2B), atau menggunakan Virtual API Key (<code>jt-live-...</code>), Anda menyatakan telah membaca, memahami, dan menyetujui seluruh ketentuan dalam dokumen ini.
               </p>
             </section>
 
@@ -72,7 +72,7 @@ export default function TermsPage() {
             <section className="legal-section">
               <h2>3. Sistem Pembayaran &amp; Penerbitan API Key</h2>
               <ul>
-                <li>Pembayaran diproses secara instan melalui sistem <b>SingaPay</b> menggunakan <b>QRIS Standar Pembayaran Nasional</b> serta Virtual Account bank resmi Indonesia (BCA, Mandiri, BRI, BNI, SeaBank, Permata).</li>
+                <li>Pembayaran diproses secara resmi melalui kanal pembayaran <b>PT Rejeki Digital Cemerlang</b> menggunakan <b>QRIS Standar Pembayaran Nasional</b>, Transfer Bank Korporat / Invoice B2B, serta Virtual Account bank resmi Indonesia (BCA, Mandiri, BRI, BNI, SeaBank, Permata).</li>
                 <li>Setelah transaksi lunas dan diverifikasi oleh sistem, satu <b>Virtual API Key unik (<code>jt-live-...</code>)</b> akan langsung diterbitkan di layar pemesanan dan dikirimkan ke alamat email pembeli.</li>
                 <li>Pengguna bertanggung jawab penuh atas kerahasiaan API Key masing-masing. Juragan Token tidak pernah meminta kunci rahasia Anda di luar formulir autentikasi resmi.</li>
               </ul>
@@ -127,7 +127,7 @@ export default function TermsPage() {
 
       <footer className="docs-footer">
         <div className="docs-footer-inner">
-          <p>© 2026 Juragan Token Indonesia. Hak Cipta Dilindungi Undang-Undang.</p>
+          <p>© 2026 PT Rejeki Digital Cemerlang (Juragantoken). Hak Cipta Dilindungi Undang-Undang.</p>
           <div className="docs-footer-nav">
             <Link href="/">Beranda</Link>
             <span>•</span>
