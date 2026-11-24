@@ -1551,13 +1551,23 @@ export default function Home() {
                   </p>
                 </div>
               </details>
-            </div>
 
-            <div className="faq-footer-help">
-              <span className="ffh-text">Siap menghubungkan API Key ke Cursor, Claude Code CLI, Chatbox, atau Python/Node.js?</span>
-              <Link href="/docs" className="ffh-link">
-                Buka Dokumentasi Integrasi Lengkap (/docs) →
-              </Link>
+              <details className="faq-card" data-reveal="fade-up" data-delay="60">
+                <summary className="faq-summary">
+                  <div className="faq-summary-content">
+                    <span className="faq-badge">Dukungan Teknis &amp; SLA</span>
+                    <h3 className="faq-question">Bagaimana jika terjadi kendala teknis dan apakah tersedia jaminan SLA ketersediaan gateway?</h3>
+                  </div>
+                  <span className="faq-chevron" aria-hidden="true">
+                    <Icon name="chevron" size={16} />
+                  </span>
+                </summary>
+                <div className="faq-answer">
+                  <p>
+                    <b>Dukungan Teknis 7 Hari &amp; Garansi SLA 99.98%.</b> Tim teknis kami siap mendampingi integrasi via WhatsApp Customer Care resmi dan sistem tiket bantuan portal. Gateway dilengkapi arsitektur multi-upstream failover otomatis sehingga inferensi AI tetap stabil tanpa terputus.
+                  </p>
+                </div>
+              </details>
             </div>
           </section>
 
