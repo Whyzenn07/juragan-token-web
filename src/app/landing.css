@@ -3601,48 +3601,11 @@ html.jt-scroll-anim [data-reveal].is-revealed {
   }
 }
 
-/* ==========================================================================
-   Opsi A: Streamlined 8-Block Company Profile & Universal Flexbox Reflow
-   ========================================================================== */
+/* Structural Helpers & Mobile-Only Flexbox Guardrails (Original Desktop Design Preserved) */
 .jt-section,
 .model-catalog,
 .faq-section {
   scroll-margin-top: 92px;
-}
-
-.jt-metrics-section {
-  margin: 4px 0 22px;
-}
-
-.jt-metrics-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  align-items: stretch;
-}
-
-.jt-metrics-grid > .jt-metric-card {
-  flex: 1 1 calc(25% - 11px);
-  min-width: 210px;
-  padding: 16px 18px 15px;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.jt-metric-value {
-  font-size: clamp(22px, 2.2vw, 27px);
-}
-
-.jt-metric-detail {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #5b718a;
-}
-
-.jt-catalog-head {
-  margin-bottom: 20px;
 }
 
 .cpe-actions-row {
@@ -3662,7 +3625,7 @@ html.jt-scroll-anim [data-reveal].is-revealed {
   color: #ffffff;
   border: 1px solid #1d63dc;
   border-radius: 9999px;
-  padding: 11px 26px;
+  padding: 11px 28px;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
@@ -3674,10 +3637,6 @@ html.jt-scroll-anim [data-reveal].is-revealed {
   background: linear-gradient(135deg, #1550b8 0%, #1d63dc 100%);
   transform: translateY(-1px);
   box-shadow: 0 12px 24px rgba(29, 99, 220, 0.24);
-}
-
-.cpe-btn-primary:active {
-  transform: translateY(1px) scale(0.985);
 }
 
 .cpe-btn-primary:focus-visible {
@@ -3700,294 +3659,37 @@ html.jt-scroll-anim [data-reveal].is-revealed {
   justify-content: center;
 }
 
-/* Flexbox Base for Multi-Card Sections Across Breakpoints */
-.jt-risks-grid,
-.jt-tier-grid,
-.jt-steps-grid,
-.faq-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: stretch;
-}
-
-.jt-risks-grid > .jt-risk-card,
-.jt-steps-grid > .jt-step-card {
-  flex: 1 1 calc(33.333% - 12px);
-  min-width: 260px;
-}
-
-.jt-tier-grid > .jt-tier-card {
-  flex: 1 1 calc(50% - 10px);
-  min-width: 310px;
-  display: flex;
-  flex-direction: column;
-}
-
-.jt-tier-card .jt-tier-actions {
-  margin-top: auto;
-}
-
-.faq-grid > .faq-card {
-  flex: 1 1 calc(50% - 10px);
-  min-width: 300px;
-}
-
-/* Tablet Reflow (641px - 992px): Smooth 2-Column Flexbox */
-@media (max-width: 992px) {
-  .jt-metrics-grid > .jt-metric-card {
-    flex: 1 1 calc(50% - 8px);
-    min-width: 0;
-  }
-
-  .jt-risks-grid > .jt-risk-card,
-  .jt-steps-grid > .jt-step-card {
-    flex: 1 1 calc(50% - 8px);
-    min-width: 0;
-  }
-
-  .jt-tier-grid > .jt-tier-card,
-  .faq-grid > .faq-card {
-    flex: 1 1 100%;
-    min-width: 0;
-  }
-
-  .model-grid {
+@media (max-width: 720px) {
+  .cpe-actions-row,
+  .results-meta,
+  .faq-footer-help {
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .model-grid > .model-card {
-    flex: 1 1 calc(50% - 8px);
-    min-width: 0;
-  }
-}
-
-/* Mobile Flexbox Reflow (<= 768px): Zero Horizontal Scroll, Native Card Reflow */
-@media (max-width: 768px) {
-  .jt-section {
-    padding-top: 34px;
-    padding-bottom: 18px;
-  }
-
-  .jt-section-head {
-    margin-bottom: 20px;
-  }
-
-  .jt-section-head h2 {
-    font-size: clamp(22px, 6.2vw, 28px);
-    line-height: 1.2;
-  }
-
-  .jt-section-head p {
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  /* Transform Enterprise Comparison Table into Readable Mobile Flexbox Cards */
-  .jt-compare-wrap {
-    padding: 14px;
-    border-radius: 16px;
-    background: #f8fbff;
-  }
-
-  .jt-compare-scroll {
-    overflow-x: visible;
-    border: 0;
-    background: transparent;
-  }
-
-  .jt-compare-table {
-    display: block;
-    min-width: 0 !important;
-    width: 100%;
-  }
-
-  .jt-compare-table thead {
-    display: none;
-  }
-
-  .jt-compare-table tbody {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .jt-compare-table tbody tr {
-    display: flex;
-    flex-direction: column;
-    background: #ffffff;
-    border: 1px solid #d7e5f7;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
-  }
-
-  .jt-compare-table td {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 11px 14px;
-    border-bottom: 1px solid #edf3fa;
-    border-left: 0 !important;
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  .jt-compare-table td:last-child {
-    border-bottom: 0;
-  }
-
-  .jt-compare-table td::before {
-    content: attr(data-label);
-    font-size: 10.5px;
-    font-weight: 750;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #64748b;
-  }
-
-  .jt-compare-table td.jt-aspect-cell {
-    background: #0a2540;
-    color: #ffffff;
-    font-size: 13.5px;
-    font-weight: 750;
-    padding: 10px 14px;
-  }
-
-  .jt-compare-table td.jt-aspect-cell::before {
-    color: #93c5fd;
-  }
-
-  .jt-compare-table td.jt-col-highlight {
-    background: #eff6ff;
-    color: #0a2540;
-    border-top: 1px solid #bfdbfe;
-  }
-
-  .jt-compare-table td.jt-col-highlight::before {
-    color: #1d63dc;
-  }
-
-  /* Catalog Toolbar, Results Meta & Buttons Flexbox Stack */
-  .results-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    font-size: 12.5px;
-  }
-
-  .toolbar-actions-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .toolbar-actions-group > button {
-    min-height: 42px;
-  }
-
-  .cpe-actions-row {
     flex-direction: column;
     align-items: stretch;
-    width: 100%;
+    gap: 10px;
   }
 
-  .cpe-btn-primary,
-  .cpe-btn-white {
+  .cpe-btn-primary {
     width: 100%;
     min-height: 46px;
     justify-content: center;
   }
 
-  .faq-footer-help {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 16px;
-  }
-
-  /* Model Detail Modal Mobile Flexbox */
-  .model-detail-modal {
-    padding: 18px 16px;
-  }
-
-  .model-stats-bar {
+  .model-stats-bar,
+  .copy-row,
+  .modal-footer-actions {
     display: flex !important;
     flex-direction: column;
-    gap: 10px;
-  }
-
-  .copy-row {
-    display: flex;
-    flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
 
+  .modal-footer-actions > *,
   .copy-row > button {
-    width: 100%;
-    min-height: 40px;
-  }
-
-  .modal-footer-actions {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
-
-  .modal-footer-actions > * {
     width: 100%;
     min-height: 44px;
     justify-content: center;
     text-align: center;
-  }
-}
-
-@media (max-width: 640px) {
-  .jt-metrics-grid {
-    gap: 10px;
-  }
-
-  .jt-metrics-grid > .jt-metric-card {
-    flex: 1 1 calc(50% - 6px);
-    min-width: 0;
-    padding: 13px 13px 12px;
-  }
-
-  .jt-metric-value {
-    font-size: 20px;
-  }
-
-  .jt-metric-label {
-    font-size: 12.5px;
-  }
-
-  .jt-metric-detail {
-    font-size: 11.5px;
-  }
-
-  .jt-risks-grid > .jt-risk-card,
-  .jt-steps-grid > .jt-step-card,
-  .model-grid > .model-card {
-    flex: 1 1 100%;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .jt-ts-steps {
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .jt-ts-arrow {
-    align-self: center;
-    transform: rotate(90deg);
   }
 }
 

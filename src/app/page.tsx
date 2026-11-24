@@ -643,18 +643,121 @@ export default function Home() {
           <GatewayFlow />
 
           {/* 5. Katalog Model AI Ringkas (9 Model Unggulan Default, Expandable ke 54 Model) */}
-          <section className="catalog model-catalog jt-section" id="catalog" ref={catalogRef}>
-            <div className="jt-section-head jt-catalog-head" data-reveal="fade-up">
-              <span className="jt-kicker">KATALOG MODEL AI · {models.length} MODEL TERKURASI</span>
-              <h2>
-                {SHOW_CATALOG_PRICING
-                  ? "Pilih Model AI & Hitung Estimasi Biaya dalam Rupiah"
-                  : "Satu API Key untuk Seluruh Model AI Terkemuka"}
-              </h2>
-              <p>
-                Klik kartu model (misal <strong>Claude Opus 5.5</strong>, <strong>GPT-6 Sol</strong>, atau{" "}
-                <strong>Gemini 4 Argon</strong>) untuk melihat spesifikasi endpoint dan langsung mengajukan deposit saldo di Portal Akun.
-              </p>
+          <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
+            {/* Catalog Section Header Card (Desain Asli Dipertahankan) */}
+            <div className="dps-banner-card" data-reveal="scale">
+              {/* Left Column: Heading & Primary Action */}
+              <div className="dps-banner-left">
+                <div className="dps-pill-header">
+                  <span className="dps-pill-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+                  </span>
+                  <span className="dps-pill-title">Katalog Lengkap Model AI</span>
+                  <span className="dps-pill-badge green">{models.length} MODEL</span>
+                  <span className="dps-pill-sub">1 API Key Universal</span>
+                </div>
+
+                <h2 className="dps-banner-title">
+                  {SHOW_CATALOG_PRICING ? (
+                    <>
+                      Pilih model, lihat seberapa jauh{" "}
+                      <span className="hero-gradient-text">Rp10.000</span> Anda.
+                    </>
+                  ) : (
+                    <>
+                      Temukan model AI tepat untuk{" "}
+                      <span className="hero-gradient-text">setiap tugas.</span>
+                    </>
+                  )}
+                </h2>
+
+                <p className="dps-banner-desc">
+                  {SHOW_CATALOG_PRICING
+                    ? "Satu API key untuk seluruh model terbaik dunia (Claude 3.7, GPT-4o, Gemini 2.0, DeepSeek R1). Harga dihitung langsung dari kurs resmi Bank Indonesia tanpa markup — hanya bayar token riil yang Anda gunakan."
+                    : "Bandingkan kapabilitas, fokus keahlian (Ngoding, Riset, Chat Hemat, hingga Gambar), dan protokol endpoint dari OpenAI, Anthropic, Google, DeepSeek, Qwen, dan puluhan model lainnya dalam satu gerbang terpadu."}
+                </p>
+
+                <div className="dps-action-row">
+                  <button
+                    type="button"
+                    className="dps-btn-primary"
+                    onClick={() => {
+                      searchInputRef.current?.focus();
+                      const el = document.getElementById("search");
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }}
+                  >
+                    <span>Jelajahi &amp; Cari Model</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </button>
+                  <span className="dps-meta-text">
+                    <span>Claude Code</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Cursor</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Chatbox</span>
+                    <span className="dps-meta-dot">·</span>
+                    <span>Web SDK</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Column: Comparison Stack */}
+              <div className="dps-banner-right">
+                {SHOW_CATALOG_PRICING ? (
+                  <>
+                    <div className="dps-compare-card">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot gray" aria-hidden="true" />
+                        <span>API GATEWAY BIASA</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Tarif USD fluktuatif, kena biaya konversi bank 3–5%, dan harus deposit minimal $5–$20 terpisah di tiap provider.
+                      </p>
+                    </div>
+
+                    <div className="dps-compare-card highlight">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot blue" aria-hidden="true" />
+                        <span>JURAGAN TOKEN GATEWAY</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Tarif Rupiah transparan. Rp 10.000 cukup untuk puluhan hingga ratusan jawaban cerdas, terpotong presisi per token tanpa deposit besar.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="dps-compare-card">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot gray" aria-hidden="true" />
+                        <span>INTEGRASI TERPISAH</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Mengelola banyak SDK, endpoint, dan kunci akses berbeda untuk OpenAI, Anthropic, Google, dan model terbuka lainnya.
+                      </p>
+                    </div>
+
+                    <div className="dps-compare-card highlight">
+                      <div className="dps-card-kicker">
+                        <span className="dps-card-dot blue" aria-hidden="true" />
+                        <span>JURAGANTOKEN GATEWAY</span>
+                      </div>
+                      <p className="dps-card-body">
+                        Satu endpoint OpenAI-compatible untuk memanggil Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, hingga Qwen secara fleksibel.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Unified Catalog Control Toolbar (Clean, Executive, Anti-Slop) */}

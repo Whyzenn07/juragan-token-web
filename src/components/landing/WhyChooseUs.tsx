@@ -33,16 +33,20 @@ export function WhyChooseUs() {
   return (
     <section className="jt-section" id="kenapa-kami" aria-labelledby="why-heading">
       <div className="jt-section-head" data-reveal="fade-up">
-        <span className="jt-kicker">KOMPARASI GATEWAY ENTERPRISE</span>
-        <h2 id="why-heading">Mengapa Perusahaan &amp; Tim IT Memilih Juragantoken</h2>
+        <span className="jt-kicker">KENAPA MEMILIH JURAGANTOKEN</span>
+        <h2 id="why-heading">Menjembatani Kebutuhan Teknis &amp; Efisiensi Operasional</h2>
         <p>
-          Evaluasi objektif antara mendaftar langsung ke tiap vendor asing, menggunakan agregator global umum, dan
-          memakai Juragantoken Gateway di bawah naungan <strong>PT Rejeki Digital Cemerlang</strong>.
+          Dibangun untuk tim developer, agensi, akademisi, dan perusahaan di Indonesia yang membutuhkan akses lintas
+          model LLM secara cepat, terstruktur, dan mudah dikendalikan.
         </p>
       </div>
 
-      {/* Neutral Category Comparison Table (Desktop table -> Mobile Flexbox Cards) */}
+      {/* Neutral Category Comparison Table (no third-party competitor names) */}
       <div className="jt-compare-wrap" data-reveal="scale">
+        <div className="jt-compare-head">
+          <h3>Perbandingan Pendekatan Integrasi</h3>
+          <span>Evaluasi objektif antara daftar ke tiap vendor, agregator global umum, dan Juragantoken</span>
+        </div>
         <div className="jt-compare-scroll">
           <table className="jt-compare-table">
             <thead>
@@ -56,14 +60,10 @@ export function WhyChooseUs() {
             <tbody>
               {NEUTRAL_COMPARE_ROWS.map((row) => (
                 <tr key={row.aspect}>
-                  <td className="jt-aspect-cell" data-label="Aspek Operasional">
-                    {row.aspect}
-                  </td>
-                  <td data-label="Daftar Langsung per Vendor">{row.directVendor}</td>
-                  <td data-label="Platform Agregator Umum">{row.genericAggregator}</td>
-                  <td className="jt-col-highlight" data-label="Juragantoken Gateway">
-                    {row.juragan}
-                  </td>
+                  <td className="jt-aspect-cell">{row.aspect}</td>
+                  <td>{row.directVendor}</td>
+                  <td>{row.genericAggregator}</td>
+                  <td className="jt-col-highlight">{row.juragan}</td>
                 </tr>
               ))}
             </tbody>

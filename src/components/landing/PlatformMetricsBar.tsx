@@ -5,28 +5,28 @@ import Link from "next/link";
 const METRIC_ITEMS = [
   {
     value: "100+",
-    label: "Model AI Frontier",
-    detail: "54 model kurasi utama dalam 1 API Key universal.",
+    label: "Model AI di Gateway",
+    detail: "54 model kurasi utama di web & 100+ pilihan aktif di model picker.",
     accent: "royal",
   },
   {
-    value: "10+",
+    value: "10",
     label: "Provider Global & Asia",
-    detail: "Claude, OpenAI, Gemini, DeepSeek, Qwen, Grok & lainnya.",
+    detail: "OpenAI, Anthropic, Google, DeepSeek, Qwen, Grok, Kimi, MiniMax, Seed & GLM.",
     accent: "navy",
   },
   {
     value: "99.98%",
-    label: "SLA & Pemantauan Live",
-    detail: "Routing stabil dengan status operasional real-time.",
+    label: "Target SLA Uptime",
+    detail: "Arsitektur routing stabil dengan pemantauan latensi dan status operasional live.",
     accent: "emerald",
     href: "/status",
-    linkLabel: "Live ↗",
+    linkLabel: "Cek Status Live ↗",
   },
   {
-    value: "PT Lokal",
-    label: "Legalitas & Zero-Training",
-    detail: "PT Rejeki Digital Cemerlang · Faktur Pajak & TLS 1.3.",
+    value: "TLS 1.3",
+    label: "Privasi & Zero-Training",
+    detail: "Autentikasi hash SHA-256 terenkripsi penuh tanpa menyimpan isi percakapan.",
     accent: "navy",
   },
 ] as const;
@@ -43,7 +43,7 @@ export function PlatformMetricsBar() {
             key={item.label}
             className="jt-metric-card"
             data-reveal="fade-up"
-            data-delay={idx * 50}
+            data-delay={idx * 60}
           >
             <div className="jt-metric-top">
               <strong className={`jt-metric-value is-${item.accent}`}>{item.value}</strong>
