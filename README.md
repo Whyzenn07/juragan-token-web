@@ -87,7 +87,7 @@
 juragan-token-web/
 ├── docs/                                # Spesifikasi Teknis, Handover, & Audit Keamanan
 │   ├── ARCHITECTURE.md                  # System design, algoritma metering, & DDL database
-│   ├── DEV_HANDOVER.md                  # Panduan handover 2 kredensial (Payment & LLM Key)
+│   ├── DEV_HANDOVER.md                  # Panduan handover untuk tim developer tokotokenai & payment
 │   ├── PRD_JURAGAN_TOKEN.md             # Product Requirement Document (v2.4.0)
 │   └── audits/                          # Laporan audit keamanan & QA
 ├── public/                              # Aset Statis Publik
@@ -99,32 +99,47 @@ juragan-token-web/
 ├── scripts/                             # Utilitas Developer & Pengujian
 │   ├── make-badge.cjs                   # Generator PNG badge email identik PaymentSuccessMark
 │   ├── security-audit.cjs               # Uji deteksi kebocoran secret di HTML & JS chunks
-│   └── test-errors.cjs                  # Suite 13 pengujian validasi & keamanan endpoint
+│   └── test-errors.cjs                  # Suite pengujian validasi & keamanan endpoint
 ├── src/
-│   ├── app/                             # Next.js App Router (Pages & API Routes)
-│   │   ├── api/
-│   │   │   ├── keys/check/              # POST: Cek saldo IDR, status, & 10 usage_logs terakhir
-│   │   │   ├── models/sync/             # GET: Sinkronisasi kurs USD/IDR & katalog model
-│   │   │   ├── orders/                  # POST: Buat order checkout & adapter gateway
-│   │   │   │   └── [id]/                # GET: Polling status order (+ /confirm untuk admin/demo)
-│   │   │   ├── supabase/status/         # GET/POST: Health check 4 pilar & sync DB
-│   │   │   ├── test-email/              # GET: Diagnostic SMTP email (terproteksi ADMIN_SECRET)
-│   │   │   ├── webhooks/payment/        # POST: Webhook Tripay, Midtrans, Xendit (fail-closed)
-│   │   │   └── v1/                      # OpenAI-Compatible AI Gateway (/chat/completions, /models)
+│   ├── app/                             # Next.js 16 App Router (Pages & API Routes)
+│   │   ├── admin/                       # Panel Admin B2B & Manajemen Order
+│   │   ├── dashboard/                   # Portal Pengguna Gmail Terintegrasi
 │   │   ├── docs/                        # Dokumentasi integrasi & interactive tester
 │   │   ├── status/                      # Halaman status kesiapan 4 pilar sistem
+│   │   ├── login/ & signup/             # Halaman Autentikasi Pengguna & Admin
 │   │   ├── privacy/ & terms/            # Kebijakan Privasi & Syarat Ketentuan
+│   │   ├── api/
+│   │   │   ├── v1/                      # AI Gateway (/chat/completions, /models, /messages)
+│   │   │   ├── v1beta/                  # Gemini Native Gateway (/models/[...slug])
+│   │   │   ├── orders/                  # POST: Buat order checkout & adapter gateway
+│   │   │   │   └── [id]/                # GET: Polling status (+ /confirm untuk approval/demo)
+│   │   │   ├── webhooks/payment/        # POST: Webhook Tripay, Midtrans, Xendit, Manual
+│   │   │   ├── auth/                    # Login, signup, me, logout, callback Google OAuth
+│   │   │   ├── admin/                   # REST endpoint panel admin (overview, orders, keys, users)
+│   │   │   ├── keys/check/              # POST: Cek saldo IDR, status, & 10 usage_logs terakhir
+│   │   │   ├── models/sync/             # GET: Sinkronisasi kurs USD/IDR & katalog model
+│   │   │   ├── supabase/status/         # GET/POST: Health check 4 pilar & sync DB
+│   │   │   └── test-email/              # GET: Diagnostic SMTP email (terproteksi ADMIN_SECRET)
+│   │   ├── components/                  # Compatibility re-exports bridge
 │   │   ├── globals.css                  # Design system & responsive styles
 │   │   ├── layout.tsx                   # Root layout + widget FloatingWhatsApp
 │   │   └── page.tsx                     # Landing page katalog & checkout utama
-│   ├── components/                      # Komponen UI terstruktur (modals, sections, ui)
+│   ├── components/                      # Komponen UI Terstruktur Modular
+│   │   ├── auth/                        # AuthCard (Login & Sign Up)
+│   │   ├── landing/                     # Komponen halaman landing (HeroOrbit, ModelShowcase, dll)
+│   │   ├── modals/                      # PaymentModal, ModelDetailModal, TokenBalanceModal, Dialog
+│   │   ├── portal/                      # InvoiceDocument, ProofUploadDropzone
+│   │   ├── sections/                    # SetupGuides, SavingsCalculator
+│   │   └── ui/                          # ProviderLogo, Icon, PaymentSuccessMark, RegionBadge
 │   ├── data/                            # Katalog 66 model AI, paket ritel, & channel bayar
-│   ├── lib/                             # Gateway, keys, orders, payment-gateway, receipt-email, supabase-sync
+│   ├── lib/                             # Gateway, keys, orders, payment-gateway, receipt-email, supabase-sync, auth, admin-service
 │   └── types/                           # Definisi TypeScript interfaces
-├── supabase/                            # Migrasi SQL, setup_all.sql, & seed data
+├── supabase/                            # Skema Database & Migrasi PostgreSQL
+│   ├── setup_all.sql                    # Master 1-Click Setup Script untuk Supabase SQL Editor
+│   └── migrations/                      # 7 file migrasi bertahap
 ├── .env.example                         # Template variabel environment siap handover
 ├── DESIGN.md                            # Pedoman desain visual & token warna
-├── package.json                         # Dependensi & npm scripts (v2.3.0)
+├── package.json                         # Dependensi & npm scripts (Next.js 16.4.6)
 └── README.md                            # Dokumentasi utama repositori
 ```
 
