@@ -292,7 +292,8 @@ export async function POST(req: NextRequest) {
     }
   };
 
-  let { provider, targetModel } = resolveUpstreamModel(requestedModel);
+  const { provider, targetModel: resolvedTargetModel } = resolveUpstreamModel(requestedModel);
+  let targetModel = resolvedTargetModel;
 
   // 4. Siapkan Upstream URL & Authorization
   let upstreamUrl = "";
@@ -327,29 +328,20 @@ export async function POST(req: NextRequest) {
       "";
 
     if (!engineKey) {
-      const geminiKey = process.env.GEMINI_API_KEY?.trim();
-      if (geminiKey) {
-        // Fallback aman ke Gemini Resilience tanpa mengirim rahasia/token ke endpoint upstream
-        provider = "gemini";
-        upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-        upstreamAuthHeader = `Bearer ${geminiKey}`;
-      } else {
-        freeSlot();
-        return NextResponse.json(
-          {
-            error: {
-              message: "Master API Key LLM (UPSTREAM_ENGINE_KEY) belum dikonfigurasi oleh tim developer.",
-              type: "server_configuration_error",
-              code: "missing_upstream_engine_key",
-            },
+      freeSlot();
+      return NextResponse.json(
+        {
+          error: {
+            message: "Master API Key LLM (UPSTREAM_ENGINE_KEY) belum dikonfigurasi oleh tim developer.",
+            type: "server_configuration_error",
+            code: "missing_upstream_engine_key",
           },
-          { status: 503, headers: CORS_HEADERS }
-        );
-      }
-    } else {
-      upstreamUrl = `${engineStatus.engineUrl}/chat/completions`;
-      upstreamAuthHeader = `Bearer ${engineKey}`;
+        },
+        { status: 503, headers: CORS_HEADERS }
+      );
     }
+    upstreamUrl = `${engineStatus.engineUrl}/chat/completions`;
+    upstreamAuthHeader = `Bearer ${engineKey}`;
   }
 
   // 5. Buat Payload yang Diteruskan & Multi-Tier Resilience Engine
@@ -468,26 +460,8 @@ export async function POST(req: NextRequest) {
           body: JSON.stringify(upstreamPayload),
         });
       } catch (engineErr: any) {
-        console.warn("[GATEWAY NOTICE] Central engine offline, auto-falling back to Gemini:", engineErr?.message);
+        console.warn("[GATEWAY NOTICE] Central engine offline:", engineErr?.message);
         upstreamRes = null;
-      }
-
-      // Jika Central Engine offline / belum ada DNS, otomatis failover ke Gemini dengan multi-tier resilience
-      if (!upstreamRes || !upstreamRes.ok) {
-        const geminiKey = process.env.GEMINI_API_KEY?.trim();
-        if (geminiKey) {
-          console.warn(`[GATEWAY GRACEFUL FALLBACK] Mengalihkan ke Google Gemini Resilience Engine...`);
-          upstreamUrl = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-          provider = "gemini";
-          const result = await fetchWithGeminiResilience(
-            upstreamUrl,
-            geminiKey,
-            upstreamPayload,
-            requestedModel
-          );
-          upstreamRes = result.res;
-          targetModel = result.modelUsed;
-        }
       }
     } else {
       const geminiKey = process.env.GEMINI_API_KEY?.trim() || "";

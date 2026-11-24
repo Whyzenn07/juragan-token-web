@@ -60,7 +60,7 @@ export function getPaymentGatewayStatus(): PaymentGatewayStatus {
   const demoEnv = (process.env.DEMO_MODE ?? process.env.NEXT_PUBLIC_DEMO_MODE ?? "true").toLowerCase();
   const demoMode = demoEnv === "true" || !isLiveConfigured;
   const sandbox = (process.env.PAYMENT_GATEWAY_SANDBOX || "false").toLowerCase() === "true";
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://juragan-token-web-retail-git-main-whyzenn07s-projects.vercel.app").replace(/\/+$/, "");
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.juragantoken.co.id").replace(/\/+$/, "");
 
   return {
     provider,
