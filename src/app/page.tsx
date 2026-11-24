@@ -11,14 +11,11 @@ import {
   Icon,
   LogoMarquee,
   ModelDetailModal,
-  ModelExpertiseShowcase,
   PlatformMetricsBar,
   PreFooterCta,
   ProviderLogo,
-  SetupGuides,
   PaymentModal,
   TokenBalanceModal,
-  UseCasesGrid,
   WhyChooseUs
 } from "@/components";
 import {
@@ -50,6 +47,19 @@ import {
 } from "@/data/catalog";
 
 type SortOption = "featured" | "provider" | "name" | "cheapest" | "priciest";
+
+const DEFAULT_VISIBLE_MODELS = 9;
+const FLAGSHIP_MODEL_IDS = [
+  "claude-opus-5-5",
+  "claude-sonnet-5-5",
+  "chatgpt-6-astra",
+  "gpt-6-sol",
+  "gemini-4-argon",
+  "gemini-3.8-flash",
+  "deepseek-v4-pro",
+  "qwen3.7-max",
+  "grok-4",
+];
 
 const formatIdr = (val: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
@@ -232,6 +242,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [viewSavedOnly, setViewSavedOnly] = useState(false);
+  const [catalogExpanded, setCatalogExpanded] = useState(false);
   const [authUser, setAuthUser] = useState<{ email: string; fullName: string; role: "user" | "admin" } | null>(null);
 
   useEffect(() => {
@@ -266,23 +277,21 @@ export default function Home() {
   const catalogRef = useRef<HTMLElement>(null);
 
   const NAV_ITEMS = [
-    { id: "expertise", label: "Solusi", href: "#keahlian-model" },
-    { id: "workflow", label: "Integrasi", href: "#cara-kerja" },
-    { id: "why", label: "Keunggulan", href: "#kenapa-kami" },
-    { id: "setup", label: "Panduan", href: "#panduan-setup" },
+    { id: "enterprise", label: "Solusi B2B", href: "#enterprise-standard" },
+    { id: "workflow", label: "Cara Kerja", href: "#cara-kerja" },
+    { id: "catalog", label: "Katalog", href: "#catalog" },
     { id: "faq", label: "FAQ", href: "#faq" },
   ] as const;
 
-  const [activeSection, setActiveSection] = useState<string>("expertise");
+  const [activeSection, setActiveSection] = useState<string>("enterprise");
 
   // Scroll spy to sync activeSection with visible viewport section
   useEffect(() => {
-    const sectionIds = ["keahlian-model", "cara-kerja", "kenapa-kami", "panduan-setup", "faq"];
+    const sectionIds = ["enterprise-standard", "cara-kerja", "catalog", "faq"];
     const sectionMap: Record<string, string> = {
-      "keahlian-model": "expertise",
+      "enterprise-standard": "enterprise",
       "cara-kerja": "workflow",
-      "kenapa-kami": "why",
-      "panduan-setup": "setup",
+      catalog: "catalog",
       faq: "faq",
     };
 
@@ -395,12 +404,32 @@ export default function Home() {
     return list;
   }, [models, activeCategory, selectedProvider, searchQuery, sortOption, savedIds, viewSavedOnly]);
 
-  // Kunci ini memicu animasi masuk kartu saat filter berganti, tapi tidak di setiap ketikan pencarian.
-  const gridKey = `${activeCategory}-${selectedProvider}-${sortOption}-${viewSavedOnly ? "saved" : "all"}`;
+  const hasActiveFilter = Boolean(
+    searchQuery.trim() || selectedProvider !== "all" || activeCategory !== "Semua" || viewSavedOnly
+  );
+
+  // Kunci ini memicu animasi masuk kartu saat filter/ekspansi berganti, tapi tidak di setiap ketikan pencarian.
+  const gridKey = `${activeCategory}-${selectedProvider}-${sortOption}-${viewSavedOnly ? "saved" : "all"}-${catalogExpanded ? "exp" : "top9"}`;
   const { isScrolled } = useScrollEffects(gridKey);
 
-  // Tampilkan seluruh model terkurasi di grid agar simetris penuh 3 kolom tanpa slot kosong
-  const displayedModels = filteredModels;
+  // Mode Company Profile ringkas: tampilkan 9 model unggulan secara default, atau tampilkan seluruh hasil saat filter/expand aktif
+  const displayedModels = useMemo(() => {
+    if (catalogExpanded || hasActiveFilter) return filteredModels;
+    const byId = new Map(filteredModels.map((m) => [m.id, m]));
+    const picked = FLAGSHIP_MODEL_IDS.map((id) => byId.get(id)).filter(
+      (m): m is ModelItem => Boolean(m)
+    );
+    if (picked.length >= DEFAULT_VISIBLE_MODELS) return picked.slice(0, DEFAULT_VISIBLE_MODELS);
+    const pickedIds = new Set(picked.map((m) => m.id));
+    for (const m of filteredModels) {
+      if (picked.length >= DEFAULT_VISIBLE_MODELS) break;
+      if (!pickedIds.has(m.id)) {
+        picked.push(m);
+        pickedIds.add(m.id);
+      }
+    }
+    return picked;
+  }, [filteredModels, catalogExpanded, hasActiveFilter]);
 
   return (
     <div className="site-canvas">
@@ -452,17 +481,9 @@ export default function Home() {
           </nav>
 
           <div className="jt-pill-actions">
-            <a
-              href="#catalog"
-              className="jt-pill-util-link"
-              onClick={(e) => {
-                e.preventDefault();
-                setViewSavedOnly(false);
-                scrollToCatalog();
-              }}
-            >
-              Katalog Model
-            </a>
+            <Link href="/docs" className="jt-pill-util-link">
+              Docs
+            </Link>
             <button
               type="button"
               className="jt-pill-util-link"
@@ -514,11 +535,11 @@ export default function Home() {
       {mobileMenuOpen && (
         <div className="mobile-nav-drawer" role="dialog" aria-label="Menu navigasi mobile">
           <nav className="mobile-nav-links">
-            <a href="#keahlian-model" onClick={() => setMobileMenuOpen(false)}>
-              Solusi &amp; Keahlian AI
+            <a href="#enterprise-standard" onClick={() => setMobileMenuOpen(false)}>
+              Solusi Enterprise &amp; Standard
             </a>
             <a href="#cara-kerja" onClick={() => setMobileMenuOpen(false)}>
-              Integrasi Gateway
+              Cara Kerja Gateway
             </a>
             <a
               href="#catalog"
@@ -527,7 +548,7 @@ export default function Home() {
                 setMobileMenuOpen(false);
               }}
             >
-              Katalog Semua Model ({models.length})
+              Katalog Model AI ({models.length})
             </a>
             {ENABLE_CHECKOUT && (
               <a href="#katalog-retail" onClick={() => setMobileMenuOpen(false)}>
@@ -535,7 +556,7 @@ export default function Home() {
               </a>
             )}
             <a href="#kenapa-kami" onClick={() => setMobileMenuOpen(false)}>
-              Keunggulan Kami
+              Komparasi Enterprise
             </a>
             <button
               type="button"
@@ -545,7 +566,7 @@ export default function Home() {
                 setBalanceModalOpen(true);
               }}
             >
-              <span>🔑 Cek Saldo Virtual Key</span>
+              <span>Cek Saldo Virtual Key</span>
               <span aria-hidden="true">↗</span>
             </button>
             <Link href="/docs" onClick={() => setMobileMenuOpen(false)}>
@@ -555,10 +576,10 @@ export default function Home() {
               Status Sistem (Live) ↗
             </Link>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)}>
-              Bantuan &amp; FAQ
+              Pertanyaan Umum (FAQ)
             </a>
           </nav>
-          <div className="mobile-drawer-footer" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+          <div className="mobile-drawer-footer jt-mobile-drawer-actions">
             {authUser ? (
               <>
                 <Link
@@ -605,148 +626,35 @@ export default function Home() {
       {/* 3. Main Content Container - Full Width Company Profile Layout */}
       <div className="company-container">
         <main className="company-main">
-          {/* Hero Section (Gaya bersih sesuai referensi gambar 1 + sinkron PRD/PDF) */}
+          {/* 1. Hero Section */}
           <HeroOrbit
             onExploreCatalog={scrollToCatalog}
             onSelectModel={handleOpenDetail}
           />
 
-          {/* Ringkasan Kapabilitas & Metrik Infrastruktur Gateway */}
+          {/* 2. Ringkasan Metrik & Logo 10 Provider */}
           <PlatformMetricsBar />
-
-          {/* Animated Moving LLM Showcase (Di bawah Metrik sebagai pembuktian visual 10 Provider) */}
           <LogoMarquee onSelectModel={handleOpenDetail} />
 
-          {/* Model Expertise by Use Case (Coding, Research, Cost Efficiency) */}
-          <ModelExpertiseShowcase
-            onSelectModel={handleOpenDetail}
-            onBrowseCategory={(cat) => {
-              setViewSavedOnly(false);
-              setSelectedProvider("all");
-              setActiveCategory(cat);
-              scrollToCatalog();
-            }}
-          />
+          {/* 3. Solusi Enterprise B2B (PT Rejeki Digital Cemerlang) & Jalur Standard */}
+          <EnterpriseStandardSection />
 
-          {/* Gateway Architecture & How It Works */}
+          {/* 4. Arsitektur & Cara Kerja Gateway */}
           <GatewayFlow />
 
-          {/* 5. Catalog Section: model riil dari gateway api.tokotokenai.com */}
-          <section className="catalog model-catalog" id="catalog" ref={catalogRef}>
-            {/* 5. Catalog Section Header Card */}
-            <div className="dps-banner-card" data-reveal="scale">
-              {/* Left Column: Heading & Primary Action */}
-              <div className="dps-banner-left">
-                <div className="dps-pill-header">
-                  <span className="dps-pill-icon" aria-hidden="true">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                      <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                      <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                      <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                    </svg>
-                  </span>
-                  <span className="dps-pill-title">Katalog Lengkap Model AI</span>
-                  <span className="dps-pill-badge green">{models.length} MODEL</span>
-                  <span className="dps-pill-sub">1 API Key Universal</span>
-                </div>
-
-                <h2 className="dps-banner-title">
-                  {SHOW_CATALOG_PRICING ? (
-                    <>
-                      Pilih model, lihat seberapa jauh{" "}
-                      <span className="hero-gradient-text">Rp10.000</span> Anda.
-                    </>
-                  ) : (
-                    <>
-                      Temukan model AI tepat untuk{" "}
-                      <span className="hero-gradient-text">setiap tugas.</span>
-                    </>
-                  )}
-                </h2>
-
-                <p className="dps-banner-desc">
-                  {SHOW_CATALOG_PRICING
-                    ? "Satu API key untuk seluruh model terbaik dunia (Claude 3.7, GPT-4o, Gemini 2.0, DeepSeek R1). Harga dihitung langsung dari kurs resmi Bank Indonesia tanpa markup — hanya bayar token riil yang Anda gunakan."
-                    : "Bandingkan kapabilitas, fokus keahlian (Ngoding, Riset, Chat Hemat, hingga Gambar), dan protokol endpoint dari OpenAI, Anthropic, Google, DeepSeek, Qwen, dan puluhan model lainnya dalam satu gerbang terpadu."}
-                </p>
-
-                <div className="dps-action-row">
-                  <button
-                    type="button"
-                    className="dps-btn-primary"
-                    onClick={() => {
-                      searchInputRef.current?.focus();
-                      const el = document.getElementById("search");
-                      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-                    }}
-                  >
-                    <span>Jelajahi &amp; Cari Model</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="11" cy="11" r="8" />
-                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                  </button>
-                  <span className="dps-meta-text">
-                    <span>Claude Code</span>
-                    <span className="dps-meta-dot">·</span>
-                    <span>Cursor</span>
-                    <span className="dps-meta-dot">·</span>
-                    <span>Chatbox</span>
-                    <span className="dps-meta-dot">·</span>
-                    <span>Web SDK</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Column: Comparison Stack */}
-              <div className="dps-banner-right">
-                {SHOW_CATALOG_PRICING ? (
-                  <>
-                    <div className="dps-compare-card">
-                      <div className="dps-card-kicker">
-                        <span className="dps-card-dot gray" aria-hidden="true" />
-                        <span>API GATEWAY BIASA</span>
-                      </div>
-                      <p className="dps-card-body">
-                        Tarif USD fluktuatif, kena biaya konversi bank 3–5%, dan harus deposit minimal $5–$20 terpisah di tiap provider.
-                      </p>
-                    </div>
-
-                    <div className="dps-compare-card highlight">
-                      <div className="dps-card-kicker">
-                        <span className="dps-card-dot blue" aria-hidden="true" />
-                        <span>JURAGAN TOKEN GATEWAY</span>
-                      </div>
-                      <p className="dps-card-body">
-                        Tarif Rupiah transparan. Rp 10.000 cukup untuk puluhan hingga ratusan jawaban cerdas, terpotong presisi per token tanpa deposit besar.
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="dps-compare-card">
-                      <div className="dps-card-kicker">
-                        <span className="dps-card-dot gray" aria-hidden="true" />
-                        <span>INTEGRASI TERPISAH</span>
-                      </div>
-                      <p className="dps-card-body">
-                        Mengelola banyak SDK, endpoint, dan kunci akses berbeda untuk OpenAI, Anthropic, Google, dan model terbuka lainnya.
-                      </p>
-                    </div>
-
-                    <div className="dps-compare-card highlight">
-                      <div className="dps-card-kicker">
-                        <span className="dps-card-dot blue" aria-hidden="true" />
-                        <span>JURAGANTOKEN GATEWAY</span>
-                      </div>
-                      <p className="dps-card-body">
-                        Satu endpoint OpenAI-compatible untuk memanggil Claude Opus 5.5, Chat GPT 6 Astra, Gemini 4 Argon, DeepSeek V4, hingga Qwen secara fleksibel.
-                      </p>
-                    </div>
-                  </>
-                )}
-              </div>
+          {/* 5. Katalog Model AI Ringkas (9 Model Unggulan Default, Expandable ke 54 Model) */}
+          <section className="catalog model-catalog jt-section" id="catalog" ref={catalogRef}>
+            <div className="jt-section-head jt-catalog-head" data-reveal="fade-up">
+              <span className="jt-kicker">KATALOG MODEL AI · {models.length} MODEL TERKURASI</span>
+              <h2>
+                {SHOW_CATALOG_PRICING
+                  ? "Pilih Model AI & Hitung Estimasi Biaya dalam Rupiah"
+                  : "Satu API Key untuk Seluruh Model AI Terkemuka"}
+              </h2>
+              <p>
+                Klik kartu model (misal <strong>Claude Opus 5.5</strong>, <strong>GPT-6 Sol</strong>, atau{" "}
+                <strong>Gemini 4 Argon</strong>) untuk melihat spesifikasi endpoint dan langsung mengajukan deposit saldo di Portal Akun.
+              </p>
             </div>
 
             {/* Unified Catalog Control Toolbar (Clean, Executive, Anti-Slop) */}
@@ -1198,10 +1106,24 @@ export default function Home() {
               )}
             </div>
 
-            {/* Satu CTA Putih terpadu menuju 100+ Model Picker Gateway */}
+            {/* Tombol Expand 54 Model + 100+ Model Picker Gateway */}
             {filteredModels.length > 0 && (
               <div className="catalog-pagination-wrap" data-reveal="fade-up">
                 <div className="cpe-actions-row">
+                  {!hasActiveFilter && filteredModels.length > DEFAULT_VISIBLE_MODELS && (
+                    <button
+                      type="button"
+                      className="cpe-btn-primary"
+                      onClick={() => setCatalogExpanded((prev) => !prev)}
+                    >
+                      <span>
+                        {catalogExpanded
+                          ? `Ringkas ke ${DEFAULT_VISIBLE_MODELS} Model Unggulan`
+                          : `Lihat Semua ${filteredModels.length} Model Terkurasi`}
+                      </span>
+                      <span aria-hidden="true">{catalogExpanded ? "↑" : "↓"}</span>
+                    </button>
+                  )}
                   <a
                     href="https://api.tokotokenai.com/model-picker"
                     target="_blank"
@@ -1428,32 +1350,16 @@ export default function Home() {
           </>
           )}
 
-          {/* 7. Skenario Penerapan Nyata per Segmen Tim */}
-          <UseCasesGrid
-            onSelectCategory={(cat) => {
-              setViewSavedOnly(false);
-              setSelectedProvider("all");
-              setActiveCategory(cat);
-              scrollToCatalog();
-            }}
-          />
-
-          {/* 7B. Sinergi Enterprise (PT Rejeki Digital Cemerlang) & Jalur Standard Fleksibel */}
-          <EnterpriseStandardSection />
-
-          {/* 8. Why Choose Juragantoken & Neutral Integration Comparison */}
+          {/* 6. Tabel Komparasi Enterprise Gateway */}
           <WhyChooseUs />
 
-          {/* 8. Setup Guides Section */}
-          <SetupGuides />
-
-          {/* 9. FAQ Section */}
+          {/* 7. FAQ Ringkas & Tautan Dokumentasi Teknis */}
           <section className="faq-section" id="faq" aria-labelledby="faq-heading">
             <div data-reveal="fade-up">
-              <div className="section-kicker">JURAGANTOKEN</div>
-              <h2 id="faq-heading">Pertanyaan Umum (FAQ)</h2>
+              <div className="section-kicker">PERTANYAAN UMUM</div>
+              <h2 id="faq-heading">Informasi Penting Sebelum Memulai</h2>
               <p className="faq-section-lead">
-                Informasi lengkap mengenai arsitektur gateway, pemilihan model AI sesuai keahlian, kompatibilitas aplikasi, dan keamanan data.
+                Ringkasan cara kerja 1 API Key universal, pembayaran IDR &amp; Faktur Pajak PT, keamanan IP Whitelist, serta panduan integrasi.
               </p>
             </div>
 
@@ -1461,8 +1367,8 @@ export default function Home() {
               <details className="faq-card" open data-reveal="fade-up" data-delay="0">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
-                    <span className="faq-badge">Multi-AI Gateway</span>
-                    <h3 className="faq-question">Apakah 1 Virtual API Key bisa dipakai bergantian untuk Claude, ChatGPT, Gemini, DeepSeek, dan Qwen?</h3>
+                    <span className="faq-badge">1 API Key Universal</span>
+                    <h3 className="faq-question">Apakah 1 Virtual API Key bisa dipakai untuk Claude Opus 5.5, GPT-6, Gemini, DeepSeek, dan Qwen sekaligus?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1470,19 +1376,16 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Bisa! Juragantoken menggunakan arsitektur Unified Multi-AI Gateway.</b>
-                  </p>
-                  <p>
-                    Anda cukup memasang satu Base URL (<code>https://api.tokotokenai.com/v1</code>) dan satu Virtual API Key (<code>jt-live-...</code>). Untuk berpindah dari Claude Opus 5.5 ke Chat GPT 6 Astra, Gemini 4 Argon, atau DeepSeek V4, Anda hanya perlu mengubah nilai parameter <code>model</code> pada request tanpa mengganti SDK maupun konfigurasi autentikasi.
+                    <b>Ya, 1 saldo &amp; 1 API Key berlaku untuk seluruh 100+ model AI.</b> Cukup pasang Base URL (<code>https://api.tokotokenai.com/v1</code>) dan kunci <code>jt-live-...</code>, lalu ganti parameter <code>model</code> kapan saja tanpa mengubah SDK atau membeli paket terpisah per model.
                   </p>
                 </div>
               </details>
 
-              <details className="faq-card" data-reveal="fade-up" data-delay="80">
+              <details className="faq-card" data-reveal="fade-up" data-delay="60">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
-                    <span className="faq-badge">Pemilihan Model</span>
-                    <h3 className="faq-question">Model AI mana yang paling cocok untuk Ngoding, Riset, dan Efisiensi Biaya?</h3>
+                    <span className="faq-badge">Pemesanan &amp; Faktur Pajak</span>
+                    <h3 className="faq-question">Bagaimana cara memesan kredit dalam Rupiah dan apakah tersedia Faktur Pajak PT?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1490,12 +1393,7 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Berikut rekomendasi kurasi berdasarkan beban kerja:</b>
-                  </p>
-                  <p>
-                    • <b>Ngoding &amp; Arsitektur Sistem:</b> Gunakan <b>Claude Opus 5.5</b>, <b>Chat GPT 6 Astra</b>, atau <b>Gemini 4 Argon</b> (serta <b>Claude Sonnet 5.5</b> untuk coding harian).<br />
-                    • <b>Riset &amp; Penalaran Mendalam:</b> Gunakan <b>GPT-6 Sol</b>, <b>GPT-5.6 Terra</b>, <b>GPT-6 Luna</b>, atau <b>DeepSeek V4 Pro</b>.<br />
-                    • <b>Operasional Cepat &amp; Hemat Biaya:</b> Gunakan <b>DeepSeek V4 Flash</b>, <b>DeepSeek V3 Chat</b>, <b>Qwen 3.7 Max</b>, <b>Qwen 3.6 Flash</b>, atau model ekosistem Asia lainnya seperti <b>GLM 5.3 Flash</b> dan <b>Kimi</b>.
+                    Masuk ke <b>Portal Akun (`/dashboard`)</b> atau klik model mana saja di katalog lalu pilih <b>Pesan Kredit</b>. Jalur <b>Standard</b> mendukung QRIS &amp; Transfer Bank lokal, sedangkan <b>Enterprise B2B</b> mendukung Invoice B2B IDR dan Faktur Pajak resmi dari <b>PT Rejeki Digital Cemerlang</b> tanpa kartu kredit luar negeri.
                   </p>
                 </div>
               </details>
@@ -1503,7 +1401,7 @@ export default function Home() {
               <details className="faq-card" data-reveal="fade-up" data-delay="0">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
-                    <span className="faq-badge">Kompatibilitas</span>
+                    <span className="faq-badge">Kompatibilitas IDE &amp; CLI</span>
                     <h3 className="faq-question">Aplikasi dan bahasa pemrograman apa saja yang didukung?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
@@ -1512,19 +1410,16 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>100% kompatibel dengan ekosistem standar OpenAI API &amp; Anthropic CLI.</b>
-                  </p>
-                  <p>
-                    Endpoint Juragantoken bekerja langsung di code editor modern (<b>Cursor IDE, Windsurf, VS Code Cline/Continue</b>), terminal <b>Claude Code CLI</b>, aplikasi desktop/mobile (<b>Chatbox, NextChat</b>), serta SDK resmi <code>openai</code> di Python, Node.js/TypeScript, Go, dan cURL.
+                    Kompatibel penuh dengan <b>Cursor IDE, Windsurf, Claude Code CLI, VS Code Continue/Cline, Chatbox</b>, serta SDK <code>openai</code> di Python, Node.js/TypeScript, Go, dan cURL untuk Windows, macOS, dan Linux.
                   </p>
                 </div>
               </details>
 
-              <details className="faq-card" data-reveal="fade-up" data-delay="80">
+              <details className="faq-card" data-reveal="fade-up" data-delay="60">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
-                    <span className="faq-badge">Masa Aktif</span>
-                    <h3 className="faq-question">Apakah kuota pada Virtual API Key memiliki batas kedaluwarsa bulanan?</h3>
+                    <span className="faq-badge">Keamanan &amp; Privasi</span>
+                    <h3 className="faq-question">Bagaimana keamanan Whitelist IP dan perlindungan privasi kode sumber kami?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1532,10 +1427,7 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Tidak ada sistem hangus bulanan.</b>
-                  </p>
-                  <p>
-                    Kuota pada Virtual API Key tetap tersimpan aman dan hanya terpakai ketika aplikasi atau tim Anda mengirimkan request inferensi ke model AI yang dipilih.
+                    <b>Zero-Training &amp; IP Whitelist Enterprise.</b> Kunci di-hash satu arah SHA-256, trafik terenkripsi TLS 1.3 tanpa menyimpan isi prompt, dan tim IT Enterprise dapat membatasi penggunaan key hanya dari IP kantor atau server produksi.
                   </p>
                 </div>
               </details>
@@ -1543,8 +1435,8 @@ export default function Home() {
               <details className="faq-card" data-reveal="fade-up" data-delay="0">
                 <summary className="faq-summary">
                   <div className="faq-summary-content">
-                    <span className="faq-badge">Monitoring</span>
-                    <h3 className="faq-question">Bagaimana cara memantau status kunci dan riwayat pemakaian model?</h3>
+                    <span className="faq-badge">Masa Aktif &amp; Monitoring</span>
+                    <h3 className="faq-question">Apakah saldo kredit hangus setiap bulan dan bagaimana memantau sisa saldo?</h3>
                   </div>
                   <span className="faq-chevron" aria-hidden="true">
                     <Icon name="chevron" size={16} />
@@ -1552,44 +1444,21 @@ export default function Home() {
                 </summary>
                 <div className="faq-answer">
                   <p>
-                    <b>Transparan secara real-time.</b>
-                  </p>
-                  <p>
-                    Klik tombol <b>Cek Saldo Key ↗</b> di bagian atas halaman ini dan masukkan kode Virtual API Key Anda (<code>jt-live-...</code>) untuk melihat status aktif serta rincian 10 pemakaian model terakhir secara instan.
-                  </p>
-                </div>
-              </details>
-
-              <details className="faq-card" data-reveal="fade-up" data-delay="80">
-                <summary className="faq-summary">
-                  <div className="faq-summary-content">
-                    <span className="faq-badge">Privasi &amp; Keamanan</span>
-                    <h3 className="faq-question">Bagaimana perlindungan privasi kode sumber dan dokumen riset kami?</h3>
-                  </div>
-                  <span className="faq-chevron" aria-hidden="true">
-                    <Icon name="chevron" size={16} />
-                  </span>
-                </summary>
-                <div className="faq-answer">
-                  <p>
-                    <b>Arsitektur Zero-Knowledge &amp; Zero-Training.</b>
-                  </p>
-                  <p>
-                    Kunci akses disimpan menggunakan hashing satu arah SHA-256 dan seluruh trafik dienkripsi melalui TLS. Gateway hanya meneruskan request inferensi secara langsung tanpa menyimpan isi percakapan atau menggunakan kode Anda untuk melatih model AI.
+                    <b>Tidak hangus bulanan.</b> Saldo hanya berkurang saat ada request inferensi. Anda dapat memantau sisa saldo dan status key kapan saja melalui <b>Portal Akun (`/dashboard`)</b> atau tombol <b>Cek Saldo</b> di navigasi atas.
                   </p>
                 </div>
               </details>
             </div>
 
             <div className="faq-footer-help">
-              <span className="ffh-text">Butuh panduan teknis langkah-demi-langkah memasang token di aplikasi Anda?</span>
-              <a href="#panduan-setup" className="ffh-link">
-                Lihat Panduan Setup Interaktif (Cursor, Claude Code, Chatbox, Python) ↗
-              </a>
+              <span className="ffh-text">Siap menghubungkan API Key ke Cursor, Claude Code CLI, Chatbox, atau Python/Node.js?</span>
+              <Link href="/docs" className="ffh-link">
+                Buka Dokumentasi Integrasi Lengkap (/docs) →
+              </Link>
             </div>
           </section>
 
-          {/* 10. Final CTA Banner Penutup Sebelum Footer */}
+          {/* 8. Final CTA Banner Penutup Sebelum Footer */}
           <PreFooterCta onOpenBalanceModal={() => setBalanceModalOpen(true)} />
 
         </main>
@@ -1635,13 +1504,16 @@ export default function Home() {
               <div className="spf-col-heading">Platform &amp; Model</div>
               <ul className="spf-links">
                 <li>
-                  <a href="#keahlian-model">Rekomendasi Keahlian AI</a>
+                  <a href="#enterprise-standard">Solusi Enterprise &amp; Standard</a>
                 </li>
                 <li>
                   <a href="#cara-kerja">Cara Kerja Gateway</a>
                 </li>
                 <li>
                   <a href="#catalog">Katalog Model AI</a>
+                </li>
+                <li>
+                  <a href="#kenapa-kami">Komparasi Enterprise</a>
                 </li>
                 <li>
                   <button
@@ -1651,9 +1523,6 @@ export default function Home() {
                   >
                     Cek Saldo API Key
                   </button>
-                </li>
-                <li>
-                  <a href="#panduan-setup">Panduan Integrasi Cepat</a>
                 </li>
               </ul>
             </div>

@@ -2,29 +2,6 @@
 
 import { WHATSAPP_DISPLAY } from "@/lib/site-config";
 
-const ADVANTAGES = [
-  {
-    kicker: "01 · Integrasi Standar Industri",
-    title: "Satu Base URL untuk 11+ Provider AI",
-    desc: "Tidak perlu memelihara banyak SDK berbeda. Aplikasi, Cursor IDE, Claude Code, dan skrip Python langsung tersambung ke satu endpoint terpadu.",
-  },
-  {
-    kicker: "02 · Fleksibilitas Model",
-    title: "Bebas Padukan Model Flagship & Hemat",
-    desc: "Gunakan Claude Opus 5.5 atau GPT-6 Astra untuk tugas berat, lalu rute beban harian ke DeepSeek atau Qwen agar efisiensi operasional terjaga.",
-  },
-  {
-    kicker: "03 · Keamanan Zero-Knowledge",
-    title: "Enkripsi Transit TLS & Hashing SHA-256",
-    desc: "Kunci API disimpan dalam bentuk hash satu arah SHA-256 dan gateway meneruskan request langsung tanpa menggunakan prompt Anda untuk melatih model.",
-  },
-  {
-    kicker: "04 · Pendampingan Lokal",
-    title: "Konsultasi & Dukungan Teknis Indonesia",
-    desc: "Tim teknis kami siap membantu setup, pemilihan model paling tepat, dan uji coba langsung via WhatsApp tanpa sistem tiket berbelit.",
-  },
-];
-
 const NEUTRAL_COMPARE_ROWS = [
   {
     aspect: "Entitas Hukum & Kepatuhan",
@@ -56,31 +33,16 @@ export function WhyChooseUs() {
   return (
     <section className="jt-section" id="kenapa-kami" aria-labelledby="why-heading">
       <div className="jt-section-head" data-reveal="fade-up">
-        <span className="jt-kicker">KENAPA MEMILIH JURAGANTOKEN</span>
-        <h2 id="why-heading">Menjembatani Kebutuhan Teknis &amp; Efisiensi Operasional</h2>
+        <span className="jt-kicker">KOMPARASI GATEWAY ENTERPRISE</span>
+        <h2 id="why-heading">Mengapa Perusahaan &amp; Tim IT Memilih Juragantoken</h2>
         <p>
-          Dibangun untuk tim developer, agensi, akademisi, dan perusahaan di Indonesia yang membutuhkan akses lintas
-          model LLM secara cepat, terstruktur, dan mudah dikendalikan.
+          Evaluasi objektif antara mendaftar langsung ke tiap vendor asing, menggunakan agregator global umum, dan
+          memakai Juragantoken Gateway di bawah naungan <strong>PT Rejeki Digital Cemerlang</strong>.
         </p>
       </div>
 
-      {/* 4 Core Real Advantages */}
-      <div className="jt-adv-grid">
-        {ADVANTAGES.map((adv, idx) => (
-          <article key={adv.title} className="jt-adv-card" data-reveal="fade-up" data-delay={idx * 60}>
-            <span className="jt-adv-kicker">{adv.kicker}</span>
-            <h3>{adv.title}</h3>
-            <p>{adv.desc}</p>
-          </article>
-        ))}
-      </div>
-
-      {/* Neutral Category Comparison Table (no third-party competitor names) */}
+      {/* Neutral Category Comparison Table (Desktop table -> Mobile Flexbox Cards) */}
       <div className="jt-compare-wrap" data-reveal="scale">
-        <div className="jt-compare-head">
-          <h3>Perbandingan Pendekatan Integrasi</h3>
-          <span>Evaluasi objektif antara daftar ke tiap vendor, agregator global umum, dan Juragantoken</span>
-        </div>
         <div className="jt-compare-scroll">
           <table className="jt-compare-table">
             <thead>
@@ -94,10 +56,14 @@ export function WhyChooseUs() {
             <tbody>
               {NEUTRAL_COMPARE_ROWS.map((row) => (
                 <tr key={row.aspect}>
-                  <td className="jt-aspect-cell">{row.aspect}</td>
-                  <td>{row.directVendor}</td>
-                  <td>{row.genericAggregator}</td>
-                  <td className="jt-col-highlight">{row.juragan}</td>
+                  <td className="jt-aspect-cell" data-label="Aspek Operasional">
+                    {row.aspect}
+                  </td>
+                  <td data-label="Daftar Langsung per Vendor">{row.directVendor}</td>
+                  <td data-label="Platform Agregator Umum">{row.genericAggregator}</td>
+                  <td className="jt-col-highlight" data-label="Juragantoken Gateway">
+                    {row.juragan}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,37 +1,35 @@
 # Product Requirement Document (PRD): Juragantoken
 
-**Versi Dokumen:** 4.0.0  
-**Status:** Living Document / Company Profile, Enterprise & Standard Gateway, User & Admin Portal  
-**Tanggal Pembaruan:** 20 November 2026  
-**Platform:** Web Application (Next.js 16.4.6 App Router, React 19, TypeScript, Vanilla CSS, Supabase Cloud)  
+**Versi Dokumen:** 4.1.0  
+**Status:** Living Document / Streamlined Company Profile, Enterprise B2B & Standard Gateway, User & Admin Portal  
+**Tanggal Pembaruan:** 24 November 2026  
+**Platform:** Web Application (Next.js 16.4.6 App Router, React 19, TypeScript, Vanilla CSS + Responsive Flexbox, Supabase Cloud)  
 **Entitas Resmi:** PT Rejeki Digital Cemerlang  
 **Domain Utama:** `https://api.tokotokenai.com`  
 **Repository:** `Whyzenn07/juragan-token-web`  
 
 ---
 
-## 1. Ikhtisar Produk (Product Overview)
+## 1. Ikhtisar Produk (Product Overview — Selaras 12 Slide PDF PT Rejeki Digital Cemerlang)
 
-### 1.1 Latar Belakang & Masalah
-Adopsi kecerdasan buatan (Frontier AI: Claude Sonnet 5.5, Claude Opus 5.5, OpenAI GPT-4o, Google Gemini 3.8 Flash, DeepSeek V4, Alibaba Qwen 2.5) kini telah menjadi kebutuhan lintas sektor di Indonesia: mulai dari **pemilik bisnis ritel & UKM** (analisis penjualan, copywriting katalog, otomatisasi CS), **agensi digital & kreator**, hingga **software engineer, periset, dan mahasiswa**. 
+### 1.1 Positioning & 2 Pilar Utama
+**Juragantoken** (`One Gateway. Every Intelligence.`) adalah gerbang utama API AI terpadu di Indonesia yang dikelola resmi oleh **PT Rejeki Digital Cemerlang** untuk menjembatani **kebutuhan teknis tim IT** sekaligus **efisiensi administratif tim Purchasing/Finance**, sambil tetap menyediakan jalur **Standard** yang fleksibel bagi developer dan tim kecil:
 
-Namun, mereka menghadapi hambatan struktural yang signifikan:
-1. **Ketiadaan Kartu Kredit Internasional:** Provider resmi (OpenAI, Anthropic, Google Cloud) mewajibkan kartu kredit Visa/Mastercard internasional dengan otentikasi 3D Secure yang sulit diakses oleh pelaku usaha lokal dan mahasiswa.
-2. **Komitmen Biaya Langganan Bulanan yang Kaku:** Paket resmi $20/bulan (±Rp 330.000 - Rp 350.000 per layanan) terasa memberatkan untuk kebutuhan fleksibel atau eksplorasi awal.
-3. **Masa Berlaku Kedaluwarsa (*Use-It-Or-Lose-It*):** Kredit resmi bulanan hangus jika tidak habis terpakai dalam 30 hari.
-4. **Fragmentasi Kunci API:** Pengembang dan pengguna bisnis harus mengelola banyak akun, kartu kredit, dan dashboard terpisah untuk setiap provider AI.
+1. **Pilar Tim IT (Keunggulan Teknis & Keamanan):**
+   - **1 Universal API Key (`jt-live-...`)** & **1 Base URL (`https://api.tokotokenai.com/v1`)** untuk mengakses 100+ model AI lintas 10+ provider (Anthropic Claude Opus/Sonnet 5.5, OpenAI Chat GPT 6 Astra / GPT-6 Sol, Google Gemini 4 Argon / 3.8 Flash, DeepSeek V4, Alibaba Qwen 3.7, xAI Grok 4, Kimi, MiniMax, GLM, Seed).
+   - **Kontrol Whitelist IP Enterprise (`allowed_ips`):** Membatasi akses API Key hanya dari IP kantor atau server produksi (`403 ip_not_whitelisted_or_inactive` bagi IP tidak dikenal).
+   - **Zero-Training & Zero-Retention Privacy:** Enkripsi TLS 1.3 dan hashing API Key satu arah SHA-256 tanpa menyimpan isi percakapan/kode sumber pengguna.
+2. **Pilar Tim Purchasing & Legal (Kepatuhan & Efisiensi Korporat):**
+   - **Legalitas PT Lokal Resmi (`PT Rejeki Digital Cemerlang`):** Menyediakan Invoice B2B resmi dalam Rupiah (IDR), dukungan **Faktur Pajak & NPWP**, tanpa kartu kredit luar negeri, bebas biaya valas (*cross-border fees*), dan menghapus beban reimbursement karyawan.
+   - **Dukungan Langsung Principal & Keamanan Deposit 100%:** Saldo kredit permanen tanpa kedaluwarsa bulanan, SLA WhatsApp lokal (`0812-2698-3990` pada mode uji), dan jalur infrastruktur *High Availability*.
+3. **Jalur Standard Fleksibel:**
+   - Developer individu, startup tahap awal, dan akademisi dapat mendaftar langsung di `/signup`, memesan kredit IDR mulai Rp 15.000 via QRIS/Transfer Bank di `/dashboard`, dan langsung menerima *Universal API Key* tanpa minimum kontrak besar.
 
-### 1.2 Solusi: Juragan Token
-**Juragan Token** adalah platform marketplace & gateway kredit Multi-AI prabayar lokal pertama di Indonesia yang berfungsi sebagai:
-- **Toko Ritel & Kasir Pembayaran IDR Fleksibel:** Memungkinkan pembelian kredit API mulai dari **Rp 15.000** menggunakan metode pembayaran lokal Indonesia (**QRIS Instan**, Virtual Account & e-Wallet **DANA, ShopeePay, OVO, GoPay, BCA, Mandiri, BRI, BNI**, serta Transfer Bank **BCA, Mandiri, BRI, BNI, BSI**).
-- **Universal OpenAI-Compatible AI Gateway:** Menyediakan **1 Virtual API Key (`jt-live-...`)** dengan Base URL standar (`https://api.tokotokenai.com/v1`) yang dapat langsung dicolokkan ke berbagai *coding tools* dan klien populer (Cursor AI, Windsurf, Claude Code CLI, Chatbox, dan Python SDK).
-- **Siklus Ganda (Dual-Lifecycle): Kunci Baru & Top-Up Kunci Lama:** Pengguna baru menerima kunci API unik, sementara pengguna lama dapat melakukan isi ulang (*top-up*) saldo ke kunci yang sama secara idempoten tanpa perlu mengubah konfigurasi IDE mereka.
-- **Hybrid Upstream Routing Berkecepatan Tinggi:** 
-  1. *Direct Engine:* Permintaan Google Gemini diproses langsung secara lokal ke Google AI Studio (`gemini-3.8-flash`) menggunakan Master Key berkecepatan tinggi.
-  2. *Pass-Through Engine:* Permintaan model frontier berdaya tinggi (Claude Opus 5.5, Claude Sonnet 5.5, GPT-4o, DeepSeek) diteruskan secara aman ke Central Engine di `https://api.tokotokenai.com/v1` (bebas dependensi OpenRouter).
-- **Masa Aktif Token Permanen:** Saldo kredit dalam mata uang rupiah (IDR) berlaku permanen tanpa kedaluwarsa bulanan.
-- **Zero-Retention Prompt Privacy:** Server Juragan Token hanya bertindak sebagai *pass-through proxy*. Tidak ada pencatatan atau penyimpanan teks prompt, dokumen bisnis, maupun respon AI ke database. Hanya metrik token kuantitatif yang dicatat untuk kebutuhan pengurangan saldo.
-- **Dual Persistence & Audit Log:** Setiap transaksi dan pemakaian kredit tersinkronisasi secara *real-time* ke **Supabase Cloud Database** (menggunakan service role key) dengan failover penyimpanan lokal atomik.
+### 1.2 Latar Belakang & Masalah Fragmentasi (Slide 2 PDF)
+Adopsi kecerdasan buatan modern di perusahaan maupun tim developer Indonesia menghadapi 3 hambatan utama:
+1. **Tim IT — Titik Buta Keamanan & Fragmentasi SDK:** Penggunaan API key pihak ketiga yang tersebar tanpa kontrol akses IP serta pemeliharaan banyak SDK/kredensial berbeda per provider.
+2. **Tim Purchasing — Kekacauan Administratif & Reimbursement:** Ratusan transaksi kartu kredit pribadi karyawan dan klaim *petty cash* berulang setiap bulan.
+3. **Legal & Compliance — Risiko Kepatuhan & Biaya Valas:** Pembayaran ke entitas asing tanpa faktur pajak lokal resmi serta beban kurs dan biaya transaksi lintas negara.
 
 ---
 
@@ -494,21 +492,24 @@ Rilis **v4.0.0** menutup siklus penuh *end-to-end* mulai dari pendaftaran penggu
    - **Admin Console Redesign (`src/app/admin/AdminDashboardClient.tsx`):**
      - Tata letak 4 tab sidebar ramping (*Ringkasan*, *Pesanan & Invoice*, *User & API Key*, *Audit Log*) bebas tumpang tindih tabel (`overflow-x` bersih di desktop 1440px dan mobile 390px) serta *FloatingWhatsApp* otomatis disembunyikan di `/admin`.
      - **Signature 760px Slide-Over Drawer:** Memungkinkan Admin memeriksa bukti screenshot transfer beresolusi penuh (*Perbesar Penuh* / *Unduh SS*), memperbarui referensi/SS, meninjau & mencetak `InvoiceDocument` resmi, dan mengeksekusi aksi *Setujui & Terbitkan API Key* tanpa meninggalkan konteks tabel.
-4. **Precision Docs Workbench (`/docs` & `#panduan-setup`):**
+4. **Precision Docs Workbench (`/docs`):**
    - Konfigurasi interaktif berbasis `1 Universal Key` (`jt-live-...`) dengan pengalih OS **macOS / Linux / Windows PowerShell / Windows CMD** yang persisten via `localStorage` (`jt-docs-os`), pemilih model cepat across 10 provider, token & syntax highlighting murni CSS tanpa pustaka berat, serta contoh siap tempel untuk **Claude Code CLI, OpenAI Codex CLI, Cursor IDE, Windsurf IDE, Gemini CLI, Continue.dev, VS Code, Python SDK, Node.js SDK, dan cURL**.
+5. **Pembaruan v4.1.0 — Perampingan Company Profile 8-Blok + Flexbox Mobile Reflow + Self-Service Model Ordering (`/dashboard`):**
+   - **Landing Page 8-Blok Ringkas (`src/app/page.tsx`, `src/app/landing.css`):** Navbar 4 menu (`Solusi B2B`, `Cara Kerja`, `Katalog`, `FAQ`), Hero + Strip Metrik Flexbox + Marquee 10 Provider, Solusi Enterprise B2B (`PT Rejeki Digital Cemerlang`) & Standard dinaikkan ke atas, Cara Kerja Gateway, Katalog 9 Model Unggulan default (*expandable* ke 54 model + 100+ Model Picker), Tabel Komparasi Enterprise (otomatis reflow menjadi kartu Flexbox vertikal di ponsel `<= 768px`), FAQ 5 pertanyaan kunci + link ke `/docs`, serta Pre-Footer CTA tunggal & Footer Global.
+   - **Self-Service Ordering & One-Time Key Reveal (`src/app/dashboard/UserDashboardClient.tsx`, `ModelDetailModal.tsx`):** Tombol langsung dari katalog (`/dashboard?order=1&model=claude-opus-5-5`), pemilih model target + banner *1 Saldo = 100+ Model AI*, kartu tujuan pembayaran resmi **PT Rejeki Digital Cemerlang** (QRIS NMID, BCA, Mandiri, Invoice B2B) di atas upload SS, serta kartu *One-Time Plaintext API Key Reveal* (`.usr-reveal-card`) yang terhapus permanen setelah dikonfirmasi user via `PATCH /api/user/dashboard` (`action: "dismiss_reveal"`).
 
 ---
 
 ## 12. Analisis Kesenjangan Sistem (*Gap Analysis*)
 
-Audit kode sumber dan hasil uji *end-to-end* pada tanggal **20 November 2026** mengidentifikasi kesenjangan nyata antara implementasi saat ini dengan kesiapan produksi skala komersial penuh:
+Audit kode sumber dan hasil uji *end-to-end* pada tanggal **24 November 2026** mengidentifikasi kesenjangan nyata antara implementasi saat ini dengan kesiapan produksi skala komersial penuh:
 
 | Prioritas | Komponen / File Terkait | Kesenjangan yang Ditemukan (Temuan Nyata Codebase) | Dampak | Rekomendasi Penutupan Gap |
 | :---: | :--- | :--- | :--- | :--- |
 | **P0** | `.env.local`, `src/lib/gateway.ts`, `src/lib/site-config.ts`, `src/lib/receipt-email.ts` | Kredensial produksi belum diisi pada environment aktif: `UPSTREAM_ENGINE_KEY` / `GEMINI_API_KEY` belum terset (`awaiting_dev_key`, sehingga inference `POST /v1/chat/completions` mengembalikan `503`), Supabase masih berada di Local JSON fallback (`data/store.json`), `GMAIL_APP_PASSWORD` belum aktif (`simulated` mode), `WHATSAPP_DISPLAY` masih nomor uji `0812-2698-3990`, dan `ENABLE_CHECKOUT` masih `false`. | Gateway belum dapat meneruskan inference LLM riil ke upstream, notifikasi email/DB cloud berjalan dalam mode lokal/simulasi, dan kasir katalog publik belum terbuka. | Pasang `UPSTREAM_ENGINE_KEY`, `GEMINI_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEY`, `GMAIL_USER`, `GMAIL_APP_PASSWORD`, perbarui nomor WhatsApp resmi, dan atur `NEXT_PUBLIC_ENABLE_CHECKOUT` sesuai fase rilis. |
 | **P0** | `src/lib/gateway.ts`, `src/lib/keys.ts` (`rateLimited`) | Rate limiter gateway (`60 RPM` umum, `20 RPM` frontier, max `5` concurrent stream) dan rate limiter endpoint `/api/auth/*` masih memakai `Map` in-memory per proses/isolate Node.js. | Pada deployment serverless multi-instance (Vercel), batas kecepatan tidak sinkron antar node dan ter-reset saat *cold start*. | Migrasikan `rateLimited()` dan pelacakan concurrent stream ke backend terdistribusi seperti **Upstash Redis** (`@upstash/ratelimit`). |
-| **P0** | `src/app/api/v1/` (`chat/completions`, `models`) vs `src/app/docs/DocsClient.tsx`, `src/components/sections/SetupGuides.tsx`, `next.config.ts` | Folder `src/app/api/v1/` saat ini hanya mengimplementasikan `/api/v1/chat/completions/route.ts` dan `/api/v1/models/route.ts` (direwrite lewat `next.config.ts` `/v1/:path*` $\rightarrow$ `/api/v1/:path*`), belum memiliki `/api/v1/messages/route.ts` (*Anthropic native Messages API adapter*). Padahal panduan `/docs` dan `SetupGuides.tsx` mengarahkan Claude Code CLI menggunakan `ANTHROPIC_BASE_URL`. | Pemanggilan native Claude Code CLI langsung ke server Next.js localhost (`/v1/messages`) belum ditangani di gateway lokal kecuali upstream proxy sudah memetakan `/v1/messages`. | Implementasikan `src/app/api/v1/messages/route.ts` yang menerjemahkan skema Anthropic Messages API (termasuk event SSE) ke layer autentikasi, IP whitelist, dan metering `src/lib/gateway.ts`. |
-| **P1** | `src/app/dashboard/UserDashboardClient.tsx` | 1) Modal *"Ajukan Pesanan Kredit API AI"* belum menampilkan **kartu instruksi rekening/QRIS tujuan bayar** secara eksplisit sebelum user mengunggah SS.<br>2) **One-Time Plaintext API Key Reveal** hanya diterima Admin saat klik *Setujui* (dikirim via email atau salin manual Admin), belum memiliki banner/modal satu-kali lihat di `/dashboard`.<br>3) Tabel **riwayat pemakaian token per request (`usageLogs`)** belum ditampilkan di `/dashboard` (baru tersedia via modal publik `/api/keys/check`). | User baru harus bertanya nomor rekening/QRIS secara manual atau menunggu salinan key dari Admin/email, serta belum bisa memantau konsumsi token harian langsung di portal login. | Tambahkan kartu rekening PT & QRIS dinamis/statis di modal order `/dashboard`, mekanisme *one-time ephemeral reveal token* terenkripsi untuk key baru, serta tab/tabel `usageLogs` per akun user. |
+| **P0** | `src/app/api/v1/` (`chat/completions`, `models`) vs `src/app/docs/DocsClient.tsx`, `next.config.ts` | Folder `src/app/api/v1/` saat ini hanya mengimplementasikan `/api/v1/chat/completions/route.ts` dan `/api/v1/models/route.ts` (direwrite lewat `next.config.ts` `/v1/:path*` $\rightarrow$ `/api/v1/:path*`), belum memiliki `/api/v1/messages/route.ts` (*Anthropic native Messages API adapter*). | Pemanggilan native Claude Code CLI langsung ke server Next.js localhost (`/v1/messages`) belum ditangani di gateway lokal kecuali upstream proxy sudah memetakan `/v1/messages`. | Implementasikan `src/app/api/v1/messages/route.ts` yang menerjemahkan skema Anthropic Messages API (termasuk event SSE) ke layer autentikasi, IP whitelist, dan metering `src/lib/gateway.ts`. |
+| **P1** | `src/app/dashboard/UserDashboardClient.tsx` | Kartu tujuan pembayaran resmi & *One-Time Plaintext API Key Reveal* **sudah selesai aktif (v4.1.0)**; item yang tersisa di `/dashboard` adalah tabel **riwayat pemakaian token per request (`usageLogs`)** langsung di dalam portal login (saat ini tersedia via modal publik `/api/keys/check`). | Pengguna yang sudah login belum bisa melihat rincian log pemakaian token harian per request/departemen langsung di tab `/dashboard`. | Tambahkan seksi/tabel `usageLogs` per akun & departemen di `/dashboard` dari `getUserDashboardData()`. |
 | **P1** | `src/app/admin/AdminDashboardClient.tsx` vs `src/app/api/admin/users/route.ts` | Endpoint backend `PATCH /api/admin/users` (`adminUpdateUserRole`) untuk mengubah role `user` $\leftrightarrow$ `admin` sudah tersedia, namun tombol ubah role belum ada di UI tab *User & API Key* (juga belum ada tombol ekspor CSV untuk pesanan/audit log). | Promosi/demosi admin masih harus dipanggil lewat API langsung atau database SQL, dan rekonsiliasi keuangan tim Finance membutuhkan salin manual. | Tambahkan kontrol toggle role (dengan konfirmasi aman) di panel *User & API Key* serta fitur unduh laporan **Export CSV / Rekapitulasi Bulanan**. |
 | **P1** | `src/lib/admin-service.ts` (`POST /api/user/dashboard` vs `POST /api/orders`) & Webhook Pembayaran | Pada pengujian live (`POST /api/user/dashboard`), nominal `baseIdr: 75000` tersimpan bulat sebagai `totalIdr: 75000` (tanpa kode unik 3 digit seperti di alur `POST /api/orders` + webhook Tripay/Midtrans/Xendit). Verifikasi order portal masih bertumpu penuh pada approval manual Admin. | Di volume tinggi tanpa kode unik atau API *Create Transaction* Payment Gateway riil, pencocokan mutasi bank manual rentan antrean. | Terapkan kode unik atau integrasikan langsung **Dynamic QRIS / Virtual Account** Tripay/Midtrans pada `createUserOrderRequest()` sehingga status otomatis berpindah ke `paid` via `/api/webhooks/payment`. |
 | **P2** | `src/app/status/page.tsx`, `src/app/privacy/page.tsx`, `src/app/terms/page.tsx`, `src/components/modals/PaymentModal.tsx` | Masih terdapat konsistensi nama entitas lama dan link jangkar usang: `src/app/status/page.tsx` baris 35 mengarah ke `/#katalog-retail` (bagian yang tersembunyi saat `ENABLE_CHECKOUT = false`) dan baris 20–23 & 46 menyebut `Juragan Token Indonesia`; `privacy/page.tsx` & `terms/page.tsx` memakai `Juragan Token Indonesia`; `PaymentModal.tsx` masih menyebut `PT JURAGAN TOKEN INDONESIA`. | Mengurangi keseragaman branding hukum korporat (**PT Rejeki Digital Cemerlang**) serta memicu dead anchor pada tombol navigasi `/status`. | Seragamkan seluruh teks entitas resmi menjadi **PT Rejeki Digital Cemerlang** dan perbarui tautan `/status` ke `/#keunggulan` atau `/docs`. |
